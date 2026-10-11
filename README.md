@@ -2,7 +2,7 @@
 
 Aplicação web em Python/Streamlit para discutir e ajustar **uma proposta de tema livre**, em até três rodadas. A IA organiza objeções e sugere um texto de compromisso. A decisão pertence aos participantes; o moderador revisa sugestões, publica versões e confirma o encerramento.
 
-Esta implementação parte de `diiegosl/chatbot-ia`, branch `matheus-dev`, commit `85aed29862b28b7324e67742d2e9364996d87abf`. O desenvolvimento para demonstração está em [MRmoratelli/tcc-decisao-coletiva](https://github.com/MRmoratelli/tcc-decisao-coletiva/tree/codex/decisao-coletiva-20261011). A branch original já compartilhava votos em memória com `st.cache_resource` e mantinha histórico de pareceres. Aqui, esses dados passam a ser separados por sala e armazenados em banco, com participantes definidos, controle de versões e regras explícitas de aceitação.
+Esta implementação parte de `diiegosl/chatbot-ia`, branch `matheus-dev`, commit `85aed29862b28b7324e67742d2e9364996d87abf`. O código para demonstração está em [MRmoratelli/tcc-decisao-coletiva](https://github.com/MRmoratelli/tcc-decisao-coletiva), branch `main`. A branch original já compartilhava votos em memória com `st.cache_resource` e mantinha histórico de pareceres. Aqui, esses dados passam a ser separados por sala e armazenados em banco, com participantes definidos, controle de versões e regras explícitas de aceitação.
 
 ## Regras da decisão
 
@@ -61,11 +61,11 @@ Em [share.streamlit.io](https://share.streamlit.io/), crie uma aplicação usand
 | Campo | Valor |
 |---|---|
 | Repository | `MRmoratelli/tcc-decisao-coletiva` |
-| Branch | `codex/decisao-coletiva-20261011` |
+| Branch | `main` |
 | Main file path | `Prototipo TCC.py` |
 | Python version (Advanced settings) | `3.12` |
 
-Se a revisão for integrada a `main`, essa branch também poderá ser usada na implantação. Publicar os arquivos no GitHub é uma etapa separada de criar a aplicação no Streamlit. Confira o guia [Deploy an app](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
+A revisão foi integrada a `main` pelo [PR #1](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/1). Publicar os arquivos no GitHub é uma etapa separada de criar a aplicação no Streamlit. Confira o guia [Deploy an app](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy). A opção **Paste GitHub URL** aceita o [arquivo de entrada em main](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/main/Prototipo%20TCC.py).
 
 Configure em **Advanced settings → Secrets** antes da implantação, em **Settings → Secrets** de uma aplicação existente, ou localmente em `.streamlit/secrets.toml`, sem publicar o arquivo no GitHub:
 
@@ -99,7 +99,7 @@ Os testes de regras cobrem aceitação unânime com ressalvas, ausências, recus
 
 Os testes da interface usam `streamlit.testing.v1.AppTest` para criar sala, usar sessões independentes, manifestar posições, publicar revisão e encerrar. Se Streamlit não estiver instalado, são marcados como não executados. `APP_TESTS_REQUIRED=1` faz a execução falhar nesse caso. O workflow de CI instala as dependências, exige esses testes e repete as regras com PostgreSQL em um serviço temporário.
 
-**Validação local inicial (11/10/2026):** 41 testes de regras e IA simulada passaram em Python 3.12.14/SQLite. Os três testes da interface foram marcados como não executados: Streamlit não estava instalado e a instalação de dependências foi bloqueada pela rede desse ambiente. A verificação de sintaxe passou. Os resultados da execução remota dos testes de interface e PostgreSQL ficam disponíveis em [GitHub Actions](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions). Testes automatizados não validam a qualidade real do Gemini nem substituem o piloto com navegadores e a avaliação do grupo.
+**Validação remota aprovada (11/10/2026):** o commit `11f220bc8c57f39a0c0a73c972e0f48d9f78a70e` passou nos 44 testes com SQLite, incluindo três testes da interface com Streamlit/AppTest, e nos 31 testes de regras também executados com PostgreSQL 16. Consulte a [execução aprovada no GitHub Actions](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/38179742597). Os arquivos foram integrados a `main`. Testes automatizados não validam a qualidade real do Gemini nem substituem o piloto com navegadores e a avaliação do grupo.
 
 Para repetir as regras com um PostgreSQL de teste, configure `TEST_DATABASE_URL` e execute:
 

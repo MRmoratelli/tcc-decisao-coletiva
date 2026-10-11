@@ -1,6 +1,6 @@
 # Aplicar e fechar esta etapa
 
-O código para demonstração está no repositório próprio [MRmoratelli/tcc-decisao-coletiva](https://github.com/MRmoratelli/tcc-decisao-coletiva/tree/codex/decisao-coletiva-20261011), branch `codex/decisao-coletiva-20261011`. A implantação web deve ser configurada no Streamlit para usar essa branch.
+O código para demonstração está no repositório próprio [MRmoratelli/tcc-decisao-coletiva](https://github.com/MRmoratelli/tcc-decisao-coletiva), branch `main`. O [PR #1](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/1) foi integrado após os testes aprovados. A implantação web deve ser configurada no Streamlit para usar `main`.
 
 ## Arquivos
 
@@ -10,11 +10,11 @@ O pacote não contém banco de dados, senhas, chaves de API nem credenciais reai
 
 ## Implantação para mostrar ao grupo
 
-1. Confira o `README.md`, as regras e os resultados em [GitHub Actions](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions). A revisão do código tem destino `main` neste repositório próprio.
-2. Entre em [share.streamlit.io](https://share.streamlit.io/) com sua conta e crie uma aplicação. Use Repository `MRmoratelli/tcc-decisao-coletiva`, Branch `codex/decisao-coletiva-20261011` e Main file path `Prototipo TCC.py`.
+1. Confira o `README.md`, as regras e os resultados em [GitHub Actions](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions).
+2. Entre em [share.streamlit.io](https://share.streamlit.io/) com sua conta e crie uma aplicação. Use Repository `MRmoratelli/tcc-decisao-coletiva`, Branch `main` e Main file path `Prototipo TCC.py`. Como alternativa, use **Paste GitHub URL** e cole `https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/main/Prototipo%20TCC.py`.
 3. Em Advanced settings, selecione Python `3.12` e configure Secrets conforme o exemplo do `README.md`. A IA precisa de `GEMINI_API_KEY`; o fluxo humano também pode ser demonstrado sem chave.
 4. Clique em Deploy. Compartilhe com o grupo o endereço fornecido pelo Streamlit, crie uma sala e distribua credenciais individuais. Confira uma sala em pelo menos dois navegadores/perfis diferentes.
-5. Antes do experimento com dados a preservar, configure PostgreSQL externo e faça o piloto abaixo. Se integrar a revisão em `main`, poderá apontar o app para `main`.
+5. Antes do experimento com dados a preservar, configure PostgreSQL externo e faça o piloto abaixo.
 
 Para executar localmente, instale `requirements.txt` e use `python -m streamlit run "Prototipo TCC.py"`.
 
