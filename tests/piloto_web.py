@@ -20,7 +20,7 @@ from playwright.sync_api import expect, sync_playwright
 
 
 APP_URL = "https://tcc-decisao-coletiva-eoiv3pcb5csadiolmfiios.streamlit.app/"
-SOURCE_COMMIT = "9ca8aa3584364539137a427d2ec918d2579ba7ce"
+SOURCE_COMMIT = "3d1e8a5756b8a19570e8d7caf82b650e344020ed"
 MASKS = []
 REPORT = {
     "kind": "PILOTO_TECNICO_AUTOMATIZADO_NAO_EXPERIMENTO",
