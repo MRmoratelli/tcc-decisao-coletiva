@@ -4,7 +4,9 @@ Não grava screenshots, vídeos, traces nem credenciais em artefatos públicos.
 Cria somente uma sala nova por execução, identificada como teste automatizado.
 """
 import collections
+import csv
 import importlib.metadata
+import io
 import json
 import os
 import re
@@ -108,10 +110,19 @@ def tab(ui, name):
 
 
 def vote(ui, position, argument):
-    ui.get_by_role("radio", name=position, exact=True).check()
+    # Streamlit estiliza o input; o alvo humano do clique é o rótulo.
+    ui.get_by_test_id("stRadio").get_by_text(position, exact=True).click()
+    expect(ui.get_by_role("radio", name=position, exact=True)).to_be_checked()
     ui.get_by_label("Justificativa e ressalvas", exact=True).fill(argument)
     ui.get_by_role("button", name="Salvar manifestação", exact=True).click()
     expect(ui.get_by_test_id("stAlert").filter(has_text="Manifestação salva.").last).to_be_visible(timeout=170000)
+
+
+def check_box(ui, label):
+    control = ui.get_by_role("checkbox", name=label, exact=True)
+    if not control.is_checked():
+        ui.get_by_test_id("stCheckbox").filter(has_text=label).get_by_text(label, exact=True).click()
+    expect(control).to_be_checked()
 
 
 def export(page, ui):
@@ -131,7 +142,7 @@ def cancel_own_test(ui, access):
         label.click()
         ui.get_by_label("Motivo de interrupção antecipada", exact=True).fill(
             "Interrupção do piloto técnico automatizado; dados fictícios, não usar no experimento.")
-        ui.get_by_label("Quero encerrar como cancelada, preservando o histórico.", exact=True).check()
+        check_box(ui, "Quero encerrar como cancelada, preservando o histórico.")
         ui.get_by_role("button", name="Cancelar sessão", exact=True).click()
         expect(ui.get_by_text("Resultado: cancelada", exact=True)).to_be_visible(timeout=10000)
         REPORT["interrupted_test_room"] = "CANCELADA"
@@ -161,7 +172,7 @@ def run():
                 "Faremos uma reunião de teste às 19h, com duração de 30 minutos.")
             mod_ui.get_by_label("Participantes: um nome ou apelido por linha", exact=True).fill(
                 "Piloto 01\nPiloto 02\nPiloto 03")
-            mod_ui.get_by_label("Usar IA para sugerir categorias e revisões", exact=True).check()
+            check_box(mod_ui, "Usar IA para sugerir categorias e revisões")
             mod_ui.get_by_role("button", name="Criar sala e gerar acessos", exact=True).click()
             expect(mod_ui.get_by_role("button", name="Baixar acessos (arquivo confidencial)", exact=True)).to_be_visible(timeout=25000)
             access = download_json(moderator, mod_ui, "Baixar acessos (arquivo confidencial)")
@@ -229,7 +240,7 @@ def run():
             reason = mod_ui.get_by_label("Justificativa da revisão humana", exact=True)
             if reason.is_visible():
                 reason.fill("No piloto fictício, ajustamos o horário e registramos o limite de duração.")
-            mod_ui.get_by_label("Revisei este texto e quero solicitar novas manifestações de todos.", exact=True).check()
+            check_box(mod_ui, "Revisei este texto e quero solicitar novas manifestações de todos.")
             mod_ui.get_by_role("button", name="Publicar nova versão", exact=True).click()
             metric(mod_ui, "Rodada", "2 / 3")
             metric(mod_ui, "Manifestações", "0 / 3")
@@ -243,7 +254,7 @@ def run():
             metric(mod_ui, "Não aceites", "0")
             tab(mod_ui, "Mediação e encerramento")
             mod_ui.get_by_role("button", name="Pausar coleta e revisar", exact=True).click()
-            mod_ui.get_by_label("Conferi as manifestações e confirmo o encerramento desta sala.", exact=True).check()
+            check_box(mod_ui, "Conferi as manifestações e confirmo o encerramento desta sala.")
             mod_ui.get_by_role("button", name="Encerrar com resultado do grupo", exact=True).click()
             expect(mod_ui.get_by_text("Resultado: acordo", exact=True)).to_be_visible(timeout=25000)
             passed("Aceites e ressalva permitiram acordo após conferência do moderador")
@@ -269,14 +280,14 @@ def run():
             csv_text = csv_path.read_text(encoding="utf-8-sig")
             csv_path.unlink(missing_ok=True)
             assert all(value not in csv_text for value in MASKS)
-            assert len(csv_text.splitlines()) == 7
+            assert len(list(csv.DictReader(io.StringIO(csv_text)))) == 6
             passed("CSV foi baixado e contém as seis manifestações do piloto")
             REPORT["functional_flow"] = "APROVADO"
             REPORT["phase"] = "CONCLUIDO"
         except Exception as error:
             REPORT["functional_flow"] = "NAO_CONCLUIDO"
             REPORT["error_type"] = type(error).__name__
-            REPORT["error"] = safe(str(error).splitlines()[0])[:250]
+            REPORT["error"] = safe(str(error))[:2500]
             if mod_ui is not None:
                 cancel_own_test(mod_ui, access)
         finally:
