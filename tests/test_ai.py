@@ -95,7 +95,33 @@ class AIValidationTests(unittest.TestCase):
         self.assertTrue(result["ok"])
         self.assertEqual(result["model"], "second")
         self.assertNotIn("failure_code", result)
+        self.assertNotIn("diagnostics", result.get("details", {}))
         self.assertEqual(len(client.calls), 2)
+
+    def test_invalid_api_key_reason_is_actionable_without_exposing_response(self):
+        error = RuntimeError("DO-NOT-EXPOSE-private-key")
+        error.code = 400
+        error.details = {"error": {"message": "DO-NOT-EXPOSE-private-key", "details": [
+            {"reason": "API_KEY_INVALID", "metadata": {"private": "DO-NOT-EXPOSE-private-key"}}]}}
+        service, _ = self.service([error])
+        result = service.mediate(self.snapshot)
+        self.assertEqual(result["failure_code"], "ACESSO_API")
+        diagnostic = result["details"]["diagnostics"]
+        self.assertEqual(diagnostic["http_status"], 400)
+        self.assertEqual(diagnostic["reason"], "API_KEY_INVALID")
+        self.assertEqual(diagnostic["stage"], "API_CALL")
+        self.assertNotIn("DO-NOT-EXPOSE", json.dumps(result))
+
+    def test_initialization_failure_is_distinguished_without_private_message(self):
+        def broken_factory(**kwargs):
+            raise ImportError("DO-NOT-EXPOSE-initialization-secret")
+        service = AIService("fake-test-key", client_factory=broken_factory)
+        result = service.mediate(self.snapshot)
+        diagnostic = result["details"]["diagnostics"]
+        self.assertEqual(diagnostic["stage"], "CLIENT_INIT")
+        self.assertEqual(diagnostic["error_type"], "ImportError")
+        self.assertIsNone(diagnostic["http_status"])
+        self.assertNotIn("DO-NOT-EXPOSE", json.dumps(result))
 
     def test_approval_comment_can_contain_objection(self):
         service, client = self.service([json.dumps({"has_objection": True, "category": "Acessibilidade"})])

@@ -357,26 +357,19 @@ def room_settings(repo, snapshot, code, token):
 
 
 @st.fragment(run_every="5s")
-def room_view(repo, ai, code, token):
+def live_consensus(repo, code, token, expected_proposal, expected_phase):
+    """Atualiza dados de leitura sem reconstruir os formulários em edição."""
     ok, snapshot = execute(lambda: repo.snapshot(code, token))
     if not ok:
         return
-    room, actor = snapshot["room"], snapshot["actor"]
+    room = snapshot["room"]
     proposal, state = current_proposal(snapshot), consensus(snapshot)
-    notice = st.session_state.pop("notice", None)
-    if notice:
-        st.info(notice)
-    st.subheader(room["theme"])
-    st.caption(f"Sala {code} · {actor.get('alias', 'Moderador')} · {room['state'].lower()} · {'com IA' if room['ai_enabled'] else 'sem IA'}")
-    if room["context"]:
-        with st.expander("Contexto e restrições"):
-            st.text(room["context"])
+    if proposal["id"] != expected_proposal or room["state"] != expected_phase:
+        st.rerun(scope="app")
     a, b, c = st.columns(3)
     a.metric("Rodada", f"{proposal['round']} / 3")
     b.metric("Manifestações", f"{state['responded']} / {state['expected']}")
     c.metric("Não aceites", len(state["rejects"]))
-    st.subheader("Proposta atual")
-    st.text(proposal["text"])
     if room["state"] == "ENCERRADA":
         st.info("Resultado: " + room["result"].replace("_", " ").lower())
         if room["close_reason"]:
@@ -385,6 +378,28 @@ def room_view(repo, ai, code, token):
         st.success("Todos os participantes aceitam esta versão. O moderador pode conferir e encerrar.")
     elif state["missing"]:
         st.caption("Aguardando: " + ", ".join(state["missing"]))
+
+
+def room_view(repo, ai, code, token):
+    ok, snapshot = execute(lambda: repo.snapshot(code, token))
+    if not ok:
+        return
+    room, actor = snapshot["room"], snapshot["actor"]
+    proposal = current_proposal(snapshot)
+    notice = st.session_state.pop("notice", None)
+    if notice:
+        st.info(notice)
+    st.subheader(room["theme"])
+    st.caption(f"Sala {code} · {actor.get('alias', 'Moderador')} · {room['state'].lower()} · {'com IA' if room['ai_enabled'] else 'sem IA'}")
+    if room["context"]:
+        with st.expander("Contexto e restrições"):
+            st.text(room["context"])
+    live_consensus(repo, code, token, proposal["id"], room["state"])
+    if st.button("Atualizar painel", key="refresh_" + room["id"],
+                 help="Carrega os detalhes mais recentes. Envie ou salve os textos em edição antes de atualizar."):
+        st.rerun()
+    st.subheader("Proposta atual")
+    st.text(proposal["text"])
     if room["state"] != "ENCERRADA":
         response_form(repo, ai, snapshot, code, token)
     overview, mediation, history, exports = st.tabs(["Objeções e posições", "Mediação e encerramento", "Versões e histórico", "Exportação"])
@@ -398,7 +413,7 @@ def room_view(repo, ai, code, token):
     with exports:
         export_panel(snapshot)
     room_settings(repo, snapshot, code, token)
-    st.caption("O painel atualiza a cada 5 segundos enquanto a página está aberta. Alterações de proposta exigem novas manifestações.")
+    st.caption("Os indicadores atualizam a cada 5 segundos. Use Atualizar painel para carregar os detalhes mais recentes. Uma mudança de versão ou de etapa é carregada automaticamente.")
 
 
 def main():

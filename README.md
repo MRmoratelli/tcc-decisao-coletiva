@@ -21,7 +21,7 @@ Há no máximo três versões: proposta inicial e duas revisões. Pode haver aco
 
 1. O moderador cria uma sala com tema, contexto, proposta inicial e participantes. A lista aceita de 2 a 30 pessoas; o experimento planejado reúne **3 a 5 pessoas no total**.
 2. Salva as credenciais de acesso. Cada pessoa recebe o mesmo endereço web e código da sala, mas uma credencial individual diferente. A credencial do moderador deve ser guardada separadamente. Ela não tem recuperação automática.
-3. Os participantes entram remotamente e registram ou editam sua posição. O painel lê o banco a cada cinco segundos enquanto está aberto.
+3. Os participantes entram remotamente e registram ou editam sua posição. Os indicadores leem o banco a cada cinco segundos. Os formulários permanecem estáveis durante a edição; **Atualizar painel** carrega os detalhes mais recentes. Mudanças de etapa ou de versão são carregadas automaticamente.
 4. Durante a coleta, o moderador pode corrigir ou agrupar categorias. As categorias são livres e dependem do tema. Nenhuma preocupação é apagada ao aceitar a proposta.
 5. O moderador pausa a coleta. As manifestações ficam congeladas para revisão. Pode reabrir a coleta para completar ou corrigir respostas, gerar sugestão de IA ou escrever uma revisão humana.
 6. Revisa o texto e publica outra versão, ou encerra se a regra de acordo estiver satisfeita. Ao atingir a terceira rodada, pode encerrar com o resultado disponível.
