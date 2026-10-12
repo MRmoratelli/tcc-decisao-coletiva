@@ -5,6 +5,7 @@ Falha da API é registrada como falha. Não produz uma falsa mediação local.
 from __future__ import annotations
 
 import json
+from importlib import metadata
 import time
 
 from decision import NO_OBJECTION, current_proposal, current_responses
@@ -41,6 +42,32 @@ MEDIATION_SCHEMA = {
 }
 
 
+def error_diagnostics(error, stage):
+    """Metadados mínimos; nunca inclui mensagem, corpo da resposta ou credenciais."""
+    try:
+        status = int(getattr(error, "code", 0))
+    except (TypeError, ValueError):
+        status = 0
+    body = getattr(error, "details", None)
+    if isinstance(body, dict):
+        body = body.get("error", body)
+        body = body.get("details", []) if isinstance(body, dict) else []
+    allowed = {
+        "API_KEY_INVALID", "API_KEY_EXPIRED", "API_KEY_SERVICE_BLOCKED",
+        "API_KEY_IP_ADDRESS_BLOCKED", "API_KEY_HTTP_REFERRER_BLOCKED",
+        "SERVICE_DISABLED", "CONSUMER_INVALID", "BILLING_DISABLED",
+    }
+    reason = next((item.get("reason") for item in body
+                   if isinstance(item, dict) and item.get("reason") in allowed), None) if isinstance(body, list) else None
+    try:
+        version = metadata.version("google-genai")
+    except metadata.PackageNotFoundError:
+        version = None
+    return {"stage": stage, "error_type": type(error).__name__,
+            "http_status": status if 100 <= status <= 599 else None,
+            "reason": reason, "sdk_version": version}
+
+
 def failure_code(error):
     code = str(getattr(error, "code", ""))
     if code == "429":
@@ -48,6 +75,8 @@ def failure_code(error):
     if code == "404":
         return "MODELO_INDISPONIVEL"
     if code in ("401", "403"):
+        return "ACESSO_API"
+    if error_diagnostics(error, "ERROR")["reason"] is not None:
         return "ACESSO_API"
     if isinstance(error, (ValueError, TypeError, KeyError)):
         return "RESPOSTA_INVALIDA"
@@ -72,6 +101,7 @@ class AIService:
         if not self.api_key:
             return result | {"failure_code": "SEM_CHAVE", "duration_ms": 0}
         client = None
+        stage = "CLIENT_INIT"
         try:
             factory = self.client_factory
             if factory is None:
@@ -81,20 +111,25 @@ class AIService:
             for model in self.models:
                 result["model"] = model
                 try:
+                    stage = "API_CALL"
                     response = client.models.generate_content(
                         model=model,
                         contents=json.dumps(data, ensure_ascii=False),
                         config={"system_instruction": instruction, "temperature": 0,
                                 "response_mime_type": "application/json", "response_json_schema": schema},
                     )
+                    stage = "RESPONSE_VALIDATION"
                     payload = json.loads(response.text or "")
                     validated = validator(payload)
                     result.pop("failure_code", None)
+                    result.pop("details", None)
                     return result | validated | {"ok": True, "duration_ms": int((time.monotonic() - start) * 1000)}
                 except Exception as error:
                     result["failure_code"] = failure_code(error)
+                    result["details"] = {"diagnostics": error_diagnostics(error, stage)}
         except Exception as error:
             result["failure_code"] = failure_code(error)
+            result["details"] = {"diagnostics": error_diagnostics(error, stage)}
         finally:
             if client is not None:
                 try:
