@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from ai_service import AIService
 from decision import Repository, current_proposal
@@ -53,6 +54,41 @@ class AIValidationTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual(result["failure_code"], "SEM_CHAVE")
         self.assertNotIn("suggested_text", result)
+
+    @patch("ai_service.time.sleep")
+    def test_transient_errors_retry_then_generate_valid_mediation(self, sleep):
+        errors = []
+        for code in (503, 504):
+            error = RuntimeError("private")
+            error.code = code
+            errors.append(error)
+        service, client = self.service(errors + [self.mediation()])
+        result = service.mediate(self.snapshot)
+        self.assertTrue(result["ok"])
+        self.assertEqual(len(client.calls), 3)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [2, 4])
+
+    @patch("ai_service.time.sleep")
+    def test_retry_exhaustion_preserves_failure_and_does_not_invent_suggestion(self, sleep):
+        for code, expected in ((503, "SERVICO_INDISPONIVEL"), (504, "TEMPO_ESGOTADO")):
+            error = RuntimeError("private")
+            error.code = code
+            service, client = self.service([error] * 3)
+            result = service.mediate(self.snapshot)
+            self.assertFalse(result["ok"])
+            self.assertEqual(result["failure_code"], expected)
+            self.assertEqual(len(client.calls), 3)
+            self.assertNotIn("suggested_text", result)
+            self.assertTrue(client.closed)
+
+    @patch("ai_service.time.sleep")
+    def test_invalid_key_is_not_retried(self, sleep):
+        error = RuntimeError("private")
+        error.code = 403
+        service, client = self.service([error])
+        self.assertEqual(service.mediate(self.snapshot)["failure_code"], "ACESSO_API")
+        self.assertEqual(len(client.calls), 1)
+        sleep.assert_not_called()
 
     def test_mediation_sends_pseudonyms_and_exposes_missing_people(self):
         service, client = self.service([self.mediation()])

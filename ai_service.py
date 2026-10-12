@@ -19,6 +19,8 @@ FAILURE_MESSAGES = {
     "MODELO_INDISPONIVEL": "O modelo configurado não está disponível para esta chave.",
     "ACESSO_API": "A API recusou o acesso. Confira a chave e as permissões nas configurações do app.",
     "RESPOSTA_INVALIDA": "A resposta da IA não passou pela validação. Nenhuma proposta foi publicada.",
+    "SERVICO_INDISPONIVEL": "O Gemini continuou indisponível após até três tentativas automáticas. Nenhuma sugestão foi gerada. As manifestações foram preservadas; tente novamente mais tarde.",
+    "TEMPO_ESGOTADO": "O Gemini não respondeu no prazo após até três tentativas automáticas. Nenhuma sugestão foi gerada. As manifestações foram preservadas.",
     "FALHA_IA": "A chamada à IA falhou. As manifestações foram preservadas; a mediação humana está disponível.",
 }
 CLASS_SCHEMA = {
@@ -70,6 +72,10 @@ def error_diagnostics(error, stage):
 
 def failure_code(error):
     code = str(getattr(error, "code", ""))
+    if code in ("500", "502", "503"):
+        return "SERVICO_INDISPONIVEL"
+    if code == "504" or isinstance(error, TimeoutError):
+        return "TEMPO_ESGOTADO"
     if code == "429":
         return "COTA_OU_LIMITE"
     if code == "404":
@@ -95,6 +101,16 @@ class AIService:
         self.models = list(dict.fromkeys(models or [DEFAULT_MODEL]))[:3]
         self.client_factory = client_factory
 
+    def _call_with_retry(self, client, **kwargs):
+        for attempt in range(3):
+            try:
+                return client.models.generate_content(**kwargs)
+            except Exception as error:
+                transient = str(getattr(error, "code", "")) in ("500", "502", "503", "504") or isinstance(error, TimeoutError)
+                if not transient or attempt == 2:
+                    raise
+                time.sleep(2 ** (attempt + 1))
+
     def _generate(self, instruction, data, schema, validator, prompt_version):
         start = time.monotonic()
         result = {"origin": "IA", "ok": False, "prompt_version": prompt_version, "model": None}
@@ -107,12 +123,12 @@ class AIService:
             if factory is None:
                 from google import genai
                 factory = genai.Client
-            client = factory(api_key=self.api_key, http_options={"timeout": 45000, "retry_options": {"attempts": 1}})
+            client = factory(api_key=self.api_key, http_options={"timeout": 60000, "retry_options": {"attempts": 1}})
             for model in self.models:
                 result["model"] = model
                 try:
                     stage = "API_CALL"
-                    response = client.models.generate_content(
+                    response = self._call_with_retry(client,
                         model=model,
                         contents=json.dumps(data, ensure_ascii=False),
                         config={"system_instruction": instruction, "temperature": 0,
