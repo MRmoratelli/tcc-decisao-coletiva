@@ -31,9 +31,9 @@ class AIValidationTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         repo = Repository(sqlite_path=Path(self.tmp.name) / "test.db")
-        access = repo.create_room("Regras de uma equipe", "Tema flex�vel", "Proposta original", ["Nome privado A", "Nome privado B"])
+        access = repo.create_room("Regras de uma equipe", "Tema flexível", "Proposta original", ["Nome privado A", "Nome privado B"])
         proposal = current_proposal(repo.snapshot(access["code"], access["moderator_token"]))["id"]
-        repo.submit_response(access["code"], access["invitations"][0]["token"], proposal, "NAO_ACEITO", "O prazo � curto")
+        repo.submit_response(access["code"], access["invitations"][0]["token"], proposal, "NAO_ACEITO", "O prazo é curto")
         self.snapshot = repo.snapshot(access["code"], access["moderator_token"])
 
     def tearDown(self):
@@ -45,9 +45,9 @@ class AIValidationTests(unittest.TestCase):
         return service, client
 
     def mediation(self, coverage=None):
-        return json.dumps({"summary": "Prazo em discuss�o", "suggested_text": "Ampliar o prazo com acompanhamento",
+        return json.dumps({"summary": "Prazo em discussão", "suggested_text": "Ampliar o prazo com acompanhamento",
                            "coverage": coverage if coverage is not None else [
-                               {"participant": "P01", "treatment": "PARCIAL", "note": "Prazo ampliado; dura��o ainda ser� decidida"}]})
+                               {"participant": "P01", "treatment": "PARCIAL", "note": "Prazo ampliado; duração ainda será decidida"}]})
 
     def test_no_key_is_explicit_failure(self):
         result = AIService().mediate(self.snapshot)
@@ -180,8 +180,8 @@ class AIValidationTests(unittest.TestCase):
     def test_prompt_input_does_not_change_vote_by_api_output(self):
         service, client = self.service([self.mediation()])
         service.mediate(self.snapshot)
-        self.assertIn("n�o como instru��es", client.calls[0]["config"]["system_instruction"])
-        # Servi�o da IA n�o recebe objeto Repository nem credenciais de participantes.
+        self.assertIn("não como instruções", client.calls[0]["config"]["system_instruction"])
+        # Serviço da IA não recebe objeto Repository nem credenciais de participantes.
         self.assertEqual(self.snapshot["responses"][0]["position"], "NAO_ACEITO")
 
 
