@@ -20,7 +20,7 @@ from playwright.sync_api import expect, sync_playwright
 
 
 APP_URL = "https://tcc-decisao-coletiva-eoiv3pcb5csadiolmfiios.streamlit.app/"
-SOURCE_COMMIT = "034c600b20d8b90e48cbfc9d56950162aed0c717"
+SOURCE_COMMIT = "9ca8aa3584364539137a427d2ec918d2579ba7ce"
 MASKS = []
 REPORT = {
     "kind": "PILOTO_TECNICO_AUTOMATIZADO_NAO_EXPERIMENTO",
@@ -180,6 +180,8 @@ def run():
             for value in MASKS:
                 print("::add-mask::" + value, flush=True)
             mod_ui.get_by_role("button", name="Já salvei: ocultar credenciais", exact=True).click()
+            expect(mod_ui.get_by_role("button", name="Atualizar painel", exact=True)).to_be_visible(timeout=120000)
+            REPORT["updated_refresh_control_seen"] = True
             passed("Sala com tema livre e três acessos individuais foi criada")
 
             step("ENTRAR_COM_TRES_CONTEXTOS_ISOLADOS")
@@ -223,7 +225,8 @@ def run():
                 expect(mod_ui.get_by_test_id("stAlert").filter(has_text=pattern).last).to_be_visible(timeout=170000)
                 after_ai = export(moderator, mod_ui)
                 ai_records = [m for m in after_ai["mediations"] if m["origin"] == "IA"]
-                REPORT["mediation_attempts"] = [{"status": m["status"], "model": m.get("model"), "failure_code": m.get("failure_code")} for m in ai_records]
+                REPORT["mediation_attempts"] = [{"status": m["status"], "model": m.get("model"), "failure_code": m.get("failure_code"),
+                    "diagnostics": json.loads(m.get("details_json") or "{}").get("diagnostics")} for m in ai_records]
                 REPORT["gemini_mediation"] = "OK" if any(m["status"] == "OK" for m in ai_records) else "FALHA_REGISTRADA"
             else:
                 REPORT["gemini_mediation"] = "SEM_CHAVE_OU_INDISPONIVEL_NA_INTERFACE"
@@ -235,11 +238,20 @@ def run():
                 passed("Gemini produziu sugestão real disponível para revisão humana")
 
             step("REVISAO_HUMANA_E_NOVA_VOTACAO")
-            mod_ui.get_by_label("Texto revisado a ser apresentado ao grupo", exact=True).fill(
-                "Faremos uma reunião de teste às 20h, com duração máxima de 30 minutos.")
+            revised = mod_ui.get_by_label("Texto revisado a ser apresentado ao grupo", exact=True)
+            revised_text = "Faremos uma reunião de teste às 20h, com duração máxima de 30 minutos."
+            revised.fill(revised_text)
             reason = mod_ui.get_by_label("Justificativa da revisão humana", exact=True)
             if reason.is_visible():
                 reason.fill("No piloto fictício, ajustamos o horário e registramos o limite de duração.")
+            moderator.wait_for_timeout(11000)
+            REPORT["draft_retained_after_refresh"] = revised.input_value() == revised_text
+            REPORT["revision_visible_after_refresh"] = revised.is_visible()
+            REPORT["selected_tabs_after_refresh"] = [item.inner_text() for item in mod_ui.get_by_role("tab").all()
+                                                      if item.get_attribute("aria-selected") == "true"]
+            assert REPORT["draft_retained_after_refresh"], "A atualização apagou o texto em edição."
+            assert REPORT["revision_visible_after_refresh"], "A atualização ocultou o formulário em edição."
+            passed("Texto e formulário de revisão permaneceram estáveis por 11 segundos")
             check_box(mod_ui, "Revisei este texto e quero solicitar novas manifestações de todos.")
             mod_ui.get_by_role("button", name="Publicar nova versão", exact=True).click()
             metric(mod_ui, "Rodada", "2 / 3")
