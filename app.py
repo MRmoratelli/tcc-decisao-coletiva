@@ -9,6 +9,7 @@ from pathlib import Path
 import streamlit as st
 
 from ai_service import AIService, DEFAULT_MODEL, FAILURE_MESSAGES
+from experiment_config import TAXONOMY_CODES, taxonomy_display
 from decision import (
     DecisionError, NO_OBJECTION, POSITIONS, Repository, UNCLASSIFIED,
     consensus, csv_export, current_proposal, current_responses, research_export,
@@ -26,9 +27,9 @@ def setting(name, default=""):
 
 
 @st.cache_resource
-def repository(database_url, sqlite_path):
+def repository(database_url, sqlite_path, experimental_mode):
     # Compartilha apenas a configuração. Conexões são abertas por transação.
-    return Repository(database_url=database_url, sqlite_path=sqlite_path)
+    return Repository(database_url=database_url, sqlite_path=sqlite_path, experimental_mode=experimental_mode)
 
 
 def notify(message):
@@ -157,13 +158,14 @@ def pareto(snapshot):
     from plotly.subplots import make_subplots
     ordered = sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))
     labels, frequencies = zip(*ordered)
+    display_labels = [taxonomy_display(label) for label in labels]
     accumulated, running, total = [], 0, sum(frequencies)
     for frequency in frequencies:
         running += frequency
         accumulated.append(100 * running / total)
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig.add_trace(go.Bar(x=labels, y=frequencies, name="Frequência", marker_color="#2563eb"), secondary_y=False)
-    fig.add_trace(go.Scatter(x=labels, y=accumulated, name="Acumulado (%)", mode="lines+markers",
+    fig.add_trace(go.Bar(x=display_labels, y=frequencies, name="Frequência", marker_color="#2563eb"), secondary_y=False)
+    fig.add_trace(go.Scatter(x=display_labels, y=accumulated, name="Acumulado (%)", mode="lines+markers",
                              line={"color": "#dc2626"}), secondary_y=True)
     fig.add_shape(type="line", x0=-0.5, x1=len(labels) - 0.5, y0=80, y1=80,
                   xref="x", yref="y2", line={"color": "#16a34a", "dash": "dash"})
@@ -184,7 +186,16 @@ def manifestations(repo, snapshot, code, token):
                 st.caption("Categoria revisada pelo moderador. Sugestão original da IA: " + (response["category_ai"] or "indisponível"))
             if snapshot["actor"]["role"] == "moderator" and snapshot["room"]["state"] == "COLETA":
                 with st.form("category_" + response["id"] + "_" + str(response["edit"])):
-                    category = st.text_input("Revisar categoria", value=response["category"], max_chars=120)
+                    if repo.experimental_mode:
+                        current = response["category"] if response["category"] in TAXONOMY_CODES else TAXONOMY_CODES[0]
+                        category = st.selectbox(
+                            "Revisar categoria",
+                            TAXONOMY_CODES,
+                            index=TAXONOMY_CODES.index(current),
+                            format_func=taxonomy_display,
+                        )
+                    else:
+                        category = st.text_input("Revisar categoria", value=response["category"], max_chars=120)
                     submitted = st.form_submit_button("Salvar categoria")
                 if submitted:
                     ok, _ = execute(lambda: repo.set_category(code, token, response["proposal_id"], response["id"], category, response["edit"]))
@@ -420,13 +431,14 @@ def main():
     st.set_page_config(page_title="Decisão Coletiva com IA", page_icon="🏛️", layout="wide")
     st.title("🏛️ Decisão Coletiva com IA")
     sqlite_path = setting("SQLITE_PATH", str(Path(__file__).resolve().parent / "data" / "decisoes.sqlite3"))
+    experimental_mode = setting("EXPERIMENT_MODE", "").strip().lower() in ("1", "true", "yes", "on")
     try:
-        repo = repository(setting("DATABASE_URL"), sqlite_path)
+        repo = repository(setting("DATABASE_URL"), sqlite_path, experimental_mode)
     except Exception:
         st.error("O armazenamento não está disponível. Confira DATABASE_URL e as dependências nas configurações da implantação.")
         return
     models = [setting("GEMINI_MODEL", DEFAULT_MODEL)] + [m.strip() for m in setting("GEMINI_FALLBACK_MODELS").split(",") if m.strip()]
-    ai = AIService(setting("GEMINI_API_KEY"), models=models)
+    ai = AIService(setting("GEMINI_API_KEY"), models=models, experimental_mode=experimental_mode)
     auth = st.session_state.get("auth")
     if not auth:
         login_screen(repo)

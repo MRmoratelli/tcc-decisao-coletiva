@@ -17,6 +17,8 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
+from experiment_config import TAXONOMY_CODES
+
 POSITIONS = {
     "ACEITO": "Aceito",
     "ACEITO_COM_RESSALVAS": "Aceito com ressalvas",
@@ -101,9 +103,10 @@ class Connection:
 
 
 class Repository:
-    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3"):
+    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3", experimental_mode=False):
         self.url = database_url.strip()
         self.postgres = self.url.startswith(("postgres://", "postgresql://"))
+        self.experimental_mode = bool(experimental_mode)
         if self.url and not self.postgres:
             raise DecisionError("DATABASE_URL deve ser uma conexão PostgreSQL.")
         self.path = str(Path(sqlite_path).resolve())
@@ -176,6 +179,12 @@ class Repository:
 
     def _bump(self, conn, room):
         conn.execute("UPDATE dc_rooms SET revision=revision+1 WHERE id=?", (room["id"],))
+
+    def _validated_category(self, category):
+        category = clean(category, "a categoria", 120)
+        if self.experimental_mode and category not in TAXONOMY_CODES:
+            raise DecisionError("No modo experimental, escolha uma categoria CAT01–CAT09.")
+        return category
 
     def create_room(self, theme, context, proposal, aliases, ai_enabled=True):
         theme = clean(theme, "o tema", 300)
@@ -285,7 +294,7 @@ class Repository:
                     or row["edit"] != edit or row["category_manual"]):
                 return False
             status = "OK" if result["ok"] else result.get("failure_code", "FALHA_IA")
-            category = clean(result["category"], "a categoria", 120) if result["ok"] else UNCLASSIFIED
+            category = self._validated_category(result["category"]) if result["ok"] else UNCLASSIFIED
             conn.execute("""UPDATE dc_responses SET category_ai=?, category=?, classification_status=?,
                          classification_model=?, classification_prompt=? WHERE id=?""", (
                 category if result["ok"] else None, category, status, result.get("model"),
@@ -298,7 +307,7 @@ class Repository:
         return True
 
     def set_category(self, code, token, proposal_id, response_id, category, expected_edit=None):
-        category = clean(category, "a categoria", 120)
+        category = self._validated_category(category)
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "COLETA")

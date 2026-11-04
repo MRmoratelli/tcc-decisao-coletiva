@@ -28,8 +28,8 @@ class StreamlitFlowTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.path = Path(self.tmp.name) / "interface.db"
-        self.previous = {name: os.environ.get(name) for name in ("SQLITE_PATH", "DATABASE_URL", "GEMINI_API_KEY")}
-        os.environ.update(SQLITE_PATH=str(self.path), DATABASE_URL="", GEMINI_API_KEY="")
+        self.previous = {name: os.environ.get(name) for name in ("SQLITE_PATH", "DATABASE_URL", "GEMINI_API_KEY", "EXPERIMENT_MODE")}
+        os.environ.update(SQLITE_PATH=str(self.path), DATABASE_URL="", GEMINI_API_KEY="", EXPERIMENT_MODE="0")
         self.repo = Repository(sqlite_path=self.path)
 
     def tearDown(self):
@@ -95,6 +95,18 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertEqual(current_proposal(snap)["round"], 2)
         self.assertEqual(current_responses(snap), [])
         self.assertEqual(snap["room"]["theme"], "Organização de um evento")
+
+    def test_experimental_mode_uses_closed_category_selector(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=False)
+        person = self.join(access, 0)
+        widget(person, "radio", "Minha posição sobre esta versão").set_value("NAO_ACEITO")
+        widget(person, "text_area", "Justificativa e ressalvas").set_value("O orçamento está desequilibrado")
+        widget(person, "button", "Salvar manifestação").click().run()
+        moderator.run()
+        selector = widget(moderator, "selectbox", "Revisar categoria")
+        self.assertIn(selector.value, tuple(f"CAT{i:02d}" for i in range(1, 10)))
+        self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
 
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)

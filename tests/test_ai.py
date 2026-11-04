@@ -39,9 +39,10 @@ class AIValidationTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def service(self, outputs, models=None):
+    def service(self, outputs, models=None, experimental_mode=False):
         client = FakeClient(outputs)
-        service = AIService("fake-test-key", models=models, client_factory=lambda **kwargs: client)
+        service = AIService("fake-test-key", models=models, client_factory=lambda **kwargs: client,
+                            experimental_mode=experimental_mode)
         return service, client
 
     def mediation(self, coverage=None):
@@ -158,6 +159,31 @@ class AIValidationTests(unittest.TestCase):
         self.assertEqual(diagnostic["error_type"], "ImportError")
         self.assertIsNone(diagnostic["http_status"])
         self.assertNotIn("DO-NOT-EXPOSE", json.dumps(result))
+
+    def test_experimental_classification_uses_closed_taxonomy(self):
+        service, client = self.service(
+            [json.dumps({"has_objection": True, "category": "CAT07"})],
+            experimental_mode=True,
+        )
+        result = service.classify(self.snapshot, "NAO_ACEITO", "O valor precisa ser redistribuído")
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["category"], "CAT07")
+        self.assertIn("CAT01", client.calls[0]["contents"])
+        self.assertIn("Não crie novos rótulos", client.calls[0]["config"]["system_instruction"])
+
+        invalid, _ = self.service(
+            [json.dumps({"has_objection": True, "category": "Custos"})],
+            experimental_mode=True,
+        )
+        self.assertFalse(invalid.classify(self.snapshot, "NAO_ACEITO", "O valor precisa ser redistribuído")["ok"])
+
+        no_objection, _ = self.service(
+            [json.dumps({"has_objection": False, "category": "Sem objeção explicitada"})],
+            experimental_mode=True,
+        )
+        accepted = no_objection.classify(self.snapshot, "ACEITO", "")
+        self.assertTrue(accepted["ok"])
+        self.assertEqual(accepted["category"], "Sem objeção explicitada")
 
     def test_approval_comment_can_contain_objection(self):
         service, client = self.service([json.dumps({"has_objection": True, "category": "Acessibilidade"})])

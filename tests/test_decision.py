@@ -11,6 +11,7 @@ from decision import (
     DecisionError, NO_OBJECTION, Repository, consensus, csv_export,
     current_proposal, current_responses, research_export,
 )
+from experiment_config import TAXONOMY_CODES
 
 
 class WorkflowTests(unittest.TestCase):
@@ -202,6 +203,25 @@ class WorkflowTests(unittest.TestCase):
         self.repo.set_category(self.code, self.admin, self.proposal, saved["id"], "Acesso")
         self.assertFalse(self.repo.apply_classification(self.code, self.tokens[0], self.proposal, saved["id"], 2, result))
         self.assertEqual(current_responses(self.snapshot())[0]["category"], "Acesso")
+
+    def test_experimental_taxonomy_accepts_only_cat_codes(self):
+        repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+        access = repo.create_room("Orçamento escolar", "Cenário", "Proposta", ["A", "B"])
+        snap = repo.snapshot(access["code"], access["moderator_token"])
+        proposal = current_proposal(snap)["id"]
+        saved = repo.submit_response(access["code"], access["invitations"][0]["token"],
+                                     proposal, "NAO_ACEITO", "O orçamento está desequilibrado")
+        repo.apply_classification(access["code"], access["invitations"][0]["token"], proposal,
+                                  saved["id"], saved["edit"],
+                                  {"ok": True, "category": "CAT07", "model": "fake", "prompt_version": "test"})
+        self.assertEqual(current_responses(repo.snapshot(access["code"], access["moderator_token"]))[0]["category"], "CAT07")
+        with self.assertRaises(DecisionError):
+            repo.set_category(access["code"], access["moderator_token"], proposal, saved["id"], "Custos")
+        with self.assertRaises(DecisionError):
+            repo.apply_classification(access["code"], access["invitations"][0]["token"], proposal,
+                                      saved["id"], saved["edit"],
+                                      {"ok": True, "category": "CAT10", "model": "fake", "prompt_version": "test"})
+        self.assertEqual(tuple(TAXONOMY_CODES), tuple(f"CAT{i:02d}" for i in range(1, 10)))
 
     def test_api_failure_preserves_response_and_no_fabricated_category(self):
         saved = self.vote(0, "NAO_ACEITO", "Custo")
