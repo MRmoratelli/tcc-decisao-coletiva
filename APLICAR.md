@@ -1,3 +1,7 @@
+> **HISTÓRICO — instruções da etapa técnica anterior, substituídas pela documentação v1.1 desta branch.**
+>
+> O texto original foi preservado abaixo. Suas instruções sobre `main`, deploy, categorias livres, comparação opcional e continuidade humana não são o procedimento vigente do PR #4. Consulte o [README atual](README.md), o [Protocolo Experimental v1.1](docs/PROTOCOLO_EXPERIMENTAL_v1.1.md) e o [checklist pré-piloto](docs/CHECKLIST_PRE_PILOTO_v1.1.md). Não executar deploy ou piloto com base neste histórico.
+
 # Aplicar e fechar esta etapa
 
 O código para demonstração está no repositório próprio [MRmoratelli/tcc-decisao-coletiva](https://github.com/MRmoratelli/tcc-decisao-coletiva), branch `main`. O [PR #1](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/1) foi integrado após os testes aprovados. A implantação web deve ser configurada no Streamlit para usar `main`.
