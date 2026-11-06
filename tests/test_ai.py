@@ -6,7 +6,8 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from ai_service import AIService, failure_message, sanitize_external_text
-from decision import Repository, current_proposal, current_responses
+from decision import Repository, current_proposal, current_responses, UNCHANGED_REVIEW_NOTE
+from experiment_config import SCENARIO_INITIAL_TEXT, SCENARIO_INITIAL_ALLOCATION, EXPERIMENT_SCENARIO_VERSION
 
 
 class FakeClient:
@@ -175,6 +176,36 @@ class AIValidationTests(unittest.TestCase):
         for code in ("COTA_OU_LIMITE", "FALHA_IA", "SERVICO_INDISPONIVEL"):
             self.assertNotIn("mediação humana", failure_message(code, True))
         self.assertIn("mediação humana", failure_message("FALHA_IA", False))
+
+    def test_financial_context_uses_current_structured_allocation_without_changing_ai_output_schema(self):
+        repo = Repository(sqlite_path=Path(self.tmp.name) / "scenario.db", experimental_mode=True)
+        access = repo.create_room("Escola", "Orçamento", SCENARIO_INITIAL_TEXT, 3, True, scenario_enabled=True)
+        code, admin = access["code"], access["moderator_token"]
+        proposal = current_proposal(repo.snapshot(code, admin))["id"]
+        token = access["invitations"][0]["token"]
+        repo.submit_response(code, token, proposal, "NAO_ACEITO", "Rever a distribuição")
+        repo.set_phase(code, admin, proposal, "REVISAO")
+        snap = repo.snapshot(code, admin)
+        source = repo.save_mediation(code, admin, proposal, snap["room"]["revision"], {
+            "origin": "IA", "ok": True, "summary": "Resumo", "suggested_text": "Texto explicativo sem números",
+        })
+        values = dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 20000}
+        proposal = repo.publish_revision(code, admin, proposal, "Texto explicativo sem números", source,
+                                         review_note=UNCHANGED_REVIEW_NOTE, allocation=values)
+        repo.submit_response(code, token, proposal, "NAO_ACEITO", "Rever a distribuição")
+        snap = repo.snapshot(code, admin)
+        classifier, c1 = self.service([json.dumps({"has_objection": True, "category": "CAT07"})], experimental_mode=True)
+        mediator, c2 = self.service([self.mediation([{"participant": "M01", "treatment": "PARCIAL", "note": "Rever valores"}])], experimental_mode=True)
+        self.assertEqual(classifier.classify(snap, "NAO_ACEITO", "Rever a distribuição")["category"], "CAT07")
+        self.assertTrue(mediator.mediate(snap)["ok"])
+        for client in (c1, c2):
+            data = json.loads(client.calls[0]["contents"])
+            self.assertEqual(data["allocation"]["items"], values)
+            self.assertEqual((data["allocation"]["total"], data["allocation"]["unallocated"]), (75000, 5000))
+            self.assertEqual(data["scenario"]["scenario_version"], EXPERIMENT_SCENARIO_VERSION)
+            self.assertEqual(data["proposal"], "Texto explicativo sem números")
+        self.assertNotIn("participant_id", c2.calls[0]["contents"])
+        self.assertNotIn("P01", c2.calls[0]["contents"])
 
     def test_no_key_is_explicit_failure(self):
         result = AIService().mediate(self.snapshot)

@@ -9,7 +9,7 @@ import re
 from importlib import metadata
 import time
 
-from decision import NO_OBJECTION, current_proposal, current_responses
+from decision import NO_OBJECTION, current_proposal, current_responses, proposal_financial_state
 from experiment_config import CLASSIFICATION_VERSION, MEDIATION_VERSION, TAXONOMY_CODES, TAXONOMY_VERSION, taxonomy_prompt
 
 def sanitize_external_text(text):
@@ -243,6 +243,9 @@ has_objection indica se o texto expressa uma preocupação ou ressalva.
             data[key] = sanitize_external_text(data[key])
         if "existing_categories" in data:
             data["existing_categories"] = [sanitize_external_text(c) for c in data["existing_categories"]]
+        financial = proposal_financial_state(snapshot)
+        if financial["status"] == "VALID":
+            data.update(scenario=financial["scenario"], allocation=financial["allocation"])
         return self._generate(instruction, data, class_schema, validate, CLASSIFICATION_VERSION)
 
     def mediate(self, snapshot):
@@ -285,6 +288,9 @@ se não há objeção explícita. Ausentes não estão representados e não pode
         for response in data["responses"]:
             for key in ("argument", "category"):
                 response[key] = sanitize_external_text(response[key])
+        financial = proposal_financial_state(snapshot)
+        if financial["status"] == "VALID":
+            data.update(scenario=financial["scenario"], allocation=financial["allocation"])
         expected = set(local_by_external)
 
         def validate(payload):

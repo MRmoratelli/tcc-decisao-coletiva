@@ -17,9 +17,10 @@ if HAS_STREAMLIT:
 elif os.getenv("APP_TESTS_REQUIRED") == "1":
     raise RuntimeError("Instale Streamlit antes de executar os testes de interface.")
 
+from experiment_config import SCENARIO_THEME, SCENARIO_CONTEXT, SCENARIO_INITIAL_TEXT, SCENARIO_INITIAL_ALLOCATION, SCENARIO_ITEMS
 from ai_service import AIService, DEFAULT_MODEL
 from decision import (MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, NO_OBJECTION,
-                      UNCHANGED_REVIEW_NOTE, Repository, current_proposal, current_responses)
+                      UNCHANGED_REVIEW_NOTE, Repository, current_proposal, current_responses, research_export)
 
 ENTRY = Path(__file__).resolve().parents[1] / "Prototipo TCC.py"
 
@@ -50,15 +51,17 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertFalse(app.exception, [str(e) for e in app.exception])
         return app
 
-    def create(self, enabled=False):
+    def create(self, enabled=False, scenario=False):
         # Fixture SQLite: somente o gate de criação é simulado neste helper de testes.
         # O bloqueio real é exercitado separadamente; regras também rodam no PostgreSQL do CI.
         storage_fixture = patch("app.experimental_storage_ready", return_value=True) if os.environ.get("EXPERIMENT_MODE") == "1" else nullcontext()
         with storage_fixture:
             app = self.app()
-            widget(app, "text_input", "Tema da decisão").set_value("Organização de um evento")
-            widget(app, "text_area", "Contexto e restrições conhecidas").set_value("Todos participam remotamente")
-            widget(app, "text_area", "Texto da proposta inicial").set_value("Reunião semanal às quartas")
+            if os.environ.get("EXPERIMENT_MODE") == "1":
+                widget(app, "checkbox", "Usar cenário experimental de orçamento escolar").set_value(scenario).run()
+            widget(app, "text_input", "Tema da decisão").set_value(SCENARIO_THEME if scenario else "Organização de um evento")
+            widget(app, "text_area", "Contexto e restrições conhecidas").set_value(SCENARIO_CONTEXT if scenario else "Todos participam remotamente")
+            widget(app, "text_area", "Texto da proposta inicial").set_value(SCENARIO_INITIAL_TEXT if scenario else "Reunião semanal às quartas")
             if os.environ.get("EXPERIMENT_MODE") == "1":
                 widget(app, "number_input", "Número de participantes").set_value(3)
             else:
@@ -652,6 +655,109 @@ class StreamlitFlowTests(unittest.TestCase):
             self.assertIsNone(manifest["condition"])
             self.assertEqual(call.kwargs["file_name"], f"historico_{access['code']}.json")
             self.assertNotIn("Versão experimental:", self.rendered_text(moderator))
+
+    def scenario_revision_setup(self, enabled=False):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=enabled, scenario=True)
+        repo, proposal_id, _ = self.seed_other_response(access, "SIGILO_FINANCEIRO — condição sobre orçamento")
+        moderator.run()
+        widget(moderator, "button", "Pausar coleta e revisar").click().run()
+        if enabled:
+            snap = repo.snapshot(access["code"], access["moderator_token"])
+            repo.save_mediation(access["code"], access["moderator_token"], proposal_id, snap["room"]["revision"], {
+                "origin": "IA", "ok": True, "summary": "Síntese consultiva", "suggested_text": "Texto revisado para distribuição",
+                "details": {"coverage": [{"participant": "P02", "treatment": "PARCIAL", "note": "Condição parcialmente incorporada"}]},
+            })
+            moderator.run()
+        else:
+            self.fill_manual_form(moderator, access, "Texto revisado para distribuição")
+        return moderator, access
+
+    def test_financial_scenario_is_default_only_in_experimental_creation(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        landing = self.app()
+        self.assertTrue(widget(landing, "checkbox", "Usar cenário experimental de orçamento escolar").value)
+        self.assertEqual(widget(landing, "text_area", "Texto da proposta inicial").value, SCENARIO_INITIAL_TEXT)
+        self.assertIn("R$ 80.000", widget(landing, "text_area", "Contexto e restrições conhecidas").value)
+        os.environ["EXPERIMENT_MODE"] = "0"
+        generic = self.app()
+        self.assertFalse(any(w.label == "Usar cenário experimental de orçamento escolar" for w in generic.checkbox))
+
+    def test_a_and_b_share_five_financial_fields_reject_over_budget_and_publish_valid_allocation(self):
+        for enabled in (False, True):
+            with self.subTest(ai_enabled=enabled):
+                moderator, access = self.scenario_revision_setup(enabled)
+                for code, item in SCENARIO_ITEMS.items():
+                    self.assertEqual(widget(moderator, "number_input", item["name"] + " — valor em R$").value, SCENARIO_INITIAL_ALLOCATION[code])
+                label = SCENARIO_ITEMS["CAT_INV01"]["name"] + " — valor em R$"
+                widget(moderator, "number_input", label).set_value(25001).run()
+                self.assertIn("não pode ultrapassar R$ 80.000", self.rendered_text(moderator))
+                self.assertTrue(widget(moderator, "button", "Publicar nova versão").disabled)
+                self.assertEqual(len(self.repo.snapshot(access["code"], access["moderator_token"])["proposals"]), 1)
+                widget(moderator, "number_input", label).set_value(20000).run()
+                self.assertIn("Total distribuído: R$ 75.000", self.rendered_text(moderator))
+                self.assertIn("Saldo não alocado: R$ 5.000", self.rendered_text(moderator))
+                widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+                if enabled:
+                    widget(moderator, "checkbox", "Confirmo a publicação sem alteração de conteúdo.").set_value(True)
+                widget(moderator, "button", "Publicar nova versão").click().run()
+                self.assertIn("Confirme os valores financeiros", self.rendered_text(moderator))
+                self.assertEqual(len(self.repo.snapshot(access["code"], access["moderator_token"])["proposals"]), 1)
+                widget(moderator, "checkbox", "Conferi os cinco valores estruturados e sua coerência com o texto publicado.").set_value(True)
+                widget(moderator, "button", "Publicar nova versão").click().run()
+                self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
+                data = research_export(self.repo.snapshot(access["code"], access["moderator_token"]))
+                self.assertEqual(data["proposals"][-1]["round"], 2)
+                self.assertEqual(data["proposals"][-1]["allocation"]["items"]["CAT_INV01"], 20000)
+                self.assertEqual((data["proposals"][-1]["total"], data["proposals"][-1]["unallocated"]), (75000, 5000))
+
+    def test_participant_sees_v1_financial_proposal_before_answer_but_not_others(self):
+        import streamlit as st
+        os.environ["EXPERIMENT_MODE"] = "1"
+        _, access = self.create(enabled=False, scenario=True)
+        marker = "SIGILO_FINANCEIRO_P02 antes da resposta alheia"
+        self.seed_other_response(access, marker)
+        with patch("app.st.table", wraps=st.table) as tables:
+            person = self.join(access, 0)
+        self.assert_blind(person, marker, "P02", "CAT07")
+        self.assertEqual(tables.call_count, 1)
+        rows = tables.call_args.args[0]
+        self.assertEqual(len(rows), 5)
+        self.assertEqual([r["Valor alocado"] for r in rows], ["R$ 25.000", "R$ 25.000", "R$ 10.000", "R$ 15.000", "R$ 5.000"])
+        self.assertIn("Total distribuído: R$ 80.000", self.rendered_text(person))
+        self.assertIn("Saldo não alocado: R$ 0", self.rendered_text(person))
+        widget(person, "button", "Salvar manifestação").click().run()
+        self.assertIn(marker, self.rendered_text(person))
+
+    def test_v2_financial_values_are_visible_while_new_responses_remain_blind(self):
+        import streamlit as st
+        moderator, access = self.scenario_revision_setup(False)
+        label = SCENARIO_ITEMS["CAT_INV01"]["name"] + " — valor em R$"
+        widget(moderator, "number_input", label).set_value(20000).run()
+        widget(moderator, "checkbox", "Conferi os cinco valores estruturados e sua coerência com o texto publicado.").set_value(True)
+        widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+        widget(moderator, "button", "Publicar nova versão").click().run()
+        marker = "SIGILO_FINANCEIRO_P02_R2 outra preocupação"
+        self.seed_other_response(access, marker)
+        with patch("app.st.table", wraps=st.table) as tables:
+            person = self.join(access, 0)
+        self.assert_blind(person, marker, "P02", "CAT07", "SIGILO_FINANCEIRO")
+        self.assertEqual(tables.call_count, 1)
+        self.assertEqual(tables.call_args.args[0][0]["Valor alocado"], "R$ 20.000")
+        self.assertIn("Total distribuído: R$ 75.000", self.rendered_text(person))
+        self.assertIn("Saldo não alocado: R$ 5.000", self.rendered_text(person))
+        self.assertEqual(widget(person, "metric", "Rodada").value, "2 / 3")
+
+    def test_financial_recalculation_keeps_review_draft_and_requires_new_value_confirmation(self):
+        moderator, _ = self.scenario_revision_setup(False)
+        draft = "Texto humano em revisão que deve continuar disponível"
+        widget(moderator, "text_area", "Texto revisado a ser apresentado ao grupo").set_value(draft).run()
+        widget(moderator, "checkbox", "Conferi os cinco valores estruturados e sua coerência com o texto publicado.").set_value(True).run()
+        label = SCENARIO_ITEMS["CAT_INV01"]["name"] + " — valor em R$"
+        widget(moderator, "number_input", label).set_value(20000).run()
+        self.assertEqual(widget(moderator, "text_area", "Texto revisado a ser apresentado ao grupo").value, draft)
+        self.assertFalse(widget(moderator, "checkbox", "Conferi os cinco valores estruturados e sua coerência com o texto publicado.").value)
+        self.assertIn("Saldo não alocado: R$ 5.000", self.rendered_text(moderator))
 
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)

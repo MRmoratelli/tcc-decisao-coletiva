@@ -9,11 +9,15 @@ from pathlib import Path
 import streamlit as st
 
 from ai_service import AIService, DEFAULT_MODEL, FAILURE_MESSAGES, failure_message
-from experiment_config import CLASSIFICATION_FAILURE_CODES, TAXONOMY_CODES, TECHNICAL_CANCEL_REASON, taxonomy_display
+from experiment_config import (
+    CLASSIFICATION_FAILURE_CODES, TAXONOMY_CODES, TECHNICAL_CANCEL_REASON, taxonomy_display,
+    SCENARIO_THEME, SCENARIO_CONTEXT, SCENARIO_INITIAL_TEXT, validate_scenario_allocation,
+)
 from decision import (
     COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS,
     UNCHANGED_REVIEW_NOTE, DecisionError, NO_OBJECTION, POSITIONS, Repository, UNCLASSIFIED,
     consensus, csv_export, current_proposal, current_responses, mediation_attempt_state, research_export,
+    proposal_financial_state, session_scenario,
 )
 
 
@@ -65,6 +69,53 @@ def experimental_storage_ready(repo):
     return not repo.experimental_mode or repo.postgres
 
 
+def money(value):
+    return "R$ " + f"{value:,}".replace(",", ".")
+
+
+def financial_proposal_view(snapshot, proposal_id=None):
+    financial = proposal_financial_state(snapshot, proposal_id)
+    if financial["scenario"] is None:
+        return
+    st.subheader("Distribuição financeira da proposta vigente" if proposal_id is None else "Distribuição financeira registrada")
+    if financial["status"] != "VALID":
+        st.error("Esta proposta não possui distribuição financeira que possa ser validada automaticamente.")
+        return
+    allocation, scenario = financial["allocation"], financial["scenario"]
+    st.table([{"Item de investimento": item["name"], "Valor alocado": money(allocation["items"][code]),
+               "Teto da demanda": money(item["ceiling"])} for code, item in scenario["allocation_items"].items()])
+    st.caption("Orçamento: " + money(scenario["budget"]) + " · Total distribuído: " + money(allocation["total"]) +
+               " · Saldo não alocado: " + money(allocation["unallocated"]))
+    st.caption("O saldo pertence ao mesmo orçamento, não é recurso adicional. Os valores estruturados são a referência financeira; a decisão substantiva permanece humana.")
+
+
+def allocation_editor(snapshot):
+    financial = proposal_financial_state(snapshot)
+    if financial["scenario"] is None:
+        return None, True
+    st.subheader("Distribuição financeira da proposta")
+    if financial["status"] != "VALID":
+        st.error("A configuração ou distribuição vigente não pode ser validada automaticamente; publicação financeira bloqueada.")
+        return None, False
+    st.caption("Informe primeiro os valores; depois finalize o texto e a revisão. Valores em reais inteiros, sem centavos. "
+               "O sistema não interpreta números do texto nem avalia se a distribuição é justa ou ótima.")
+    st.caption("Estes campos se referem à próxima versão; a proposta vigente só muda após publicação.")
+    scenario, previous = financial["scenario"], financial["allocation"]
+    proposal = current_proposal(snapshot)
+    values = {code: st.number_input(item["name"] + " — valor em R$", min_value=0, max_value=item["ceiling"],
+                                   value=previous["items"][code], step=1, key="allocation_" + proposal["id"] + "_" + code)
+              for code, item in scenario["allocation_items"].items()}
+    total = sum(values.values())
+    st.caption("Orçamento: " + money(scenario["budget"]) + " · Total distribuído: " + money(total) +
+               " · Saldo não alocado: " + money(scenario["budget"] - total))
+    try:
+        validate_scenario_allocation(values, scenario)
+    except ValueError as error:
+        st.error(str(error))
+        return values, False
+    return values, True
+
+
 def login_screen(repo):
     st.write("Discuta uma proposta, revise o texto e registre a aceitação do grupo em até três rodadas.")
     join, create = st.tabs(["Entrar na sala", "Criar sala"])
@@ -83,11 +134,15 @@ def login_screen(repo):
         storage_ready = experimental_storage_ready(repo)
         if not storage_ready:
             st.error("Modo experimental requer PostgreSQL persistente. Configure DATABASE_URL antes de iniciar uma sessão.")
+        scenario_enabled = repo.experimental_mode and st.checkbox("Usar cenário experimental de orçamento escolar", value=True)
+        if scenario_enabled:
+            st.caption("Cenário simulado oficial: R$ 80.000 para cinco demandas de R$ 145.000 no total. "
+                       "V1 usa a distribuição fixa de R$ 25.000 / 25.000 / 10.000 / 15.000 / 5.000.")
         st.caption("O tema é livre. Descreva uma proposta concreta e as restrições conhecidas antes de convidar o grupo.")
         with st.form("create"):
-            theme = st.text_input("Tema da decisão", max_chars=300)
-            context = st.text_area("Contexto e restrições conhecidas", max_chars=6000)
-            proposal = st.text_area("Texto da proposta inicial", height=180, max_chars=12000)
+            theme = st.text_input("Tema da decisão", value=SCENARIO_THEME if scenario_enabled else "", max_chars=300)
+            context = st.text_area("Contexto e restrições conhecidas", value=SCENARIO_CONTEXT if scenario_enabled else "", max_chars=6000)
+            proposal = st.text_area("Texto da proposta inicial", value=SCENARIO_INITIAL_TEXT if scenario_enabled else "", height=180, max_chars=12000)
             if repo.experimental_mode:
                 roster = st.number_input("Número de participantes", min_value=2, max_value=30, value=5, step=1)
             else:
@@ -100,7 +155,7 @@ def login_screen(repo):
             submitted = st.form_submit_button("Criar sala e gerar acessos", type="primary", disabled=not storage_ready)
         if submitted and storage_ready:
             aliases = int(roster) if repo.experimental_mode else [line.strip() for line in roster.splitlines() if line.strip()]
-            ok, invitation = execute(lambda: repo.create_room(theme, context, proposal, aliases, enabled))
+            ok, invitation = execute(lambda: repo.create_room(theme, context, proposal, aliases, enabled, scenario_enabled=scenario_enabled))
             if ok:
                 st.session_state["invitation"] = invitation
                 st.session_state["auth"] = {"code": invitation["code"], "token": invitation["moderator_token"]}
@@ -428,28 +483,45 @@ def mediator_panel(repo, ai, snapshot, code, token):
             st.dataframe(coverage, use_container_width=True, hide_index=True)
         st.caption("O registro de cobertura é uma análise da mediação; não comprova atendimento da objeção.")
     if proposal["round"] < 3:
-        with st.form("revision_" + proposal["id"] + "_" + str(selected)):
+        allocation, financial_ok = allocation_editor(snapshot)
+        financial_scenario = session_scenario(snapshot) is not None
+        revision_key = "revision_" + proposal["id"] + "_" + str(selected)
+        # No cenário, widgets reativos preservam o rascunho ao recalcular os valores.
+        revision_context = st.container() if financial_scenario else st.form(revision_key)
+        with revision_context:
             revised = st.text_area("Texto revisado a ser apresentado ao grupo",
                                    value=mediation["suggested_text"] if mediation else proposal["text"],
-                                   height=220, max_chars=12000)
+                                   height=220, max_chars=12000,
+                                   **({"key": revision_key + "_text"} if financial_scenario else {}))
             human_summary = st.text_area("Justificativa da revisão humana", max_chars=6000) if not mediation and not repo.experimental_mode else ""
             review_note, unchanged = "", False
             if repo.experimental_mode and mediation and mediation["origin"] == "IA":
                 st.caption("Revise a sugestão sem substituí-la por uma mediação humana independente. "
                            "Vincule ajustes às manifestações/restrições, sem inserir preferência pessoal.")
-                review_note = st.text_area("Nota de revisão humana da sugestão da IA", max_chars=2000)
-                unchanged = st.checkbox("Confirmo a publicação sem alteração de conteúdo.")
-            confirm = st.checkbox("Revisei este texto e quero solicitar novas manifestações de todos.")
-            submitted = st.form_submit_button("Publicar nova versão", type="primary",
-                                              disabled=repo.experimental_mode and not mediation)
+                review_note = st.text_area("Nota de revisão humana da sugestão da IA", max_chars=2000,
+                                           **({"key": revision_key + "_note"} if financial_scenario else {}))
+                unchanged = st.checkbox("Confirmo a publicação sem alteração de conteúdo.",
+                                        **({"key": revision_key + "_unchanged"} if financial_scenario else {}))
+                if financial_scenario:
+                    st.caption("Sem alteração refere-se ao texto da sugestão; os valores estruturados são confirmados separadamente.")
+            financial_confirmed = st.checkbox("Conferi os cinco valores estruturados e sua coerência com o texto publicado.",
+                                             key=revision_key + "_finance_" + str(tuple((allocation or {}).values()))) if financial_scenario else True
+            confirm = st.checkbox("Revisei este texto e quero solicitar novas manifestações de todos.",
+                                  **({"key": revision_key + "_confirm"} if financial_scenario else {}))
+            submit_button = st.button if financial_scenario else st.form_submit_button
+            submitted = submit_button("Publicar nova versão", type="primary",
+                                      disabled=(repo.experimental_mode and not mediation) or not financial_ok,
+                                      **({"key": revision_key + "_publish"} if financial_scenario else {}))
         if submitted:
             if not confirm:
                 st.error("Confirme a revisão humana antes de publicar.")
+            elif not financial_confirmed:
+                st.error("Confirme os valores financeiros antes de publicar.")
             elif not mediation and not repo.experimental_mode and not human_summary.strip():
                 st.error("Registre a justificativa da revisão humana para preservar o histórico.")
             else:
                 def publish():
-                    if revised.strip() == proposal["text"]:
+                    if revised.strip() == proposal["text"] and not financial_scenario:
                         raise DecisionError("A nova versão deve conter uma alteração na proposta.")
                     source = selected
                     if source is None:
@@ -462,7 +534,7 @@ def mediator_panel(repo, ai, snapshot, code, token):
                     note = review_note.strip()
                     if mediation and revised.strip() == mediation["suggested_text"] and unchanged and not note:
                         note = UNCHANGED_REVIEW_NOTE
-                    return repo.publish_revision(code, token, proposal["id"], revised, source, review_note=note)
+                    return repo.publish_revision(code, token, proposal["id"], revised, source, review_note=note, allocation=allocation)
                 ok, _ = execute(publish)
                 if ok:
                     notify("Nova versão publicada. Todos precisam se manifestar novamente.")
@@ -493,6 +565,7 @@ def history_panel(snapshot, experimental_mode=False):
         with st.expander(f"Rodada {proposal['round']} · {proposal['origin']}", expanded=proposal["id"] == snapshot["room"]["active_proposal_id"]):
             st.caption(proposal["created_at"] + " · horários em UTC")
             st.text(proposal["text"])
+            financial_proposal_view(snapshot, proposal["id"])
             publication = next((event for event in snapshot["events"]
                                 if event["action"] == "PROPOSTA_PUBLICADA" and event["proposal_id"] == proposal["id"]), None)
             if publication:
@@ -636,6 +709,9 @@ def room_view(repo, ai, code, token):
         st.rerun()
     st.subheader("Proposta atual")
     st.text(proposal["text"])
+    financial_proposal_view(snapshot)
+    if repo.experimental_mode and session_scenario(snapshot) is None:
+        st.caption("Cenário financeiro não habilitado nesta sessão; propostas em texto livre não são validadas financeiramente de forma automática.")
     if room["state"] != "ENCERRADA":
         response_form(repo, ai, snapshot, code, token)
     overview, mediation, history, exports = st.tabs(["Objeções e posições", "Mediação e encerramento", "Versões e histórico", "Exportação"])

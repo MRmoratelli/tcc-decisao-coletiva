@@ -12,11 +12,13 @@ from datetime import datetime
 from decision import (
     COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, UNCHANGED_REVIEW_NOTE,
     DecisionError, NO_OBJECTION, Repository, UNCLASSIFIED, consensus, csv_export,
-    current_proposal, current_responses, mediation_attempt_state, research_export,
+    current_proposal, current_responses, mediation_attempt_state, research_export, proposal_financial_state,
 )
 from experiment_config import (CLASSIFICATION_VERSION, MEDIATION_VERSION, EXPERIMENT_RELEASE,
                                EXPERIMENT_CONFIG_VERSION, MAX_MEDIATION_EXECUTIONS, TAXONOMY_VERSION,
-                               TAXONOMY_CODES, TECHNICAL_CANCEL_REASON)
+                               TAXONOMY_CODES, TECHNICAL_CANCEL_REASON, EXPERIMENT_SCENARIO_VERSION,
+                               SCENARIO_BUDGET, SCENARIO_ITEMS, SCENARIO_INITIAL_ALLOCATION, SCENARIO_INITIAL_TEXT,
+                               scenario_definition, validate_scenario_allocation)
 
 
 class WorkflowTests(unittest.TestCase):
@@ -1082,6 +1084,199 @@ class ExperimentalExportTests(unittest.TestCase):
         self.assertEqual(rows[0]["classification_model"], "'+modelo")
         self.assertEqual(rows[0]["classification_prompt"], CLASSIFICATION_VERSION)
         self.assertTrue(rows[0]["argument"].startswith("'="))
+
+
+class ScenarioRestrictionTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp.name) / "scenario.db"
+        self.repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def create_scenario(self, enabled=False, proposal_text=SCENARIO_INITIAL_TEXT):
+        self.access = self.repo.create_room("Escola simulada", "Orçamento limitado", proposal_text, 3,
+                                             enabled, scenario_enabled=True)
+        self.code, self.admin = self.access["code"], self.access["moderator_token"]
+        self.proposal = current_proposal(self.snapshot())["id"]
+
+    def snapshot(self):
+        return self.repo.snapshot(self.code, self.admin)
+
+    def prepare_source(self):
+        snap = self.snapshot()
+        self.repo.submit_response(self.code, self.access["invitations"][0]["token"], self.proposal, "ACEITO", "")
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        snap = self.snapshot()
+        text = "Proposta revisada para rodada " + str(current_proposal(snap)["round"] + 1)
+        if snap["room"]["ai_enabled"]:
+            result = {"origin": "IA", "ok": True, "summary": "Síntese da rodada", "suggested_text": text,
+                      "details": {"coverage": [{"participant": "P01", "treatment": "SEM_OBJECAO", "note": "Sem objeção explicitada"}]}}
+        else:
+            details = {key: "Nenhum ponto adicional identificado" for key, _ in MANUAL_MEDIATION_FIELDS}
+            details["restriction_checks"] = {key: True for key, _ in MANUAL_RESTRICTION_CHECKS}
+            details["coverage"] = [{"response_id": r["id"], "treatment": "SEM_OBJECAO"} for r in current_responses(snap)]
+            result = {"origin": "HUMANA", "ok": True, "suggested_text": text, "details": details}
+        source = self.repo.save_mediation(self.code, self.admin, self.proposal, snap["room"]["revision"], result)
+        return source, text
+
+    def test_official_budget_ceilings_initial_values_and_separate_identifiers(self):
+        self.assertEqual(SCENARIO_BUDGET, 80000)
+        self.assertEqual([i["ceiling"] for i in SCENARIO_ITEMS.values()], [40000, 35000, 20000, 30000, 20000])
+        self.assertEqual(sum(i["ceiling"] for i in SCENARIO_ITEMS.values()), 145000)
+        self.assertEqual(list(SCENARIO_INITIAL_ALLOCATION.values()), [25000, 25000, 10000, 15000, 5000])
+        self.assertEqual(set(SCENARIO_INITIAL_ALLOCATION), set(SCENARIO_ITEMS))
+        self.assertTrue(set(SCENARIO_ITEMS).isdisjoint(TAXONOMY_CODES))
+        self.assertEqual(sum(SCENARIO_INITIAL_ALLOCATION.values()), 80000)
+        for code, item in SCENARIO_ITEMS.items():
+            self.assertEqual((item["code"], item["currency"]), (code, "BRL"))
+
+    def test_exact_budget_and_lower_totals_are_valid_with_explicit_unallocated_balance(self):
+        base = dict(SCENARIO_INITIAL_ALLOCATION)
+        self.assertEqual(validate_scenario_allocation(base)["total"], 80000)
+        self.assertEqual(validate_scenario_allocation(base)["unallocated"], 0)
+        base["CAT_INV01"] -= 5000
+        result = validate_scenario_allocation(base)
+        self.assertEqual((result["total"], result["unallocated"]), (75000, 5000))
+        zero = validate_scenario_allocation({code: 0 for code in SCENARIO_ITEMS})
+        self.assertEqual((len(zero["items"]), zero["total"], zero["unallocated"]), (5, 0, 80000))
+
+    def test_budget_80001_is_rejected(self):
+        values = dict(SCENARIO_INITIAL_ALLOCATION)
+        values["CAT_INV01"] += 1
+        with self.assertRaisesRegex(ValueError, "total distribuído"):
+            validate_scenario_allocation(values)
+
+    def test_negative_and_each_of_the_five_ceiling_violations_are_rejected(self):
+        for code, item in SCENARIO_ITEMS.items():
+            for value in (-1, item["ceiling"] + 1):
+                with self.subTest(code=code, value=value):
+                    values = {c: 0 for c in SCENARIO_ITEMS}
+                    values[code] = value
+                    with self.assertRaises(ValueError):
+                        validate_scenario_allocation(values)
+
+    def test_non_finite_fractional_boolean_string_and_missing_values_are_rejected(self):
+        for value in (float("nan"), float("inf"), -float("inf"), 1.5, 25000.0, True, "25000", None):
+            with self.subTest(value=value):
+                values = dict(SCENARIO_INITIAL_ALLOCATION)
+                values["CAT_INV01"] = value
+                with self.assertRaises(ValueError):
+                    validate_scenario_allocation(values)
+
+    def test_missing_unknown_and_additional_resource_items_are_rejected(self):
+        for code in SCENARIO_ITEMS:
+            values = dict(SCENARIO_INITIAL_ALLOCATION)
+            del values[code]
+            with self.assertRaises(ValueError):
+                validate_scenario_allocation(values)
+        for code in ("CAT01", "CAT_INV06", "novo_orcamento", "reserva_externa", "doacao_futura"):
+            values = dict(SCENARIO_INITIAL_ALLOCATION) | {code: 1000}
+            with self.subTest(code=code), self.assertRaises(ValueError):
+                validate_scenario_allocation(values)
+
+    def test_scenario_v1_is_fixed_and_generic_mode_stays_non_financial(self):
+        self.create_scenario()
+        state = proposal_financial_state(self.snapshot())
+        self.assertEqual(state["status"], "VALID")
+        self.assertEqual(state["allocation"]["items"], SCENARIO_INITIAL_ALLOCATION)
+        other = dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 20000}
+        with self.assertRaises(DecisionError):
+            self.repo.create_room("Tema", "", "Proposta", 3, scenario_enabled=True, allocation=other)
+        generic = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path)
+        with self.assertRaises(DecisionError):
+            generic.create_room("Tema", "", "Proposta", ["A", "B"], scenario_enabled=True)
+        access = generic.create_room("Tema", "", "Proposta sem orçamento obrigatório", ["A", "B"])
+        data = research_export(generic.snapshot(access["code"], access["moderator_token"]))
+        self.assertIsNone(data["scenario"])
+        self.assertEqual(data["proposals"][0]["allocation_validation_status"], "NOT_ENABLED")
+
+    def test_a_and_b_reject_same_invalid_allocations_and_publish_valid_values(self):
+        for enabled in (True, False):
+            with self.subTest(ai_enabled=enabled):
+                self.create_scenario(enabled)
+                source, text = self.prepare_source()
+                over = dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 25001}
+                for values in (None, {}, over, dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": -1}):
+                    with self.assertRaises(DecisionError):
+                        self.repo.publish_revision(self.code, self.admin, self.proposal, text, source,
+                                                   review_note=UNCHANGED_REVIEW_NOTE, allocation=values)
+                self.assertEqual(len(self.snapshot()["proposals"]), 1)
+                self.assertFalse(any(e["action"] == "PROPOSTA_PUBLICADA" for e in self.snapshot()["events"]))
+                valid = dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 20000}
+                new = self.repo.publish_revision(self.code, self.admin, self.proposal, text, source,
+                                                 review_note=UNCHANGED_REVIEW_NOTE, allocation=valid)
+                state = proposal_financial_state(self.snapshot())
+                self.assertEqual(current_proposal(self.snapshot())["id"], new)
+                self.assertEqual((state["allocation"]["total"], state["allocation"]["unallocated"]), (75000, 5000))
+                event = next(e for e in self.snapshot()["events"] if e["action"] == "PROPOSTA_PUBLICADA")
+                self.assertEqual(event["proposal_id"], new)
+                self.assertEqual(json.loads(event["payload_json"])["allocation"], state["allocation"])
+
+    def test_v1_v2_v3_allocations_and_frozen_scenario_export_under_schema_two(self):
+        self.create_scenario(False)
+        versions = [self.proposal]
+        allocations = [dict(SCENARIO_INITIAL_ALLOCATION),
+                       dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 20000},
+                       dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 20000, "CAT_INV02": 20000}]
+        for values in allocations[1:]:
+            source, text = self.prepare_source()
+            self.proposal = self.repo.publish_revision(self.code, self.admin, self.proposal, text, source, allocation=values)
+            versions.append(self.proposal)
+        data = research_export(self.snapshot())
+        self.assertEqual(data["schema_version"], 2)
+        self.assertEqual(data["scenario"]["scenario_version"], EXPERIMENT_SCENARIO_VERSION)
+        self.assertEqual(data["scenario"]["budget"], 80000)
+        self.assertEqual(data["scenario"]["allocation_items"], SCENARIO_ITEMS)
+        self.assertEqual(data["experiment"]["scenario_version"], EXPERIMENT_SCENARIO_VERSION)
+        for index, proposal in enumerate(data["proposals"]):
+            self.assertEqual(proposal["id"], versions[index])
+            self.assertEqual(proposal["allocation"]["items"], allocations[index])
+            self.assertEqual(proposal["total"], sum(allocations[index].values()))
+            self.assertEqual(proposal["unallocated"], 80000 - proposal["total"])
+            self.assertEqual(proposal["allocation_validation_status"], "VALID")
+        source, text = self.prepare_source()
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, text, source, allocation=allocations[-1])
+        self.assertEqual(len(self.snapshot()["proposals"]), 3)
+
+    def test_financial_change_can_create_new_version_without_rewriting_explanatory_prose(self):
+        self.create_scenario(False, "Distribuição conforme os valores estruturados apresentados.")
+        source, _ = self.prepare_source()
+        old_text = current_proposal(self.snapshot())["text"]
+        values = dict(SCENARIO_INITIAL_ALLOCATION) | {"CAT_INV01": 20000}
+        self.proposal = self.repo.publish_revision(self.code, self.admin, self.proposal, old_text, source, allocation=values)
+        self.assertEqual(current_proposal(self.snapshot())["text"], old_text)
+        self.assertEqual(proposal_financial_state(self.snapshot())["allocation"]["total"], 75000)
+        source, _ = self.prepare_source()
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, old_text, source, allocation=values)
+
+    def test_missing_financial_record_is_explicit_and_not_inferred_from_v1_text(self):
+        self.create_scenario(False)
+        source, text = self.prepare_source()
+        snap = self.snapshot()
+        event = next(e for e in snap["events"] if e["action"] == "SALA_CRIADA")
+        payload = json.loads(event["payload_json"])
+        del payload["allocation"]
+        with self.repo.transaction(write=True) as conn:
+            conn.execute("UPDATE dc_events SET payload_json=? WHERE id=?", (json.dumps(payload), event["id"]))
+        data = research_export(self.snapshot())
+        self.assertEqual(data["proposals"][0]["allocation_validation_status"], "NOT_RECORDED")
+        self.assertIsNone(data["proposals"][0]["allocation"])
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, text, source, allocation=dict(SCENARIO_INITIAL_ALLOCATION))
+
+    def test_unknown_or_inconsistent_scenario_configuration_is_not_automatically_validated(self):
+        bad = scenario_definition()
+        bad["scenario_version"] = "unsupported-future-version"
+        with self.assertRaisesRegex(ValueError, "não reconhecida"):
+            validate_scenario_allocation(dict(SCENARIO_INITIAL_ALLOCATION), bad)
+        bad = scenario_definition()
+        bad["budget"] = 90000
+        with self.assertRaises(ValueError):
+            validate_scenario_allocation(dict(SCENARIO_INITIAL_ALLOCATION), bad)
 
 
 if __name__ == "__main__":

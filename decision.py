@@ -22,6 +22,7 @@ from pathlib import Path
 from experiment_config import (
     CLASSIFICATION_FAILURE_CODES, CLASSIFICATION_VERSION, EXPERIMENT_CONFIG_VERSION, EXPERIMENT_RELEASE,
     MAX_MEDIATION_EXECUTIONS, MEDIATION_VERSION, TAXONOMY_CODES, TAXONOMY_VERSION,
+    SCENARIO_INITIAL_ALLOCATION, scenario_definition, validate_scenario_allocation,
 )
 
 POSITIONS = {
@@ -144,6 +145,42 @@ def mediation_attempt_state(snapshot):
             "retry": retry, "can_start": not attempts or retry,
             "persistent_failure": len(attempts) >= MAX_MEDIATION_EXECUTIONS
             and all(m["status"] == "FALHA" for m in attempts)}
+
+
+def session_scenario(snapshot):
+    event = next((e for e in snapshot["events"] if e["action"] == "SESSAO_EXPERIMENTAL_CONFIGURADA"), None)
+    if not event:
+        return None
+    try:
+        metadata = json.loads(event["payload_json"])
+    except (ValueError, TypeError):
+        return {}  # Configuração ilegível nunca vira cenário livre silenciosamente.
+    if not isinstance(metadata, dict):
+        return {}
+    if metadata.get("scenario_enabled") or "scenario" in metadata:
+        return metadata["scenario"] if isinstance(metadata.get("scenario"), dict) else {}
+    return None
+
+
+def proposal_financial_state(snapshot, proposal_id=None):
+    scenario = session_scenario(snapshot)
+    if scenario is None:
+        return {"status": "NOT_ENABLED", "scenario": None, "allocation": None}
+    proposal_id = proposal_id or snapshot["room"]["active_proposal_id"]
+    try:
+        validate_scenario_allocation(dict(SCENARIO_INITIAL_ALLOCATION), scenario)
+        event = next((e for e in snapshot["events"] if e["proposal_id"] == proposal_id
+                      and e["action"] in ("SALA_CRIADA", "PROPOSTA_PUBLICADA")), None)
+        payload = json.loads(event["payload_json"]) if event else {}
+        allocation = payload.get("allocation")
+        if allocation is None:
+            return {"status": "NOT_RECORDED", "scenario": scenario, "allocation": None}
+        validated = validate_scenario_allocation(allocation.get("items"), scenario)
+        if allocation != validated:
+            raise ValueError("Totais ou saldo não correspondem aos itens registrados.")
+        return {"status": "VALID", "scenario": scenario, "allocation": validated}
+    except (ValueError, TypeError, AttributeError):
+        return {"status": "INVALID", "scenario": scenario, "allocation": None}
 
 
 SCHEMA = (
@@ -352,10 +389,23 @@ class Repository:
             raise DecisionError("No modo experimental, escolha uma categoria CAT01–CAT09.")
         return category
 
-    def create_room(self, theme, context, proposal, aliases, ai_enabled=True):
+    def create_room(self, theme, context, proposal, aliases, ai_enabled=True, scenario_enabled=False, allocation=None):
         theme = clean(theme, "o tema", 300)
         context = clean(context, "o contexto", 6000, False)
         proposal = clean(proposal, "a proposta inicial", 12000)
+        scenario, initial = None, None
+        if scenario_enabled:
+            if not self.experimental_mode:
+                raise DecisionError("O cenário financeiro é restrito ao modo experimental.")
+            scenario = scenario_definition()
+            try:
+                initial = validate_scenario_allocation(dict(SCENARIO_INITIAL_ALLOCATION) if allocation is None else allocation, scenario)
+            except ValueError as error:
+                raise DecisionError(str(error)) from error
+            if initial["items"] != SCENARIO_INITIAL_ALLOCATION:
+                raise DecisionError("V1 deve utilizar a distribuição oficial 25/25/10/15/5 mil reais.")
+        elif allocation is not None:
+            raise DecisionError("Ative o cenário financeiro para registrar uma distribuição estruturada.")
         if self.experimental_mode:
             # Legacy callers may pass a roster; discard its identifiers before storage.
             count = aliases if type(aliases) is int else len(aliases)
@@ -391,10 +441,15 @@ class Repository:
                 invitations.append({"alias": alias, "pseudonym": pseudonym, "token": token})
             self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SALA_CRIADA", {
                 "participants": len(aliases), "ai_enabled": bool(ai_enabled), "max_rounds": MAX_ROUNDS,
+                **({"allocation": initial, "scenario_version": scenario["scenario_version"]} if scenario else {}),
             })
             if self.experimental_mode:
+                metadata = self.runtime_identity() | {"condition": "A" if ai_enabled else "B", "ai_enabled": bool(ai_enabled),
+                                                     "scenario_enabled": bool(scenario_enabled)}
+                if scenario is not None:
+                    metadata["scenario"] = scenario
                 self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SESSAO_EXPERIMENTAL_CONFIGURADA",
-                            self.runtime_identity() | {"condition": "A" if ai_enabled else "B", "ai_enabled": bool(ai_enabled)})
+                            metadata)
         return {"code": code, "moderator_token": moderator_token, "invitations": invitations}
 
     def runtime_identity(self):
@@ -650,7 +705,7 @@ class Repository:
             })
         return mediation_id
 
-    def publish_revision(self, code, token, proposal_id, text, mediation_id=None, review_note=""):
+    def publish_revision(self, code, token, proposal_id, text, mediation_id=None, review_note="", allocation=None):
         text = clean(text, "a proposta revisada", 12000)
         if not isinstance(review_note, str):
             raise DecisionError("Registre uma nota de revisão humana textual.")
@@ -665,7 +720,19 @@ class Repository:
             old = conn.execute("SELECT * FROM dc_proposals WHERE id=?", (proposal_id,)).fetchone()
             if old["round"] >= MAX_ROUNDS:
                 raise DecisionError("O limite de três rodadas já foi atingido.")
-            if text == old["text"]:
+            events = [dict(e) for e in conn.execute("SELECT * FROM dc_events WHERE room_id=? ORDER BY created_at", (room["id"],)).fetchall()]
+            financial = proposal_financial_state({"room": room, "events": events})
+            validated = None
+            if financial["scenario"] is not None:
+                if financial["status"] != "VALID":
+                    raise DecisionError("A distribuição da proposta vigente não pode ser validada automaticamente. Não publique com estado financeiro incerto.")
+                try:
+                    validated = validate_scenario_allocation(allocation, financial["scenario"])
+                except ValueError as error:
+                    raise DecisionError(str(error)) from error
+            elif allocation is not None:
+                raise DecisionError("Esta sessão não possui cenário financeiro habilitado.")
+            if text == old["text"] and (validated is None or validated == financial["allocation"]):
                 raise DecisionError("A nova versão deve conter uma alteração na proposta.")
             origin = "HUMANA"
             mediation = None
@@ -709,6 +776,8 @@ class Repository:
                 "source_mediation_id": mediation_id,
                 "source_origin": mediation["origin"] if mediation else None,
                 "changed_from_source": changed, "review_note": review_note,
+                **({"allocation": validated, "scenario_version": financial["scenario"]["scenario_version"],
+                    "allocation_source": "HUMANA"} if validated is not None else {}),
             })
         return new_id
 
@@ -858,6 +927,9 @@ def research_export(snapshot):
         events.append(event)
     output["events"] = events
     output["experiment"], output["exporter"] = _experiment_manifest(snapshot, events, output["exported_at"])
+    scenario = session_scenario(snapshot)
+    output["scenario"] = _export_fields(scenario, ("scenario_version", "budget", "currency", "allocation_items", "initial_allocation")) if scenario is not None else None
+    output["experiment"]["scenario_version"] = scenario.get("scenario_version") if scenario is not None else None
     proposals = {p["id"]: p for p in snapshot["proposals"]}
     publications = {e["proposal_id"]: e for e in events if e["action"] == "PROPOSTA_PUBLICADA"}
     starts = {e["payload"].get("mediation_id"): e for e in events
@@ -884,6 +956,11 @@ def research_export(snapshot):
     output["proposals"] = []
     for row in snapshot["proposals"]:
         item = _export_fields(row, ("id", "room_id", "round", "text", "parent_id", "source_mediation_id", "origin", "created_at"))
+        financial = proposal_financial_state(snapshot, row["id"])
+        item["allocation"] = financial["allocation"]
+        item["allocation_validation_status"] = financial["status"]
+        item["total"] = financial["allocation"]["total"] if financial["allocation"] is not None else None
+        item["unallocated"] = financial["allocation"]["unallocated"] if financial["allocation"] is not None else None
         event = publications.get(row["id"])
         if event and isinstance(event["payload"], dict):
             payload = event["payload"]
