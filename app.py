@@ -46,6 +46,20 @@ def execute(action):
     return False, None
 
 
+def participant_has_current_response(snapshot):
+    """Somente a manifestação do próprio participante na proposta ativa libera a visão."""
+    actor = snapshot["actor"]
+    return actor["role"] == "participant" and any(
+        response["participant_id"] == actor["id"]
+        for response in current_responses(snapshot)
+    )
+
+
+def participant_visibility_blocked(snapshot, experimental_mode):
+    return (experimental_mode and snapshot["actor"]["role"] == "participant"
+            and not participant_has_current_response(snapshot))
+
+
 def login_screen(repo):
     st.write("Discuta uma proposta, revise o texto e registre a aceitação do grupo em até três rodadas.")
     join, create = st.tabs(["Entrar na sala", "Criar sala"])
@@ -72,7 +86,7 @@ def login_screen(repo):
                 roster = st.text_area("Participantes: um nome ou apelido por linha", help="Lista fixa da sala. Para seu experimento, cadastre as 3 a 5 pessoas disponíveis.")
             enabled = st.checkbox("Usar IA para sugerir categorias e revisões", value=True)
             if repo.experimental_mode:
-                st.caption("As manifestações ficam visíveis aos membros da sala. Com IA ativa, textos sanitizados são enviados ao Gemini; a mediação usa identificadores temporários M01, M02 etc. Evite dados pessoais no texto.")
+                st.caption("As manifestações dos demais ficam ocultas até sua resposta em cada versão. Com IA ativa, textos sanitizados são enviados ao Gemini; a mediação usa identificadores temporários M01, M02 etc. Evite dados pessoais no texto.")
             else:
                 st.caption("As manifestações ficam visíveis aos membros da sala. Com IA ativa, tema, proposta e justificativas serão enviados ao Gemini com identificadores P01, P02 etc. Evite dados pessoais no texto.")
             submitted = st.form_submit_button("Criar sala e gerar acessos", type="primary")
@@ -263,6 +277,9 @@ def manifestations(repo, snapshot, code, token):
 
 
 def mediator_panel(repo, ai, snapshot, code, token):
+    if participant_visibility_blocked(snapshot, repo.experimental_mode):
+        st.info("O processo de mediação desta rodada ficará disponível após sua manifestação nesta versão.")
+        return
     room, proposal, state = snapshot["room"], current_proposal(snapshot), consensus(snapshot)
     is_moderator = snapshot["actor"]["role"] == "moderator"
     if is_moderator and not repo.postgres:
@@ -360,7 +377,10 @@ def mediator_panel(repo, ai, snapshot, code, token):
                 st.rerun()
 
 
-def history_panel(snapshot):
+def history_panel(snapshot, experimental_mode=False):
+    if participant_visibility_blocked(snapshot, experimental_mode):
+        st.info("Histórico detalhado disponível após sua manifestação nesta versão.")
+        return
     for proposal in reversed(snapshot["proposals"]):
         with st.expander(f"Rodada {proposal['round']} · {proposal['origin']}", expanded=proposal["id"] == snapshot["room"]["active_proposal_id"]):
             st.caption(proposal["created_at"] + " · horários em UTC")
@@ -432,9 +452,14 @@ def live_consensus(repo, code, token, expected_proposal, expected_phase):
     if not ok:
         return
     room = snapshot["room"]
-    proposal, state = current_proposal(snapshot), consensus(snapshot)
+    proposal = current_proposal(snapshot)
     if proposal["id"] != expected_proposal or room["state"] != expected_phase:
         st.rerun(scope="app")
+    if participant_visibility_blocked(snapshot, repo.experimental_mode):
+        st.metric("Rodada", f"{proposal['round']} / 3")
+        st.info("Registre sua manifestação antes de visualizar informações agregadas desta rodada.")
+        return
+    state = consensus(snapshot)
     a, b, c = st.columns(3)
     a.metric("Rodada", f"{proposal['round']} / 3")
     b.metric("Manifestações", f"{state['responded']} / {state['expected']}")
@@ -473,12 +498,15 @@ def room_view(repo, ai, code, token):
         response_form(repo, ai, snapshot, code, token)
     overview, mediation, history, exports = st.tabs(["Objeções e posições", "Mediação e encerramento", "Versões e histórico", "Exportação"])
     with overview:
-        pareto(snapshot)
-        manifestations(repo, snapshot, code, token)
+        if participant_visibility_blocked(snapshot, repo.experimental_mode):
+            st.info("As manifestações dos demais ficam ocultas até você registrar sua posição nesta versão.")
+        else:
+            pareto(snapshot)
+            manifestations(repo, snapshot, code, token)
     with mediation:
         mediator_panel(repo, ai, snapshot, code, token)
     with history:
-        history_panel(snapshot)
+        history_panel(snapshot, repo.experimental_mode)
     with exports:
         export_panel(snapshot)
     room_settings(repo, snapshot, code, token)

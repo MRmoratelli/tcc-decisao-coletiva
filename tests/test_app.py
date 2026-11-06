@@ -158,6 +158,174 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertEqual(final["category_contests"][0]["status"], "RESOLVIDA")
         self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
 
+    def rendered_text(self, app):
+        # Inspect all text and table bodies, including collapsed expanders/tabs.
+        kinds = ("text", "caption", "markdown", "info", "warning", "success", "error", "dataframe")
+        return "\n".join(str(item.value) for kind in kinds for item in app.get(kind)) + "\n" + "\n".join(
+            item.label for item in app.expander
+        )
+
+    def seed_other_response(self, access, marker, index=1):
+        repo = Repository(sqlite_path=self.path, experimental_mode=True)
+        snap = repo.snapshot(access["code"], access["moderator_token"])
+        proposal_id = current_proposal(snap)["id"]
+        token = access["invitations"][index]["token"]
+        saved = repo.submit_response(access["code"], token, proposal_id, "NAO_ACEITO", marker)
+        repo.set_category(access["code"], access["moderator_token"], proposal_id, saved["id"], "CAT07", saved["edit"])
+        return repo, proposal_id, saved
+
+    def assert_blind(self, person, *markers):
+        self.assertFalse(person.exception, [str(e) for e in person.exception])
+        text = self.rendered_text(person)
+        for marker in markers:
+            self.assertNotIn(marker, text)
+        for leak in ("Aguardando:", "Faltam respostas:", "Todos os participantes aceitam", "Todos aceitam",
+                     "Categoria:", "Classificação:", "Contestação do participante:", "Resultado:"):
+            self.assertNotIn(leak, text)
+        self.assertEqual([m.label for m in person.metric], ["Rodada"])
+        self.assertFalse(person.get("plotly_chart"))
+        self.assertFalse(person.dataframe)
+        self.assertFalse(person.get("download_button"))
+        self.assertTrue(any("antes de visualizar informações agregadas" in m.value for m in person.info))
+        self.assertTrue(any("Histórico detalhado disponível após" in m.value for m in person.info))
+
+    def test_visibility_helper_requires_own_response_to_active_proposal(self):
+        from app import participant_has_current_response, participant_visibility_blocked
+        snap = {"actor": {"role": "participant", "id": "self"},
+                "room": {"active_proposal_id": "v2"},
+                "responses": [{"participant_id": "self", "proposal_id": "v1"},
+                              {"participant_id": "other", "proposal_id": "v2"}]}
+        self.assertFalse(participant_has_current_response(snap))
+        self.assertTrue(participant_visibility_blocked(snap, True))
+        self.assertFalse(participant_visibility_blocked(snap, False))
+        snap["responses"].append({"participant_id": "self", "proposal_id": "v2"})
+        self.assertTrue(participant_has_current_response(snap))
+        self.assertFalse(participant_visibility_blocked(snap, True))
+        snap["actor"] = {"role": "moderator"}
+        self.assertFalse(participant_has_current_response(snap))
+        self.assertFalse(participant_visibility_blocked(snap, True))
+
+    def test_experimental_unanswered_participant_sees_no_other_response_or_aggregate(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        _, access = self.create()
+        marker = "SIGILO_P02_R1 orçamento insuficiente"
+        repo, proposal_id, saved = self.seed_other_response(access, marker)
+        repo.suggest_category(access["code"], access["invitations"][1]["token"], proposal_id,
+                              saved["id"], "CAT05", saved["edit"])
+        person = self.join(access, 0)
+        self.assert_blind(person, marker, "P02", "P03", "CAT07", "CAT05")
+        self.assertIn("Reunião semanal às quartas", self.rendered_text(person))
+        self.assertIn("Todos participam remotamente", self.rendered_text(person))
+        self.assertEqual(widget(person, "radio", "Minha posição sobre esta versão").value, "ACEITO")
+        self.assertIsNotNone(widget(person, "text_area", "Justificativa e ressalvas"))
+        self.seed_other_response(access, "SIGILO_P03_R1 outra objeção", index=2)
+        widget(person, "button", "Atualizar painel").click().run()
+        self.assert_blind(person, marker, "SIGILO_P03_R1", "P02", "P03", "CAT07")
+
+    def test_experimental_visibility_unlocks_only_after_successful_save(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        _, access = self.create()
+        marker = "SIGILO_P02_R1 prioridade de investimento"
+        self.seed_other_response(access, marker)
+        person = self.join(access, 0)
+        widget(person, "radio", "Minha posição sobre esta versão").set_value("NAO_ACEITO")
+        widget(person, "button", "Salvar manifestação").click().run()
+        # A validation failure cannot release data from the other participant.
+        self.assertTrue(person.error)
+        self.assert_blind(person, marker, "P02", "CAT07")
+        widget(person, "text_area", "Justificativa e ressalvas").set_value("Prefiro outra distribuição")
+        widget(person, "button", "Salvar manifestação").click().run()
+        self.assertFalse(person.exception, [str(e) for e in person.exception])
+        self.assertIn(marker, self.rendered_text(person))
+        self.assertIn("CAT07", self.rendered_text(person))
+        self.assertEqual([m.label for m in person.metric], ["Rodada", "Manifestações", "Não aceites"])
+        self.assertEqual(widget(person, "metric", "Manifestações").value, "2 / 3")
+        self.assertTrue(person.get("plotly_chart"))
+        self.assertTrue(person.dataframe)
+        self.assertFalse(person.get("download_button"))
+
+    def test_experimental_new_versions_reapply_blindness_in_v2_and_v3(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create()
+        markers = ["SIGILO_P02_R1 objeção inicial"]
+        self.seed_other_response(access, markers[0])
+        person = self.join(access, 0)
+        widget(person, "button", "Salvar manifestação").click().run()
+        self.assertIn(markers[0], self.rendered_text(person))
+        for round_number in (2, 3):
+            moderator.run()
+            widget(moderator, "button", "Pausar coleta e revisar").click().run()
+            widget(moderator, "text_area", "Texto revisado a ser apresentado ao grupo").set_value(f"Proposta da rodada {round_number}")
+            widget(moderator, "text_area", "Justificativa da revisão humana").set_value(f"MEDIAÇÃO_R{round_number - 1} baseada nas objeções")
+            widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+            widget(moderator, "button", "Publicar nova versão").click().run()
+            markers.append(f"SIGILO_P02_R{round_number} objeção nova")
+            self.seed_other_response(access, markers[-1])
+            person.run()
+            self.assert_blind(person, *markers, "MEDIAÇÃO_R", "P02", "CAT07")
+            self.assertEqual(widget(person, "metric", "Rodada").value, f"{round_number} / 3")
+            self.assertIn(f"Proposta da rodada {round_number}", self.rendered_text(person))
+            widget(person, "button", "Salvar manifestação").click().run()
+            self.assertFalse(person.exception, [str(e) for e in person.exception])
+            self.assertIn(markers[-1], self.rendered_text(person))
+            self.assertTrue(person.get("plotly_chart"))
+
+    def test_experimental_moderator_keeps_full_visibility_and_export(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create()
+        marker = "SIGILO_P02 moderador vê esta manifestação"
+        repo, proposal_id, saved = self.seed_other_response(access, marker)
+        repo.suggest_category(access["code"], access["invitations"][1]["token"], proposal_id,
+                              saved["id"], "CAT05", saved["edit"])
+        moderator.run()
+        text = self.rendered_text(moderator)
+        self.assertIn(marker, text)
+        self.assertIn("Aguardando: P01, P03", text)
+        self.assertIn("Contestação do participante:", text)
+        self.assertEqual(widget(moderator, "metric", "Não aceites").value, "1")
+        self.assertTrue(moderator.get("plotly_chart"))
+        self.assertTrue(moderator.dataframe)
+        self.assertIsNotNone(widget(moderator, "selectbox", "Revisar categoria"))
+        labels = [w.label for w in moderator.get("download_button")]
+        self.assertIn("Baixar histórico completo (JSON)", labels)
+        self.assertIn("Baixar manifestações (CSV)", labels)
+        widget(moderator, "button", "Pausar coleta e revisar").click().run()
+        self.assertIn(marker, self.rendered_text(moderator))
+        self.assertIsNotNone(widget(moderator, "button", "Publicar nova versão"))
+
+    def test_experimental_unanswered_history_and_mediation_stay_hidden_when_paused_or_closed(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        _, access = self.create()
+        marker = "SIGILO_P02 manifestação corrente"
+        repo, proposal_id, _ = self.seed_other_response(access, marker)
+        code, token = access["code"], access["moderator_token"]
+        repo.set_phase(code, token, proposal_id, "REVISAO")
+        snap = repo.snapshot(code, token)
+        repo.save_mediation(code, token, proposal_id, snap["room"]["revision"], {
+            "origin": "HUMANA", "ok": True, "summary": "MEDIAÇÃO_SIGILOSA_R1",
+            "suggested_text": "SUGESTÃO_SIGILOSA_R1",
+        })
+        repo.set_phase(code, token, proposal_id, "COLETA")
+        person = self.join(access, 0)
+        self.assert_blind(person, marker, "MEDIAÇÃO_SIGILOSA", "SUGESTÃO_SIGILOSA")
+        repo.set_phase(code, token, proposal_id, "REVISAO")
+        person.run()
+        self.assert_blind(person, marker, "MEDIAÇÃO_SIGILOSA", "SUGESTÃO_SIGILOSA")
+        repo.finish(code, token, proposal_id, "MOTIVO_SIGILOSO ligado às posições", cancel=True)
+        person.run()
+        self.assert_blind(person, marker, "MEDIAÇÃO_SIGILOSA", "SUGESTÃO_SIGILOSA", "MOTIVO_SIGILOSO")
+
+    def test_generic_mode_preserves_visibility_before_own_response(self):
+        _, access = self.create()
+        marker = "VISÍVEL_NO_MODO_GENÉRICO antes de responder"
+        self.seed_other_response(access, marker)
+        person = self.join(access, 0)
+        self.assertIn(marker, self.rendered_text(person))
+        self.assertIn("Aguardando: P01, P03", self.rendered_text(person))
+        self.assertEqual(widget(person, "metric", "Manifestações").value, "1 / 3")
+        self.assertTrue(person.get("plotly_chart"))
+        self.assertTrue(person.dataframe)
+
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)
         person = self.join(access, 0)
