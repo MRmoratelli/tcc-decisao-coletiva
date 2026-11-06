@@ -10,12 +10,20 @@ import hashlib
 import hmac
 import io
 import json
+import os
+import re
 import secrets
 import sqlite3
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+
+from experiment_config import (
+    CLASSIFICATION_FAILURE_CODES, CLASSIFICATION_VERSION, EXPERIMENT_CONFIG_VERSION, EXPERIMENT_RELEASE,
+    MAX_MEDIATION_EXECUTIONS, MEDIATION_VERSION, TAXONOMY_CODES, TAXONOMY_VERSION,
+    SCENARIO_INITIAL_ALLOCATION, scenario_definition, validate_scenario_allocation,
+)
 
 POSITIONS = {
     "ACEITO": "Aceito",
@@ -25,6 +33,22 @@ POSITIONS = {
 NO_OBJECTION = "Sem objeção explicitada"
 UNCLASSIFIED = "Não classificada"
 MAX_ROUNDS = 3
+UNCHANGED_REVIEW_NOTE = "Publicada sem alteração de conteúdo."
+COVERAGE_STATES = ("CONTEMPLADA", "PARCIAL", "NAO_CONTEMPLADA", "SEM_OBJECAO")
+MANUAL_MEDIATION_FIELDS = (
+    ("divergences", "Divergências identificadas"),
+    ("conditions", "Condições/preocupações registradas"),
+    ("convergences", "Pontos de convergência"),
+    ("changes", "Alterações propostas"),
+    ("restrictions", "Verificação de restrições"),
+    ("rationale", "Justificativa das alterações"),
+)
+MANUAL_RESTRICTION_CHECKS = (
+    ("budget_and_constraints", "Conferi o orçamento e as restrições fornecidas."),
+    ("scenario_limits", "Conferi os limites do cenário."),
+    ("no_extra_resources", "Não incluí recurso indisponível."),
+    ("no_silent_omission", "Nenhuma demanda foi eliminada silenciosamente."),
+)
 
 
 class DecisionError(ValueError):
@@ -43,6 +67,12 @@ def digest(token):
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
+def declared_app_commit(value):
+    """SHA declarado na implantação, nunca deduzido da branch ou consultado externamente."""
+    value = str(value or "").strip()
+    return value if re.fullmatch(r"[0-9a-fA-F]{7,40}", value) else None
+
+
 def clean(text, label, limit, required=True):
     value = str(text).strip()
     if required and not value:
@@ -50,6 +80,107 @@ def clean(text, label, limit, required=True):
     if len(value) > limit:
         raise DecisionError(f"{label} deve ter até {limit} caracteres.")
     return value
+
+
+def validated_manual_mediation(result, responses):
+    """Valida estrutura e vínculos; não julga fidelidade nem otimiza a proposta."""
+    details = result.get("details")
+    if not isinstance(details, dict):
+        raise DecisionError("Preencha a mediação manual estruturada.")
+    fields = {}
+    for key, label in MANUAL_MEDIATION_FIELDS:
+        if not isinstance(details.get(key), str):
+            raise DecisionError(f"Preencha {label}.")
+        fields[key] = clean(details[key], label, 2500)
+    checks = details.get("restriction_checks")
+    if not isinstance(checks, dict) or any(checks.get(key) is not True for key, _ in MANUAL_RESTRICTION_CHECKS):
+        raise DecisionError("Confirme todas as verificações de restrições.")
+    by_id = {row["id"]: row for row in responses}
+    if not by_id or any(row["category"] not in (*TAXONOMY_CODES, NO_OBJECTION) for row in responses):
+        raise DecisionError("Classifique as manifestações antes de registrar a mediação manual.")
+    coverage = details.get("coverage")
+    if not isinstance(coverage, list) or len(coverage) != len(by_id):
+        raise DecisionError("Registre a cobertura de cada manifestação da versão atual.")
+    normalized, seen = [], set()
+    for item in coverage:
+        if not isinstance(item, dict) or not isinstance(item.get("response_id"), str):
+            raise DecisionError("Cobertura sem manifestação válida.")
+        response_id = item["response_id"]
+        if response_id not in by_id or response_id in seen:
+            raise DecisionError("Cobertura de manifestação desconhecida ou repetida.")
+        row = by_id[response_id]
+        treatment = item.get("treatment")
+        if treatment not in COVERAGE_STATES:
+            raise DecisionError("Estado de cobertura inválido.")
+        if (treatment == "SEM_OBJECAO") != (row["category"] == NO_OBJECTION):
+            raise DecisionError("SEM_OBJECAO exige manifestação classificada sem objeção explicitada.")
+        if row["category"] == NO_OBJECTION and row["position"] != "ACEITO":
+            raise DecisionError("Ressalva ou rejeição não pode ser tratada como ausência de objeção.")
+        note = item.get("note", "")
+        if not isinstance(note, str):
+            raise DecisionError("Registre a razão operacional da cobertura.")
+        note = clean(note, "a razão operacional da cobertura", 2000, treatment != "SEM_OBJECAO")
+        normalized.append({"response_id": response_id, "response_edit": row["edit"],
+                           "participant": row["pseudonym"], "category": row["category"],
+                           "treatment": treatment, "note": note})
+        seen.add(response_id)
+    suggested = result.get("suggested_text")
+    if not isinstance(suggested, str):
+        raise DecisionError("Preencha a proposta revisada sugerida.")
+    return {**result,
+            "suggested_text": clean(suggested, "a proposta revisada sugerida", 12000),
+            "summary": "\n\n".join(f"{label}\n{fields[key]}" for key, label in MANUAL_MEDIATION_FIELDS),
+            "details": {**fields, "restriction_checks": {key: True for key, _ in MANUAL_RESTRICTION_CHECKS},
+                        "coverage": normalized}}
+
+
+def mediation_attempt_state(snapshot):
+    room = snapshot["room"]
+    attempts = [m for m in snapshot["mediations"] if m["proposal_id"] == room["active_proposal_id"]
+                and m["revision"] == room["revision"] and m["origin"] == "IA"]
+    pending = any(m["status"] == "EM_EXECUCAO" for m in attempts)
+    success = any(m["status"] == "OK" for m in attempts)
+    retry = len(attempts) == 1 and attempts[0]["status"] == "FALHA"
+    return {"executions": len(attempts), "in_progress": pending, "has_success": success,
+            "retry": retry, "can_start": not attempts or retry,
+            "persistent_failure": len(attempts) >= MAX_MEDIATION_EXECUTIONS
+            and all(m["status"] == "FALHA" for m in attempts)}
+
+
+def session_scenario(snapshot):
+    event = next((e for e in snapshot["events"] if e["action"] == "SESSAO_EXPERIMENTAL_CONFIGURADA"), None)
+    if not event:
+        return None
+    try:
+        metadata = json.loads(event["payload_json"])
+    except (ValueError, TypeError):
+        return {}  # Configuração ilegível nunca vira cenário livre silenciosamente.
+    if not isinstance(metadata, dict):
+        return {}
+    if metadata.get("scenario_enabled") or "scenario" in metadata:
+        return metadata["scenario"] if isinstance(metadata.get("scenario"), dict) else {}
+    return None
+
+
+def proposal_financial_state(snapshot, proposal_id=None):
+    scenario = session_scenario(snapshot)
+    if scenario is None:
+        return {"status": "NOT_ENABLED", "scenario": None, "allocation": None}
+    proposal_id = proposal_id or snapshot["room"]["active_proposal_id"]
+    try:
+        validate_scenario_allocation(dict(SCENARIO_INITIAL_ALLOCATION), scenario)
+        event = next((e for e in snapshot["events"] if e["proposal_id"] == proposal_id
+                      and e["action"] in ("SALA_CRIADA", "PROPOSTA_PUBLICADA")), None)
+        payload = json.loads(event["payload_json"]) if event else {}
+        allocation = payload.get("allocation")
+        if allocation is None:
+            return {"status": "NOT_RECORDED", "scenario": scenario, "allocation": None}
+        validated = validate_scenario_allocation(allocation.get("items"), scenario)
+        if allocation != validated:
+            raise ValueError("Totais ou saldo não correspondem aos itens registrados.")
+        return {"status": "VALID", "scenario": scenario, "allocation": validated}
+    except (ValueError, TypeError, AttributeError):
+        return {"status": "INVALID", "scenario": scenario, "allocation": None}
 
 
 SCHEMA = (
@@ -78,6 +209,15 @@ SCHEMA = (
         classification_model TEXT, classification_prompt TEXT,
         edit INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
         UNIQUE(proposal_id, participant_id))""",
+    """CREATE TABLE IF NOT EXISTS dc_category_contests (
+        id TEXT PRIMARY KEY,
+        response_id TEXT NOT NULL REFERENCES dc_responses(id),
+        response_edit INTEGER NOT NULL,
+        participant_id TEXT NOT NULL REFERENCES dc_participants(id),
+        suggested_category TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('PENDENTE','RESOLVIDA')),
+        created_at TEXT NOT NULL, resolved_at TEXT, resolved_category TEXT,
+        UNIQUE(response_id, response_edit))""",
     """CREATE TABLE IF NOT EXISTS dc_mediations (
         id TEXT PRIMARY KEY, room_id TEXT NOT NULL REFERENCES dc_rooms(id),
         proposal_id TEXT NOT NULL REFERENCES dc_proposals(id),
@@ -101,9 +241,11 @@ class Connection:
 
 
 class Repository:
-    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3"):
+    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3", experimental_mode=False, app_commit=None):
         self.url = database_url.strip()
         self.postgres = self.url.startswith(("postgres://", "postgresql://"))
+        self.experimental_mode = bool(experimental_mode)
+        self.app_commit = declared_app_commit(os.getenv("APP_COMMIT") if app_commit is None else app_commit)
         if self.url and not self.postgres:
             raise DecisionError("DATABASE_URL deve ser uma conexão PostgreSQL.")
         self.path = str(Path(sqlite_path).resolve())
@@ -177,11 +319,101 @@ class Repository:
     def _bump(self, conn, room):
         conn.execute("UPDATE dc_rooms SET revision=revision+1 WHERE id=?", (room["id"],))
 
-    def create_room(self, theme, context, proposal, aliases, ai_enabled=True):
+    def _ensure_ai_configuration(self, conn, room, actor, configuration):
+        required = ("model", "classification_prompt", "mediation_prompt", "taxonomy_version")
+        if (not isinstance(configuration, dict) or any(
+                not isinstance(configuration.get(k), str) or not configuration[k].strip()
+                or len(configuration[k]) > 200 for k in required)
+                or configuration.get("temperature") != 0):
+            raise DecisionError("Configuração experimental de IA inválida.")
+        configuration = {k: configuration[k] for k in (*required, "temperature")}
+        existing = self._ai_configuration(conn, room)
+        if existing is not None and existing != configuration:
+            raise DecisionError("A configuração de IA difere da fixada nesta sessão. Restaure a configuração original ou cancele a sessão; não prossiga com outra configuração.")
+        if existing is None:
+            self._event(conn, room, room["active_proposal_id"], actor, "CONFIGURACAO_IA_FIXADA", configuration)
+
+    def _ai_configuration(self, conn, room):
+        row = conn.execute("SELECT payload_json FROM dc_events WHERE room_id=? AND action='CONFIGURACAO_IA_FIXADA'",
+                           (room["id"],)).fetchone()
+        return json.loads(row["payload_json"]) if row else None
+
+    def ensure_ai_configuration(self, code, token, configuration):
+        with self.transaction(write=True) as conn:
+            room, actor = self._access(conn, code, token, write=True)
+            if self.experimental_mode and room["ai_enabled"]:
+                self._ensure_ai_configuration(conn, room, actor, configuration)
+
+    def _check_ai_result_configuration(self, conn, room, result, prompt_key):
+        if not self.experimental_mode:
+            return
+        config = self._ai_configuration(conn, room)
+        if config and ((result.get("model") and result["model"] != config["model"])
+                       or (result.get("prompt_version") and result["prompt_version"] != config[prompt_key])):
+            raise DecisionError("Resultado da IA incompatível com a configuração fixada na sessão.")
+
+    def _attempt_state(self, conn, room):
+        rows = conn.execute("SELECT * FROM dc_mediations WHERE proposal_id=? AND revision=? AND origin='IA'",
+                            (room["active_proposal_id"], room["revision"])).fetchall()
+        return mediation_attempt_state({"room": room, "mediations": [dict(r) for r in rows]})
+
+    def _reserve_ai_mediation(self, conn, room, actor):
+        state = self._attempt_state(conn, room)
+        if not state["can_start"] or state["executions"] >= MAX_MEDIATION_EXECUTIONS:
+            raise DecisionError("Não há nova execução de mediação IA permitida para esta versão/revisão.")
+        config = self._ai_configuration(conn, room) or {}
+        mediation_id = uid()
+        conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
+            mediation_id, room["id"], room["active_proposal_id"], room["revision"], "IA", "EM_EXECUCAO",
+            "", "", "{}", config.get("model"), config.get("mediation_prompt"), None, None, now(),
+        ))
+        self._event(conn, room, room["active_proposal_id"], actor, "MEDIACAO_INICIADA", {
+            "mediation_id": mediation_id, "execution": state["executions"] + 1, "revision": room["revision"],
+        })
+        return mediation_id
+
+    def begin_ai_mediation(self, code, token, proposal_id, revision, configuration):
+        """Reserva persistida antes da API; a chamada externa ocorre fora da transação."""
+        with self.transaction(write=True) as conn:
+            room, actor = self._access(conn, code, token, write=True, moderator=True)
+            self._current(room, proposal_id, "REVISAO")
+            if not self.experimental_mode or not room["ai_enabled"] or room["revision"] != revision:
+                raise DecisionError("Execução experimental indisponível para esta condição/revisão.")
+            self._ensure_ai_configuration(conn, room, actor, configuration)
+            return self._reserve_ai_mediation(conn, room, actor)
+
+    def _validated_category(self, category, allow_no_objection=False):
+        category = clean(category, "a categoria", 120)
+        allowed = category in TAXONOMY_CODES or (allow_no_objection and category == NO_OBJECTION)
+        if self.experimental_mode and not allowed:
+            raise DecisionError("No modo experimental, escolha uma categoria CAT01–CAT09.")
+        return category
+
+    def create_room(self, theme, context, proposal, aliases, ai_enabled=True, scenario_enabled=False, allocation=None):
         theme = clean(theme, "o tema", 300)
         context = clean(context, "o contexto", 6000, False)
         proposal = clean(proposal, "a proposta inicial", 12000)
-        aliases = [clean(alias, "o nome de cada participante", 80) for alias in aliases]
+        scenario, initial = None, None
+        if scenario_enabled:
+            if not self.experimental_mode:
+                raise DecisionError("O cenário financeiro é restrito ao modo experimental.")
+            scenario = scenario_definition()
+            try:
+                initial = validate_scenario_allocation(dict(SCENARIO_INITIAL_ALLOCATION) if allocation is None else allocation, scenario)
+            except ValueError as error:
+                raise DecisionError(str(error)) from error
+            if initial["items"] != SCENARIO_INITIAL_ALLOCATION:
+                raise DecisionError("V1 deve utilizar a distribuição oficial 25/25/10/15/5 mil reais.")
+        elif allocation is not None:
+            raise DecisionError("Ative o cenário financeiro para registrar uma distribuição estruturada.")
+        if self.experimental_mode:
+            # Legacy callers may pass a roster; discard its identifiers before storage.
+            count = aliases if type(aliases) is int else len(aliases)
+            if not 2 <= count <= 30:
+                raise DecisionError("Cadastre de 2 a 30 participantes antes de iniciar.")
+            aliases = [f"P{i:02d}" for i in range(1, count + 1)]
+        else:
+            aliases = [clean(alias, "o nome de cada participante", 80) for alias in aliases]
         if not 2 <= len(aliases) <= 30:
             raise DecisionError("Cadastre de 2 a 30 participantes antes de iniciar.")
         if len({a.casefold() for a in aliases}) != len(aliases):
@@ -204,13 +436,29 @@ class Repository:
                 token, participant_id = secrets.token_urlsafe(24), uid()
                 pseudonym = f"P{index:02d}"
                 conn.execute("INSERT INTO dc_participants VALUES (?,?,?,?,?,?)", (
-                    participant_id, room_id, alias, alias.casefold(), pseudonym, digest(token),
+                    participant_id, room_id, alias, alias if self.experimental_mode else alias.casefold(), pseudonym, digest(token),
                 ))
                 invitations.append({"alias": alias, "pseudonym": pseudonym, "token": token})
             self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SALA_CRIADA", {
                 "participants": len(aliases), "ai_enabled": bool(ai_enabled), "max_rounds": MAX_ROUNDS,
+                **({"allocation": initial, "scenario_version": scenario["scenario_version"]} if scenario else {}),
             })
+            if self.experimental_mode:
+                metadata = self.runtime_identity() | {"condition": "A" if ai_enabled else "B", "ai_enabled": bool(ai_enabled),
+                                                     "scenario_enabled": bool(scenario_enabled)}
+                if scenario is not None:
+                    metadata["scenario"] = scenario
+                self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SESSAO_EXPERIMENTAL_CONFIGURADA",
+                            metadata)
         return {"code": code, "moderator_token": moderator_token, "invitations": invitations}
+
+    def runtime_identity(self):
+        return {"experiment_release": EXPERIMENT_RELEASE, "experiment_config_version": EXPERIMENT_CONFIG_VERSION,
+                "taxonomy_version": TAXONOMY_VERSION, "max_rounds": MAX_ROUNDS,
+                "max_mediation_executions": MAX_MEDIATION_EXECUTIONS,
+                "defined_prompt_versions": {"classification": CLASSIFICATION_VERSION, "mediation": MEDIATION_VERSION},
+                "experimental_mode": self.experimental_mode,
+                "storage_type": "postgresql" if self.postgres else "sqlite", "app_commit": self.app_commit}
 
     def snapshot(self, code, token):
         with self.transaction() as conn:
@@ -228,6 +476,13 @@ class Repository:
                    JOIN dc_participants p ON p.id=r.participant_id
                    WHERE p.room_id=? ORDER BY r.created_at""", (room["id"],),
             ).fetchall()]
+            contests = [dict(c) for c in conn.execute(
+                """SELECT c.*, p.pseudonym FROM dc_category_contests c
+                   JOIN dc_responses r ON r.id=c.response_id
+                   JOIN dc_proposals pr ON pr.id=r.proposal_id
+                   JOIN dc_participants p ON p.id=c.participant_id
+                   WHERE pr.room_id=? ORDER BY c.created_at""", (room["id"],),
+            ).fetchall()]
             mediations = [dict(m) for m in conn.execute(
                 "SELECT * FROM dc_mediations WHERE room_id=? ORDER BY created_at", (room["id"],),
             ).fetchall()]
@@ -235,7 +490,8 @@ class Repository:
                 "SELECT * FROM dc_events WHERE room_id=? ORDER BY created_at", (room["id"],),
             ).fetchall()]
         return {"room": room, "actor": actor, "participants": participants,
-                "proposals": proposals, "responses": responses, "mediations": mediations, "events": events}
+                "proposals": proposals, "responses": responses, "category_contests": contests,
+                "mediations": mediations, "events": events, "runtime": self.runtime_identity()}
 
     def submit_response(self, code, token, proposal_id, position, argument, expected_edit=None):
         if position not in POSITIONS:
@@ -266,8 +522,8 @@ class Repository:
                 ))
             self._bump(conn, room)
             self._event(conn, room, proposal_id, actor, "MANIFESTACAO_REGISTRADA", {
-                "response_id": response_id, "edit": edit, "position": position, "argument": argument,
-                "previous": {"position": old["position"], "argument": old["argument"], "edit": old["edit"]} if old else None,
+                "response_id": response_id, "edit": edit, "position": position,
+                "edited": old is not None, "previous_edit": current_edit if old else None,
             })
         return {"id": response_id, "edit": edit}
 
@@ -284,8 +540,9 @@ class Repository:
             if (room["active_proposal_id"] != proposal_id or room["state"] != "COLETA"
                     or row["edit"] != edit or row["category_manual"]):
                 return False
+            self._check_ai_result_configuration(conn, room, result, "classification_prompt")
             status = "OK" if result["ok"] else result.get("failure_code", "FALHA_IA")
-            category = clean(result["category"], "a categoria", 120) if result["ok"] else UNCLASSIFIED
+            category = self._validated_category(result["category"], allow_no_objection=True) if result["ok"] else UNCLASSIFIED
             conn.execute("""UPDATE dc_responses SET category_ai=?, category=?, classification_status=?,
                          classification_model=?, classification_prompt=? WHERE id=?""", (
                 category if result["ok"] else None, category, status, result.get("model"),
@@ -297,8 +554,45 @@ class Repository:
             })
         return True
 
-    def set_category(self, code, token, proposal_id, response_id, category, expected_edit=None):
-        category = clean(category, "a categoria", 120)
+    def suggest_category(self, code, token, proposal_id, response_id, suggested_category, expected_edit):
+        if not self.experimental_mode:
+            raise DecisionError("A contestação controlada está disponível somente no modo experimental.")
+        suggested_category = self._validated_category(suggested_category)
+        with self.transaction(write=True) as conn:
+            room, actor = self._access(conn, code, token, write=True)
+            self._current(room, proposal_id, "COLETA")
+            if actor["role"] != "participant":
+                raise DecisionError("A contestação deve ser registrada pelo próprio participante.")
+            row = conn.execute("SELECT * FROM dc_responses WHERE id=? AND proposal_id=?",
+                               (response_id, proposal_id)).fetchone()
+            if not row or row["participant_id"] != actor["id"]:
+                raise DecisionError("Manifestação não disponível para este acesso.")
+            if row["edit"] != expected_edit:
+                raise DecisionError("A manifestação mudou. Atualize a página antes de contestar a categoria.")
+            if row["category"] == UNCLASSIFIED:
+                raise DecisionError("Aguarde uma classificação antes de registrar contestação.")
+            if suggested_category == row["category"]:
+                raise DecisionError("Escolha uma categoria diferente da classificação atual.")
+            existing = conn.execute(
+                "SELECT id FROM dc_category_contests WHERE response_id=? AND response_edit=?",
+                (response_id, expected_edit),
+            ).fetchone()
+            if existing:
+                raise DecisionError("Já existe uma contestação registrada para esta edição da manifestação.")
+            contest_id, stamp = uid(), now()
+            conn.execute("INSERT INTO dc_category_contests VALUES (?,?,?,?,?,?,?,?,?)", (
+                contest_id, response_id, expected_edit, actor["id"], suggested_category,
+                "PENDENTE", stamp, None, None,
+            ))
+            self._bump(conn, room)
+            self._event(conn, room, proposal_id, actor, "CATEGORIA_CONTESTADA", {
+                "contest_id": contest_id, "response_id": response_id, "edit": expected_edit,
+                "assigned_category": row["category"], "suggested_category": suggested_category,
+            })
+        return contest_id
+
+    def set_category(self, code, token, proposal_id, response_id, category, expected_edit=None, technical_fallback=False):
+        category = self._validated_category(category, allow_no_objection=True)
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "COLETA")
@@ -306,13 +600,36 @@ class Repository:
                                (response_id, proposal_id)).fetchone()
             if not row:
                 raise DecisionError("Manifestação não pertence à proposta atual.")
+            if self.experimental_mode and category == NO_OBJECTION and row["position"] != "ACEITO":
+                raise DecisionError("Ressalva ou rejeição exige uma categoria de objeção.")
             if expected_edit is not None and row["edit"] != expected_edit:
                 raise DecisionError("O participante editou a justificativa. Atualize antes de revisar a categoria.")
+            failed = (self.experimental_mode and room["ai_enabled"]
+                      and row["classification_status"] in CLASSIFICATION_FAILURE_CODES)
+            if failed and not technical_fallback:
+                raise DecisionError("Registre esta classificação como fallback técnico da IA.")
+            if technical_fallback and (not failed or category not in TAXONOMY_CODES):
+                raise DecisionError("Fallback técnico exige falha de classificação IA e categoria CAT01–CAT09.")
+            contest = conn.execute(
+                """SELECT * FROM dc_category_contests
+                   WHERE response_id=? AND response_edit=? AND status='PENDENTE'""",
+                (response_id, row["edit"]),
+            ).fetchone()
             conn.execute("UPDATE dc_responses SET category=?, category_manual=1 WHERE id=?", (category, response_id))
+            if technical_fallback:
+                conn.execute("UPDATE dc_responses SET classification_status='FALLBACK_HUMANO' WHERE id=?", (response_id,))
+            if contest:
+                conn.execute("""UPDATE dc_category_contests
+                    SET status='RESOLVIDA', resolved_at=?, resolved_category=? WHERE id=?""",
+                    (now(), category, contest["id"]))
             self._bump(conn, room)
-            self._event(conn, room, proposal_id, actor, "CATEGORIA_REVISADA", {
-                "response_id": response_id, "previous": row["category"], "category": category,
-            })
+            payload = {"response_id": response_id, "previous": row["category"], "category": category}
+            if contest:
+                payload.update({"contest_id": contest["id"], "participant_suggestion": contest["suggested_category"]})
+            if technical_fallback:
+                payload.update({"failure_code": row["classification_status"], "edit": row["edit"]})
+            self._event(conn, room, proposal_id, actor,
+                        "CLASSIFICACAO_FALLBACK_HUMANO" if technical_fallback else "CATEGORIA_REVISADA", payload)
 
     def set_phase(self, code, token, proposal_id, phase):
         if phase not in ("COLETA", "REVISAO"):
@@ -321,10 +638,14 @@ class Repository:
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, previous)
+            if self.experimental_mode and room["ai_enabled"] and phase == "COLETA":
+                state = self._attempt_state(conn, room)
+                if state["executions"] and not state["has_success"]:
+                    raise DecisionError("Preserve as manifestações congeladas entre execuções da mediação IA. Conclua o protocolo ou cancele tecnicamente.")
             conn.execute("UPDATE dc_rooms SET state=?, revision=revision+1 WHERE id=?", (phase, room["id"]))
             self._event(conn, room, proposal_id, actor, "ETAPA_ALTERADA", {"from": previous, "to": phase})
 
-    def save_mediation(self, code, token, proposal_id, revision, result):
+    def save_mediation(self, code, token, proposal_id, revision, result, attempt_id=None):
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO")
@@ -334,37 +655,116 @@ class Repository:
                 raise DecisionError("A IA está desativada nesta sala.")
             if result["origin"] not in ("IA", "HUMANA"):
                 raise DecisionError("Origem de mediação inválida.")
-            mediation_id = uid()
-            conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
-                mediation_id, room["id"], proposal_id, revision, result["origin"],
-                "OK" if result["ok"] else "FALHA", result.get("summary", ""),
-                result.get("suggested_text", ""), json.dumps(result.get("details", {}), ensure_ascii=False),
-                result.get("model"), result.get("prompt_version"), result.get("failure_code"),
-                result.get("duration_ms"), now(),
-            ))
+            if self.experimental_mode:
+                expected_origin = "IA" if room["ai_enabled"] else "HUMANA"
+                if result["origin"] != expected_origin:
+                    raise DecisionError("A origem da mediação deve corresponder à condição experimental.")
+                if expected_origin == "HUMANA" and result["ok"]:
+                    responses = [dict(row) for row in conn.execute(
+                        """SELECT r.*, p.pseudonym FROM dc_responses r
+                           JOIN dc_participants p ON p.id=r.participant_id WHERE r.proposal_id=?""",
+                        (proposal_id,),
+                    ).fetchall()]
+                    result = validated_manual_mediation(result, responses)
+                elif result["ok"]:
+                    for key, label, limit in (("summary", "a síntese da IA", 16000),
+                                              ("suggested_text", "a proposta sugerida pela IA", 12000)):
+                        if not isinstance(result.get(key), str) or not result[key].strip():
+                            raise DecisionError(f"Preencha {label}.")
+                        clean(result[key], label, limit)
+            if self.experimental_mode and room["ai_enabled"]:
+                self._check_ai_result_configuration(conn, room, result, "mediation_prompt")
+                mediation_id = attempt_id or self._reserve_ai_mediation(conn, room, actor)
+                pending = conn.execute("SELECT * FROM dc_mediations WHERE id=? AND room_id=?",
+                                       (mediation_id, room["id"])).fetchone()
+                if (not pending or pending["status"] != "EM_EXECUCAO" or pending["origin"] != "IA"
+                        or pending["proposal_id"] != proposal_id or pending["revision"] != revision):
+                    raise DecisionError("Execução de mediação inválida ou já concluída.")
+                # Uma falha nunca vira sugestão local nem reaproveita texto de outra execução.
+                conn.execute("""UPDATE dc_mediations SET status=?, summary=?, suggested_text=?, details_json=?,
+                    model=?, prompt_version=?, failure_code=?, duration_ms=? WHERE id=?""", (
+                    "OK" if result["ok"] else "FALHA", result.get("summary", "") if result["ok"] else "",
+                    result.get("suggested_text", "") if result["ok"] else "",
+                    json.dumps(result.get("details", {}), ensure_ascii=False),
+                    result.get("model") or pending["model"], result.get("prompt_version") or pending["prompt_version"],
+                    result.get("failure_code"), result.get("duration_ms"), mediation_id,
+                ))
+            else:
+                if attempt_id:
+                    raise DecisionError("Reserva de execução IA indisponível nesta condição.")
+                mediation_id = uid()
+                conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
+                    mediation_id, room["id"], proposal_id, revision, result["origin"],
+                    "OK" if result["ok"] else "FALHA", result.get("summary", ""),
+                    result.get("suggested_text", ""), json.dumps(result.get("details", {}), ensure_ascii=False),
+                    result.get("model"), result.get("prompt_version"), result.get("failure_code"),
+                    result.get("duration_ms"), now(),
+                ))
             self._event(conn, room, proposal_id, actor, "MEDIACAO_REGISTRADA", {
                 "mediation_id": mediation_id, "origin": result["origin"], "ok": result["ok"],
             })
         return mediation_id
 
-    def publish_revision(self, code, token, proposal_id, text, mediation_id=None):
+    def publish_revision(self, code, token, proposal_id, text, mediation_id=None, review_note="", allocation=None):
         text = clean(text, "a proposta revisada", 12000)
+        if not isinstance(review_note, str):
+            raise DecisionError("Registre uma nota de revisão humana textual.")
+        review_note = clean(review_note, "a nota de revisão humana", 2000, False)
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO")
+            if self.experimental_mode and room["ai_enabled"]:
+                state = self._attempt_state(conn, room)
+                if state["persistent_failure"] or state["in_progress"]:
+                    raise DecisionError("Publicação bloqueada pelo protocolo de falhas da mediação IA.")
             old = conn.execute("SELECT * FROM dc_proposals WHERE id=?", (proposal_id,)).fetchone()
             if old["round"] >= MAX_ROUNDS:
                 raise DecisionError("O limite de três rodadas já foi atingido.")
-            if text == old["text"]:
+            events = [dict(e) for e in conn.execute("SELECT * FROM dc_events WHERE room_id=? ORDER BY created_at", (room["id"],)).fetchall()]
+            financial = proposal_financial_state({"room": room, "events": events})
+            validated = None
+            if financial["scenario"] is not None:
+                if financial["status"] != "VALID":
+                    raise DecisionError("A distribuição da proposta vigente não pode ser validada automaticamente. Não publique com estado financeiro incerto.")
+                try:
+                    validated = validate_scenario_allocation(allocation, financial["scenario"])
+                except ValueError as error:
+                    raise DecisionError(str(error)) from error
+            elif allocation is not None:
+                raise DecisionError("Esta sessão não possui cenário financeiro habilitado.")
+            if text == old["text"] and (validated is None or validated == financial["allocation"]):
                 raise DecisionError("A nova versão deve conter uma alteração na proposta.")
             origin = "HUMANA"
+            mediation = None
+            if self.experimental_mode and not mediation_id:
+                raise DecisionError("Selecione uma mediação válida da condição experimental antes de publicar.")
             if mediation_id:
                 mediation = conn.execute("SELECT * FROM dc_mediations WHERE id=? AND room_id=?",
                                          (mediation_id, room["id"])).fetchone()
                 if (not mediation or mediation["proposal_id"] != proposal_id
                         or mediation["revision"] != room["revision"] or mediation["status"] != "OK"):
                     raise DecisionError("Esta mediação não corresponde ao conjunto atual de manifestações.")
+                if self.experimental_mode:
+                    expected_origin = "IA" if room["ai_enabled"] else "HUMANA"
+                    if mediation["origin"] != expected_origin:
+                        raise DecisionError("A base deve ser uma mediação da condição experimental atual.")
+                    if expected_origin == "HUMANA":
+                        responses = [dict(row) for row in conn.execute(
+                            """SELECT r.*, p.pseudonym FROM dc_responses r
+                               JOIN dc_participants p ON p.id=r.participant_id WHERE r.proposal_id=?""",
+                            (proposal_id,),
+                        ).fetchall()]
+                        validated_manual_mediation({"details": json.loads(mediation["details_json"]),
+                                                   "suggested_text": mediation["suggested_text"]}, responses)
+                    elif not review_note:
+                        raise DecisionError("Registre a nota de revisão humana da sugestão da IA.")
                 origin = "IA_REVISADA_POR_HUMANO" if mediation["origin"] == "IA" else "HUMANA"
+            changed = text != mediation["suggested_text"] if mediation else None
+            if self.experimental_mode and mediation and mediation["origin"] == "IA":
+                if changed and review_note.casefold().rstrip(".") == UNCHANGED_REVIEW_NOTE.casefold().rstrip("."):
+                    raise DecisionError("Justifique a alteração realizada na sugestão da IA.")
+                if not changed and not review_note.startswith(UNCHANGED_REVIEW_NOTE):
+                    review_note = UNCHANGED_REVIEW_NOTE + " " + review_note
             new_id = uid()
             conn.execute("INSERT INTO dc_proposals VALUES (?,?,?,?,?,?,?,?)", (
                 new_id, room["id"], old["round"] + 1, text, proposal_id, mediation_id, origin, now(),
@@ -374,6 +774,10 @@ class Repository:
             self._event(conn, room, new_id, actor, "PROPOSTA_PUBLICADA", {
                 "parent_id": proposal_id, "round": old["round"] + 1, "origin": origin,
                 "source_mediation_id": mediation_id,
+                "source_origin": mediation["origin"] if mediation else None,
+                "changed_from_source": changed, "review_note": review_note,
+                **({"allocation": validated, "scenario_version": financial["scenario"]["scenario_version"],
+                    "allocation_source": "HUMANA"} if validated is not None else {}),
             })
         return new_id
 
@@ -382,6 +786,10 @@ class Repository:
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO" if not cancel else room["state"])
+            if self.experimental_mode and room["ai_enabled"] and not cancel:
+                state = self._attempt_state(conn, room)
+                if state["persistent_failure"] or state["in_progress"]:
+                    raise DecisionError("Condição experimental não preservada: registre cancelamento técnico.")
             snapshot = {
                 "participants": [dict(p) for p in conn.execute("SELECT id, pseudonym FROM dc_participants WHERE room_id=?", (room["id"],)).fetchall()],
                 "responses": [dict(r) for r in conn.execute("SELECT * FROM dc_responses WHERE proposal_id=?", (proposal_id,)).fetchall()],
@@ -437,23 +845,161 @@ def consensus(snapshot):
                 r["position"] in ("ACEITO", "ACEITO_COM_RESSALVAS") for r in responses.values())}
 
 
+# Campos estruturados apenas; texto científico livre permanece intacto.
+_EXPORT_PRIVATE_KEYS = frozenset({
+    "alias", "normalized_alias", "token", "token_hash", "moderator_hash", "moderator_token",
+    "participant_token", "participant_tokens", "tokens", "api_key", "gemini_api_key", "database_url",
+    "secrets", "streamlit_secrets", "credentials",
+})
+_RUNTIME_FIELDS = ("experiment_release", "experiment_config_version", "taxonomy_version", "max_rounds",
+                   "max_mediation_executions", "defined_prompt_versions", "experimental_mode", "storage_type", "app_commit")
+
+
+def _export_safe(value):
+    if isinstance(value, dict):
+        return {k: _export_safe(v) for k, v in value.items() if str(k).casefold() not in _EXPORT_PRIVATE_KEYS}
+    if isinstance(value, list):
+        return [_export_safe(v) for v in value]
+    return value
+
+
+def _export_fields(row, fields):
+    return _export_safe({key: row[key] for key in fields if key in row})
+
+
+def _export_json(raw):
+    try:
+        return _export_safe(json.loads(raw))
+    except (ValueError, TypeError):
+        return None
+
+
+def _experiment_manifest(snapshot, events, exported_at):
+    runtime = _export_fields(snapshot.get("runtime", {}), _RUNTIME_FIELDS)
+    runtime["app_commit"] = declared_app_commit(runtime.get("app_commit"))
+    session_event = next((e for e in events if e["action"] == "SESSAO_EXPERIMENTAL_CONFIGURADA"), None)
+    identity = session_event["payload"] if session_event and isinstance(session_event["payload"], dict) else {}
+    mode = identity.get("experimental_mode", runtime.get("experimental_mode"))
+    condition = identity.get("condition") if identity else ("A" if snapshot["room"]["ai_enabled"] else "B") if mode else None
+    fixed_event = next((e for e in events if e["action"] == "CONFIGURACAO_IA_FIXADA"), None)
+    fixed = fixed_event["payload"] if fixed_event and isinstance(fixed_event["payload"], dict) and condition == "A" else {}
+    manifest = {key: identity.get(key) for key in _RUNTIME_FIELDS}
+    manifest.update({
+        "experimental_mode": mode, "condition": condition, "ai_enabled": bool(snapshot["room"]["ai_enabled"]),
+        "app_commit": declared_app_commit(identity.get("app_commit")),
+        "app_commit_source": "APP_COMMIT declarado na criação da sessão" if identity else "não registrado",
+        "session_metadata_status": "recorded" if identity else "not_recorded",
+        "session_metadata_event_id": session_event["id"] if session_event else None,
+        "condition_source": "session_record" if identity else "runtime_room_state" if mode else None,
+        "model": fixed.get("model"), "classification_prompt_version": fixed.get("classification_prompt"),
+        "mediation_prompt_version": fixed.get("mediation_prompt"), "temperature": fixed.get("temperature"),
+        "taxonomy_version": fixed.get("taxonomy_version", identity.get("taxonomy_version")),
+        "ai_configuration_status": "recorded" if fixed else "not_recorded" if condition == "A" else "not_applicable",
+        "ai_configuration_event_id": fixed_event["id"] if fixed else None,
+        "max_rounds": identity.get("max_rounds", MAX_ROUNDS),
+        "max_mediation_executions": identity.get("max_mediation_executions", MAX_MEDIATION_EXECUTIONS),
+        "exported_at": exported_at,
+    })
+    # Identidade do exportador não é retroatribuída a uma sessão antiga.
+    runtime["app_commit_source"] = "APP_COMMIT da configuração da implantação; não verificado externamente"
+    runtime["build_changed_since_session_start"] = (
+        manifest["app_commit"] != runtime["app_commit"]
+        if manifest["app_commit"] and runtime["app_commit"] else None
+    )
+    return manifest, runtime
+
+
 def research_export(snapshot):
-    """Exporta a trilha completa sem credenciais nem aliases pessoais."""
-    output = {"schema_version": 1, "exported_at": now(), "max_rounds": MAX_ROUNDS}
-    for section in ("room", "participants", "proposals", "responses", "mediations", "events"):
-        output[section] = snapshot[section]
-    output = json.loads(json.dumps(output, ensure_ascii=False))
-    for person in output["participants"] + output["responses"]:
-        person.pop("alias", None)
-        person.pop("normalized_alias", None)
-        person.pop("token_hash", None)
-    output["room"].pop("moderator_hash", None)
+    """Pacote pseudonimizado; sem leitura de secrets nem sanitização do texto local."""
+    output = {"schema_version": 2, "exported_at": now(), "max_rounds": MAX_ROUNDS}
+    output["room"] = _export_fields(snapshot["room"], (
+        "id", "code", "theme", "context", "state", "active_proposal_id", "ai_enabled", "revision",
+        "created_at", "closed_at", "result", "close_reason",
+    ))
+    output["participants"] = [_export_fields(p, ("id", "pseudonym", "experimental_role")) for p in snapshot["participants"]]
+    events = []
+    for row in snapshot["events"]:
+        event = _export_fields(row, ("id", "room_id", "proposal_id", "actor", "action", "created_at"))
+        payload = _export_json(row["payload_json"])
+        event.update(payload=payload, payload_json=json.dumps(payload, ensure_ascii=False) if payload is not None else None)
+        if payload is None:
+            event["payload_parse_error"] = True
+        events.append(event)
+    output["events"] = events
+    output["experiment"], output["exporter"] = _experiment_manifest(snapshot, events, output["exported_at"])
+    scenario = session_scenario(snapshot)
+    output["scenario"] = _export_fields(scenario, ("scenario_version", "budget", "currency", "allocation_items", "initial_allocation")) if scenario is not None else None
+    output["experiment"]["scenario_version"] = scenario.get("scenario_version") if scenario is not None else None
+    proposals = {p["id"]: p for p in snapshot["proposals"]}
+    publications = {e["proposal_id"]: e for e in events if e["action"] == "PROPOSTA_PUBLICADA"}
+    starts = {e["payload"].get("mediation_id"): e for e in events
+              if e["action"] == "MEDIACAO_INICIADA" and isinstance(e["payload"], dict)}
+    mediations = []
+    for row in snapshot["mediations"]:
+        item = _export_fields(row, ("id", "room_id", "proposal_id", "revision", "origin", "status", "summary",
+                                    "suggested_text", "model", "prompt_version", "failure_code", "duration_ms", "created_at"))
+        details = _export_json(row["details_json"])
+        item.update(details=details, details_json=json.dumps(details, ensure_ascii=False) if details is not None else None,
+                    coverage=details.get("coverage", []) if isinstance(details, dict) else [])
+        if details is None:
+            item["details_parse_error"] = True
+        start = starts.get(row["id"])
+        item["execution"] = start["payload"].get("execution") if start else None
+        item["execution_event_id"] = start["id"] if start else None
+        item["execution_started_at"] = start["created_at"] if start else None
+        completion = next((e for e in events if e["action"] == "MEDIACAO_REGISTRADA"
+                           and isinstance(e["payload"], dict) and e["payload"].get("mediation_id") == row["id"]), None)
+        item["execution_completed_at"] = completion["created_at"] if completion else None
+        mediations.append(item)
+    output["mediations"] = mediations
+    by_mediation = {m["id"]: m for m in mediations}
+    output["proposals"] = []
+    for row in snapshot["proposals"]:
+        item = _export_fields(row, ("id", "room_id", "round", "text", "parent_id", "source_mediation_id", "origin", "created_at"))
+        financial = proposal_financial_state(snapshot, row["id"])
+        item["allocation"] = financial["allocation"]
+        item["allocation_validation_status"] = financial["status"]
+        item["total"] = financial["allocation"]["total"] if financial["allocation"] is not None else None
+        item["unallocated"] = financial["allocation"]["unallocated"] if financial["allocation"] is not None else None
+        event = publications.get(row["id"])
+        if event and isinstance(event["payload"], dict):
+            payload = event["payload"]
+            source = by_mediation.get(row["source_mediation_id"])
+            item["human_review"] = {
+                "source_mediation_id": row["source_mediation_id"], "source_origin": payload.get("source_origin"),
+                "original_suggested_text": source["suggested_text"] if source else None,
+                "published_text": row["text"], "changed_from_source": payload.get("changed_from_source"),
+                "review_note": payload.get("review_note"), "published_by": event["actor"],
+                "published_at": event["created_at"], "event_id": event["id"],
+            }
+        output["proposals"].append(item)
+    output["responses"] = []
+    for row in snapshot["responses"]:
+        item = _export_fields(row, ("id", "proposal_id", "participant_id", "pseudonym", "position", "argument", "category_ai",
+                                   "category", "category_manual", "classification_status", "classification_model",
+                                   "classification_prompt", "edit", "created_at", "updated_at"))
+        related = [e for e in events if e["action"] in ("CLASSIFICACAO_IA", "CLASSIFICACAO_FALLBACK_HUMANO")
+                   and isinstance(e["payload"], dict) and e["payload"].get("response_id") == row["id"]
+                   and e["payload"].get("edit") == row["edit"]]
+        failures = [e for e in related if e["action"] == "CLASSIFICACAO_IA" and e["payload"].get("status") in CLASSIFICATION_FAILURE_CODES]
+        fallbacks = [e for e in related if e["action"] == "CLASSIFICACAO_FALLBACK_HUMANO"]
+        last_failure = failures[-1] if failures else None
+        item["classification_failure_code"] = (last_failure["payload"].get("failure_code") or last_failure["payload"].get("status")) if last_failure else None
+        item["classification_failure_event_id"] = last_failure["id"] if last_failure else None
+        item["classification_fallback"] = row["classification_status"] == "FALLBACK_HUMANO"
+        item["classification_fallback_event_id"] = fallbacks[-1]["id"] if fallbacks else None
+        item["round"] = proposals[row["proposal_id"]]["round"]
+        output["responses"].append(item)
+    output["category_contests"] = [_export_fields(c, (
+        "id", "response_id", "response_edit", "participant_id", "pseudonym", "suggested_category", "status",
+        "created_at", "resolved_at", "resolved_category",
+    )) for c in snapshot["category_contests"]]
     return output
 
 
 def csv_export(snapshot):
     output = io.StringIO(newline="")
-    fields = ["round", "participant", "position", "argument", "category", "category_ai", "classification_status", "updated_at"]
+    fields = ["round", "participant", "position", "argument", "category", "category_ai", "classification_status", "classification_model", "classification_prompt", "updated_at"]
     writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
     rounds = {p["id"]: p["round"] for p in snapshot["proposals"]}
