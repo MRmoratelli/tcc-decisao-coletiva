@@ -50,7 +50,10 @@ class StreamlitFlowTests(unittest.TestCase):
         widget(app, "text_input", "Tema da decisão").set_value("Organização de um evento")
         widget(app, "text_area", "Contexto e restrições conhecidas").set_value("Todos participam remotamente")
         widget(app, "text_area", "Texto da proposta inicial").set_value("Reunião semanal às quartas")
-        widget(app, "text_area", "Participantes: um nome ou apelido por linha").set_value("Ana\nBruno\nCarla")
+        if os.environ.get("EXPERIMENT_MODE") == "1":
+            widget(app, "number_input", "Número de participantes").set_value(3)
+        else:
+            widget(app, "text_area", "Participantes: um nome ou apelido por linha").set_value("Ana\nBruno\nCarla")
         widget(app, "checkbox", "Usar IA para sugerir categorias e revisões").set_value(enabled)
         widget(app, "button", "Criar sala e gerar acessos").click().run()
         self.assertFalse(app.exception, [str(e) for e in app.exception])
@@ -95,6 +98,23 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertEqual(current_proposal(snap)["round"], 2)
         self.assertEqual(current_responses(snap), [])
         self.assertEqual(snap["room"]["theme"], "Organização de um evento")
+
+    def test_experimental_creation_and_response_warn_without_civil_identity(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        landing = self.app()
+        self.assertIn("Número de participantes", [w.label for w in landing.number_input])
+        self.assertNotIn("Participantes: um nome ou apelido por linha", [w.label for w in landing.text_area])
+        moderator, access = self.create()
+        self.assertEqual([p["alias"] for p in access["invitations"]], ["P01", "P02", "P03"])
+        person = self.join(access, 0)
+        self.assertTrue(any("Não informe nome, e-mail, telefone, matrícula, documento" in c.value for c in person.caption))
+        widget(person, "radio", "Minha posição sobre esta versão").set_value("ACEITO_COM_RESSALVAS")
+        original = "Contato pessoa@example.org; revisar o orçamento"
+        widget(person, "text_area", "Justificativa e ressalvas").set_value(original)
+        widget(person, "button", "Salvar manifestação").click().run()
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(current_responses(snap)[0]["argument"], original)
+        self.assertFalse(person.exception, [str(e) for e in person.exception])
 
     def test_experimental_mode_uses_closed_category_selector(self):
         os.environ["EXPERIMENT_MODE"] = "1"

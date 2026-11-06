@@ -200,7 +200,14 @@ class Repository:
         theme = clean(theme, "o tema", 300)
         context = clean(context, "o contexto", 6000, False)
         proposal = clean(proposal, "a proposta inicial", 12000)
-        aliases = [clean(alias, "o nome de cada participante", 80) for alias in aliases]
+        if self.experimental_mode:
+            # Legacy callers may pass a roster; discard its identifiers before storage.
+            count = aliases if type(aliases) is int else len(aliases)
+            if not 2 <= count <= 30:
+                raise DecisionError("Cadastre de 2 a 30 participantes antes de iniciar.")
+            aliases = [f"P{i:02d}" for i in range(1, count + 1)]
+        else:
+            aliases = [clean(alias, "o nome de cada participante", 80) for alias in aliases]
         if not 2 <= len(aliases) <= 30:
             raise DecisionError("Cadastre de 2 a 30 participantes antes de iniciar.")
         if len({a.casefold() for a in aliases}) != len(aliases):
@@ -223,7 +230,7 @@ class Repository:
                 token, participant_id = secrets.token_urlsafe(24), uid()
                 pseudonym = f"P{index:02d}"
                 conn.execute("INSERT INTO dc_participants VALUES (?,?,?,?,?,?)", (
-                    participant_id, room_id, alias, alias.casefold(), pseudonym, digest(token),
+                    participant_id, room_id, alias, alias if self.experimental_mode else alias.casefold(), pseudonym, digest(token),
                 ))
                 invitations.append({"alias": alias, "pseudonym": pseudonym, "token": token})
             self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SALA_CRIADA", {
@@ -293,8 +300,8 @@ class Repository:
                 ))
             self._bump(conn, room)
             self._event(conn, room, proposal_id, actor, "MANIFESTACAO_REGISTRADA", {
-                "response_id": response_id, "edit": edit, "position": position, "argument": argument,
-                "previous": {"position": old["position"], "argument": old["argument"], "edit": old["edit"]} if old else None,
+                "response_id": response_id, "edit": edit, "position": position,
+                "edited": old is not None, "previous_edit": current_edit if old else None,
             })
         return {"id": response_id, "edit": edit}
 

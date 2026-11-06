@@ -66,12 +66,18 @@ def login_screen(repo):
             theme = st.text_input("Tema da decisão", max_chars=300)
             context = st.text_area("Contexto e restrições conhecidas", max_chars=6000)
             proposal = st.text_area("Texto da proposta inicial", height=180, max_chars=12000)
-            roster = st.text_area("Participantes: um nome ou apelido por linha", help="Lista fixa da sala. Para seu experimento, cadastre as 3 a 5 pessoas disponíveis.")
+            if repo.experimental_mode:
+                roster = st.number_input("Número de participantes", min_value=2, max_value=30, value=5, step=1)
+            else:
+                roster = st.text_area("Participantes: um nome ou apelido por linha", help="Lista fixa da sala. Para seu experimento, cadastre as 3 a 5 pessoas disponíveis.")
             enabled = st.checkbox("Usar IA para sugerir categorias e revisões", value=True)
-            st.caption("As manifestações ficam visíveis aos membros da sala. Com IA ativa, tema, proposta e justificativas serão enviados ao Gemini com identificadores P01, P02 etc. Evite dados pessoais no texto.")
+            if repo.experimental_mode:
+                st.caption("As manifestações ficam visíveis aos membros da sala. Com IA ativa, textos sanitizados são enviados ao Gemini; a mediação usa identificadores temporários M01, M02 etc. Evite dados pessoais no texto.")
+            else:
+                st.caption("As manifestações ficam visíveis aos membros da sala. Com IA ativa, tema, proposta e justificativas serão enviados ao Gemini com identificadores P01, P02 etc. Evite dados pessoais no texto.")
             submitted = st.form_submit_button("Criar sala e gerar acessos", type="primary")
         if submitted:
-            aliases = [line.strip() for line in roster.splitlines() if line.strip()]
+            aliases = int(roster) if repo.experimental_mode else [line.strip() for line in roster.splitlines() if line.strip()]
             ok, invitation = execute(lambda: repo.create_room(theme, context, proposal, aliases, enabled))
             if ok:
                 st.session_state["invitation"] = invitation
@@ -124,6 +130,8 @@ def response_form(repo, ai, snapshot, code, token):
         position = st.radio("Minha posição sobre esta versão", list(POSITIONS),
                             format_func=POSITIONS.get, index=list(POSITIONS).index(old["position"]) if old else 0,
                             key=prefix + "_position")
+        if repo.experimental_mode:
+            st.caption("Não informe nome, e-mail, telefone, matrícula, documento ou outros dados pessoais na justificativa.")
         argument = st.text_area("Justificativa e ressalvas", value=old["argument"] if old else "",
                                 max_chars=6000, height=130, key=prefix + "_argument")
         submitted = st.form_submit_button("Salvar manifestação", type="primary")

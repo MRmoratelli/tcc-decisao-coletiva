@@ -76,7 +76,33 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(second["edit"], 2)
         self.assertEqual(len(current_responses(self.snapshot())), 1)
         history = [e for e in self.snapshot()["events"] if e["action"] == "MANIFESTACAO_REGISTRADA"]
-        self.assertEqual(json.loads(history[-1]["payload_json"])["previous"]["argument"], "Prazo insuficiente")
+        payload = json.loads(history[-1]["payload_json"])
+        self.assertEqual(payload["previous_edit"], 1)
+        self.assertTrue(payload["edited"])
+        for event in history:
+            self.assertNotIn("argument", event["payload_json"])
+            self.assertNotIn("Prazo", event["payload_json"])
+        self.assertEqual(current_responses(self.snapshot())[0]["argument"], "Prazo agora compreendido")
+
+    def test_experimental_roster_uses_only_neutral_codes(self):
+        repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+        for roster in (5, ["Nome civil A", "Nome civil B"]):
+            access = repo.create_room("Tema", "Contexto", "Proposta", roster)
+            snap = repo.snapshot(access["code"], access["moderator_token"])
+            count = roster if type(roster) is int else len(roster)
+            codes = [f"P{i:02d}" for i in range(1, count + 1)]
+            self.assertEqual([p["alias"] for p in snap["participants"]], codes)
+            self.assertEqual([p["pseudonym"] for p in snap["participants"]], codes)
+            self.assertEqual([p["alias"] for p in access["invitations"]], codes)
+            with repo.transaction() as conn:
+                rows = conn.execute("SELECT normalized_alias FROM dc_participants WHERE room_id=? ORDER BY pseudonym",
+                                    (snap["room"]["id"],)).fetchall()
+                self.assertEqual([r["normalized_alias"] for r in rows], codes)
+            self.assertNotIn("Nome civil", json.dumps(snap))
+        for invalid in (0, 1, 31):
+            with self.assertRaises(DecisionError):
+                repo.create_room("Tema", "Contexto", "Proposta", invalid)
+        self.assertEqual([p["alias"] for p in self.snapshot()["participants"]], ["Ana", "Bruno", "Carla"])
 
     def test_stale_edit_is_rejected(self):
         self.vote(0, expected_edit=0)

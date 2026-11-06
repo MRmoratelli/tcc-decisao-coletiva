@@ -5,11 +5,26 @@ Falha da API é registrada como falha. Não produz uma falsa mediação local.
 from __future__ import annotations
 
 import json
+import re
 from importlib import metadata
 import time
 
 from decision import NO_OBJECTION, current_proposal, current_responses
 from experiment_config import TAXONOMY_CODES, taxonomy_prompt
+
+def sanitize_external_text(text):
+    """Best-effort minimization, only at the external boundary; not anonymization.
+
+    Unlabelled arbitrary numbers/names are deliberately not guessed. In particular,
+    scenario amounts such as R$ 80.000 must survive unchanged.
+    """
+    text = re.sub(r"(?<![\w.+-])[\w.+-]+@[\w-]+(?:\.[\w-]+)+", "[EMAIL_REMOVIDO]", text)
+    text = re.sub(r"(?<!\d)\d{3}\.\d{3}\.\d{3}-\d{2}(?!\d)", "[DOCUMENTO_REMOVIDO]", text)
+    text = re.sub(r"(?<!\d)\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}(?!\d)", "[DOCUMENTO_REMOVIDO]", text)
+    text = re.sub(r"(?i)\b(CPF|RG|matr[ií]cula)\s*[:#-]?\s*\d[\d. /-]{3,}\d", r"\1 [DOCUMENTO_REMOVIDO]", text)
+    text = re.sub(r"(?<![\w$])(?:\+?55[ .-]?)?(?:\([1-9]\d\)[ .-]?|[1-9]\d[ .-]?)[2-9]\d{3,4}[ -]?\d{4}(?!\d)", "[TELEFONE_REMOVIDO]", text)
+    return text
+
 
 CLASSIFICATION_VERSION = "classificacao-v1"
 MEDIATION_VERSION = "mediacao-v1"
@@ -210,6 +225,10 @@ has_objection indica se o texto expressa uma preocupação ou ressalva.
                 raise ValueError("A posição declarada exige uma preocupação registrada.")
             return {"category": category}
 
+        for key in ("theme", "context", "proposal", "argument"):
+            data[key] = sanitize_external_text(data[key])
+        if "existing_categories" in data:
+            data["existing_categories"] = [sanitize_external_text(c) for c in data["existing_categories"]]
         return self._generate(instruction, data, class_schema, validate, CLASSIFICATION_VERSION)
 
     def mediate(self, snapshot):
@@ -236,7 +255,23 @@ se não há objeção explícita. Ausentes não estão representados e não pode
             "responses": [{k: r[k] for k in ("pseudonym", "position", "argument", "category")} for r in responses],
             "missing": [p["pseudonym"] for p in snapshot["participants"] if p["id"] not in answered],
         }
-        expected = {r["pseudonym"] for r in responses}
+        local_by_external = {r["pseudonym"]: r["pseudonym"] for r in responses}
+        if self.experimental_mode:
+            local_by_external = {f"M{i:02d}": r["pseudonym"] for i, r in enumerate(responses, 1)}
+            data["responses"] = [
+                {"participant": external, "position": r["position"],
+                 "argument": r["argument"], "category": r["category"]}
+                for external, r in zip(local_by_external, responses)
+            ]
+            data.pop("missing")
+            data["missing_count"] = len([p for p in snapshot["participants"] if p["id"] not in answered])
+            instruction = instruction.replace("usando seu pseudônimo", "usando somente o identificador temporário Mxx fornecido nesta chamada")
+        for key in ("theme", "context", "proposal"):
+            data[key] = sanitize_external_text(data[key])
+        for response in data["responses"]:
+            for key in ("argument", "category"):
+                response[key] = sanitize_external_text(response[key])
+        expected = set(local_by_external)
 
         def validate(payload):
             if not isinstance(payload, dict):
@@ -254,6 +289,8 @@ se não há objeção explícita. Ausentes não estão representados e não pode
                     raise ValueError("Tratamento inválido.")
                 nonempty(item["note"], 2000)
                 seen.add(item["participant"])
+            # Restore local references only after validating the external identifiers.
+            coverage = [{**item, "participant": local_by_external[item["participant"]]} for item in coverage]
             return {"summary": summary, "suggested_text": text, "details": {"coverage": coverage}}
 
         return self._generate(instruction, data, MEDIATION_SCHEMA, validate, MEDIATION_VERSION)
