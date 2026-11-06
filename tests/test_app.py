@@ -4,6 +4,7 @@ Instale requirements.txt para executar. CI exige que estes testes sejam executad
 """
 import importlib.util
 import json
+from contextlib import nullcontext
 import os
 import tempfile
 import unittest
@@ -16,6 +17,7 @@ if HAS_STREAMLIT:
 elif os.getenv("APP_TESTS_REQUIRED") == "1":
     raise RuntimeError("Instale Streamlit antes de executar os testes de interface.")
 
+from ai_service import AIService, DEFAULT_MODEL
 from decision import (MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, NO_OBJECTION,
                       UNCHANGED_REVIEW_NOTE, Repository, current_proposal, current_responses)
 
@@ -49,18 +51,22 @@ class StreamlitFlowTests(unittest.TestCase):
         return app
 
     def create(self, enabled=False):
-        app = self.app()
-        widget(app, "text_input", "Tema da decisão").set_value("Organização de um evento")
-        widget(app, "text_area", "Contexto e restrições conhecidas").set_value("Todos participam remotamente")
-        widget(app, "text_area", "Texto da proposta inicial").set_value("Reunião semanal às quartas")
-        if os.environ.get("EXPERIMENT_MODE") == "1":
-            widget(app, "number_input", "Número de participantes").set_value(3)
-        else:
-            widget(app, "text_area", "Participantes: um nome ou apelido por linha").set_value("Ana\nBruno\nCarla")
-        widget(app, "checkbox", "Usar IA para sugerir categorias e revisões").set_value(enabled)
-        widget(app, "button", "Criar sala e gerar acessos").click().run()
-        self.assertFalse(app.exception, [str(e) for e in app.exception])
-        return app, app.session_state["invitation"]
+        # Fixture SQLite: somente o gate de criação é simulado neste helper de testes.
+        # O bloqueio real é exercitado separadamente; regras também rodam no PostgreSQL do CI.
+        storage_fixture = patch("app.experimental_storage_ready", return_value=True) if os.environ.get("EXPERIMENT_MODE") == "1" else nullcontext()
+        with storage_fixture:
+            app = self.app()
+            widget(app, "text_input", "Tema da decisão").set_value("Organização de um evento")
+            widget(app, "text_area", "Contexto e restrições conhecidas").set_value("Todos participam remotamente")
+            widget(app, "text_area", "Texto da proposta inicial").set_value("Reunião semanal às quartas")
+            if os.environ.get("EXPERIMENT_MODE") == "1":
+                widget(app, "number_input", "Número de participantes").set_value(3)
+            else:
+                widget(app, "text_area", "Participantes: um nome ou apelido por linha").set_value("Ana\nBruno\nCarla")
+            widget(app, "checkbox", "Usar IA para sugerir categorias e revisões").set_value(enabled)
+            widget(app, "button", "Criar sala e gerar acessos").click().run()
+            self.assertFalse(app.exception, [str(e) for e in app.exception])
+            return app, app.session_state["invitation"]
 
     def join(self, access, index):
         app = self.app()
@@ -461,6 +467,137 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertTrue(payload["changed_from_source"])
         self.assertEqual(payload["review_note"], note)
         self.assertIn(note, self.rendered_text(moderator))
+
+    def test_formal_experimental_creation_requires_postgresql_but_landing_still_loads(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        app = self.app()  # No storage mock: this is the production creation gate.
+        self.assertTrue(widget(app, "button", "Criar sala e gerar acessos").disabled)
+        self.assertIn("Modo experimental requer PostgreSQL persistente. Configure DATABASE_URL", self.rendered_text(app))
+        self.assertIsNotNone(widget(app, "button", "Entrar"))
+        self.assertFalse(app.exception)
+        with self.repo.transaction() as conn:
+            count = conn.execute("SELECT COUNT(*) AS total FROM dc_rooms").fetchone()["total"]
+        self.assertEqual(count, 0)
+        from app import experimental_storage_ready
+        from types import SimpleNamespace
+        self.assertTrue(experimental_storage_ready(SimpleNamespace(experimental_mode=True, postgres=True)))
+        os.environ["EXPERIMENT_MODE"] = "0"
+        generic = self.app()
+        self.assertFalse(widget(generic, "button", "Criar sala e gerar acessos").disabled)
+        _, access = self.create()  # Generic creation has no storage mock.
+        self.assertTrue(self.repo.snapshot(access["code"], access["moderator_token"]))
+
+    def test_app_ignores_fallback_environment_only_in_experimental_mode(self):
+        for experimental in ("1", "0"):
+            with patch.dict(os.environ, {"EXPERIMENT_MODE": experimental, "GEMINI_MODEL": "primary",
+                                         "GEMINI_FALLBACK_MODELS": "fallback1,fallback2"}), \
+                 patch("app.AIService", wraps=AIService) as service:
+                self.app()
+                self.assertEqual(service.call_args.kwargs["models"], ["primary"] if experimental == "1" else ["primary", "fallback1", "fallback2"])
+
+    def test_experimental_classification_fallback_is_explicit_and_still_contestable(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=True)
+        person = self.join(access, 0)
+        original = "Quero preservar a preocupação sobre acessibilidade"
+        widget(person, "radio", "Minha posição sobre esta versão").set_value("NAO_ACEITO")
+        widget(person, "text_area", "Justificativa e ressalvas").set_value(original)
+        widget(person, "button", "Salvar manifestação").click().run()
+        moderator.run()
+        self.assertIn("SEM_CHAVE", self.rendered_text(moderator))
+        widget(moderator, "selectbox", "Revisar categoria").set_value("CAT07")
+        widget(moderator, "button", "Classificar como fallback técnico").click().run()
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        row = current_responses(snap)[0]
+        self.assertEqual((row["classification_status"], row["category"], row["argument"]), ("FALLBACK_HUMANO", "CAT07", original))
+        self.assertIsNone(row["category_ai"])
+        self.assertIn("manualmente devido a falha técnica da IA", self.rendered_text(moderator))
+        person.run()
+        widget(person, "selectbox", "Categoria que considero mais adequada").set_value("CAT05")
+        widget(person, "button", "Contestar categoria").click().run()
+        moderator.run()
+        widget(moderator, "selectbox", "Revisar categoria").set_value("CAT05")
+        widget(moderator, "button", "Salvar categoria final").click().run()
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(snap["category_contests"][0]["status"], "RESOLVIDA")
+        self.assertEqual(current_responses(snap)[0]["classification_status"], "FALLBACK_HUMANO")
+        widget(moderator, "button", "Pausar coleta e revisar").click().run()
+        self.assertFalse(any(w.label == "Salvar mediação manual" for w in moderator.button))
+
+    def mediation_failure_setup(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=True)
+        self.seed_other_response(access, "Preocupação preservada para as duas execuções")
+        moderator.run()
+        widget(moderator, "button", "Pausar coleta e revisar").click().run()
+        return moderator, access
+
+    def test_second_mediation_failure_removes_retry_and_allows_only_technical_cancellation(self):
+        failure = {"origin": "IA", "ok": False, "failure_code": "SERVICO_INDISPONIVEL", "model": DEFAULT_MODEL,
+                   "prompt_version": "mediacao-v1", "duration_ms": 1}
+        with patch("ai_service.AIService.mediate", return_value=failure) as mediate:
+            moderator, access = self.mediation_failure_setup()
+            widget(moderator, "button", "Gerar sugestão com IA").click().run()
+            self.assertIn("última execução controlada", self.rendered_text(moderator))
+            self.assertTrue(widget(moderator, "button", "Reabrir coleta desta versão").disabled)
+            first = self.repo.snapshot(access["code"], access["moderator_token"])
+            self.assertEqual([m["status"] for m in first["mediations"]], ["FALHA"])
+            widget(moderator, "button", "Tentar mediação IA novamente").click().run()
+            self.assertIn("não pode continuar na condição A", self.rendered_text(moderator))
+            labels = [w.label for w in moderator.button]
+            for label in ("Gerar sugestão com IA", "Tentar mediação IA novamente", "Publicar nova versão", "Salvar mediação manual"):
+                self.assertNotIn(label, labels)
+            snap = self.repo.snapshot(access["code"], access["moderator_token"])
+            self.assertEqual(len(snap["mediations"]), 2)
+            self.assertEqual(snap["room"]["revision"], first["room"]["revision"])
+            widget(moderator, "button", "Cancelar sessão por falha técnica").click().run()
+            snap = self.repo.snapshot(access["code"], access["moderator_token"])
+            self.assertEqual(snap["room"]["result"], "CANCELADA")
+            self.assertTrue(all(m["status"] == "FALHA" and m["failure_code"] == "SERVICO_INDISPONIVEL" for m in snap["mediations"]))
+            self.assertTrue(all(not m["summary"] and not m["suggested_text"] for m in snap["mediations"]))
+            self.assertEqual(mediate.call_count, 2)
+            calls = [args.args[0] for args in mediate.call_args_list]
+            self.assertEqual(current_responses(calls[0]), current_responses(calls[1]))
+            self.assertEqual(calls[0]["room"]["revision"], calls[1]["room"]["revision"])
+
+    def test_second_mediation_success_allows_normal_reviewed_publication(self):
+        failure = {"origin": "IA", "ok": False, "failure_code": "TEMPO_ESGOTADO", "model": DEFAULT_MODEL, "prompt_version": "mediacao-v1"}
+        success = {"origin": "IA", "ok": True, "model": DEFAULT_MODEL, "prompt_version": "mediacao-v1",
+                   "summary": "Síntese da segunda execução", "suggested_text": "Proposta da segunda execução", "details": {"coverage": []}}
+        with patch("ai_service.AIService.mediate", side_effect=[failure, success]):
+            moderator, access = self.mediation_failure_setup()
+            widget(moderator, "button", "Gerar sugestão com IA").click().run()
+            widget(moderator, "button", "Tentar mediação IA novamente").click().run()
+            self.assertTrue(widget(moderator, "button", "Gerar sugestão com IA").disabled)
+            widget(moderator, "checkbox", "Confirmo a publicação sem alteração de conteúdo.").set_value(True)
+            widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+            widget(moderator, "button", "Publicar nova versão").click().run()
+            snap = self.repo.snapshot(access["code"], access["moderator_token"])
+            self.assertEqual(current_proposal(snap)["round"], 2)
+            self.assertEqual([m["status"] for m in snap["mediations"]], ["FALHA", "OK"])
+            self.assertEqual(current_proposal(snap)["source_mediation_id"], snap["mediations"][1]["id"])
+
+    def test_session_configuration_change_blocks_operations_instead_of_switching_model(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=True)
+        with patch.dict(os.environ, {"GEMINI_MODEL": "different-model"}):
+            moderator.run()
+        self.assertIn("difere da fixada nesta sessão", self.rendered_text(moderator))
+        self.assertFalse(any(w.label in ("Gerar sugestão com IA", "Publicar nova versão") for w in moderator.button))
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        config = json.loads(next(e for e in snap["events"] if e["action"] == "CONFIGURACAO_IA_FIXADA")["payload_json"])
+        self.assertEqual(config["model"], DEFAULT_MODEL)
+        self.assertEqual(snap["mediations"], [])
+
+    def test_database_read_failure_does_not_expose_private_exception_or_fabricate_state(self):
+        moderator, access = self.create()
+        with patch("decision.Repository.snapshot", side_effect=RuntimeError("DO_NOT_EXPOSE_DB_DETAILS")):
+            moderator.run()
+        text = self.rendered_text(moderator)
+        self.assertIn("Não foi possível salvar ou ler os dados", text)
+        self.assertNotIn("DO_NOT_EXPOSE_DB_DETAILS", text)
+        self.assertFalse(moderator.radio)
+        self.assertEqual(self.repo.snapshot(access["code"], access["moderator_token"])["responses"], [])
 
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)

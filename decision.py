@@ -17,7 +17,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
-from experiment_config import TAXONOMY_CODES
+from experiment_config import CLASSIFICATION_FAILURE_CODES, MAX_MEDIATION_EXECUTIONS, TAXONOMY_CODES
 
 POSITIONS = {
     "ACEITO": "Aceito",
@@ -120,6 +120,19 @@ def validated_manual_mediation(result, responses):
             "summary": "\n\n".join(f"{label}\n{fields[key]}" for key, label in MANUAL_MEDIATION_FIELDS),
             "details": {**fields, "restriction_checks": {key: True for key, _ in MANUAL_RESTRICTION_CHECKS},
                         "coverage": normalized}}
+
+
+def mediation_attempt_state(snapshot):
+    room = snapshot["room"]
+    attempts = [m for m in snapshot["mediations"] if m["proposal_id"] == room["active_proposal_id"]
+                and m["revision"] == room["revision"] and m["origin"] == "IA"]
+    pending = any(m["status"] == "EM_EXECUCAO" for m in attempts)
+    success = any(m["status"] == "OK" for m in attempts)
+    retry = len(attempts) == 1 and attempts[0]["status"] == "FALHA"
+    return {"executions": len(attempts), "in_progress": pending, "has_success": success,
+            "retry": retry, "can_start": not attempts or retry,
+            "persistent_failure": len(attempts) >= MAX_MEDIATION_EXECUTIONS
+            and all(m["status"] == "FALHA" for m in attempts)}
 
 
 SCHEMA = (
@@ -257,6 +270,69 @@ class Repository:
     def _bump(self, conn, room):
         conn.execute("UPDATE dc_rooms SET revision=revision+1 WHERE id=?", (room["id"],))
 
+    def _ensure_ai_configuration(self, conn, room, actor, configuration):
+        required = ("model", "classification_prompt", "mediation_prompt", "taxonomy_version")
+        if (not isinstance(configuration, dict) or any(
+                not isinstance(configuration.get(k), str) or not configuration[k].strip()
+                or len(configuration[k]) > 200 for k in required)
+                or configuration.get("temperature") != 0):
+            raise DecisionError("Configuração experimental de IA inválida.")
+        configuration = {k: configuration[k] for k in (*required, "temperature")}
+        existing = self._ai_configuration(conn, room)
+        if existing is not None and existing != configuration:
+            raise DecisionError("A configuração de IA difere da fixada nesta sessão. Restaure a configuração original ou cancele a sessão; não prossiga com outra configuração.")
+        if existing is None:
+            self._event(conn, room, room["active_proposal_id"], actor, "CONFIGURACAO_IA_FIXADA", configuration)
+
+    def _ai_configuration(self, conn, room):
+        row = conn.execute("SELECT payload_json FROM dc_events WHERE room_id=? AND action='CONFIGURACAO_IA_FIXADA'",
+                           (room["id"],)).fetchone()
+        return json.loads(row["payload_json"]) if row else None
+
+    def ensure_ai_configuration(self, code, token, configuration):
+        with self.transaction(write=True) as conn:
+            room, actor = self._access(conn, code, token, write=True)
+            if self.experimental_mode and room["ai_enabled"]:
+                self._ensure_ai_configuration(conn, room, actor, configuration)
+
+    def _check_ai_result_configuration(self, conn, room, result, prompt_key):
+        if not self.experimental_mode:
+            return
+        config = self._ai_configuration(conn, room)
+        if config and ((result.get("model") and result["model"] != config["model"])
+                       or (result.get("prompt_version") and result["prompt_version"] != config[prompt_key])):
+            raise DecisionError("Resultado da IA incompatível com a configuração fixada na sessão.")
+
+    def _attempt_state(self, conn, room):
+        rows = conn.execute("SELECT * FROM dc_mediations WHERE proposal_id=? AND revision=? AND origin='IA'",
+                            (room["active_proposal_id"], room["revision"])).fetchall()
+        return mediation_attempt_state({"room": room, "mediations": [dict(r) for r in rows]})
+
+    def _reserve_ai_mediation(self, conn, room, actor):
+        state = self._attempt_state(conn, room)
+        if not state["can_start"] or state["executions"] >= MAX_MEDIATION_EXECUTIONS:
+            raise DecisionError("Não há nova execução de mediação IA permitida para esta versão/revisão.")
+        config = self._ai_configuration(conn, room) or {}
+        mediation_id = uid()
+        conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
+            mediation_id, room["id"], room["active_proposal_id"], room["revision"], "IA", "EM_EXECUCAO",
+            "", "", "{}", config.get("model"), config.get("mediation_prompt"), None, None, now(),
+        ))
+        self._event(conn, room, room["active_proposal_id"], actor, "MEDIACAO_INICIADA", {
+            "mediation_id": mediation_id, "execution": state["executions"] + 1, "revision": room["revision"],
+        })
+        return mediation_id
+
+    def begin_ai_mediation(self, code, token, proposal_id, revision, configuration):
+        """Reserva persistida antes da API; a chamada externa ocorre fora da transação."""
+        with self.transaction(write=True) as conn:
+            room, actor = self._access(conn, code, token, write=True, moderator=True)
+            self._current(room, proposal_id, "REVISAO")
+            if not self.experimental_mode or not room["ai_enabled"] or room["revision"] != revision:
+                raise DecisionError("Execução experimental indisponível para esta condição/revisão.")
+            self._ensure_ai_configuration(conn, room, actor, configuration)
+            return self._reserve_ai_mediation(conn, room, actor)
+
     def _validated_category(self, category, allow_no_objection=False):
         category = clean(category, "a categoria", 120)
         allowed = category in TAXONOMY_CODES or (allow_no_objection and category == NO_OBJECTION)
@@ -386,6 +462,7 @@ class Repository:
             if (room["active_proposal_id"] != proposal_id or room["state"] != "COLETA"
                     or row["edit"] != edit or row["category_manual"]):
                 return False
+            self._check_ai_result_configuration(conn, room, result, "classification_prompt")
             status = "OK" if result["ok"] else result.get("failure_code", "FALHA_IA")
             category = self._validated_category(result["category"], allow_no_objection=True) if result["ok"] else UNCLASSIFIED
             conn.execute("""UPDATE dc_responses SET category_ai=?, category=?, classification_status=?,
@@ -436,7 +513,7 @@ class Repository:
             })
         return contest_id
 
-    def set_category(self, code, token, proposal_id, response_id, category, expected_edit=None):
+    def set_category(self, code, token, proposal_id, response_id, category, expected_edit=None, technical_fallback=False):
         category = self._validated_category(category, allow_no_objection=True)
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
@@ -449,12 +526,20 @@ class Repository:
                 raise DecisionError("Ressalva ou rejeição exige uma categoria de objeção.")
             if expected_edit is not None and row["edit"] != expected_edit:
                 raise DecisionError("O participante editou a justificativa. Atualize antes de revisar a categoria.")
+            failed = (self.experimental_mode and room["ai_enabled"]
+                      and row["classification_status"] in CLASSIFICATION_FAILURE_CODES)
+            if failed and not technical_fallback:
+                raise DecisionError("Registre esta classificação como fallback técnico da IA.")
+            if technical_fallback and (not failed or category not in TAXONOMY_CODES):
+                raise DecisionError("Fallback técnico exige falha de classificação IA e categoria CAT01–CAT09.")
             contest = conn.execute(
                 """SELECT * FROM dc_category_contests
                    WHERE response_id=? AND response_edit=? AND status='PENDENTE'""",
                 (response_id, row["edit"]),
             ).fetchone()
             conn.execute("UPDATE dc_responses SET category=?, category_manual=1 WHERE id=?", (category, response_id))
+            if technical_fallback:
+                conn.execute("UPDATE dc_responses SET classification_status='FALLBACK_HUMANO' WHERE id=?", (response_id,))
             if contest:
                 conn.execute("""UPDATE dc_category_contests
                     SET status='RESOLVIDA', resolved_at=?, resolved_category=? WHERE id=?""",
@@ -463,7 +548,10 @@ class Repository:
             payload = {"response_id": response_id, "previous": row["category"], "category": category}
             if contest:
                 payload.update({"contest_id": contest["id"], "participant_suggestion": contest["suggested_category"]})
-            self._event(conn, room, proposal_id, actor, "CATEGORIA_REVISADA", payload)
+            if technical_fallback:
+                payload.update({"failure_code": row["classification_status"], "edit": row["edit"]})
+            self._event(conn, room, proposal_id, actor,
+                        "CLASSIFICACAO_FALLBACK_HUMANO" if technical_fallback else "CATEGORIA_REVISADA", payload)
 
     def set_phase(self, code, token, proposal_id, phase):
         if phase not in ("COLETA", "REVISAO"):
@@ -472,10 +560,14 @@ class Repository:
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, previous)
+            if self.experimental_mode and room["ai_enabled"] and phase == "COLETA":
+                state = self._attempt_state(conn, room)
+                if state["executions"] and not state["has_success"]:
+                    raise DecisionError("Preserve as manifestações congeladas entre execuções da mediação IA. Conclua o protocolo ou cancele tecnicamente.")
             conn.execute("UPDATE dc_rooms SET state=?, revision=revision+1 WHERE id=?", (phase, room["id"]))
             self._event(conn, room, proposal_id, actor, "ETAPA_ALTERADA", {"from": previous, "to": phase})
 
-    def save_mediation(self, code, token, proposal_id, revision, result):
+    def save_mediation(self, code, token, proposal_id, revision, result, attempt_id=None):
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO")
@@ -502,14 +594,34 @@ class Repository:
                         if not isinstance(result.get(key), str) or not result[key].strip():
                             raise DecisionError(f"Preencha {label}.")
                         clean(result[key], label, limit)
-            mediation_id = uid()
-            conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
-                mediation_id, room["id"], proposal_id, revision, result["origin"],
-                "OK" if result["ok"] else "FALHA", result.get("summary", ""),
-                result.get("suggested_text", ""), json.dumps(result.get("details", {}), ensure_ascii=False),
-                result.get("model"), result.get("prompt_version"), result.get("failure_code"),
-                result.get("duration_ms"), now(),
-            ))
+            if self.experimental_mode and room["ai_enabled"]:
+                self._check_ai_result_configuration(conn, room, result, "mediation_prompt")
+                mediation_id = attempt_id or self._reserve_ai_mediation(conn, room, actor)
+                pending = conn.execute("SELECT * FROM dc_mediations WHERE id=? AND room_id=?",
+                                       (mediation_id, room["id"])).fetchone()
+                if (not pending or pending["status"] != "EM_EXECUCAO" or pending["origin"] != "IA"
+                        or pending["proposal_id"] != proposal_id or pending["revision"] != revision):
+                    raise DecisionError("Execução de mediação inválida ou já concluída.")
+                # Uma falha nunca vira sugestão local nem reaproveita texto de outra execução.
+                conn.execute("""UPDATE dc_mediations SET status=?, summary=?, suggested_text=?, details_json=?,
+                    model=?, prompt_version=?, failure_code=?, duration_ms=? WHERE id=?""", (
+                    "OK" if result["ok"] else "FALHA", result.get("summary", "") if result["ok"] else "",
+                    result.get("suggested_text", "") if result["ok"] else "",
+                    json.dumps(result.get("details", {}), ensure_ascii=False),
+                    result.get("model") or pending["model"], result.get("prompt_version") or pending["prompt_version"],
+                    result.get("failure_code"), result.get("duration_ms"), mediation_id,
+                ))
+            else:
+                if attempt_id:
+                    raise DecisionError("Reserva de execução IA indisponível nesta condição.")
+                mediation_id = uid()
+                conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
+                    mediation_id, room["id"], proposal_id, revision, result["origin"],
+                    "OK" if result["ok"] else "FALHA", result.get("summary", ""),
+                    result.get("suggested_text", ""), json.dumps(result.get("details", {}), ensure_ascii=False),
+                    result.get("model"), result.get("prompt_version"), result.get("failure_code"),
+                    result.get("duration_ms"), now(),
+                ))
             self._event(conn, room, proposal_id, actor, "MEDIACAO_REGISTRADA", {
                 "mediation_id": mediation_id, "origin": result["origin"], "ok": result["ok"],
             })
@@ -523,6 +635,10 @@ class Repository:
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO")
+            if self.experimental_mode and room["ai_enabled"]:
+                state = self._attempt_state(conn, room)
+                if state["persistent_failure"] or state["in_progress"]:
+                    raise DecisionError("Publicação bloqueada pelo protocolo de falhas da mediação IA.")
             old = conn.execute("SELECT * FROM dc_proposals WHERE id=?", (proposal_id,)).fetchone()
             if old["round"] >= MAX_ROUNDS:
                 raise DecisionError("O limite de três rodadas já foi atingido.")
@@ -578,6 +694,10 @@ class Repository:
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO" if not cancel else room["state"])
+            if self.experimental_mode and room["ai_enabled"] and not cancel:
+                state = self._attempt_state(conn, room)
+                if state["persistent_failure"] or state["in_progress"]:
+                    raise DecisionError("Condição experimental não preservada: registre cancelamento técnico.")
             snapshot = {
                 "participants": [dict(p) for p in conn.execute("SELECT id, pseudonym FROM dc_participants WHERE room_id=?", (room["id"],)).fetchall()],
                 "responses": [dict(r) for r in conn.execute("SELECT * FROM dc_responses WHERE proposal_id=?", (proposal_id,)).fetchall()],

@@ -10,7 +10,7 @@ from importlib import metadata
 import time
 
 from decision import NO_OBJECTION, current_proposal, current_responses
-from experiment_config import TAXONOMY_CODES, taxonomy_prompt
+from experiment_config import TAXONOMY_CODES, TAXONOMY_VERSION, taxonomy_prompt
 
 def sanitize_external_text(text):
     """Best-effort minimization, only at the external boundary; not anonymization.
@@ -39,6 +39,14 @@ FAILURE_MESSAGES = {
     "TEMPO_ESGOTADO": "O Gemini não respondeu no prazo após até três tentativas automáticas. Nenhuma sugestão foi gerada. As manifestações foram preservadas.",
     "FALHA_IA": "A chamada à IA falhou. As manifestações foram preservadas; a mediação humana está disponível.",
 }
+
+
+def failure_message(code, experimental_mode=False):
+    if experimental_mode and code in ("COTA_OU_LIMITE", "FALHA_IA", "SERVICO_INDISPONIVEL"):
+        return "Falha técnica da IA (" + code + "). As manifestações foram preservadas. Siga o protocolo experimental de falhas."
+    return FAILURE_MESSAGES.get(code, FAILURE_MESSAGES["FALHA_IA"])
+
+
 CLASS_SCHEMA = {
     "type": "object",
     "properties": {"has_objection": {"type": "boolean"}, "category": {"type": "string"}},
@@ -117,6 +125,14 @@ class AIService:
         self.models = list(dict.fromkeys(models or [DEFAULT_MODEL]))[:3]
         self.client_factory = client_factory
         self.experimental_mode = bool(experimental_mode)
+        if self.experimental_mode:
+            self.models = self.models[:1]
+
+    def experimental_configuration(self):
+        """Somente configuração não secreta necessária para impedir troca na sessão."""
+        return {"model": self.models[0], "classification_prompt": CLASSIFICATION_VERSION,
+                "mediation_prompt": MEDIATION_VERSION, "taxonomy_version": TAXONOMY_VERSION,
+                "temperature": 0}
 
     def _call_with_retry(self, client, **kwargs):
         for attempt in range(3):

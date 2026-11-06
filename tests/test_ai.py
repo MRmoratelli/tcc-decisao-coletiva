@@ -5,7 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from ai_service import AIService, sanitize_external_text
+from ai_service import AIService, failure_message, sanitize_external_text
 from decision import Repository, current_proposal, current_responses
 
 
@@ -120,6 +120,61 @@ class AIValidationTests(unittest.TestCase):
             coverage = [{"participant": i, "treatment": "PARCIAL", "note": "Revisar"} for i in ids]
             service, _ = self.service([self.mediation(coverage)], experimental_mode=True)
             self.assertFalse(service.mediate(self.snapshot)["ok"])
+
+    @patch("ai_service.time.sleep")
+    def test_experimental_model_never_switches_to_configured_fallback(self, sleep):
+        error = RuntimeError("private provider message")
+        error.code = 503
+        service, client = self.service([error] * 3 + [self.mediation()], models=["primary", "fallback"], experimental_mode=True)
+        self.assertEqual(service.models, ["primary"])
+        result = service.mediate(self.snapshot)
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["model"], "primary")
+        self.assertEqual(len(client.calls), 3)
+        self.assertEqual({c["model"] for c in client.calls}, {"primary"})
+        self.assertNotIn("suggested_text", result)
+
+    @patch("ai_service.time.sleep")
+    def test_experimental_nontransient_failure_is_not_retried_or_switched(self, sleep):
+        error = RuntimeError("private")
+        error.code = 404
+        service, client = self.service([error, self.mediation()], models=["primary", "fallback"], experimental_mode=True)
+        self.assertEqual(service.mediate(self.snapshot)["failure_code"], "MODELO_INDISPONIVEL")
+        self.assertEqual(len(client.calls), 1)
+        sleep.assert_not_called()
+
+    @patch("ai_service.time.sleep")
+    def test_all_transient_codes_and_timeout_have_three_internal_attempts(self, sleep):
+        for code in (500, 502, 503, 504, None):
+            with self.subTest(code=code):
+                sleep.reset_mock()
+                error = TimeoutError("private") if code is None else RuntimeError("private")
+                if code is not None:
+                    error.code = code
+                service, client = self.service([error] * 3, experimental_mode=True)
+                result = service.mediate(self.snapshot)
+                self.assertFalse(result["ok"])
+                self.assertEqual(len(client.calls), 3)
+                self.assertEqual([c.args[0] for c in sleep.call_args_list], [2, 4])
+                self.assertNotIn("private", json.dumps(result))
+
+    @patch("ai_service.time.sleep")
+    def test_controlled_reexecution_keeps_same_model_prompt_payload_and_parameters(self, sleep):
+        error = RuntimeError("private")
+        error.code = 503
+        first, c1 = self.service([error] * 3, models=["primary", "fallback"], experimental_mode=True)
+        second, c2 = self.service([self.mediation([{"participant": "M01", "treatment": "PARCIAL", "note": "Condição parcial"}])],
+                                   models=["primary", "fallback"], experimental_mode=True)
+        self.assertFalse(first.mediate(self.snapshot)["ok"])
+        self.assertTrue(second.mediate(self.snapshot)["ok"])
+        self.assertEqual(first.experimental_configuration(), second.experimental_configuration())
+        self.assertEqual(c1.calls[0], c2.calls[0])
+        self.assertNotIn("fake-test-key", json.dumps(first.experimental_configuration()))
+
+    def test_experimental_messages_never_offer_human_mediation_after_ai_failure(self):
+        for code in ("COTA_OU_LIMITE", "FALHA_IA", "SERVICO_INDISPONIVEL"):
+            self.assertNotIn("mediação humana", failure_message(code, True))
+        self.assertIn("mediação humana", failure_message("FALHA_IA", False))
 
     def test_no_key_is_explicit_failure(self):
         result = AIService().mediate(self.snapshot)

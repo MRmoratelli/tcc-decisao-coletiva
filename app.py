@@ -8,12 +8,12 @@ from pathlib import Path
 
 import streamlit as st
 
-from ai_service import AIService, DEFAULT_MODEL, FAILURE_MESSAGES
-from experiment_config import TAXONOMY_CODES, taxonomy_display
+from ai_service import AIService, DEFAULT_MODEL, FAILURE_MESSAGES, failure_message
+from experiment_config import CLASSIFICATION_FAILURE_CODES, TAXONOMY_CODES, TECHNICAL_CANCEL_REASON, taxonomy_display
 from decision import (
     COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS,
     UNCHANGED_REVIEW_NOTE, DecisionError, NO_OBJECTION, POSITIONS, Repository, UNCLASSIFIED,
-    consensus, csv_export, current_proposal, current_responses, research_export,
+    consensus, csv_export, current_proposal, current_responses, mediation_attempt_state, research_export,
 )
 
 
@@ -61,6 +61,10 @@ def participant_visibility_blocked(snapshot, experimental_mode):
             and not participant_has_current_response(snapshot))
 
 
+def experimental_storage_ready(repo):
+    return not repo.experimental_mode or repo.postgres
+
+
 def login_screen(repo):
     st.write("Discuta uma proposta, revise o texto e registre a aceitação do grupo em até três rodadas.")
     join, create = st.tabs(["Entrar na sala", "Criar sala"])
@@ -76,6 +80,9 @@ def login_screen(repo):
                 st.query_params["sala"] = code.strip().upper()
                 st.rerun()
     with create:
+        storage_ready = experimental_storage_ready(repo)
+        if not storage_ready:
+            st.error("Modo experimental requer PostgreSQL persistente. Configure DATABASE_URL antes de iniciar uma sessão.")
         st.caption("O tema é livre. Descreva uma proposta concreta e as restrições conhecidas antes de convidar o grupo.")
         with st.form("create"):
             theme = st.text_input("Tema da decisão", max_chars=300)
@@ -90,8 +97,8 @@ def login_screen(repo):
                 st.caption("As manifestações dos demais ficam ocultas até sua resposta em cada versão. Com IA ativa, textos sanitizados são enviados ao Gemini; a mediação usa identificadores temporários M01, M02 etc. Evite dados pessoais no texto.")
             else:
                 st.caption("As manifestações ficam visíveis aos membros da sala. Com IA ativa, tema, proposta e justificativas serão enviados ao Gemini com identificadores P01, P02 etc. Evite dados pessoais no texto.")
-            submitted = st.form_submit_button("Criar sala e gerar acessos", type="primary")
-        if submitted:
+            submitted = st.form_submit_button("Criar sala e gerar acessos", type="primary", disabled=not storage_ready)
+        if submitted and storage_ready:
             aliases = int(roster) if repo.experimental_mode else [line.strip() for line in roster.splitlines() if line.strip()]
             ok, invitation = execute(lambda: repo.create_room(theme, context, proposal, aliases, enabled))
             if ok:
@@ -163,7 +170,7 @@ def response_form(repo, ai, snapshot, code, token):
                 classification = ai.classify(snapshot, position, argument.strip())
                 execute(lambda: repo.apply_classification(code, token, proposal["id"], saved["id"], saved["edit"], classification))
             if not classification["ok"]:
-                notice += " " + FAILURE_MESSAGES.get(classification["failure_code"], FAILURE_MESSAGES["FALHA_IA"])
+                notice += " " + failure_message(classification["failure_code"], repo.experimental_mode)
         notify(notice)
         st.rerun()
 
@@ -241,7 +248,15 @@ def manifestations(repo, snapshot, code, token):
             st.caption(f"Categoria: {response['category']} · Classificação: {response['classification_status']}")
             if response["category_manual"]:
                 st.caption("Categoria revisada pelo moderador. Sugestão original da IA: " + (response["category_ai"] or "indisponível"))
+            if response["classification_status"] == "FALLBACK_HUMANO":
+                st.caption("Esta classificação foi realizada manualmente devido a falha técnica da IA. "
+                           "Isso não transforma a condição A em condição B.")
             if snapshot["actor"]["role"] == "moderator" and snapshot["room"]["state"] == "COLETA":
+                fallback = (repo.experimental_mode and snapshot["room"]["ai_enabled"]
+                            and response["classification_status"] in CLASSIFICATION_FAILURE_CODES)
+                if fallback:
+                    st.warning(failure_message(response["classification_status"], True))
+                    st.caption("Use CAT01–CAT09 como fallback técnico de classificação; a falha da IA será preservada no histórico.")
                 contest = next((c for c in snapshot["category_contests"]
                                 if c["response_id"] == response["id"] and c["response_edit"] == response["edit"]), None)
                 if contest:
@@ -252,7 +267,7 @@ def manifestations(repo, snapshot, code, token):
                 with st.form("category_" + response["id"] + "_" + str(response["edit"])):
                     if repo.experimental_mode:
                         choices = list(TAXONOMY_CODES)
-                        if response["position"] == "ACEITO":
+                        if response["position"] == "ACEITO" and not fallback:
                             choices = [NO_OBJECTION] + choices
                         if contest and contest["status"] == "PENDENTE":
                             default = contest["suggested_category"]
@@ -268,10 +283,12 @@ def manifestations(repo, snapshot, code, token):
                         )
                     else:
                         category = st.text_input("Revisar categoria", value=response["category"], max_chars=120)
-                    button_label = "Salvar categoria final" if contest and contest["status"] == "PENDENTE" else "Salvar categoria"
+                    button_label = ("Classificar como fallback técnico" if fallback else
+                                    "Salvar categoria final" if contest and contest["status"] == "PENDENTE" else "Salvar categoria")
                     submitted = st.form_submit_button(button_label)
                 if submitted:
-                    ok, _ = execute(lambda: repo.set_category(code, token, response["proposal_id"], response["id"], category, response["edit"]))
+                    ok, _ = execute(lambda: repo.set_category(code, token, response["proposal_id"], response["id"], category,
+                                                             response["edit"], technical_fallback=fallback))
                     if ok:
                         notify("Categoria revisada. O texto, a posição e a trilha de contestação foram preservados.")
                         st.rerun()
@@ -337,22 +354,51 @@ def mediator_panel(repo, ai, snapshot, code, token):
         st.info("A proposta está em revisão pelo moderador. As manifestações desta versão estão preservadas.")
         return
     st.write("As manifestações estão congeladas. Revise os argumentos antes de publicar outra versão.")
+    protocol = mediation_attempt_state(snapshot) if repo.experimental_mode and room["ai_enabled"] else None
+    if protocol and protocol["persistent_failure"]:
+        st.error("Falha técnica persistente. Esta sessão experimental não pode continuar na condição A.")
+        st.caption("Mediação humana não pode substituir a IA nesta condição. Os registros serão preservados.")
+        if st.button("Cancelar sessão por falha técnica"):
+            ok, _ = execute(lambda: repo.finish(code, token, proposal["id"], TECHNICAL_CANCEL_REASON, cancel=True))
+            if ok:
+                st.rerun()
+        return
+    if protocol and protocol["in_progress"]:
+        st.warning("Há uma execução de mediação IA registrada como em andamento. Atualize para conferir o resultado. "
+                   "Não repita chamadas com estado incerto; se não for recuperável, cancele a sessão.")
+        return
     if state["missing"]:
         st.warning("Faltam respostas: " + ", ".join(state["missing"]) + ". Isso impede encerrar por acordo.")
-    if st.button("Reabrir coleta desta versão", key="reopen_" + proposal["id"]):
+    if st.button("Reabrir coleta desta versão", key="reopen_" + proposal["id"],
+                 disabled=bool(protocol and protocol["retry"])):
         ok, _ = execute(lambda: repo.set_phase(code, token, proposal["id"], "COLETA"))
         if ok:
             st.rerun()
     if room["ai_enabled"]:
         if not ai.api_key:
             st.info(FAILURE_MESSAGES["SEM_CHAVE"])
-        if st.button("Gerar sugestão com IA", disabled=not bool(current_responses(snapshot)) or not ai.api_key):
+        if protocol and protocol["retry"]:
+            st.warning("A primeira execução falhou. O protocolo permite uma última execução controlada, "
+                       "com a mesma configuração e as mesmas manifestações congeladas.")
+        label = "Tentar mediação IA novamente" if protocol and protocol["retry"] else "Gerar sugestão com IA"
+        disabled = (not bool(current_responses(snapshot)) or
+                    (not ai.api_key and not repo.experimental_mode) or bool(protocol and not protocol["can_start"]))
+        if st.button(label, disabled=disabled):
+            attempt_id = None
+            if repo.experimental_mode:
+                ok, attempt_id = execute(lambda: repo.begin_ai_mediation(code, token, proposal["id"], room["revision"],
+                                                                         ai.experimental_configuration()))
+                if not ok:
+                    return
             with st.spinner("A IA está analisando as manifestações desta versão..."):
                 result = ai.mediate(snapshot)
-                ok, _ = execute(lambda: repo.save_mediation(code, token, proposal["id"], room["revision"], result))
+                ok, _ = execute(lambda: repo.save_mediation(code, token, proposal["id"], room["revision"], result,
+                                                          attempt_id=attempt_id))
             if ok:
-                notify("Sugestão registrada para revisão humana." if result["ok"] else FAILURE_MESSAGES.get(result["failure_code"], FAILURE_MESSAGES["FALHA_IA"]))
+                notify("Sugestão registrada para revisão humana." if result["ok"] else failure_message(result["failure_code"], repo.experimental_mode))
                 st.rerun()
+            else:
+                return
     else:
         st.caption("Sala sem IA. Categorias e revisões são feitas pelo moderador.")
         if repo.experimental_mode:
@@ -466,7 +512,9 @@ def history_panel(snapshot, experimental_mode=False):
         for mediation in reversed(snapshot["mediations"]):
             with st.expander(mediation["origin"] + " · " + mediation["status"] + " · " + mediation["created_at"]):
                 if mediation["status"] == "FALHA":
-                    st.write(FAILURE_MESSAGES.get(mediation["failure_code"], FAILURE_MESSAGES["FALHA_IA"]))
+                    st.write(failure_message(mediation["failure_code"], experimental_mode))
+                elif mediation["status"] == "EM_EXECUCAO":
+                    st.write("Execução registrada como em andamento; resultado ainda não confirmado.")
                 else:
                     st.text(mediation["summary"])
                     st.text(mediation["suggested_text"])
@@ -550,6 +598,13 @@ def room_view(repo, ai, code, token):
     if not ok:
         return
     room, actor = snapshot["room"], snapshot["actor"]
+    if repo.experimental_mode and room["ai_enabled"]:
+        ok, _ = execute(lambda: repo.ensure_ai_configuration(code, token, ai.experimental_configuration()))
+        if not ok:
+            # Leitura e cancelamento continuam possíveis; não prossiga com outra configuração.
+            export_panel(snapshot)
+            room_settings(repo, snapshot, code, token)
+            return
     proposal = current_proposal(snapshot)
     notice = st.session_state.pop("notice", None)
     if notice:
@@ -594,7 +649,9 @@ def main():
     except Exception:
         st.error("O armazenamento não está disponível. Confira DATABASE_URL e as dependências nas configurações da implantação.")
         return
-    models = [setting("GEMINI_MODEL", DEFAULT_MODEL)] + [m.strip() for m in setting("GEMINI_FALLBACK_MODELS").split(",") if m.strip()]
+    models = [setting("GEMINI_MODEL", DEFAULT_MODEL)]
+    if not experimental_mode:
+        models += [m.strip() for m in setting("GEMINI_FALLBACK_MODELS").split(",") if m.strip()]
     ai = AIService(setting("GEMINI_API_KEY"), models=models, experimental_mode=experimental_mode)
     auth = st.session_state.get("auth")
     if not auth:

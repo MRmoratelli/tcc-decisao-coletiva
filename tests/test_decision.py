@@ -10,9 +10,9 @@ from pathlib import Path
 from decision import (
     COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, UNCHANGED_REVIEW_NOTE,
     DecisionError, NO_OBJECTION, Repository, UNCLASSIFIED, consensus, csv_export,
-    current_proposal, current_responses, research_export,
+    current_proposal, current_responses, mediation_attempt_state, research_export,
 )
-from experiment_config import TAXONOMY_CODES
+from experiment_config import TAXONOMY_CODES, TECHNICAL_CANCEL_REASON
 
 
 class WorkflowTests(unittest.TestCase):
@@ -625,6 +625,211 @@ class ExperimentalMediationTests(unittest.TestCase):
         failed = self.save({"origin": "IA", "ok": False, "failure_code": "FALHA_IA"})
         with self.assertRaises(DecisionError):
             self.repo.publish_revision(self.code, self.admin, self.proposal, "Nova proposta", failed, review_note="Revisada")
+
+
+class ExperimentalFailureProtocolTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=Path(self.tmp.name) / "failures.db", experimental_mode=True)
+        self.access = self.repo.create_room("Orçamento", "Contexto", "Proposta inicial", 3, True)
+        self.code, self.admin = self.access["code"], self.access["moderator_token"]
+        self.proposal = current_proposal(self.snapshot())["id"]
+        self.token = self.access["invitations"][0]["token"]
+        self.saved = self.repo.submit_response(self.code, self.token, self.proposal, "NAO_ACEITO", "Preservar esta justificativa")
+        self.config = {"model": "primary", "classification_prompt": "classificacao-v1", "mediation_prompt": "mediacao-v1",
+                       "taxonomy_version": "taxonomia-v1", "temperature": 0}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def snapshot(self):
+        return self.repo.snapshot(self.code, self.admin)
+
+    def freeze(self):
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        return self.snapshot()["room"]["revision"]
+
+    def begin(self):
+        return self.repo.begin_ai_mediation(self.code, self.admin, self.proposal, self.snapshot()["room"]["revision"], self.config)
+
+    def result(self, ok=False):
+        base = {"origin": "IA", "ok": ok, "model": "primary", "prompt_version": "mediacao-v1", "duration_ms": 1}
+        return base | ({"summary": "Síntese IA válida", "suggested_text": "Proposta IA revisada"} if ok else
+                       {"failure_code": "SERVICO_INDISPONIVEL", "summary": "NÃO REAPROVEITAR", "suggested_text": "NÃO GERAR PROPOSTA LOCAL"})
+
+    def complete(self, attempt_id, ok=False):
+        return self.repo.save_mediation(self.code, self.admin, self.proposal, self.snapshot()["room"]["revision"],
+                                         self.result(ok), attempt_id=attempt_id)
+
+    def test_classification_failure_and_human_fallback_remain_distinct_from_correction_and_contest(self):
+        self.repo.ensure_ai_configuration(self.code, self.admin, self.config)
+        failure = {"ok": False, "failure_code": "COTA_OU_LIMITE", "model": "primary", "prompt_version": "classificacao-v1"}
+        self.repo.apply_classification(self.code, self.token, self.proposal, self.saved["id"], self.saved["edit"], failure)
+        row = current_responses(self.snapshot())[0]
+        self.assertEqual((row["argument"], row["category"], row["classification_status"]),
+                         ("Preservar esta justificativa", UNCLASSIFIED, "COTA_OU_LIMITE"))
+        with self.assertRaises(DecisionError):
+            self.repo.set_category(self.code, self.admin, self.proposal, row["id"], "CAT07", row["edit"])
+        with self.assertRaises(DecisionError):
+            self.repo.set_category(self.code, self.admin, self.proposal, row["id"], "Livre", row["edit"], technical_fallback=True)
+        self.repo.set_category(self.code, self.admin, self.proposal, row["id"], "CAT07", row["edit"], technical_fallback=True)
+        snap = self.snapshot()
+        row = current_responses(snap)[0]
+        self.assertEqual(row["classification_status"], "FALLBACK_HUMANO")
+        self.assertIsNone(row["category_ai"])
+        self.assertEqual((row["classification_model"], row["classification_prompt"]), ("primary", "classificacao-v1"))
+        event = next(e for e in snap["events"] if e["action"] == "CLASSIFICACAO_FALLBACK_HUMANO")
+        self.assertEqual(json.loads(event["payload_json"])["failure_code"], "COTA_OU_LIMITE")
+        self.assertTrue(any(e["action"] == "CLASSIFICACAO_IA" for e in snap["events"]))
+        self.repo.suggest_category(self.code, self.token, self.proposal, row["id"], "CAT05", row["edit"])
+        self.repo.set_category(self.code, self.admin, self.proposal, row["id"], "CAT05", row["edit"])
+        snap = self.snapshot()
+        self.assertEqual(current_responses(snap)[0]["classification_status"], "FALLBACK_HUMANO")
+        self.assertEqual(snap["category_contests"][0]["status"], "RESOLVIDA")
+        self.assertTrue(snap["room"]["ai_enabled"])
+        self.freeze()
+        with self.assertRaises(DecisionError):
+            self.repo.save_mediation(self.code, self.admin, self.proposal, self.snapshot()["room"]["revision"],
+                                     {"origin": "HUMANA", "ok": True, "summary": "Não permitido", "suggested_text": "Texto"})
+
+    def test_fallback_requires_real_classification_failure(self):
+        with self.assertRaises(DecisionError):
+            self.repo.set_category(self.code, self.admin, self.proposal, self.saved["id"], "CAT07", technical_fallback=True)
+
+    def test_configuration_is_frozen_for_session_without_secret_values(self):
+        self.repo.ensure_ai_configuration(self.code, self.admin, self.config | {"api_key": "DO_NOT_LOG"})
+        self.repo.ensure_ai_configuration(self.code, self.token, dict(self.config))
+        events = [e for e in self.snapshot()["events"] if e["action"] == "CONFIGURACAO_IA_FIXADA"]
+        self.assertEqual(len(events), 1)
+        self.assertNotIn("DO_NOT_LOG", events[0]["payload_json"])
+        for field in self.config:
+            config = self.config | {field: 1 if field == "temperature" else "changed"}
+            with self.subTest(field=field), self.assertRaises(DecisionError):
+                self.repo.ensure_ai_configuration(self.code, self.admin, config)
+        with self.assertRaises(DecisionError):
+            self.repo.apply_classification(self.code, self.token, self.proposal, self.saved["id"], self.saved["edit"],
+                                           {"ok": True, "category": "CAT07", "model": "other", "prompt_version": "classificacao-v1"})
+        self.assertEqual(current_responses(self.snapshot())[0]["classification_status"], "PENDENTE")
+
+    def test_attempt_is_reserved_before_call_and_first_failure_is_persisted_once(self):
+        revision = self.freeze()
+        attempt = self.begin()
+        snap = self.snapshot()
+        self.assertEqual([(m["id"], m["status"]) for m in snap["mediations"]], [(attempt, "EM_EXECUCAO")])
+        with self.assertRaises(DecisionError): self.begin()
+        self.assertEqual(self.complete(attempt), attempt)
+        snap = self.snapshot()
+        self.assertEqual(snap["room"]["revision"], revision)
+        self.assertEqual(len(snap["mediations"]), 1)
+        row = snap["mediations"][0]
+        self.assertEqual((row["status"], row["failure_code"], row["summary"], row["suggested_text"]),
+                         ("FALHA", "SERVICO_INDISPONIVEL", "", ""))
+        self.assertTrue(mediation_attempt_state(snap)["retry"])
+        with self.assertRaises(DecisionError): self.complete(attempt)
+
+    def test_two_failures_block_third_call_reopening_publication_and_normal_finish_but_allow_technical_cancel(self):
+        revision = self.freeze()
+        first = self.begin(); self.complete(first)
+        with self.assertRaises(DecisionError):
+            self.repo.set_phase(self.code, self.admin, self.proposal, "COLETA")
+        second = self.begin(); self.complete(second)
+        snap = self.snapshot()
+        self.assertTrue(mediation_attempt_state(snap)["persistent_failure"])
+        self.assertEqual(snap["room"]["revision"], revision)
+        with self.assertRaises(DecisionError): self.begin()
+        with self.assertRaises(DecisionError):
+            self.repo.save_mediation(self.code, self.admin, self.proposal, revision, self.result())
+        with self.assertRaises(DecisionError):
+            self.repo.save_mediation(self.code, self.admin, self.proposal, revision, {"origin": "HUMANA", "ok": True})
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, "Não permitido", first, review_note="Revisado")
+        with self.assertRaises(DecisionError): self.repo.finish(self.code, self.admin, self.proposal)
+        self.assertEqual(self.repo.finish(self.code, self.admin, self.proposal, TECHNICAL_CANCEL_REASON, cancel=True), "CANCELADA")
+        snap = self.snapshot()
+        self.assertEqual(snap["room"]["close_reason"], TECHNICAL_CANCEL_REASON)
+        self.assertEqual({m["id"] for m in snap["mediations"]}, {first, second})
+        self.assertTrue(all(m["failure_code"] == "SERVICO_INDISPONIVEL" for m in snap["mediations"]))
+        self.assertEqual(current_responses(snap)[0]["argument"], "Preservar esta justificativa")
+        self.assertEqual(len([e for e in snap["events"] if e["action"] == "MEDIACAO_REGISTRADA"]), 2)
+
+    def test_second_success_preserves_failed_attempt_and_allows_reviewed_publication(self):
+        self.freeze()
+        self.complete(self.begin())
+        second = self.begin(); self.complete(second, True)
+        with self.assertRaises(DecisionError): self.begin()
+        self.repo.publish_revision(self.code, self.admin, self.proposal, "Proposta IA revisada", second, review_note=UNCHANGED_REVIEW_NOTE)
+        snap = self.snapshot()
+        self.assertEqual(current_proposal(snap)["round"], 2)
+        self.assertEqual(current_proposal(snap)["source_mediation_id"], second)
+        self.assertEqual([m["status"] for m in snap["mediations"]], ["FALHA", "OK"])
+        self.assertEqual(current_responses(snap), [])
+
+    def test_first_success_does_not_allow_unnecessary_second_execution(self):
+        self.freeze()
+        self.complete(self.begin(), True)
+        with self.assertRaises(DecisionError): self.begin()
+
+    def test_concurrent_reservations_allow_only_one_external_execution_at_a_time(self):
+        self.freeze()
+        def reserve(_):
+            try: return self.begin()
+            except DecisionError: return None
+        for _ in range(2):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                results = list(pool.map(reserve, range(2)))
+            valid = [r for r in results if r is not None]
+            self.assertEqual(len(valid), 1)
+            self.complete(valid[0])
+        self.assertEqual(len(self.snapshot()["mediations"]), 2)
+
+    def test_changed_revision_or_configuration_cannot_be_used_for_retry(self):
+        revision = self.freeze()
+        self.complete(self.begin())
+        for config, rev in ((self.config | {"model": "other"}, revision), (self.config, revision + 1)):
+            with self.assertRaises(DecisionError):
+                self.repo.begin_ai_mediation(self.code, self.admin, self.proposal, rev, config)
+        self.assertEqual(len(self.snapshot()["mediations"]), 1)
+
+    def test_unconfirmed_execution_cannot_be_repeated_or_published(self):
+        self.freeze()
+        attempt = self.begin()
+        for action in (self.begin, lambda: self.repo.set_phase(self.code, self.admin, self.proposal, "COLETA"),
+                       lambda: self.repo.publish_revision(self.code, self.admin, self.proposal, "Texto", attempt, review_note="Revisto")):
+            with self.assertRaises(DecisionError): action()
+        self.repo.finish(self.code, self.admin, self.proposal, "Execução sem resultado confirmado", cancel=True)
+        self.assertEqual(self.snapshot()["mediations"][0]["status"], "EM_EXECUCAO")
+
+    def test_generic_mode_keeps_previous_unlimited_mediation_behavior(self):
+        repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=Path(self.tmp.name) / "generic.db")
+        access = repo.create_room("Tema", "", "Proposta", ["A", "B"])
+        code, token = access["code"], access["moderator_token"]
+        prop = current_proposal(repo.snapshot(code, token))["id"]
+        repo.set_phase(code, token, prop, "REVISAO")
+        revision = repo.snapshot(code, token)["room"]["revision"]
+        for _ in range(3): repo.save_mediation(code, token, prop, revision, self.result())
+        repo.set_phase(code, token, prop, "COLETA")
+        self.assertEqual(len(repo.snapshot(code, token)["mediations"]), 3)
+
+    def test_condition_b_does_not_enter_ai_failure_protocol(self):
+        access = self.repo.create_room("Tema", "", "Proposta", 2, False)
+        code, token = access["code"], access["moderator_token"]
+        prop = current_proposal(self.repo.snapshot(code, token))["id"]
+        saved = self.repo.submit_response(code, access["invitations"][0]["token"], prop, "ACEITO", "")
+        self.repo.ensure_ai_configuration(code, token, self.config)
+        self.repo.set_phase(code, token, prop, "REVISAO")
+        snap = self.repo.snapshot(code, token)
+        with self.assertRaises(DecisionError):
+            self.repo.begin_ai_mediation(code, token, prop, snap["room"]["revision"], self.config)
+        details = {key: "Nenhum ponto adicional identificado" for key, _ in MANUAL_MEDIATION_FIELDS}
+        details["restriction_checks"] = {key: True for key, _ in MANUAL_RESTRICTION_CHECKS}
+        details["coverage"] = [{"response_id": saved["id"], "treatment": "SEM_OBJECAO"}]
+        for _ in range(3):
+            self.repo.save_mediation(code, token, prop, snap["room"]["revision"],
+                                     {"origin": "HUMANA", "ok": True, "suggested_text": "Proposta revisada", "details": details})
+        snap = self.repo.snapshot(code, token)
+        self.assertEqual(len(snap["mediations"]), 3)
+        self.assertFalse(mediation_attempt_state(snap)["persistent_failure"])
+        self.assertFalse(any(e["action"] == "CONFIGURACAO_IA_FIXADA" for e in snap["events"]))
 
 
 if __name__ == "__main__":

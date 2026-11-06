@@ -5,6 +5,14 @@ Este módulo concentra apenas constantes não secretas do protocolo.
 
 EXPERIMENT_CONFIG_VERSION = "experimento-v1"
 TAXONOMY_VERSION = "taxonomia-v1"
+MAX_MEDIATION_EXECUTIONS = 2
+CLASSIFICATION_FAILURE_CODES = (
+    "SEM_CHAVE", "COTA_OU_LIMITE", "MODELO_INDISPONIVEL", "ACESSO_API",
+    "RESPOSTA_INVALIDA", "SERVICO_INDISPONIVEL", "TEMPO_ESGOTADO", "FALHA_IA",
+)
+TECHNICAL_CANCEL_REASON = (
+    "Falha técnica persistente da mediação IA após tentativas previstas no protocolo experimental."
+)
 
 TAXONOMY = {
     "CAT01": {"label": "Impacto pedagógico", "description": "Contribuição para ensino e aprendizagem."},
