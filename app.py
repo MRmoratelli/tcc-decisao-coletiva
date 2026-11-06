@@ -11,7 +11,8 @@ import streamlit as st
 from ai_service import AIService, DEFAULT_MODEL, FAILURE_MESSAGES
 from experiment_config import TAXONOMY_CODES, taxonomy_display
 from decision import (
-    DecisionError, NO_OBJECTION, POSITIONS, Repository, UNCLASSIFIED,
+    COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS,
+    UNCHANGED_REVIEW_NOTE, DecisionError, NO_OBJECTION, POSITIONS, Repository, UNCLASSIFIED,
     consensus, csv_export, current_proposal, current_responses, research_export,
 )
 
@@ -251,14 +252,14 @@ def manifestations(repo, snapshot, code, token):
                 with st.form("category_" + response["id"] + "_" + str(response["edit"])):
                     if repo.experimental_mode:
                         choices = list(TAXONOMY_CODES)
-                        if response["category"] == NO_OBJECTION:
+                        if response["position"] == "ACEITO":
                             choices = [NO_OBJECTION] + choices
                         if contest and contest["status"] == "PENDENTE":
                             default = contest["suggested_category"]
                         elif response["category"] in choices:
                             default = response["category"]
                         else:
-                            default = choices[0]
+                            default = TAXONOMY_CODES[0]
                         category = st.selectbox(
                             "Revisar categoria",
                             choices,
@@ -274,6 +275,44 @@ def manifestations(repo, snapshot, code, token):
                     if ok:
                         notify("Categoria revisada. O texto, a posição e a trilha de contestação foram preservados.")
                         st.rerun()
+
+
+def manual_mediation_form(repo, snapshot, code, token):
+    """Contrapartida manual padronizada, sem chamar o serviço de IA."""
+    room, proposal = snapshot["room"], current_proposal(snapshot)
+    st.subheader("Mediação manual estruturada — condição B")
+    st.info("Preserve explicitamente pedidos incompatíveis. Busque uma proposta viável que incorpore "
+            "as condições registradas, sem favorecer participantes por preferência pessoal ou aplicar "
+            "maioria/frequência automaticamente. Não invente argumentos, critérios ou prioridades. "
+            "Registre a razão operacional do atendimento parcial ou não atendimento e respeite as restrições.")
+    st.caption("Classifique as manifestações durante a coleta antes de preencher a mediação. "
+               "Se um bloco não tiver pontos identificados, registre isso explicitamente, sem inventar conteúdo.")
+    st.caption("As confirmações registram conferência manual; não há validação automática de orçamento ou otimização.")
+    with st.form("manual_mediation_" + proposal["id"] + "_" + str(room["revision"])):
+        details = {key: st.text_area(label, max_chars=2500) for key, label in MANUAL_MEDIATION_FIELDS}
+        details["restriction_checks"] = {key: st.checkbox(label) for key, label in MANUAL_RESTRICTION_CHECKS}
+        suggested = st.text_area("Proposta revisada sugerida", height=180, max_chars=12000)
+        st.write("Cobertura por manifestação — não é pontuação de qualidade")
+        coverage = []
+        for response in current_responses(snapshot):
+            st.caption(response["pseudonym"] + " · " + POSITIONS[response["position"]] +
+                       " · " + taxonomy_display(response["category"]))
+            no_objection = response["category"] == NO_OBJECTION
+            choices = ["SEM_OBJECAO"] if no_objection else [s for s in COVERAGE_STATES if s != "SEM_OBJECAO"]
+            treatment = st.selectbox("Cobertura de " + response["pseudonym"], choices,
+                                     index=0 if no_objection else choices.index("NAO_CONTEMPLADA"),
+                                     key="coverage_" + response["id"] + "_" + str(response["edit"]))
+            note = "" if no_objection else st.text_area("Razão operacional — " + response["pseudonym"], max_chars=2000)
+            coverage.append({"response_id": response["id"], "treatment": treatment, "note": note})
+        details["coverage"] = coverage
+        submitted = st.form_submit_button("Salvar mediação manual")
+    if submitted:
+        ok, _ = execute(lambda: repo.save_mediation(code, token, proposal["id"], room["revision"], {
+            "origin": "HUMANA", "ok": True, "suggested_text": suggested, "details": details,
+        }))
+        if ok:
+            notify("Mediação manual estruturada registrada para revisão e publicação.")
+            st.rerun()
 
 
 def mediator_panel(repo, ai, snapshot, code, token):
@@ -316,13 +355,24 @@ def mediator_panel(repo, ai, snapshot, code, token):
                 st.rerun()
     else:
         st.caption("Sala sem IA. Categorias e revisões são feitas pelo moderador.")
+        if repo.experimental_mode:
+            manual_mediation_form(repo, snapshot, code, token)
     valid = [m for m in snapshot["mediations"] if m["proposal_id"] == proposal["id"]
              and m["revision"] == room["revision"] and m["status"] == "OK"]
-    options = [None] + [m["id"] for m in reversed(valid)]
+    if repo.experimental_mode:
+        expected_origin = "IA" if room["ai_enabled"] else "HUMANA"
+        valid = [m for m in valid if m["origin"] == expected_origin]
+    options = ([] if repo.experimental_mode else [None]) + [m["id"] for m in reversed(valid)]
     by_id = {m["id"]: m for m in valid}
+    base_key = "base_" + proposal["id"]
+    if repo.experimental_mode and options and st.session_state.get(base_key) not in options:
+        st.session_state[base_key] = options[0]
     selected = st.selectbox("Base para a revisão", options,
                             format_func=lambda key: "Redação humana" if key is None else
-                            by_id[key]["origin"] + " · " + by_id[key]["created_at"], key="base_" + proposal["id"])
+                            by_id[key]["origin"] + " · " + by_id[key]["created_at"],
+                            disabled=not options, key=base_key)
+    if repo.experimental_mode and not valid:
+        st.info("Registre uma mediação válida desta condição antes de publicar uma nova versão.")
     mediation = by_id.get(selected)
     if mediation:
         st.subheader("Sugestão consultiva")
@@ -330,19 +380,26 @@ def mediator_panel(repo, ai, snapshot, code, token):
         coverage = json.loads(mediation["details_json"]).get("coverage", [])
         if coverage:
             st.dataframe(coverage, use_container_width=True, hide_index=True)
-        st.caption("O registro de cobertura é uma análise da IA e precisa de revisão humana; não comprova atendimento da objeção.")
+        st.caption("O registro de cobertura é uma análise da mediação; não comprova atendimento da objeção.")
     if proposal["round"] < 3:
         with st.form("revision_" + proposal["id"] + "_" + str(selected)):
             revised = st.text_area("Texto revisado a ser apresentado ao grupo",
                                    value=mediation["suggested_text"] if mediation else proposal["text"],
                                    height=220, max_chars=12000)
-            human_summary = st.text_area("Justificativa da revisão humana", max_chars=6000) if not mediation else ""
+            human_summary = st.text_area("Justificativa da revisão humana", max_chars=6000) if not mediation and not repo.experimental_mode else ""
+            review_note, unchanged = "", False
+            if repo.experimental_mode and mediation and mediation["origin"] == "IA":
+                st.caption("Revise a sugestão sem substituí-la por uma mediação humana independente. "
+                           "Vincule ajustes às manifestações/restrições, sem inserir preferência pessoal.")
+                review_note = st.text_area("Nota de revisão humana da sugestão da IA", max_chars=2000)
+                unchanged = st.checkbox("Confirmo a publicação sem alteração de conteúdo.")
             confirm = st.checkbox("Revisei este texto e quero solicitar novas manifestações de todos.")
-            submitted = st.form_submit_button("Publicar nova versão", type="primary")
+            submitted = st.form_submit_button("Publicar nova versão", type="primary",
+                                              disabled=repo.experimental_mode and not mediation)
         if submitted:
             if not confirm:
                 st.error("Confirme a revisão humana antes de publicar.")
-            elif not mediation and not human_summary.strip():
+            elif not mediation and not repo.experimental_mode and not human_summary.strip():
                 st.error("Registre a justificativa da revisão humana para preservar o histórico.")
             else:
                 def publish():
@@ -350,11 +407,16 @@ def mediator_panel(repo, ai, snapshot, code, token):
                         raise DecisionError("A nova versão deve conter uma alteração na proposta.")
                     source = selected
                     if source is None:
+                        if repo.experimental_mode:
+                            raise DecisionError("Selecione a mediação registrada da condição experimental.")
                         source = repo.save_mediation(code, token, proposal["id"], room["revision"], {
                             "origin": "HUMANA", "ok": True, "summary": human_summary.strip(),
                             "suggested_text": revised.strip(),
                         })
-                    return repo.publish_revision(code, token, proposal["id"], revised, source)
+                    note = review_note.strip()
+                    if mediation and revised.strip() == mediation["suggested_text"] and unchanged and not note:
+                        note = UNCHANGED_REVIEW_NOTE
+                    return repo.publish_revision(code, token, proposal["id"], revised, source, review_note=note)
                 ok, _ = execute(publish)
                 if ok:
                     notify("Nova versão publicada. Todos precisam se manifestar novamente.")
@@ -385,6 +447,15 @@ def history_panel(snapshot, experimental_mode=False):
         with st.expander(f"Rodada {proposal['round']} · {proposal['origin']}", expanded=proposal["id"] == snapshot["room"]["active_proposal_id"]):
             st.caption(proposal["created_at"] + " · horários em UTC")
             st.text(proposal["text"])
+            publication = next((event for event in snapshot["events"]
+                                if event["action"] == "PROPOSTA_PUBLICADA" and event["proposal_id"] == proposal["id"]), None)
+            if publication:
+                review = json.loads(publication["payload_json"])
+                if review.get("review_note"):
+                    st.caption("Revisão humana: " + review["review_note"])
+                if review.get("source_mediation_id"):
+                    st.caption("Mediação de origem: " + review["source_mediation_id"] +
+                               " · Texto alterado: " + ("sim" if review.get("changed_from_source") else "não"))
             rows = [{"Participante": r["pseudonym"], "Posição": POSITIONS[r["position"]],
                      "Justificativa": r["argument"], "Categoria": r["category"]}
                     for r in snapshot["responses"] if r["proposal_id"] == proposal["id"]]

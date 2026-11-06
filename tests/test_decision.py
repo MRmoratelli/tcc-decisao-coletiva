@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from decision import (
+    COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, UNCHANGED_REVIEW_NOTE,
     DecisionError, NO_OBJECTION, Repository, UNCLASSIFIED, consensus, csv_export,
     current_proposal, current_responses, research_export,
 )
@@ -415,6 +416,215 @@ class WorkflowTests(unittest.TestCase):
         snap = self.snapshot()
         snap["participants"] = []
         self.assertFalse(consensus(snap)["accepted"])
+
+
+class ExperimentalMediationTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=Path(self.tmp.name) / "experimental.db",
+                               experimental_mode=True)
+        self.create_condition(False)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def create_condition(self, ai_enabled):
+        self.access = self.repo.create_room("Orçamento escolar", "Orçamento restrito", "Distribuição inicial", 3, ai_enabled)
+        self.code, self.admin = self.access["code"], self.access["moderator_token"]
+        self.proposal = current_proposal(self.snapshot())["id"]
+        for index, argument in enumerate(("Aumentar computadores sem reduzir biblioteca", "Aumentar biblioteca sem reduzir computadores", "")):
+            saved = self.repo.submit_response(self.code, self.access["invitations"][index]["token"], self.proposal,
+                                               "NAO_ACEITO" if argument else "ACEITO", argument)
+            if argument:
+                self.repo.set_category(self.code, self.admin, self.proposal, saved["id"], "CAT07", saved["edit"])
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+
+    def snapshot(self):
+        return self.repo.snapshot(self.code, self.admin)
+
+    def manual_result(self):
+        details = {key: "Registro explícito de " + label for key, label in MANUAL_MEDIATION_FIELDS}
+        details["divergences"] = "Pedidos incompatíveis de ampliar computadores e biblioteca sem reduzir o outro item."
+        details["restriction_checks"] = {key: True for key, _ in MANUAL_RESTRICTION_CHECKS}
+        details["coverage"] = [
+            {"response_id": r["id"], "treatment": "SEM_OBJECAO" if r["category"] == NO_OBJECTION else "PARCIAL",
+             "note": "" if r["category"] == NO_OBJECTION else "Restrição de recursos impede atendimento integral."}
+            for r in current_responses(self.snapshot())
+        ]
+        return {"origin": "HUMANA", "ok": True, "suggested_text": "Distribuição revisada viável", "details": details}
+
+    def save(self, result):
+        return self.repo.save_mediation(self.code, self.admin, self.proposal, self.snapshot()["room"]["revision"], result)
+
+    def ai_source(self):
+        return self.save({"origin": "IA", "ok": True, "summary": "Divergências de orçamento preservadas",
+                          "suggested_text": "Sugestão original IA", "model": "fake-model", "prompt_version": "test",
+                          "details": {"coverage": [{"participant": "P01", "treatment": "PARCIAL", "note": "Condição parcial"}]}})
+
+    def test_b_taxonomy_and_contest_use_same_controlled_categories(self):
+        self.repo.set_phase(self.code, self.admin, self.proposal, "COLETA")
+        r = current_responses(self.snapshot())[0]
+        for invalid in ("Categoria livre", "CAT10", UNCLASSIFIED, NO_OBJECTION):
+            with self.assertRaises(DecisionError):
+                self.repo.set_category(self.code, self.admin, self.proposal, r["id"], invalid, r["edit"])
+        contest = self.repo.suggest_category(self.code, self.access["invitations"][0]["token"], self.proposal, r["id"], "CAT05", r["edit"])
+        self.repo.set_category(self.code, self.admin, self.proposal, r["id"], "CAT05", r["edit"])
+        row = next(c for c in self.snapshot()["category_contests"] if c["id"] == contest)
+        self.assertEqual((row["status"], row["resolved_category"]), ("RESOLVIDA", "CAT05"))
+        self.assertIsNone(current_responses(self.snapshot())[0]["category_ai"])
+        self.assertFalse(self.repo.apply_classification(self.code, self.admin, self.proposal, r["id"], r["edit"],
+                                                       {"ok": True, "category": "CAT03"}))
+
+    def test_b_rejects_each_missing_or_blank_template_block(self):
+        for key, _ in MANUAL_MEDIATION_FIELDS:
+            for missing in (True, False):
+                with self.subTest(key=key, missing=missing):
+                    result = self.manual_result()
+                    if missing:
+                        del result["details"][key]
+                    else:
+                        result["details"][key] = "  "
+                    with self.assertRaises(DecisionError):
+                        self.save(result)
+        self.assertEqual(self.snapshot()["mediations"], [])
+
+    def test_b_requires_restriction_confirmations_and_suggested_text(self):
+        for key, _ in MANUAL_RESTRICTION_CHECKS:
+            result = self.manual_result()
+            result["details"]["restriction_checks"][key] = False
+            with self.assertRaises(DecisionError):
+                self.save(result)
+        result = self.manual_result()
+        result["suggested_text"] = ""
+        with self.assertRaises(DecisionError):
+            self.save(result)
+
+    def test_b_coverage_requires_every_current_response_once_and_operational_reasons(self):
+        for mutation in ("missing", "duplicate", "unknown", "invalid_state", "no_reason", "false_no_objection", "missing_no_objection"):
+            with self.subTest(mutation=mutation):
+                result = self.manual_result()
+                coverage = result["details"]["coverage"]
+                if mutation == "missing": coverage.pop()
+                elif mutation == "duplicate": coverage[1] = dict(coverage[0])
+                elif mutation == "unknown": coverage[0]["response_id"] = "unknown"
+                elif mutation == "invalid_state": coverage[0]["treatment"] = "MAIORIA"
+                elif mutation == "no_reason": coverage[0]["note"] = ""
+                elif mutation == "false_no_objection": coverage[0]["treatment"] = "SEM_OBJECAO"
+                elif mutation == "missing_no_objection": coverage[-1].update(treatment="CONTEMPLADA", note="x")
+                with self.assertRaises(DecisionError):
+                    self.save(result)
+        self.assertEqual(tuple(COVERAGE_STATES), ("CONTEMPLADA", "PARCIAL", "NAO_CONTEMPLADA", "SEM_OBJECAO"))
+
+    def test_b_complete_mediation_persists_template_coverage_and_conflicting_requests(self):
+        result = self.manual_result()
+        original = json.dumps(result)
+        source = self.save(result)
+        self.assertEqual(json.dumps(result), original)
+        snap = self.snapshot()
+        saved = next(m for m in snap["mediations"] if m["id"] == source)
+        self.assertEqual((saved["origin"], saved["status"], saved["proposal_id"]), ("HUMANA", "OK", self.proposal))
+        self.assertEqual(saved["revision"], snap["room"]["revision"])
+        details = json.loads(saved["details_json"])
+        for key, label in MANUAL_MEDIATION_FIELDS:
+            self.assertEqual(details[key], result["details"][key])
+            self.assertIn(label, saved["summary"])
+        for coverage, response in zip(details["coverage"], current_responses(snap)):
+            self.assertEqual((coverage["response_id"], coverage["response_edit"], coverage["participant"], coverage["category"]),
+                             (response["id"], response["edit"], response["pseudonym"], response["category"]))
+        self.assertEqual([c["treatment"] for c in details["coverage"]], ["PARCIAL", "PARCIAL", "SEM_OBJECAO"])
+        self.assertEqual(details["coverage"][-1]["note"], "")
+        self.assertIn("Pedidos incompatíveis", details["divergences"])
+        self.assertFalse(consensus(snap)["accepted"])
+        new = self.repo.publish_revision(self.code, self.admin, self.proposal, result["suggested_text"], source)
+        snap = self.snapshot()
+        self.assertEqual(current_proposal(snap)["id"], new)
+        self.assertEqual(current_proposal(snap)["source_mediation_id"], source)
+        self.assertEqual(current_responses(snap), [])
+        self.assertEqual(research_export(snap)["mediations"][0]["details_json"], saved["details_json"])
+
+    def test_b_requires_registered_manual_source_and_rejects_stale_source(self):
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, "Texto sem mediação")
+        with self.assertRaises(DecisionError):
+            self.save({"origin": "IA", "ok": True, "summary": "IA", "suggested_text": "Texto IA"})
+        source = self.save(self.manual_result())
+        self.repo.set_phase(self.code, self.admin, self.proposal, "COLETA")
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, "Texto com base obsoleta", source)
+
+    def test_b_rejects_unclassified_responses_before_manual_mediation(self):
+        self.repo.set_phase(self.code, self.admin, self.proposal, "COLETA")
+        r = current_responses(self.snapshot())[0]
+        self.repo.submit_response(self.code, self.access["invitations"][0]["token"], self.proposal,
+                                   "NAO_ACEITO", "Argumento editado", expected_edit=r["edit"])
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        with self.assertRaises(DecisionError):
+            self.save(self.manual_result())
+
+    def test_b_agreement_can_finish_without_creating_manual_mediation(self):
+        self.repo.set_phase(self.code, self.admin, self.proposal, "COLETA")
+        for invitation in self.access["invitations"]:
+            self.repo.submit_response(self.code, invitation["token"], self.proposal, "ACEITO", "")
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        self.assertEqual(self.repo.finish(self.code, self.admin, self.proposal), "ACORDO")
+        self.assertEqual(self.snapshot()["mediations"], [])
+
+    def test_a_requires_ai_source_and_textual_review_note(self):
+        self.create_condition(True)
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, "Nova proposta", review_note="Revisada")
+        with self.assertRaises(DecisionError):
+            self.save(self.manual_result())
+        source = self.ai_source()
+        for note in ("", "  ", None):
+            with self.assertRaises(DecisionError):
+                self.repo.publish_revision(self.code, self.admin, self.proposal, "Sugestão original IA", source, review_note=note)
+        self.assertEqual(len(self.snapshot()["proposals"]), 1)
+
+    def test_a_unchanged_publication_records_explicit_note_and_retains_original(self):
+        self.create_condition(True)
+        source = self.ai_source()
+        original = self.snapshot()["mediations"][0]
+        self.repo.publish_revision(self.code, self.admin, self.proposal, "Sugestão original IA", source,
+                                   review_note=UNCHANGED_REVIEW_NOTE)
+        snap = self.snapshot()
+        self.assertEqual(snap["mediations"][0], original)
+        self.assertEqual(current_proposal(snap)["source_mediation_id"], source)
+        self.assertEqual(current_proposal(snap)["origin"], "IA_REVISADA_POR_HUMANO")
+        event = next(e for e in snap["events"] if e["action"] == "PROPOSTA_PUBLICADA")
+        payload = json.loads(event["payload_json"])
+        self.assertFalse(payload["changed_from_source"])
+        self.assertEqual(payload["review_note"], UNCHANGED_REVIEW_NOTE)
+
+    def test_a_changed_publication_requires_reason_and_reconstructs_ai_human_proposal_chain(self):
+        self.create_condition(True)
+        source = self.ai_source()
+        original = self.snapshot()["mediations"][0]
+        for note in ("", UNCHANGED_REVIEW_NOTE):
+            with self.assertRaises(DecisionError):
+                self.repo.publish_revision(self.code, self.admin, self.proposal, "Texto ajustado à restrição", source, review_note=note)
+        note = "Correção de omissão e ajuste à restrição financeira registrada."
+        new = self.repo.publish_revision(self.code, self.admin, self.proposal, "Texto ajustado à restrição", source, review_note=note)
+        snap = self.snapshot()
+        self.assertEqual(snap["mediations"][0], original)
+        event = next(e for e in snap["events"] if e["action"] == "PROPOSTA_PUBLICADA")
+        payload = json.loads(event["payload_json"])
+        self.assertEqual((payload["source_mediation_id"], payload["source_origin"], payload["changed_from_source"], payload["review_note"]),
+                         (source, "IA", True, note))
+        self.assertEqual((event["proposal_id"], event["actor"]), (new, "MODERADOR"))
+        self.assertTrue(event["created_at"])
+        self.assertEqual(current_proposal(snap)["text"], "Texto ajustado à restrição")
+        self.assertNotIn("Sugestão original IA", event["payload_json"])
+        self.assertNotIn("Texto ajustado à restrição", event["payload_json"])
+
+    def test_a_rejects_empty_successful_mediation_and_failed_source(self):
+        self.create_condition(True)
+        with self.assertRaises(DecisionError):
+            self.save({"origin": "IA", "ok": True, "summary": "", "suggested_text": ""})
+        failed = self.save({"origin": "IA", "ok": False, "failure_code": "FALHA_IA"})
+        with self.assertRaises(DecisionError):
+            self.repo.publish_revision(self.code, self.admin, self.proposal, "Nova proposta", failed, review_note="Revisada")
 
 
 if __name__ == "__main__":

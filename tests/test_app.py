@@ -3,10 +3,12 @@
 Instale requirements.txt para executar. CI exige que estes testes sejam executados.
 """
 import importlib.util
+import json
 import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 HAS_STREAMLIT = importlib.util.find_spec("streamlit") is not None
 if HAS_STREAMLIT:
@@ -14,7 +16,8 @@ if HAS_STREAMLIT:
 elif os.getenv("APP_TESTS_REQUIRED") == "1":
     raise RuntimeError("Instale Streamlit antes de executar os testes de interface.")
 
-from decision import Repository, current_proposal, current_responses
+from decision import (MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, NO_OBJECTION,
+                      UNCHANGED_REVIEW_NOTE, Repository, current_proposal, current_responses)
 
 ENTRY = Path(__file__).resolve().parents[1] / "Prototipo TCC.py"
 
@@ -189,6 +192,31 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertTrue(any("antes de visualizar informações agregadas" in m.value for m in person.info))
         self.assertTrue(any("Histórico detalhado disponível após" in m.value for m in person.info))
 
+    def manual_result(self, access, suggested, marker="Registro manual"):
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        details = {key: marker + " — " + label for key, label in MANUAL_MEDIATION_FIELDS}
+        details["restriction_checks"] = {key: True for key, _ in MANUAL_RESTRICTION_CHECKS}
+        details["coverage"] = [{"response_id": r["id"],
+                                "treatment": "SEM_OBJECAO" if r["category"] == NO_OBJECTION else "PARCIAL",
+                                "note": "" if r["category"] == NO_OBJECTION else "Limite do cenário impede atendimento integral."}
+                               for r in current_responses(snap)]
+        return {"origin": "HUMANA", "ok": True, "suggested_text": suggested, "details": details}
+
+    def fill_manual_form(self, moderator, access, suggested, marker="Registro manual"):
+        result = self.manual_result(access, suggested, marker)
+        for key, label in MANUAL_MEDIATION_FIELDS:
+            widget(moderator, "text_area", label).set_value(result["details"][key])
+        for _, label in MANUAL_RESTRICTION_CHECKS:
+            widget(moderator, "checkbox", label).set_value(True)
+        widget(moderator, "text_area", "Proposta revisada sugerida").set_value(suggested)
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        for row in current_responses(snap):
+            if row["category"] != NO_OBJECTION:
+                widget(moderator, "selectbox", "Cobertura de " + row["pseudonym"]).set_value("PARCIAL")
+                widget(moderator, "text_area", "Razão operacional — " + row["pseudonym"]).set_value("Limite do cenário impede atendimento integral.")
+        widget(moderator, "button", "Salvar mediação manual").click().run()
+        self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
+
     def test_visibility_helper_requires_own_response_to_active_proposal(self):
         from app import participant_has_current_response, participant_visibility_blocked
         snap = {"actor": {"role": "participant", "id": "self"},
@@ -255,8 +283,7 @@ class StreamlitFlowTests(unittest.TestCase):
         for round_number in (2, 3):
             moderator.run()
             widget(moderator, "button", "Pausar coleta e revisar").click().run()
-            widget(moderator, "text_area", "Texto revisado a ser apresentado ao grupo").set_value(f"Proposta da rodada {round_number}")
-            widget(moderator, "text_area", "Justificativa da revisão humana").set_value(f"MEDIAÇÃO_R{round_number - 1} baseada nas objeções")
+            self.fill_manual_form(moderator, access, f"Proposta da rodada {round_number}", f"MEDIAÇÃO_R{round_number - 1}")
             widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
             widget(moderator, "button", "Publicar nova versão").click().run()
             markers.append(f"SIGILO_P02_R{round_number} objeção nova")
@@ -301,10 +328,8 @@ class StreamlitFlowTests(unittest.TestCase):
         code, token = access["code"], access["moderator_token"]
         repo.set_phase(code, token, proposal_id, "REVISAO")
         snap = repo.snapshot(code, token)
-        repo.save_mediation(code, token, proposal_id, snap["room"]["revision"], {
-            "origin": "HUMANA", "ok": True, "summary": "MEDIAÇÃO_SIGILOSA_R1",
-            "suggested_text": "SUGESTÃO_SIGILOSA_R1",
-        })
+        repo.save_mediation(code, token, proposal_id, snap["room"]["revision"],
+                            self.manual_result(access, "SUGESTÃO_SIGILOSA_R1", "MEDIAÇÃO_SIGILOSA_R1"))
         repo.set_phase(code, token, proposal_id, "COLETA")
         person = self.join(access, 0)
         self.assert_blind(person, marker, "MEDIAÇÃO_SIGILOSA", "SUGESTÃO_SIGILOSA")
@@ -325,6 +350,117 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertEqual(widget(person, "metric", "Manifestações").value, "1 / 3")
         self.assertTrue(person.get("plotly_chart"))
         self.assertTrue(person.dataframe)
+
+    def test_b_structured_manual_workflow_never_calls_ai(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        with patch("ai_service.AIService.classify", side_effect=AssertionError("IA proibida na condição B")) as classify, \
+             patch("ai_service.AIService.mediate", side_effect=AssertionError("IA proibida na condição B")) as mediate:
+            moderator, access = self.create(enabled=False)
+            person = self.join(access, 0)
+            widget(person, "radio", "Minha posição sobre esta versão").set_value("NAO_ACEITO")
+            widget(person, "text_area", "Justificativa e ressalvas").set_value("Aumentar biblioteca sem reduzir computadores")
+            widget(person, "button", "Salvar manifestação").click().run()
+            moderator.run()
+            self.assertFalse(any(w.label == "Revisar categoria" for w in moderator.text_input))
+            widget(moderator, "selectbox", "Revisar categoria").set_value("CAT07")
+            widget(moderator, "button", "Salvar categoria").click().run()
+            widget(moderator, "button", "Pausar coleta e revisar").click().run()
+            self.assertFalse(any(w.label == "Gerar sugestão com IA" for w in moderator.button))
+            self.assertTrue(widget(moderator, "button", "Publicar nova versão").disabled)
+            self.assertEqual(widget(moderator, "selectbox", "Base para a revisão").options, [])
+            widget(moderator, "button", "Salvar mediação manual").click().run()
+            self.assertTrue(moderator.error)
+            self.assertEqual(self.repo.snapshot(access["code"], access["moderator_token"])["mediations"], [])
+            self.fill_manual_form(moderator, access, "Distribuição revisada do orçamento", "Pedidos incompatíveis preservados")
+            snap = self.repo.snapshot(access["code"], access["moderator_token"])
+            mediation = snap["mediations"][0]
+            self.assertEqual(mediation["origin"], "HUMANA")
+            details = json.loads(mediation["details_json"])
+            self.assertEqual(details["coverage"][0]["treatment"], "PARCIAL")
+            for key, _ in MANUAL_MEDIATION_FIELDS:
+                self.assertIn(key, details)
+            widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+            widget(moderator, "button", "Publicar nova versão").click().run()
+            snap = self.repo.snapshot(access["code"], access["moderator_token"])
+            self.assertEqual(current_proposal(snap)["source_mediation_id"], mediation["id"])
+            self.assertEqual(current_proposal(snap)["round"], 2)
+            person.run()
+            self.assert_blind(person, "Pedidos incompatíveis", "CAT07")
+            classify.assert_not_called()
+            mediate.assert_not_called()
+
+    def test_b_participant_contests_manual_category_and_moderator_resolves(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=False)
+        person = self.join(access, 0)
+        widget(person, "radio", "Minha posição sobre esta versão").set_value("ACEITO_COM_RESSALVAS")
+        widget(person, "text_area", "Justificativa e ressalvas").set_value("Acessibilidade precisa ser considerada")
+        widget(person, "button", "Salvar manifestação").click().run()
+        moderator.run()
+        widget(moderator, "selectbox", "Revisar categoria").set_value("CAT03")
+        widget(moderator, "button", "Salvar categoria").click().run()
+        person.run()
+        widget(person, "selectbox", "Categoria que considero mais adequada").set_value("CAT05")
+        widget(person, "button", "Contestar categoria").click().run()
+        moderator.run()
+        widget(moderator, "selectbox", "Revisar categoria").set_value("CAT05")
+        widget(moderator, "button", "Salvar categoria final").click().run()
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(current_responses(snap)[0]["category"], "CAT05")
+        self.assertIsNone(current_responses(snap)[0]["category_ai"])
+        self.assertEqual(snap["category_contests"][0]["status"], "RESOLVIDA")
+
+    def ai_review_setup(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        moderator, access = self.create(enabled=True)
+        repo, proposal_id, _ = self.seed_other_response(access, "Condição de orçamento")
+        moderator.run()
+        widget(moderator, "button", "Pausar coleta e revisar").click().run()
+        self.assertTrue(widget(moderator, "button", "Publicar nova versão").disabled)
+        snap = repo.snapshot(access["code"], access["moderator_token"])
+        source = repo.save_mediation(access["code"], access["moderator_token"], proposal_id, snap["room"]["revision"], {
+            "origin": "IA", "ok": True, "summary": "Síntese original da IA",
+            "suggested_text": "Sugestão original IA", "details": {"coverage": [
+                {"participant": "P02", "treatment": "PARCIAL", "note": "Condição parcialmente incorporada"}]},
+        })
+        original = repo.snapshot(access["code"], access["moderator_token"])["mediations"][0]
+        moderator.run()
+        return moderator, access, original, source
+
+    def test_a_unchanged_ai_suggestion_requires_explicit_review_and_keeps_source(self):
+        moderator, access, original, source = self.ai_review_setup()
+        widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+        widget(moderator, "button", "Publicar nova versão").click().run()
+        self.assertTrue(moderator.error)
+        self.assertEqual(len(self.repo.snapshot(access["code"], access["moderator_token"])["proposals"]), 1)
+        widget(moderator, "checkbox", "Confirmo a publicação sem alteração de conteúdo.").set_value(True)
+        widget(moderator, "button", "Publicar nova versão").click().run()
+        self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(current_proposal(snap)["source_mediation_id"], source)
+        self.assertEqual(snap["mediations"][0], original)
+        payload = json.loads(next(e for e in snap["events"] if e["action"] == "PROPOSTA_PUBLICADA")["payload_json"])
+        self.assertEqual(payload["review_note"], UNCHANGED_REVIEW_NOTE)
+        self.assertFalse(payload["changed_from_source"])
+        self.assertIn(UNCHANGED_REVIEW_NOTE, self.rendered_text(moderator))
+
+    def test_a_changed_ai_suggestion_requires_reason_and_displays_review_trail(self):
+        moderator, access, original, source = self.ai_review_setup()
+        widget(moderator, "text_area", "Texto revisado a ser apresentado ao grupo").set_value("Texto corrigido por restrição")
+        widget(moderator, "checkbox", "Revisei este texto e quero solicitar novas manifestações de todos.").set_value(True)
+        widget(moderator, "button", "Publicar nova versão").click().run()
+        self.assertTrue(moderator.error)
+        note = "Removida inferência não sustentada e preservada objeção minoritária."
+        widget(moderator, "text_area", "Nota de revisão humana da sugestão da IA").set_value(note)
+        widget(moderator, "button", "Publicar nova versão").click().run()
+        self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
+        snap = self.repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(snap["mediations"][0], original)
+        self.assertEqual(current_proposal(snap)["source_mediation_id"], source)
+        payload = json.loads(next(e for e in snap["events"] if e["action"] == "PROPOSTA_PUBLICADA")["payload_json"])
+        self.assertTrue(payload["changed_from_source"])
+        self.assertEqual(payload["review_note"], note)
+        self.assertIn(note, self.rendered_text(moderator))
 
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)

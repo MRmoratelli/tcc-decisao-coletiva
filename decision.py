@@ -27,6 +27,22 @@ POSITIONS = {
 NO_OBJECTION = "Sem objeção explicitada"
 UNCLASSIFIED = "Não classificada"
 MAX_ROUNDS = 3
+UNCHANGED_REVIEW_NOTE = "Publicada sem alteração de conteúdo."
+COVERAGE_STATES = ("CONTEMPLADA", "PARCIAL", "NAO_CONTEMPLADA", "SEM_OBJECAO")
+MANUAL_MEDIATION_FIELDS = (
+    ("divergences", "Divergências identificadas"),
+    ("conditions", "Condições/preocupações registradas"),
+    ("convergences", "Pontos de convergência"),
+    ("changes", "Alterações propostas"),
+    ("restrictions", "Verificação de restrições"),
+    ("rationale", "Justificativa das alterações"),
+)
+MANUAL_RESTRICTION_CHECKS = (
+    ("budget_and_constraints", "Conferi o orçamento e as restrições fornecidas."),
+    ("scenario_limits", "Conferi os limites do cenário."),
+    ("no_extra_resources", "Não incluí recurso indisponível."),
+    ("no_silent_omission", "Nenhuma demanda foi eliminada silenciosamente."),
+)
 
 
 class DecisionError(ValueError):
@@ -52,6 +68,58 @@ def clean(text, label, limit, required=True):
     if len(value) > limit:
         raise DecisionError(f"{label} deve ter até {limit} caracteres.")
     return value
+
+
+def validated_manual_mediation(result, responses):
+    """Valida estrutura e vínculos; não julga fidelidade nem otimiza a proposta."""
+    details = result.get("details")
+    if not isinstance(details, dict):
+        raise DecisionError("Preencha a mediação manual estruturada.")
+    fields = {}
+    for key, label in MANUAL_MEDIATION_FIELDS:
+        if not isinstance(details.get(key), str):
+            raise DecisionError(f"Preencha {label}.")
+        fields[key] = clean(details[key], label, 2500)
+    checks = details.get("restriction_checks")
+    if not isinstance(checks, dict) or any(checks.get(key) is not True for key, _ in MANUAL_RESTRICTION_CHECKS):
+        raise DecisionError("Confirme todas as verificações de restrições.")
+    by_id = {row["id"]: row for row in responses}
+    if not by_id or any(row["category"] not in (*TAXONOMY_CODES, NO_OBJECTION) for row in responses):
+        raise DecisionError("Classifique as manifestações antes de registrar a mediação manual.")
+    coverage = details.get("coverage")
+    if not isinstance(coverage, list) or len(coverage) != len(by_id):
+        raise DecisionError("Registre a cobertura de cada manifestação da versão atual.")
+    normalized, seen = [], set()
+    for item in coverage:
+        if not isinstance(item, dict) or not isinstance(item.get("response_id"), str):
+            raise DecisionError("Cobertura sem manifestação válida.")
+        response_id = item["response_id"]
+        if response_id not in by_id or response_id in seen:
+            raise DecisionError("Cobertura de manifestação desconhecida ou repetida.")
+        row = by_id[response_id]
+        treatment = item.get("treatment")
+        if treatment not in COVERAGE_STATES:
+            raise DecisionError("Estado de cobertura inválido.")
+        if (treatment == "SEM_OBJECAO") != (row["category"] == NO_OBJECTION):
+            raise DecisionError("SEM_OBJECAO exige manifestação classificada sem objeção explicitada.")
+        if row["category"] == NO_OBJECTION and row["position"] != "ACEITO":
+            raise DecisionError("Ressalva ou rejeição não pode ser tratada como ausência de objeção.")
+        note = item.get("note", "")
+        if not isinstance(note, str):
+            raise DecisionError("Registre a razão operacional da cobertura.")
+        note = clean(note, "a razão operacional da cobertura", 2000, treatment != "SEM_OBJECAO")
+        normalized.append({"response_id": response_id, "response_edit": row["edit"],
+                           "participant": row["pseudonym"], "category": row["category"],
+                           "treatment": treatment, "note": note})
+        seen.add(response_id)
+    suggested = result.get("suggested_text")
+    if not isinstance(suggested, str):
+        raise DecisionError("Preencha a proposta revisada sugerida.")
+    return {**result,
+            "suggested_text": clean(suggested, "a proposta revisada sugerida", 12000),
+            "summary": "\n\n".join(f"{label}\n{fields[key]}" for key, label in MANUAL_MEDIATION_FIELDS),
+            "details": {**fields, "restriction_checks": {key: True for key, _ in MANUAL_RESTRICTION_CHECKS},
+                        "coverage": normalized}}
 
 
 SCHEMA = (
@@ -377,6 +445,8 @@ class Repository:
                                (response_id, proposal_id)).fetchone()
             if not row:
                 raise DecisionError("Manifestação não pertence à proposta atual.")
+            if self.experimental_mode and category == NO_OBJECTION and row["position"] != "ACEITO":
+                raise DecisionError("Ressalva ou rejeição exige uma categoria de objeção.")
             if expected_edit is not None and row["edit"] != expected_edit:
                 raise DecisionError("O participante editou a justificativa. Atualize antes de revisar a categoria.")
             contest = conn.execute(
@@ -415,6 +485,23 @@ class Repository:
                 raise DecisionError("A IA está desativada nesta sala.")
             if result["origin"] not in ("IA", "HUMANA"):
                 raise DecisionError("Origem de mediação inválida.")
+            if self.experimental_mode:
+                expected_origin = "IA" if room["ai_enabled"] else "HUMANA"
+                if result["origin"] != expected_origin:
+                    raise DecisionError("A origem da mediação deve corresponder à condição experimental.")
+                if expected_origin == "HUMANA" and result["ok"]:
+                    responses = [dict(row) for row in conn.execute(
+                        """SELECT r.*, p.pseudonym FROM dc_responses r
+                           JOIN dc_participants p ON p.id=r.participant_id WHERE r.proposal_id=?""",
+                        (proposal_id,),
+                    ).fetchall()]
+                    result = validated_manual_mediation(result, responses)
+                elif result["ok"]:
+                    for key, label, limit in (("summary", "a síntese da IA", 16000),
+                                              ("suggested_text", "a proposta sugerida pela IA", 12000)):
+                        if not isinstance(result.get(key), str) or not result[key].strip():
+                            raise DecisionError(f"Preencha {label}.")
+                        clean(result[key], label, limit)
             mediation_id = uid()
             conn.execute("INSERT INTO dc_mediations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
                 mediation_id, room["id"], proposal_id, revision, result["origin"],
@@ -428,8 +515,11 @@ class Repository:
             })
         return mediation_id
 
-    def publish_revision(self, code, token, proposal_id, text, mediation_id=None):
+    def publish_revision(self, code, token, proposal_id, text, mediation_id=None, review_note=""):
         text = clean(text, "a proposta revisada", 12000)
+        if not isinstance(review_note, str):
+            raise DecisionError("Registre uma nota de revisão humana textual.")
+        review_note = clean(review_note, "a nota de revisão humana", 2000, False)
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "REVISAO")
@@ -439,13 +529,36 @@ class Repository:
             if text == old["text"]:
                 raise DecisionError("A nova versão deve conter uma alteração na proposta.")
             origin = "HUMANA"
+            mediation = None
+            if self.experimental_mode and not mediation_id:
+                raise DecisionError("Selecione uma mediação válida da condição experimental antes de publicar.")
             if mediation_id:
                 mediation = conn.execute("SELECT * FROM dc_mediations WHERE id=? AND room_id=?",
                                          (mediation_id, room["id"])).fetchone()
                 if (not mediation or mediation["proposal_id"] != proposal_id
                         or mediation["revision"] != room["revision"] or mediation["status"] != "OK"):
                     raise DecisionError("Esta mediação não corresponde ao conjunto atual de manifestações.")
+                if self.experimental_mode:
+                    expected_origin = "IA" if room["ai_enabled"] else "HUMANA"
+                    if mediation["origin"] != expected_origin:
+                        raise DecisionError("A base deve ser uma mediação da condição experimental atual.")
+                    if expected_origin == "HUMANA":
+                        responses = [dict(row) for row in conn.execute(
+                            """SELECT r.*, p.pseudonym FROM dc_responses r
+                               JOIN dc_participants p ON p.id=r.participant_id WHERE r.proposal_id=?""",
+                            (proposal_id,),
+                        ).fetchall()]
+                        validated_manual_mediation({"details": json.loads(mediation["details_json"]),
+                                                   "suggested_text": mediation["suggested_text"]}, responses)
+                    elif not review_note:
+                        raise DecisionError("Registre a nota de revisão humana da sugestão da IA.")
                 origin = "IA_REVISADA_POR_HUMANO" if mediation["origin"] == "IA" else "HUMANA"
+            changed = text != mediation["suggested_text"] if mediation else None
+            if self.experimental_mode and mediation and mediation["origin"] == "IA":
+                if changed and review_note.casefold().rstrip(".") == UNCHANGED_REVIEW_NOTE.casefold().rstrip("."):
+                    raise DecisionError("Justifique a alteração realizada na sugestão da IA.")
+                if not changed and not review_note.startswith(UNCHANGED_REVIEW_NOTE):
+                    review_note = UNCHANGED_REVIEW_NOTE + " " + review_note
             new_id = uid()
             conn.execute("INSERT INTO dc_proposals VALUES (?,?,?,?,?,?,?,?)", (
                 new_id, room["id"], old["round"] + 1, text, proposal_id, mediation_id, origin, now(),
@@ -455,6 +568,8 @@ class Repository:
             self._event(conn, room, new_id, actor, "PROPOSTA_PUBLICADA", {
                 "parent_id": proposal_id, "round": old["round"] + 1, "origin": origin,
                 "source_mediation_id": mediation_id,
+                "source_origin": mediation["origin"] if mediation else None,
+                "changed_from_source": changed, "review_note": review_note,
             })
         return new_id
 
