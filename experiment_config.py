@@ -4,7 +4,10 @@ Este módulo concentra apenas constantes não secretas do protocolo.
 """
 
 EXPERIMENT_CONFIG_VERSION = "experimento-v1"
+EXPERIMENT_RELEASE = "experimental-v1"
 TAXONOMY_VERSION = "taxonomia-v1"
+CLASSIFICATION_VERSION = "classificacao-v1"
+MEDIATION_VERSION = "mediacao-v1"
 MAX_MEDIATION_EXECUTIONS = 2
 CLASSIFICATION_FAILURE_CODES = (
     "SEM_CHAVE", "COTA_OU_LIMITE", "MODELO_INDISPONIVEL", "ACESSO_API",

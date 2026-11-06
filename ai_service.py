@@ -10,7 +10,7 @@ from importlib import metadata
 import time
 
 from decision import NO_OBJECTION, current_proposal, current_responses
-from experiment_config import TAXONOMY_CODES, TAXONOMY_VERSION, taxonomy_prompt
+from experiment_config import CLASSIFICATION_VERSION, MEDIATION_VERSION, TAXONOMY_CODES, TAXONOMY_VERSION, taxonomy_prompt
 
 def sanitize_external_text(text):
     """Best-effort minimization, only at the external boundary; not anonymization.
@@ -26,8 +26,6 @@ def sanitize_external_text(text):
     return text
 
 
-CLASSIFICATION_VERSION = "classificacao-v1"
-MEDIATION_VERSION = "mediacao-v1"
 DEFAULT_MODEL = "gemini-3.8-flash"
 FAILURE_MESSAGES = {
     "SEM_CHAVE": "A chave Gemini não foi configurada. O registro das manifestações continua disponível.",

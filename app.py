@@ -28,9 +28,9 @@ def setting(name, default=""):
 
 
 @st.cache_resource
-def repository(database_url, sqlite_path, experimental_mode):
+def repository(database_url, sqlite_path, experimental_mode, app_commit=None):
     # Compartilha apenas a configuração. Conexões são abertas por transação.
-    return Repository(database_url=database_url, sqlite_path=sqlite_path, experimental_mode=experimental_mode)
+    return Repository(database_url=database_url, sqlite_path=sqlite_path, experimental_mode=experimental_mode, app_commit=app_commit)
 
 
 def notify(message):
@@ -526,13 +526,24 @@ def export_panel(snapshot):
         st.info("O moderador pode exportar os registros para a avaliação do projeto.")
         return
     code = snapshot["room"]["code"]
-    st.write("JSON inclui versões, manifestações atuais, edições anteriores e eventos. CSV reúne a manifestação final de cada participante em cada versão.")
+    dataset = research_export(snapshot)
+    experimental = dataset["experiment"]["experimental_mode"]
+    if experimental:
+        st.caption("Versão experimental: " + (dataset["experiment"]["experiment_release"] or "não registrada nesta sessão"))
+        st.caption("Build: " + (dataset["experiment"]["app_commit"] or "não informado"))
+        if dataset["exporter"]["app_commit"] != dataset["experiment"]["app_commit"]:
+            st.caption("Build do exportador: " + (dataset["exporter"]["app_commit"] or "não informado"))
+        st.caption("APP_COMMIT é declarado na configuração da implantação; não comprova por si só qual código foi implantado.")
+    stamp = dataset["exported_at"].replace("-", "").replace(":", "").replace(".", "").replace("+0000", "Z")
+    json_name = f"experimento_{code}_{stamp}.json" if experimental else f"historico_{code}.json"
+    csv_name = f"manifestacoes_{code}_{stamp}.csv" if experimental else f"manifestacoes_{code}.csv"
+    st.write("JSON inclui manifesto, versões, manifestações vigentes por versão, metadados de edição e eventos. CSV é uma visão simplificada das manifestações.")
     st.caption("Os arquivos usam P01, P02 etc. e excluem credenciais e nomes de cadastro. Justificativas podem conter dados pessoais inseridos pelos próprios participantes; revise antes de compartilhar.")
     st.download_button("Baixar histórico completo (JSON)",
-                       json.dumps(research_export(snapshot), ensure_ascii=False, indent=2),
-                       file_name=f"historico_{code}.json", mime="application/json", key="json_" + code)
+                       json.dumps(dataset, ensure_ascii=False, indent=2),
+                       file_name=json_name, mime="application/json", key="json_" + code)
     st.download_button("Baixar manifestações (CSV)", csv_export(snapshot),
-                       file_name=f"manifestacoes_{code}.csv", mime="text/csv", key="csv_" + code)
+                       file_name=csv_name, mime="text/csv", key="csv_" + code)
 
 
 def room_settings(repo, snapshot, code, token):
@@ -605,6 +616,11 @@ def room_view(repo, ai, code, token):
             export_panel(snapshot)
             room_settings(repo, snapshot, code, token)
             return
+        # Inclui no pacote a configuração que pode ter sido fixada neste primeiro acesso.
+        ok, snapshot = execute(lambda: repo.snapshot(code, token))
+        if not ok:
+            return
+        room, actor = snapshot["room"], snapshot["actor"]
     proposal = current_proposal(snapshot)
     notice = st.session_state.pop("notice", None)
     if notice:
@@ -645,7 +661,7 @@ def main():
     sqlite_path = setting("SQLITE_PATH", str(Path(__file__).resolve().parent / "data" / "decisoes.sqlite3"))
     experimental_mode = setting("EXPERIMENT_MODE", "").strip().lower() in ("1", "true", "yes", "on")
     try:
-        repo = repository(setting("DATABASE_URL"), sqlite_path, experimental_mode)
+        repo = repository(setting("DATABASE_URL"), sqlite_path, experimental_mode, setting("APP_COMMIT"))
     except Exception:
         st.error("O armazenamento não está disponível. Confira DATABASE_URL e as dependências nas configurações da implantação.")
         return

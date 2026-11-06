@@ -599,6 +599,60 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertFalse(moderator.radio)
         self.assertEqual(self.repo.snapshot(access["code"], access["moderator_token"])["responses"], [])
 
+    def test_experimental_export_has_manifest_timestamped_names_and_build_only_for_moderator(self):
+        import streamlit as st
+        from experiment_config import EXPERIMENT_RELEASE
+        build = "c" * 40
+        with patch.dict(os.environ, {"EXPERIMENT_MODE": "1", "APP_COMMIT": build}), \
+             patch("app.st.download_button", wraps=st.download_button) as downloads:
+            moderator, access = self.create(enabled=False)
+            json_call = next(c for c in reversed(downloads.call_args_list) if c.args[0] == "Baixar histórico completo (JSON)")
+            csv_call = next(c for c in reversed(downloads.call_args_list) if c.args[0] == "Baixar manifestações (CSV)")
+            data = json.loads(json_call.args[1])
+            self.assertEqual(data["experiment"]["condition"], "B")
+            self.assertEqual(data["experiment"]["app_commit"], build)
+            self.assertEqual(data["experiment"]["experiment_release"], EXPERIMENT_RELEASE)
+            self.assertRegex(json_call.kwargs["file_name"], f"^experimento_{access['code']}_" + r"\d{8}T\d{12}Z\.json$")
+            self.assertEqual(csv_call.kwargs["file_name"], json_call.kwargs["file_name"].replace("experimento_", "manifestacoes_").replace(".json", ".csv"))
+            self.assertNotIn(access["moderator_token"], json_call.args[1])
+            self.assertIn("Versão experimental: " + EXPERIMENT_RELEASE, self.rendered_text(moderator))
+            self.assertIn("Build: " + build, self.rendered_text(moderator))
+            person = self.join(access, 0)
+            self.assertNotIn("Build:", self.rendered_text(person))
+            self.assertNotIn(build, self.rendered_text(person))
+            self.assertFalse(person.get("download_button"))
+            widget(person, "button", "Salvar manifestação").click().run()
+            self.assertFalse(person.get("download_button"))
+            self.assertNotIn("Build:", self.rendered_text(person))
+
+    def test_first_a_export_uses_recorded_model_configuration_and_missing_build_is_explicit(self):
+        import streamlit as st
+        with patch.dict(os.environ, {"EXPERIMENT_MODE": "1", "APP_COMMIT": "", "GEMINI_MODEL": "modelo-de-teste"}), \
+             patch("app.st.download_button", wraps=st.download_button) as downloads:
+            moderator, _ = self.create(enabled=True)
+            call = next(c for c in reversed(downloads.call_args_list) if c.args[0] == "Baixar histórico completo (JSON)")
+            manifest = json.loads(call.args[1])["experiment"]
+            self.assertEqual(manifest["condition"], "A")
+            self.assertEqual(manifest["model"], "modelo-de-teste")
+            self.assertEqual(manifest["classification_prompt_version"], "classificacao-v1")
+            self.assertEqual(manifest["mediation_prompt_version"], "mediacao-v1")
+            self.assertEqual(manifest["temperature"], 0)
+            self.assertEqual(manifest["ai_configuration_status"], "recorded")
+            self.assertIsNone(manifest["app_commit"])
+            self.assertIn("Build: não informado", self.rendered_text(moderator))
+            self.assertFalse(moderator.exception)
+
+    def test_generic_export_keeps_generic_names_and_does_not_claim_condition_a_or_b(self):
+        import streamlit as st
+        with patch("app.st.download_button", wraps=st.download_button) as downloads:
+            moderator, access = self.create(enabled=False)
+            call = next(c for c in reversed(downloads.call_args_list) if c.args[0] == "Baixar histórico completo (JSON)")
+            manifest = json.loads(call.args[1])["experiment"]
+            self.assertFalse(manifest["experimental_mode"])
+            self.assertIsNone(manifest["condition"])
+            self.assertEqual(call.kwargs["file_name"], f"historico_{access['code']}.json")
+            self.assertNotIn("Versão experimental:", self.rendered_text(moderator))
+
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)
         person = self.join(access, 0)

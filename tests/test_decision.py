@@ -6,13 +6,17 @@ import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from unittest.mock import patch
+from datetime import datetime
 
 from decision import (
     COVERAGE_STATES, MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, UNCHANGED_REVIEW_NOTE,
     DecisionError, NO_OBJECTION, Repository, UNCLASSIFIED, consensus, csv_export,
     current_proposal, current_responses, mediation_attempt_state, research_export,
 )
-from experiment_config import TAXONOMY_CODES, TECHNICAL_CANCEL_REASON
+from experiment_config import (CLASSIFICATION_VERSION, MEDIATION_VERSION, EXPERIMENT_RELEASE,
+                               EXPERIMENT_CONFIG_VERSION, MAX_MEDIATION_EXECUTIONS, TAXONOMY_VERSION,
+                               TAXONOMY_CODES, TECHNICAL_CANCEL_REASON)
 
 
 class WorkflowTests(unittest.TestCase):
@@ -830,6 +834,254 @@ class ExperimentalFailureProtocolTests(unittest.TestCase):
         self.assertEqual(len(snap["mediations"]), 3)
         self.assertFalse(mediation_attempt_state(snap)["persistent_failure"])
         self.assertFalse(any(e["action"] == "CONFIGURACAO_IA_FIXADA" for e in snap["events"]))
+
+
+class ExperimentalExportTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp.name) / "export.db"
+        self.build = "a" * 40
+        with patch.dict(os.environ, {"APP_COMMIT": self.build}):
+            self.repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+        self.config = {"model": "modelo-fixado", "classification_prompt": CLASSIFICATION_VERSION,
+                       "mediation_prompt": MEDIATION_VERSION, "taxonomy_version": TAXONOMY_VERSION, "temperature": 0}
+        self.create(True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def create(self, enabled):
+        self.access = self.repo.create_room("Orçamento", "R$ 80.000 disponíveis", "Proposta inicial", 3, enabled)
+        self.code, self.admin = self.access["code"], self.access["moderator_token"]
+        self.proposal = current_proposal(self.snapshot())["id"]
+
+    def snapshot(self):
+        return self.repo.snapshot(self.code, self.admin)
+
+    def response(self, position="NAO_ACEITO", argument="Texto original pessoa@example.org R$ 80.000"):
+        return self.repo.submit_response(self.code, self.access["invitations"][0]["token"], self.proposal, position, argument)
+
+    def test_a_manifest_exposes_release_versions_build_and_frozen_ai_configuration(self):
+        self.repo.ensure_ai_configuration(self.code, self.admin, self.config)
+        data = research_export(self.snapshot())
+        manifest = data["experiment"]
+        self.assertEqual(data["schema_version"], 2)
+        self.assertEqual(manifest["condition"], "A")
+        self.assertTrue(manifest["ai_enabled"])
+        self.assertTrue(manifest["experimental_mode"])
+        self.assertEqual(manifest["experiment_release"], EXPERIMENT_RELEASE)
+        self.assertEqual(manifest["experiment_config_version"], EXPERIMENT_CONFIG_VERSION)
+        self.assertEqual(manifest["taxonomy_version"], TAXONOMY_VERSION)
+        self.assertEqual(manifest["max_rounds"], 3)
+        self.assertEqual(manifest["max_mediation_executions"], MAX_MEDIATION_EXECUTIONS)
+        self.assertEqual(manifest["model"], self.config["model"])
+        self.assertEqual(manifest["classification_prompt_version"], CLASSIFICATION_VERSION)
+        self.assertEqual(manifest["mediation_prompt_version"], MEDIATION_VERSION)
+        self.assertEqual(manifest["temperature"], 0)
+        self.assertEqual(manifest["app_commit"], self.build)
+        self.assertEqual(manifest["storage_type"], "postgresql" if self.repo.postgres else "sqlite")
+        self.assertEqual(manifest["exported_at"], data["exported_at"])
+        self.assertEqual(manifest["ai_configuration_status"], "recorded")
+
+    def test_b_manifest_never_claims_ai_model_or_ai_prompts_were_used(self):
+        self.create(False)
+        manifest = research_export(self.snapshot())["experiment"]
+        self.assertEqual(manifest["condition"], "B")
+        self.assertFalse(manifest["ai_enabled"])
+        for key in ("model", "classification_prompt_version", "mediation_prompt_version", "temperature"):
+            self.assertIsNone(manifest[key])
+        self.assertEqual(manifest["ai_configuration_status"], "not_applicable")
+        self.assertEqual(manifest["taxonomy_version"], TAXONOMY_VERSION)
+        self.assertEqual(manifest["defined_prompt_versions"], {"classification": CLASSIFICATION_VERSION, "mediation": MEDIATION_VERSION})
+
+    def test_missing_or_invalid_app_commit_never_invents_a_sha_or_exports_invalid_content(self):
+        for value in ("", "DO_NOT_EXPORT_SECRET_MISTAKEN_FOR_BUILD"):
+            with patch.dict(os.environ, {"APP_COMMIT": value}):
+                repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+            access = repo.create_room("Tema", "", "Proposta", 2)
+            data = research_export(repo.snapshot(access["code"], access["moderator_token"]))
+            self.assertIsNone(data["experiment"]["app_commit"])
+            self.assertIsNone(data["exporter"]["app_commit"])
+            self.assertNotIn("DO_NOT_EXPORT_SECRET_MISTAKEN_FOR_BUILD", json.dumps(data))
+
+    def test_session_identity_is_not_rewritten_by_later_build_or_exporter(self):
+        other = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True, app_commit="b" * 40)
+        data = research_export(other.snapshot(self.code, self.admin))
+        self.assertEqual(data["experiment"]["app_commit"], self.build)
+        self.assertEqual(data["exporter"]["app_commit"], "b" * 40)
+        self.assertTrue(data["exporter"]["build_changed_since_session_start"])
+        self.assertEqual(data["experiment"]["session_metadata_status"], "recorded")
+
+    def test_legacy_session_keeps_unknown_identity_explicit(self):
+        generic = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path)
+        access = generic.create_room("Legado", "", "Proposta", ["A", "B"])
+        data = research_export(self.repo.snapshot(access["code"], access["moderator_token"]))
+        self.assertEqual(data["experiment"]["session_metadata_status"], "not_recorded")
+        for key in ("app_commit", "experiment_release", "experiment_config_version", "model", "temperature"):
+            self.assertIsNone(data["experiment"][key])
+        self.assertEqual(data["exporter"]["app_commit"], self.build)
+        self.assertEqual(data["experiment"]["ai_configuration_status"], "not_recorded")
+        plain = research_export(generic.snapshot(access["code"], access["moderator_token"]))
+        self.assertFalse(plain["experiment"]["experimental_mode"])
+        self.assertIsNone(plain["experiment"]["condition"])
+
+    def test_frozen_configuration_is_used_instead_of_exporter_prompt_definitions(self):
+        configured = self.config | {"classification_prompt": "class-frozen", "mediation_prompt": "media-frozen", "taxonomy_version": "tax-frozen"}
+        self.repo.ensure_ai_configuration(self.code, self.admin, configured)
+        manifest = research_export(self.snapshot())["experiment"]
+        self.assertEqual(manifest["classification_prompt_version"], "class-frozen")
+        self.assertEqual(manifest["mediation_prompt_version"], "media-frozen")
+        self.assertEqual(manifest["taxonomy_version"], "tax-frozen")
+        self.assertEqual(manifest["defined_prompt_versions"]["classification"], CLASSIFICATION_VERSION)
+
+    def test_complete_a_trace_includes_original_text_fallback_contest_mediations_review_and_result(self):
+        self.repo.ensure_ai_configuration(self.code, self.admin, self.config)
+        response = self.response()
+        token = self.access["invitations"][0]["token"]
+        self.repo.apply_classification(self.code, token, self.proposal, response["id"], response["edit"],
+                                       {"ok": False, "failure_code": "COTA_OU_LIMITE", "model": self.config["model"], "prompt_version": CLASSIFICATION_VERSION})
+        self.repo.set_category(self.code, self.admin, self.proposal, response["id"], "CAT07", response["edit"], technical_fallback=True)
+        self.repo.suggest_category(self.code, token, self.proposal, response["id"], "CAT05", response["edit"])
+        self.repo.set_category(self.code, self.admin, self.proposal, response["id"], "CAT05", response["edit"])
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        revision = self.snapshot()["room"]["revision"]
+        first = self.repo.begin_ai_mediation(self.code, self.admin, self.proposal, revision, self.config)
+        self.repo.save_mediation(self.code, self.admin, self.proposal, revision,
+                                 {"origin": "IA", "ok": False, "failure_code": "SERVICO_INDISPONIVEL"}, attempt_id=first)
+        second = self.repo.begin_ai_mediation(self.code, self.admin, self.proposal, revision, self.config)
+        self.repo.save_mediation(self.code, self.admin, self.proposal, revision, {
+            "origin": "IA", "ok": True, "summary": "Síntese original", "suggested_text": "Proposta sugerida original",
+            "model": self.config["model"], "prompt_version": MEDIATION_VERSION, "duration_ms": 50,
+            "details": {"coverage": [{"participant": "P01", "treatment": "PARCIAL", "note": "Condição parcialmente incorporada"}]},
+        }, attempt_id=second)
+        note = "Ajustada a proposta para preservar condição minoritária registrada."
+        new = self.repo.publish_revision(self.code, self.admin, self.proposal, "Proposta publicada após revisão humana", second, review_note=note)
+        for person in self.access["invitations"]:
+            self.repo.submit_response(self.code, person["token"], new, "ACEITO", "")
+        self.repo.set_phase(self.code, self.admin, new, "REVISAO")
+        self.repo.finish(self.code, self.admin, new)
+        snap = self.snapshot()
+        before = json.dumps(snap)
+        data = research_export(snap)
+        self.assertEqual(json.dumps(snap), before)
+        row = next(r for r in data["responses"] if r["id"] == response["id"])
+        self.assertEqual(row["argument"], "Texto original pessoa@example.org R$ 80.000")
+        self.assertNotIn("[EMAIL_REMOVIDO]", row["argument"])
+        self.assertEqual((row["classification_status"], row["category_ai"], row["category"]), ("FALLBACK_HUMANO", None, "CAT05"))
+        self.assertTrue(row["classification_fallback"])
+        self.assertEqual(row["classification_failure_code"], "COTA_OU_LIMITE")
+        by_event = {e["id"]: e for e in data["events"]}
+        self.assertEqual(by_event[row["classification_failure_event_id"]]["action"], "CLASSIFICACAO_IA")
+        self.assertEqual(by_event[row["classification_fallback_event_id"]]["action"], "CLASSIFICACAO_FALLBACK_HUMANO")
+        contest = data["category_contests"][0]
+        self.assertEqual((contest["response_id"], contest["response_edit"], contest["pseudonym"], contest["suggested_category"], contest["resolved_category"]),
+                         (response["id"], 1, "P01", "CAT05", "CAT05"))
+        self.assertEqual([m["execution"] for m in data["mediations"]], [1, 2])
+        self.assertEqual([m["status"] for m in data["mediations"]], ["FALHA", "OK"])
+        self.assertEqual(data["mediations"][0]["failure_code"], "SERVICO_INDISPONIVEL")
+        self.assertEqual(data["mediations"][1]["coverage"][0]["participant"], "P01")
+        proposal = next(p for p in data["proposals"] if p["id"] == new)
+        review = proposal["human_review"]
+        self.assertEqual(proposal["parent_id"], self.proposal)
+        self.assertEqual(proposal["source_mediation_id"], second)
+        self.assertEqual(review["original_suggested_text"], "Proposta sugerida original")
+        self.assertEqual(review["published_text"], proposal["text"])
+        self.assertEqual(review["review_note"], note)
+        self.assertTrue(review["changed_from_source"])
+        self.assertEqual(review["published_by"], "MODERADOR")
+        for timestamp in (data["room"]["created_at"], data["room"]["closed_at"], row["created_at"], row["updated_at"],
+                          review["published_at"], data["mediations"][0]["execution_started_at"], data["mediations"][0]["execution_completed_at"]):
+            self.assertIsNotNone(datetime.fromisoformat(timestamp).tzinfo)
+        self.assertEqual(data["room"]["result"], "ACORDO")
+
+    def test_ai_category_remains_distinct_from_contested_and_final_category(self):
+        saved = self.response()
+        token = self.access["invitations"][0]["token"]
+        self.repo.apply_classification(self.code, token, self.proposal, saved["id"], 1,
+                                       {"ok": True, "category": "CAT03", "model": "modelo", "prompt_version": CLASSIFICATION_VERSION})
+        self.repo.suggest_category(self.code, token, self.proposal, saved["id"], "CAT05", 1)
+        self.repo.set_category(self.code, self.admin, self.proposal, saved["id"], "CAT05", 1)
+        data = research_export(self.snapshot())
+        self.assertEqual(data["responses"][0]["category_ai"], "CAT03")
+        self.assertEqual(data["responses"][0]["category"], "CAT05")
+        self.assertFalse(data["responses"][0]["classification_fallback"])
+        self.assertEqual(data["category_contests"][0]["suggested_category"], "CAT05")
+
+    def test_manual_b_mediation_exports_structured_template_and_local_coverage(self):
+        self.create(False)
+        saved = self.response("ACEITO", "")
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        details = {key: "Nenhum ponto adicional identificado" for key, _ in MANUAL_MEDIATION_FIELDS}
+        details["restriction_checks"] = {key: True for key, _ in MANUAL_RESTRICTION_CHECKS}
+        details["coverage"] = [{"response_id": saved["id"], "treatment": "SEM_OBJECAO"}]
+        revision = self.snapshot()["room"]["revision"]
+        source = self.repo.save_mediation(self.code, self.admin, self.proposal, revision,
+                                         {"origin": "HUMANA", "ok": True, "suggested_text": "Proposta revisada", "details": details})
+        data = research_export(self.snapshot())
+        mediation = data["mediations"][0]
+        self.assertEqual(mediation["id"], source)
+        self.assertEqual(mediation["origin"], "HUMANA")
+        self.assertEqual(json.loads(mediation["details_json"]), mediation["details"])
+        self.assertEqual(mediation["coverage"][0]["response_id"], saved["id"])
+        self.assertEqual(mediation["coverage"][0]["participant"], "P01")
+        self.assertEqual(mediation["coverage"][0]["note"], "")
+        self.assertIsNone(mediation["execution"])
+
+    def test_pending_and_cancelled_executions_export_without_fake_completion_or_agreement(self):
+        self.response()
+        self.repo.set_phase(self.code, self.admin, self.proposal, "REVISAO")
+        revision = self.snapshot()["room"]["revision"]
+        first = self.repo.begin_ai_mediation(self.code, self.admin, self.proposal, revision, self.config)
+        pending = research_export(self.snapshot())["mediations"][0]
+        self.assertEqual((pending["execution"], pending["status"]), (1, "EM_EXECUCAO"))
+        self.assertIsNone(pending["execution_completed_at"])
+        self.repo.save_mediation(self.code, self.admin, self.proposal, revision,
+                                 {"origin": "IA", "ok": False, "failure_code": "TEMPO_ESGOTADO"}, attempt_id=first)
+        second = self.repo.begin_ai_mediation(self.code, self.admin, self.proposal, revision, self.config)
+        self.repo.save_mediation(self.code, self.admin, self.proposal, revision,
+                                 {"origin": "IA", "ok": False, "failure_code": "TEMPO_ESGOTADO"}, attempt_id=second)
+        self.repo.finish(self.code, self.admin, self.proposal, TECHNICAL_CANCEL_REASON, cancel=True)
+        data = research_export(self.snapshot())
+        self.assertEqual((data["room"]["state"], data["room"]["result"], data["room"]["close_reason"]),
+                         ("ENCERRADA", "CANCELADA", TECHNICAL_CANCEL_REASON))
+        self.assertEqual([m["execution"] for m in data["mediations"]], [1, 2])
+        self.assertTrue(all(m["status"] == "FALHA" and m["failure_code"] == "TEMPO_ESGOTADO" for m in data["mediations"]))
+
+    def test_export_excludes_structured_secrets_civil_aliases_and_environment_but_not_original_argument(self):
+        self.response()
+        snapshot = self.snapshot()
+        snapshot["room"].update(moderator_hash="BAD_MODERATOR_HASH", DATABASE_URL="BAD_DATABASE_URL", secrets={"key": "BAD_SECRET"})
+        snapshot["participants"][0].update(alias="NOME CIVIL PRIVADO", normalized_alias="nome civil privado", token_hash="BAD_TOKEN_HASH",
+                                           token="BAD_PARTICIPANT_TOKEN", email="civil@example.org", enrollment="BAD_ENROLLMENT")
+        snapshot["responses"][0]["alias"] = "NOME CIVIL PRIVADO"
+        snapshot["actor"]["moderator_token"] = "BAD_MODERATOR_TOKEN"
+        payload = json.loads(snapshot["events"][0]["payload_json"])
+        payload["nested"] = {"GEMINI_API_KEY": "BAD_API_KEY", "DATABASE_URL": "BAD_DATABASE_URL", "tokens": [{"token_hash": "BAD_TOKEN_HASH"}]}
+        snapshot["events"][0]["payload_json"] = json.dumps(payload)
+        before = json.dumps(snapshot)
+        with patch.dict(os.environ, {"GEMINI_API_KEY": "ENVIRONMENT_API_SECRET", "DATABASE_URL": "postgresql://private:secret@host/private"}):
+            data = research_export(snapshot)
+        serialized = json.dumps(data, ensure_ascii=False)
+        for private in ("BAD_MODERATOR_HASH", "BAD_DATABASE_URL", "BAD_SECRET", "NOME CIVIL PRIVADO", "BAD_TOKEN_HASH", "BAD_PARTICIPANT_TOKEN",
+                        "BAD_ENROLLMENT", "BAD_MODERATOR_TOKEN", "BAD_API_KEY", "ENVIRONMENT_API_SECRET", "civil@example.org",
+                        "postgresql://private:secret@host/private", self.admin, *[p["token"] for p in self.access["invitations"]]):
+            self.assertNotIn(private, serialized)
+        for key in ('"moderator_hash"', '"token_hash"', '"moderator_token"', '"alias"', '"GEMINI_API_KEY"', '"DATABASE_URL"', '"secrets"'):
+            self.assertNotIn(key, serialized)
+        self.assertIn("pessoa@example.org", data["responses"][0]["argument"])
+        self.assertIn(self.build, serialized)
+        self.assertEqual(json.dumps(snapshot), before)
+
+    def test_csv_keeps_original_text_model_prompt_and_formula_escaping(self):
+        self.response(argument='=HYPERLINK("https://example.org")')
+        snap = self.snapshot()
+        snap["responses"][0].update(classification_model="+modelo", classification_prompt=CLASSIFICATION_VERSION)
+        rows = list(csv.DictReader(io.StringIO(csv_export(snap).decode("utf-8-sig"))))
+        self.assertEqual(rows[0]["round"], "1")
+        self.assertEqual(rows[0]["participant"], "P01")
+        self.assertEqual(rows[0]["classification_model"], "'+modelo")
+        self.assertEqual(rows[0]["classification_prompt"], CLASSIFICATION_VERSION)
+        self.assertTrue(rows[0]["argument"].startswith("'="))
 
 
 if __name__ == "__main__":

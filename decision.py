@@ -10,6 +10,8 @@ import hashlib
 import hmac
 import io
 import json
+import os
+import re
 import secrets
 import sqlite3
 import uuid
@@ -17,7 +19,10 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
-from experiment_config import CLASSIFICATION_FAILURE_CODES, MAX_MEDIATION_EXECUTIONS, TAXONOMY_CODES
+from experiment_config import (
+    CLASSIFICATION_FAILURE_CODES, CLASSIFICATION_VERSION, EXPERIMENT_CONFIG_VERSION, EXPERIMENT_RELEASE,
+    MAX_MEDIATION_EXECUTIONS, MEDIATION_VERSION, TAXONOMY_CODES, TAXONOMY_VERSION,
+)
 
 POSITIONS = {
     "ACEITO": "Aceito",
@@ -59,6 +64,12 @@ def uid():
 
 def digest(token):
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def declared_app_commit(value):
+    """SHA declarado na implantação, nunca deduzido da branch ou consultado externamente."""
+    value = str(value or "").strip()
+    return value if re.fullmatch(r"[0-9a-fA-F]{7,40}", value) else None
 
 
 def clean(text, label, limit, required=True):
@@ -193,10 +204,11 @@ class Connection:
 
 
 class Repository:
-    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3", experimental_mode=False):
+    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3", experimental_mode=False, app_commit=None):
         self.url = database_url.strip()
         self.postgres = self.url.startswith(("postgres://", "postgresql://"))
         self.experimental_mode = bool(experimental_mode)
+        self.app_commit = declared_app_commit(os.getenv("APP_COMMIT") if app_commit is None else app_commit)
         if self.url and not self.postgres:
             raise DecisionError("DATABASE_URL deve ser uma conexão PostgreSQL.")
         self.path = str(Path(sqlite_path).resolve())
@@ -380,7 +392,18 @@ class Repository:
             self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SALA_CRIADA", {
                 "participants": len(aliases), "ai_enabled": bool(ai_enabled), "max_rounds": MAX_ROUNDS,
             })
+            if self.experimental_mode:
+                self._event(conn, room, proposal_id, {"pseudonym": "MODERADOR"}, "SESSAO_EXPERIMENTAL_CONFIGURADA",
+                            self.runtime_identity() | {"condition": "A" if ai_enabled else "B", "ai_enabled": bool(ai_enabled)})
         return {"code": code, "moderator_token": moderator_token, "invitations": invitations}
+
+    def runtime_identity(self):
+        return {"experiment_release": EXPERIMENT_RELEASE, "experiment_config_version": EXPERIMENT_CONFIG_VERSION,
+                "taxonomy_version": TAXONOMY_VERSION, "max_rounds": MAX_ROUNDS,
+                "max_mediation_executions": MAX_MEDIATION_EXECUTIONS,
+                "defined_prompt_versions": {"classification": CLASSIFICATION_VERSION, "mediation": MEDIATION_VERSION},
+                "experimental_mode": self.experimental_mode,
+                "storage_type": "postgresql" if self.postgres else "sqlite", "app_commit": self.app_commit}
 
     def snapshot(self, code, token):
         with self.transaction() as conn:
@@ -413,7 +436,7 @@ class Repository:
             ).fetchall()]
         return {"room": room, "actor": actor, "participants": participants,
                 "proposals": proposals, "responses": responses, "category_contests": contests,
-                "mediations": mediations, "events": events}
+                "mediations": mediations, "events": events, "runtime": self.runtime_identity()}
 
     def submit_response(self, code, token, proposal_id, position, argument, expected_edit=None):
         if position not in POSITIONS:
@@ -753,23 +776,153 @@ def consensus(snapshot):
                 r["position"] in ("ACEITO", "ACEITO_COM_RESSALVAS") for r in responses.values())}
 
 
+# Campos estruturados apenas; texto científico livre permanece intacto.
+_EXPORT_PRIVATE_KEYS = frozenset({
+    "alias", "normalized_alias", "token", "token_hash", "moderator_hash", "moderator_token",
+    "participant_token", "participant_tokens", "tokens", "api_key", "gemini_api_key", "database_url",
+    "secrets", "streamlit_secrets", "credentials",
+})
+_RUNTIME_FIELDS = ("experiment_release", "experiment_config_version", "taxonomy_version", "max_rounds",
+                   "max_mediation_executions", "defined_prompt_versions", "experimental_mode", "storage_type", "app_commit")
+
+
+def _export_safe(value):
+    if isinstance(value, dict):
+        return {k: _export_safe(v) for k, v in value.items() if str(k).casefold() not in _EXPORT_PRIVATE_KEYS}
+    if isinstance(value, list):
+        return [_export_safe(v) for v in value]
+    return value
+
+
+def _export_fields(row, fields):
+    return _export_safe({key: row[key] for key in fields if key in row})
+
+
+def _export_json(raw):
+    try:
+        return _export_safe(json.loads(raw))
+    except (ValueError, TypeError):
+        return None
+
+
+def _experiment_manifest(snapshot, events, exported_at):
+    runtime = _export_fields(snapshot.get("runtime", {}), _RUNTIME_FIELDS)
+    runtime["app_commit"] = declared_app_commit(runtime.get("app_commit"))
+    session_event = next((e for e in events if e["action"] == "SESSAO_EXPERIMENTAL_CONFIGURADA"), None)
+    identity = session_event["payload"] if session_event and isinstance(session_event["payload"], dict) else {}
+    mode = identity.get("experimental_mode", runtime.get("experimental_mode"))
+    condition = identity.get("condition") if identity else ("A" if snapshot["room"]["ai_enabled"] else "B") if mode else None
+    fixed_event = next((e for e in events if e["action"] == "CONFIGURACAO_IA_FIXADA"), None)
+    fixed = fixed_event["payload"] if fixed_event and isinstance(fixed_event["payload"], dict) and condition == "A" else {}
+    manifest = {key: identity.get(key) for key in _RUNTIME_FIELDS}
+    manifest.update({
+        "experimental_mode": mode, "condition": condition, "ai_enabled": bool(snapshot["room"]["ai_enabled"]),
+        "app_commit": declared_app_commit(identity.get("app_commit")),
+        "app_commit_source": "APP_COMMIT declarado na criação da sessão" if identity else "não registrado",
+        "session_metadata_status": "recorded" if identity else "not_recorded",
+        "session_metadata_event_id": session_event["id"] if session_event else None,
+        "condition_source": "session_record" if identity else "runtime_room_state" if mode else None,
+        "model": fixed.get("model"), "classification_prompt_version": fixed.get("classification_prompt"),
+        "mediation_prompt_version": fixed.get("mediation_prompt"), "temperature": fixed.get("temperature"),
+        "taxonomy_version": fixed.get("taxonomy_version", identity.get("taxonomy_version")),
+        "ai_configuration_status": "recorded" if fixed else "not_recorded" if condition == "A" else "not_applicable",
+        "ai_configuration_event_id": fixed_event["id"] if fixed else None,
+        "max_rounds": identity.get("max_rounds", MAX_ROUNDS),
+        "max_mediation_executions": identity.get("max_mediation_executions", MAX_MEDIATION_EXECUTIONS),
+        "exported_at": exported_at,
+    })
+    # Identidade do exportador não é retroatribuída a uma sessão antiga.
+    runtime["app_commit_source"] = "APP_COMMIT da configuração da implantação; não verificado externamente"
+    runtime["build_changed_since_session_start"] = (
+        manifest["app_commit"] != runtime["app_commit"]
+        if manifest["app_commit"] and runtime["app_commit"] else None
+    )
+    return manifest, runtime
+
+
 def research_export(snapshot):
-    """Exporta a trilha completa sem credenciais nem aliases pessoais."""
-    output = {"schema_version": 1, "exported_at": now(), "max_rounds": MAX_ROUNDS}
-    for section in ("room", "participants", "proposals", "responses", "category_contests", "mediations", "events"):
-        output[section] = snapshot[section]
-    output = json.loads(json.dumps(output, ensure_ascii=False))
-    for person in output["participants"] + output["responses"]:
-        person.pop("alias", None)
-        person.pop("normalized_alias", None)
-        person.pop("token_hash", None)
-    output["room"].pop("moderator_hash", None)
+    """Pacote pseudonimizado; sem leitura de secrets nem sanitização do texto local."""
+    output = {"schema_version": 2, "exported_at": now(), "max_rounds": MAX_ROUNDS}
+    output["room"] = _export_fields(snapshot["room"], (
+        "id", "code", "theme", "context", "state", "active_proposal_id", "ai_enabled", "revision",
+        "created_at", "closed_at", "result", "close_reason",
+    ))
+    output["participants"] = [_export_fields(p, ("id", "pseudonym", "experimental_role")) for p in snapshot["participants"]]
+    events = []
+    for row in snapshot["events"]:
+        event = _export_fields(row, ("id", "room_id", "proposal_id", "actor", "action", "created_at"))
+        payload = _export_json(row["payload_json"])
+        event.update(payload=payload, payload_json=json.dumps(payload, ensure_ascii=False) if payload is not None else None)
+        if payload is None:
+            event["payload_parse_error"] = True
+        events.append(event)
+    output["events"] = events
+    output["experiment"], output["exporter"] = _experiment_manifest(snapshot, events, output["exported_at"])
+    proposals = {p["id"]: p for p in snapshot["proposals"]}
+    publications = {e["proposal_id"]: e for e in events if e["action"] == "PROPOSTA_PUBLICADA"}
+    starts = {e["payload"].get("mediation_id"): e for e in events
+              if e["action"] == "MEDIACAO_INICIADA" and isinstance(e["payload"], dict)}
+    mediations = []
+    for row in snapshot["mediations"]:
+        item = _export_fields(row, ("id", "room_id", "proposal_id", "revision", "origin", "status", "summary",
+                                    "suggested_text", "model", "prompt_version", "failure_code", "duration_ms", "created_at"))
+        details = _export_json(row["details_json"])
+        item.update(details=details, details_json=json.dumps(details, ensure_ascii=False) if details is not None else None,
+                    coverage=details.get("coverage", []) if isinstance(details, dict) else [])
+        if details is None:
+            item["details_parse_error"] = True
+        start = starts.get(row["id"])
+        item["execution"] = start["payload"].get("execution") if start else None
+        item["execution_event_id"] = start["id"] if start else None
+        item["execution_started_at"] = start["created_at"] if start else None
+        completion = next((e for e in events if e["action"] == "MEDIACAO_REGISTRADA"
+                           and isinstance(e["payload"], dict) and e["payload"].get("mediation_id") == row["id"]), None)
+        item["execution_completed_at"] = completion["created_at"] if completion else None
+        mediations.append(item)
+    output["mediations"] = mediations
+    by_mediation = {m["id"]: m for m in mediations}
+    output["proposals"] = []
+    for row in snapshot["proposals"]:
+        item = _export_fields(row, ("id", "room_id", "round", "text", "parent_id", "source_mediation_id", "origin", "created_at"))
+        event = publications.get(row["id"])
+        if event and isinstance(event["payload"], dict):
+            payload = event["payload"]
+            source = by_mediation.get(row["source_mediation_id"])
+            item["human_review"] = {
+                "source_mediation_id": row["source_mediation_id"], "source_origin": payload.get("source_origin"),
+                "original_suggested_text": source["suggested_text"] if source else None,
+                "published_text": row["text"], "changed_from_source": payload.get("changed_from_source"),
+                "review_note": payload.get("review_note"), "published_by": event["actor"],
+                "published_at": event["created_at"], "event_id": event["id"],
+            }
+        output["proposals"].append(item)
+    output["responses"] = []
+    for row in snapshot["responses"]:
+        item = _export_fields(row, ("id", "proposal_id", "participant_id", "pseudonym", "position", "argument", "category_ai",
+                                   "category", "category_manual", "classification_status", "classification_model",
+                                   "classification_prompt", "edit", "created_at", "updated_at"))
+        related = [e for e in events if e["action"] in ("CLASSIFICACAO_IA", "CLASSIFICACAO_FALLBACK_HUMANO")
+                   and isinstance(e["payload"], dict) and e["payload"].get("response_id") == row["id"]
+                   and e["payload"].get("edit") == row["edit"]]
+        failures = [e for e in related if e["action"] == "CLASSIFICACAO_IA" and e["payload"].get("status") in CLASSIFICATION_FAILURE_CODES]
+        fallbacks = [e for e in related if e["action"] == "CLASSIFICACAO_FALLBACK_HUMANO"]
+        last_failure = failures[-1] if failures else None
+        item["classification_failure_code"] = (last_failure["payload"].get("failure_code") or last_failure["payload"].get("status")) if last_failure else None
+        item["classification_failure_event_id"] = last_failure["id"] if last_failure else None
+        item["classification_fallback"] = row["classification_status"] == "FALLBACK_HUMANO"
+        item["classification_fallback_event_id"] = fallbacks[-1]["id"] if fallbacks else None
+        item["round"] = proposals[row["proposal_id"]]["round"]
+        output["responses"].append(item)
+    output["category_contests"] = [_export_fields(c, (
+        "id", "response_id", "response_edit", "participant_id", "pseudonym", "suggested_category", "status",
+        "created_at", "resolved_at", "resolved_category",
+    )) for c in snapshot["category_contests"]]
     return output
 
 
 def csv_export(snapshot):
     output = io.StringIO(newline="")
-    fields = ["round", "participant", "position", "argument", "category", "category_ai", "classification_status", "updated_at"]
+    fields = ["round", "participant", "position", "argument", "category", "category_ai", "classification_status", "classification_model", "classification_prompt", "updated_at"]
     writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
     rounds = {p["id"]: p["round"] for p in snapshot["proposals"]}
