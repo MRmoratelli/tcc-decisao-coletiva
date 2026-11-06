@@ -736,10 +736,20 @@ def main():
     st.title("🏛️ Decisão Coletiva com IA")
     sqlite_path = setting("SQLITE_PATH", str(Path(__file__).resolve().parent / "data" / "decisoes.sqlite3"))
     experimental_mode = setting("EXPERIMENT_MODE", "").strip().lower() in ("1", "true", "yes", "on")
+    database_url = setting("DATABASE_URL")
+    if experimental_mode and not database_url:
+        st.error("O armazenamento não está disponível: DATABASE_URL não foi encontrada nos Secrets/ambiente.")
+        return
+    if database_url and not database_url.strip().startswith(("postgres://", "postgresql://")):
+        st.error("O armazenamento não está disponível: DATABASE_URL não está no formato PostgreSQL esperado.")
+        return
     try:
-        repo = repository(setting("DATABASE_URL"), sqlite_path, experimental_mode, setting("APP_COMMIT"))
-    except Exception:
-        st.error("O armazenamento não está disponível. Confira DATABASE_URL e as dependências nas configurações da implantação.")
+        repo = repository(database_url, sqlite_path, experimental_mode, setting("APP_COMMIT"))
+    except Exception as error:
+        error_type = type(error).__name__
+        sqlstate = getattr(error, "sqlstate", None)
+        st.error("O armazenamento não está disponível. A conexão PostgreSQL falhou.")
+        st.caption(f"Diagnóstico seguro: {error_type}" + (f" | SQLSTATE {sqlstate}" if sqlstate else ""))
         return
     models = [setting("GEMINI_MODEL", DEFAULT_MODEL)]
     if not experimental_mode:
