@@ -748,8 +748,26 @@ def main():
     except Exception as error:
         error_type = type(error).__name__
         sqlstate = getattr(error, "sqlstate", None)
+        message = str(error).lower()
+        if "password authentication failed" in message or "authentication failed" in message:
+            category = "AUTENTICACAO"
+        elif "could not translate host name" in message or "name or service not known" in message or "nodename nor servname" in message:
+            category = "HOST_DNS"
+        elif "timeout" in message or "timed out" in message:
+            category = "TIMEOUT"
+        elif "ssl" in message or "certificate" in message:
+            category = "SSL"
+        elif "connection refused" in message:
+            category = "CONEXAO_RECUSADA"
+        elif "network is unreachable" in message:
+            category = "REDE"
+        else:
+            category = "CONEXAO_POSTGRESQL"
         st.error("O armazenamento não está disponível. A conexão PostgreSQL falhou.")
-        st.caption(f"Diagnóstico seguro: {error_type}" + (f" | SQLSTATE {sqlstate}" if sqlstate else ""))
+        st.caption(
+            f"Diagnóstico seguro: {error_type} | categoria {category}"
+            + (f" | SQLSTATE {sqlstate}" if sqlstate else "")
+        )
         return
     models = [setting("GEMINI_MODEL", DEFAULT_MODEL)]
     if not experimental_mode:
