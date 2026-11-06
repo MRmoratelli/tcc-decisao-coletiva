@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from decision import (
-    DecisionError, NO_OBJECTION, Repository, consensus, csv_export,
+    DecisionError, NO_OBJECTION, Repository, UNCLASSIFIED, consensus, csv_export,
     current_proposal, current_responses, research_export,
 )
 from experiment_config import TAXONOMY_CODES
@@ -222,6 +222,72 @@ class WorkflowTests(unittest.TestCase):
                                       saved["id"], saved["edit"],
                                       {"ok": True, "category": "CAT10", "model": "fake", "prompt_version": "test"})
         self.assertEqual(tuple(TAXONOMY_CODES), tuple(f"CAT{i:02d}" for i in range(1, 10)))
+
+    def test_participant_contests_category_and_moderator_resolves_with_traceability(self):
+        repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+        access = repo.create_room("Orçamento escolar", "Cenário", "Proposta", ["A", "B"])
+        snap = repo.snapshot(access["code"], access["moderator_token"])
+        proposal = current_proposal(snap)["id"]
+        saved = repo.submit_response(access["code"], access["invitations"][0]["token"],
+                                     proposal, "NAO_ACEITO", "Quero priorizar acessibilidade")
+        repo.apply_classification(access["code"], access["invitations"][0]["token"], proposal,
+                                  saved["id"], saved["edit"],
+                                  {"ok": True, "category": "CAT03", "model": "fake", "prompt_version": "test"})
+        contest_id = repo.suggest_category(access["code"], access["invitations"][0]["token"],
+                                           proposal, saved["id"], "CAT05", saved["edit"])
+        before = repo.snapshot(access["code"], access["moderator_token"])
+        row = current_responses(before)[0]
+        contest = next(c for c in before["category_contests"] if c["id"] == contest_id)
+        self.assertEqual((row["category_ai"], row["category"]), ("CAT03", "CAT03"))
+        self.assertEqual((contest["suggested_category"], contest["status"]), ("CAT05", "PENDENTE"))
+
+        with self.assertRaises(DecisionError):
+            repo.suggest_category(access["code"], access["invitations"][1]["token"],
+                                  proposal, saved["id"], "CAT05", saved["edit"])
+        with self.assertRaises(DecisionError):
+            repo.suggest_category(access["code"], access["invitations"][0]["token"],
+                                  proposal, saved["id"], "CAT10", saved["edit"])
+        with self.assertRaises(DecisionError):
+            repo.suggest_category(access["code"], access["invitations"][0]["token"],
+                                  proposal, saved["id"], "CAT04", saved["edit"])
+
+        repo.set_category(access["code"], access["moderator_token"], proposal,
+                          saved["id"], "CAT05", saved["edit"])
+        after = repo.snapshot(access["code"], access["moderator_token"])
+        row = current_responses(after)[0]
+        contest = next(c for c in after["category_contests"] if c["id"] == contest_id)
+        self.assertEqual((row["category_ai"], row["category"]), ("CAT03", "CAT05"))
+        self.assertEqual((contest["status"], contest["resolved_category"]), ("RESOLVIDA", "CAT05"))
+        exported = research_export(after)
+        self.assertEqual(exported["category_contests"][0]["suggested_category"], "CAT05")
+
+    def test_contest_is_bound_to_response_edit_and_old_trace_is_preserved(self):
+        repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+        access = repo.create_room("Orçamento escolar", "Cenário", "Proposta", ["A", "B"])
+        proposal = current_proposal(repo.snapshot(access["code"], access["moderator_token"]))["id"]
+        token = access["invitations"][0]["token"]
+        saved = repo.submit_response(access["code"], token, proposal, "NAO_ACEITO", "Primeiro texto")
+        repo.apply_classification(access["code"], token, proposal, saved["id"], saved["edit"],
+                                  {"ok": True, "category": "CAT03", "model": "fake", "prompt_version": "test"})
+        repo.suggest_category(access["code"], token, proposal, saved["id"], "CAT05", saved["edit"])
+        edited = repo.submit_response(access["code"], token, proposal, "NAO_ACEITO", "Texto revisado", expected_edit=1)
+        self.assertEqual(edited["edit"], 2)
+        snap = repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(len(snap["category_contests"]), 1)
+        self.assertEqual(snap["category_contests"][0]["response_edit"], 1)
+        self.assertEqual(current_responses(snap)[0]["category"], UNCLASSIFIED)
+        with self.assertRaises(DecisionError):
+            repo.suggest_category(access["code"], token, proposal, saved["id"], "CAT05", 1)
+
+    def test_experimental_no_objection_is_valid_repository_state(self):
+        repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
+        access = repo.create_room("Orçamento escolar", "Cenário", "Proposta", ["A", "B"])
+        proposal = current_proposal(repo.snapshot(access["code"], access["moderator_token"]))["id"]
+        token = access["invitations"][0]["token"]
+        saved = repo.submit_response(access["code"], token, proposal, "ACEITO", "Considero adequado")
+        repo.apply_classification(access["code"], token, proposal, saved["id"], saved["edit"],
+                                  {"ok": True, "category": NO_OBJECTION, "model": "fake", "prompt_version": "test"})
+        self.assertEqual(current_responses(repo.snapshot(access["code"], access["moderator_token"]))[0]["category"], NO_OBJECTION)
 
     def test_api_failure_preserves_response_and_no_fabricated_category(self):
         saved = self.vote(0, "NAO_ACEITO", "Custo")

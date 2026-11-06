@@ -144,6 +144,40 @@ def response_form(repo, ai, snapshot, code, token):
         notify(notice)
         st.rerun()
 
+    if repo.experimental_mode and old:
+        contest = next((c for c in snapshot["category_contests"]
+                        if c["response_id"] == old["id"] and c["response_edit"] == old["edit"]), None)
+        if old["category"] == UNCLASSIFIED:
+            st.caption("Sua categoria ainda não foi definida. Aguarde a classificação/revisão.")
+        elif old["category"] in TAXONOMY_CODES or old["category"] == NO_OBJECTION:
+            st.caption("Categoria atribuída à sua manifestação: " + taxonomy_display(old["category"]))
+            if contest:
+                suggestion = taxonomy_display(contest["suggested_category"])
+                if contest["status"] == "PENDENTE":
+                    st.info("Contestação registrada. Você sugeriu " + suggestion +
+                            ". O moderador definirá a categoria final.")
+                else:
+                    st.success("Contestação revisada. Sugestão do participante: " + suggestion +
+                               " · Categoria final: " + taxonomy_display(contest["resolved_category"]))
+            else:
+                alternatives = [code for code in TAXONOMY_CODES if code != old["category"]]
+                if alternatives:
+                    with st.form(prefix + "_contest"):
+                        suggested = st.selectbox(
+                            "Categoria que considero mais adequada",
+                            alternatives,
+                            format_func=taxonomy_display,
+                            key=prefix + "_suggested_category",
+                        )
+                        contest_submitted = st.form_submit_button("Contestar categoria")
+                    if contest_submitted:
+                        ok, _ = execute(lambda: repo.suggest_category(
+                            code, token, proposal["id"], old["id"], suggested, old["edit"]
+                        ))
+                        if ok:
+                            notify("Contestação registrada. A categoria só muda após revisão do moderador.")
+                            st.rerun()
+
 
 def pareto(snapshot):
     responses = current_responses(snapshot)
@@ -185,22 +219,38 @@ def manifestations(repo, snapshot, code, token):
             if response["category_manual"]:
                 st.caption("Categoria revisada pelo moderador. Sugestão original da IA: " + (response["category_ai"] or "indisponível"))
             if snapshot["actor"]["role"] == "moderator" and snapshot["room"]["state"] == "COLETA":
+                contest = next((c for c in snapshot["category_contests"]
+                                if c["response_id"] == response["id"] and c["response_edit"] == response["edit"]), None)
+                if contest:
+                    st.caption("Contestação do participante: " + taxonomy_display(contest["suggested_category"]) +
+                               " · Status: " + contest["status"].lower())
+                    if contest["status"] == "RESOLVIDA":
+                        st.caption("Categoria final registrada: " + taxonomy_display(contest["resolved_category"]))
                 with st.form("category_" + response["id"] + "_" + str(response["edit"])):
                     if repo.experimental_mode:
-                        current = response["category"] if response["category"] in TAXONOMY_CODES else TAXONOMY_CODES[0]
+                        choices = list(TAXONOMY_CODES)
+                        if response["category"] == NO_OBJECTION:
+                            choices = [NO_OBJECTION] + choices
+                        if contest and contest["status"] == "PENDENTE":
+                            default = contest["suggested_category"]
+                        elif response["category"] in choices:
+                            default = response["category"]
+                        else:
+                            default = choices[0]
                         category = st.selectbox(
                             "Revisar categoria",
-                            TAXONOMY_CODES,
-                            index=TAXONOMY_CODES.index(current),
+                            choices,
+                            index=choices.index(default),
                             format_func=taxonomy_display,
                         )
                     else:
                         category = st.text_input("Revisar categoria", value=response["category"], max_chars=120)
-                    submitted = st.form_submit_button("Salvar categoria")
+                    button_label = "Salvar categoria final" if contest and contest["status"] == "PENDENTE" else "Salvar categoria"
+                    submitted = st.form_submit_button(button_label)
                 if submitted:
                     ok, _ = execute(lambda: repo.set_category(code, token, response["proposal_id"], response["id"], category, response["edit"]))
                     if ok:
-                        notify("Categoria revisada. O texto e a posição do participante foram preservados.")
+                        notify("Categoria revisada. O texto, a posição e a trilha de contestação foram preservados.")
                         st.rerun()
 
 

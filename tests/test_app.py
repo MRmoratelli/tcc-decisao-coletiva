@@ -108,6 +108,36 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertIn(selector.value, tuple(f"CAT{i:02d}" for i in range(1, 10)))
         self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
 
+    def test_participant_can_contest_and_moderator_resolves_in_interface(self):
+        os.environ["EXPERIMENT_MODE"] = "1"
+        repo = Repository(sqlite_path=self.path, experimental_mode=True)
+        access = repo.create_room("Orçamento escolar", "Cenário", "Proposta", ["A", "B"], ai_enabled=True)
+        proposal = current_proposal(repo.snapshot(access["code"], access["moderator_token"]))["id"]
+        token = access["invitations"][0]["token"]
+        saved = repo.submit_response(access["code"], token, proposal, "NAO_ACEITO", "Acessibilidade deve ter prioridade")
+        repo.apply_classification(access["code"], token, proposal, saved["id"], saved["edit"],
+                                  {"ok": True, "category": "CAT03", "model": "fake", "prompt_version": "test"})
+
+        person = self.join(access, 0)
+        suggestion = widget(person, "selectbox", "Categoria que considero mais adequada")
+        suggestion.set_value("CAT05")
+        widget(person, "button", "Contestar categoria").click().run()
+        snap = repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(snap["category_contests"][0]["suggested_category"], "CAT05")
+        self.assertEqual(current_responses(snap)[0]["category"], "CAT03")
+
+        moderator = self.app()
+        widget(moderator, "text_input", "Código da sala").set_value(access["code"])
+        widget(moderator, "text_input", "Credencial individual").set_value(access["moderator_token"])
+        widget(moderator, "button", "Entrar").click().run()
+        selector = widget(moderator, "selectbox", "Revisar categoria")
+        selector.set_value("CAT05")
+        widget(moderator, "button", "Salvar categoria final").click().run()
+        final = repo.snapshot(access["code"], access["moderator_token"])
+        self.assertEqual(current_responses(final)[0]["category"], "CAT05")
+        self.assertEqual(final["category_contests"][0]["status"], "RESOLVIDA")
+        self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
+
     def test_no_api_key_preserves_vote_and_allows_human_workflow(self):
         moderator, access = self.create(enabled=True)
         person = self.join(access, 0)

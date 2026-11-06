@@ -80,6 +80,15 @@ SCHEMA = (
         classification_model TEXT, classification_prompt TEXT,
         edit INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
         UNIQUE(proposal_id, participant_id))""",
+    """CREATE TABLE IF NOT EXISTS dc_category_contests (
+        id TEXT PRIMARY KEY,
+        response_id TEXT NOT NULL REFERENCES dc_responses(id),
+        response_edit INTEGER NOT NULL,
+        participant_id TEXT NOT NULL REFERENCES dc_participants(id),
+        suggested_category TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('PENDENTE','RESOLVIDA')),
+        created_at TEXT NOT NULL, resolved_at TEXT, resolved_category TEXT,
+        UNIQUE(response_id, response_edit))""",
     """CREATE TABLE IF NOT EXISTS dc_mediations (
         id TEXT PRIMARY KEY, room_id TEXT NOT NULL REFERENCES dc_rooms(id),
         proposal_id TEXT NOT NULL REFERENCES dc_proposals(id),
@@ -180,9 +189,10 @@ class Repository:
     def _bump(self, conn, room):
         conn.execute("UPDATE dc_rooms SET revision=revision+1 WHERE id=?", (room["id"],))
 
-    def _validated_category(self, category):
+    def _validated_category(self, category, allow_no_objection=False):
         category = clean(category, "a categoria", 120)
-        if self.experimental_mode and category not in TAXONOMY_CODES:
+        allowed = category in TAXONOMY_CODES or (allow_no_objection and category == NO_OBJECTION)
+        if self.experimental_mode and not allowed:
             raise DecisionError("No modo experimental, escolha uma categoria CAT01–CAT09.")
         return category
 
@@ -237,6 +247,13 @@ class Repository:
                    JOIN dc_participants p ON p.id=r.participant_id
                    WHERE p.room_id=? ORDER BY r.created_at""", (room["id"],),
             ).fetchall()]
+            contests = [dict(c) for c in conn.execute(
+                """SELECT c.*, p.pseudonym FROM dc_category_contests c
+                   JOIN dc_responses r ON r.id=c.response_id
+                   JOIN dc_proposals pr ON pr.id=r.proposal_id
+                   JOIN dc_participants p ON p.id=c.participant_id
+                   WHERE pr.room_id=? ORDER BY c.created_at""", (room["id"],),
+            ).fetchall()]
             mediations = [dict(m) for m in conn.execute(
                 "SELECT * FROM dc_mediations WHERE room_id=? ORDER BY created_at", (room["id"],),
             ).fetchall()]
@@ -244,7 +261,8 @@ class Repository:
                 "SELECT * FROM dc_events WHERE room_id=? ORDER BY created_at", (room["id"],),
             ).fetchall()]
         return {"room": room, "actor": actor, "participants": participants,
-                "proposals": proposals, "responses": responses, "mediations": mediations, "events": events}
+                "proposals": proposals, "responses": responses, "category_contests": contests,
+                "mediations": mediations, "events": events}
 
     def submit_response(self, code, token, proposal_id, position, argument, expected_edit=None):
         if position not in POSITIONS:
@@ -294,7 +312,7 @@ class Repository:
                     or row["edit"] != edit or row["category_manual"]):
                 return False
             status = "OK" if result["ok"] else result.get("failure_code", "FALHA_IA")
-            category = self._validated_category(result["category"]) if result["ok"] else UNCLASSIFIED
+            category = self._validated_category(result["category"], allow_no_objection=True) if result["ok"] else UNCLASSIFIED
             conn.execute("""UPDATE dc_responses SET category_ai=?, category=?, classification_status=?,
                          classification_model=?, classification_prompt=? WHERE id=?""", (
                 category if result["ok"] else None, category, status, result.get("model"),
@@ -306,8 +324,45 @@ class Repository:
             })
         return True
 
+    def suggest_category(self, code, token, proposal_id, response_id, suggested_category, expected_edit):
+        if not self.experimental_mode:
+            raise DecisionError("A contestação controlada está disponível somente no modo experimental.")
+        suggested_category = self._validated_category(suggested_category)
+        with self.transaction(write=True) as conn:
+            room, actor = self._access(conn, code, token, write=True)
+            self._current(room, proposal_id, "COLETA")
+            if actor["role"] != "participant":
+                raise DecisionError("A contestação deve ser registrada pelo próprio participante.")
+            row = conn.execute("SELECT * FROM dc_responses WHERE id=? AND proposal_id=?",
+                               (response_id, proposal_id)).fetchone()
+            if not row or row["participant_id"] != actor["id"]:
+                raise DecisionError("Manifestação não disponível para este acesso.")
+            if row["edit"] != expected_edit:
+                raise DecisionError("A manifestação mudou. Atualize a página antes de contestar a categoria.")
+            if row["category"] == UNCLASSIFIED:
+                raise DecisionError("Aguarde uma classificação antes de registrar contestação.")
+            if suggested_category == row["category"]:
+                raise DecisionError("Escolha uma categoria diferente da classificação atual.")
+            existing = conn.execute(
+                "SELECT id FROM dc_category_contests WHERE response_id=? AND response_edit=?",
+                (response_id, expected_edit),
+            ).fetchone()
+            if existing:
+                raise DecisionError("Já existe uma contestação registrada para esta edição da manifestação.")
+            contest_id, stamp = uid(), now()
+            conn.execute("INSERT INTO dc_category_contests VALUES (?,?,?,?,?,?,?,?,?)", (
+                contest_id, response_id, expected_edit, actor["id"], suggested_category,
+                "PENDENTE", stamp, None, None,
+            ))
+            self._bump(conn, room)
+            self._event(conn, room, proposal_id, actor, "CATEGORIA_CONTESTADA", {
+                "contest_id": contest_id, "response_id": response_id, "edit": expected_edit,
+                "assigned_category": row["category"], "suggested_category": suggested_category,
+            })
+        return contest_id
+
     def set_category(self, code, token, proposal_id, response_id, category, expected_edit=None):
-        category = self._validated_category(category)
+        category = self._validated_category(category, allow_no_objection=True)
         with self.transaction(write=True) as conn:
             room, actor = self._access(conn, code, token, write=True, moderator=True)
             self._current(room, proposal_id, "COLETA")
@@ -317,11 +372,21 @@ class Repository:
                 raise DecisionError("Manifestação não pertence à proposta atual.")
             if expected_edit is not None and row["edit"] != expected_edit:
                 raise DecisionError("O participante editou a justificativa. Atualize antes de revisar a categoria.")
+            contest = conn.execute(
+                """SELECT * FROM dc_category_contests
+                   WHERE response_id=? AND response_edit=? AND status='PENDENTE'""",
+                (response_id, row["edit"]),
+            ).fetchone()
             conn.execute("UPDATE dc_responses SET category=?, category_manual=1 WHERE id=?", (category, response_id))
+            if contest:
+                conn.execute("""UPDATE dc_category_contests
+                    SET status='RESOLVIDA', resolved_at=?, resolved_category=? WHERE id=?""",
+                    (now(), category, contest["id"]))
             self._bump(conn, room)
-            self._event(conn, room, proposal_id, actor, "CATEGORIA_REVISADA", {
-                "response_id": response_id, "previous": row["category"], "category": category,
-            })
+            payload = {"response_id": response_id, "previous": row["category"], "category": category}
+            if contest:
+                payload.update({"contest_id": contest["id"], "participant_suggestion": contest["suggested_category"]})
+            self._event(conn, room, proposal_id, actor, "CATEGORIA_REVISADA", payload)
 
     def set_phase(self, code, token, proposal_id, phase):
         if phase not in ("COLETA", "REVISAO"):
@@ -449,7 +514,7 @@ def consensus(snapshot):
 def research_export(snapshot):
     """Exporta a trilha completa sem credenciais nem aliases pessoais."""
     output = {"schema_version": 1, "exported_at": now(), "max_rounds": MAX_ROUNDS}
-    for section in ("room", "participants", "proposals", "responses", "mediations", "events"):
+    for section in ("room", "participants", "proposals", "responses", "category_contests", "mediations", "events"):
         output[section] = snapshot[section]
     output = json.loads(json.dumps(output, ensure_ascii=False))
     for person in output["participants"] + output["responses"]:
