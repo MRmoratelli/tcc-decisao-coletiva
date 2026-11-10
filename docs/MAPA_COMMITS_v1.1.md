@@ -1,33 +1,46 @@
-# Mapa de commits — protocolo experimental v1.1
+# Mapa de commits — protocolo experimental v1.1 e hardening de deploy
 
 ## Escopo e governança
 
-Repositório: `MRmoratelli/tcc-decisao-coletiva`. Branch: `feat/protocolo-experimental-v1`. PR [#4](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/4) aberto/em rascunho, sem merge. Referência de `main`: `b342030bb80eb4d03ff0ee39cb5d7751bfc88336`. Este mapa não comprova deploy.
+Repositório: `MRmoratelli/tcc-decisao-coletiva`. Branch: `feat/protocolo-experimental-v1`. PR [#4](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/4) permanece aberto/em rascunho, sem merge. Referência de `main`: `b342030bb80eb4d03ff0ee39cb5d7751bfc88336`.
 
-Os SHAs 1–8 abaixo foram conferidos na lista de commits do PR. Não foram reescritos pelo commit documental. A implementação funcional documentada termina no Commit 8; o Commit 9 altera somente Markdown.
+Os Commits 1–8 implementam o protocolo funcional; o Commit 9 consolida a documentação v1.1. Os Commits 10–11 surgiram durante a configuração real do deploy de teste no Streamlit/Neon e adicionaram diagnóstico seguro de PostgreSQL. O commit de regularização posterior mantém essa capacidade, restaura a compatibilidade da interface experimental com a fixture SQLite dos testes e adiciona cobertura automatizada. Nenhuma dessas alterações modifica regra decisória, condição A/B, taxonomia, cenário, mediação ou exportação científica.
 
 | Nº | SHA | Mensagem | Entrega principal |
 |---|---|---|---|
-| 1 | [`d499520cfe1928938d9097a679ff4efaa1a3ab45`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/d499520cfe1928938d9097a679ff4efaa1a3ab45) | `feat: introduz modo experimental e taxonomia controlada` | EXPERIMENT_MODE, configuração e CAT01–CAT09 |
-| 2 | [`914137c5a23045489c1429b5f67deedf08bed41a`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/914137c5a23045489c1429b5f67deedf08bed41a) | `feat: adiciona contestação rastreável de categoria` | Contestação ligada à manifestação/edição e categoria final humana |
-| 3 | [`ab2d9428feafae1c1ba9079057f469827c894cad`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/ab2d9428feafae1c1ba9079057f469827c894cad) | `privacy: minimiza identificação, logs e dados enviados à IA` | P01…Pn, sanitização, metadados mínimos e M01…Mn externos |
-| 4 | [`7d09536c5167d34b93aed2133d446aa9690d7662`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/7d09536c5167d34b93aed2133d446aa9690d7662) | `feat: aplica visibilidade cega antes da própria manifestação` | Bloqueio por participante/proposta, sem agregados ou histórico antes da resposta |
-| 5 | [`13bda09475275f0ea6b9381d97f683aba785ac5c`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/13bda09475275f0ea6b9381d97f683aba785ac5c) | `feat: padroniza condição B e rastreia revisão humana` | Template manual B, coverage e vínculo sugestão → revisão → publicação |
-| 6 | [`d4d0ed1b2b2f1c925a3dd581661c21d231d78181`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/d4d0ed1b2b2f1c925a3dd581661c21d231d78181) | `feat: implementa protocolo experimental de falhas` | Modelo único, fallback de classificação, duas execuções de mediação e gate PostgreSQL |
-| 7 | [`ed4b1cb12ca175b7efd6a8cf98d70385b07b6c15`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/ed4b1cb12ca175b7efd6a8cf98d70385b07b6c15) | `feat: completa rastreabilidade e exportação experimental` | Schema 2, identidade histórica/exportador, APP_COMMIT e trilhas legíveis |
-| 8 | [`25eff66cb970b63abb2b4561fb01793546f262f2`](https://github.com/MRmoratelli/tcc-decisao-coletiva/commit/25eff66cb970b63abb2b4561fb01793546f262f2) | `feat: valida restrições do cenário experimental` | Cenário escolar, V1 oficial e alocações financeiras validadas/rastreáveis |
-| 9 | Identidade do próprio commit documental no Git; comando abaixo | `docs: consolida protocolo experimental v1.1` | README vigente, protocolo, checklist, histórico e conferência documental; sem alteração funcional |
+| 1 | `d499520cfe1928938d9097a679ff4efaa1a3ab45` | `feat: introduz modo experimental e taxonomia controlada` | EXPERIMENT_MODE, configuração e CAT01–CAT09 |
+| 2 | `914137c5a23045489c1429b5f67deedf08bed41a` | `feat: adiciona contestação rastreável de categoria` | Contestação ligada à manifestação/edição e categoria final humana |
+| 3 | `ab2d9428feafae1c1ba9079057f469827c894cad` | `privacy: minimiza identificação, logs e dados enviados à IA` | P01…Pn, sanitização, metadados mínimos e M01…Mn externos |
+| 4 | `7d09536c5167d34b93aed2133d446aa9690d7662` | `feat: aplica visibilidade cega antes da própria manifestação` | Bloqueio por participante/proposta |
+| 5 | `13bda09475275f0ea6b9381d97f683aba785ac5c` | `feat: padroniza condição B e rastreia revisão humana` | Template manual B, coverage e revisão humana |
+| 6 | `d4d0ed1b2b2f1c925a3dd581661c21d231d78181` | `feat: implementa protocolo experimental de falhas` | Modelo único, fallback de classificação, duas execuções de mediação e gate PostgreSQL |
+| 7 | `ed4b1cb12ca175b7efd6a8cf98d70385b07b6c15` | `feat: completa rastreabilidade e exportação experimental` | Schema 2, APP_COMMIT e trilhas |
+| 8 | `25eff66cb970b63abb2b4561fb01793546f262f2` | `feat: valida restrições do cenário experimental` | Cenário escolar e alocações financeiras |
+| 9 | `75a43517a0ec207e54c301b01524283e2d9064ee` | `docs: consolida protocolo experimental v1.1` | Documentação v1.1; CI 142/84 |
+| 10 | `1219e6f330f34faff7deed4bc5a83010ab26f295` | `chore: add safe database diagnostics for experimental deploy` | Diagnóstico de falha de conexão sem exibir URL/segredos |
+| 11 | `a228f7775ed97a2adc47386fe057b639455e6015` | `chore: classify safe postgres connection diagnostics` | Classificação segura: autenticação, DNS, timeout, SSL, conexão recusada, rede ou genérica |
+| 12 | Identidade no Git do commit de regularização | `chore: regulariza diagnostico postgres do deploy` | Remove gate prematuro que quebrou os testes, mantém diagnóstico seguro testável e registra o hardening |
 
-## Identificar o SHA do Commit 9 sem inventar autorreferência
+## Incidente e regularização
 
-Este mapa integra o próprio Commit 9. Inserir literalmente o hash desse commit no seu conteúdo alteraria o hash que se tenta registrar. Por isso, seu SHA real deve ser obtido no metadado Git ou no relatório final da operação, não por placeholder com aparência de SHA e não por um commit posterior de preenchimento.
+O Commit 11 falhou no workflow `Regras e interface`: 142 testes foram iniciados, com 1 falha e 25 erros de interface; a etapa PostgreSQL foi pulada. A causa foi o gate prematuro em `app.main()` que abortava a interface experimental quando `DATABASE_URL` estava ausente, impedindo a fixture SQLite controlada dos testes de interface.
 
-```bash
-git log --all --format='%H %s' --grep='^docs: consolida protocolo experimental v1\.1$'
-```
+A regularização restaura o desenho anterior: sem `DATABASE_URL`, a aplicação pode renderizar em SQLite e o gate de criação experimental continua sendo `experimental_storage_ready`. Quando uma `DATABASE_URL` real é fornecida e a construção do repositório falha, a interface exibe somente tipo/categoria/SQLSTATE, nunca a mensagem bruta da exceção, URL, usuário ou senha.
 
-Também é possível conferir o [histórico da branch](https://github.com/MRmoratelli/tcc-decisao-coletiva/commits/feat/protocolo-experimental-v1) e a lista de commits do PR #4, verificando mensagem e pai direto `25eff66cb970b63abb2b4561fb01793546f262f2`. Esse comando é de leitura e não faz merge/deploy.
+Há teste específico para garantir a classificação e a ausência da mensagem potencialmente sensível no retorno do helper. O CI completo do Commit 12 deve ser a evidência de regularização; não considerar a branch candidata a congelamento enquanto esse CI não estiver verde.
 
-## Próxima etapa
+## Deploy de teste
 
-**AUDITORIA FINAL DO PACOTE EXPERIMENTAL v1.1**, solicitada separadamente, deve conferir Commits 1–9, PR/CI, protocolo, documentação, exportação, privacidade, A/B, cenário, D16/D17 e configuração de deploy/readiness. Este mapa não executa a auditoria, não autoriza piloto e não propõe Commit 10.
+O deploy de teste foi configurado no Streamlit Community Cloud para a branch `feat/protocolo-experimental-v1`, com PostgreSQL Neon. A conexão foi validada após correção de autenticação. Isso é evidência operacional de ambiente de teste, não resultado científico e não autoriza coleta real.
+
+`APP_COMMIT` deve ser atualizado para o SHA do head efetivamente selecionado quando a build candidata for congelada. O valor declarado não prova sozinho o build implantado.
+
+## Próximos gates
+
+1. CI completo verde no commit de regularização.
+2. Atualizar `APP_COMMIT` no deploy para o novo head após o CI.
+3. Executar dry-run B e A em trilha dedicada.
+4. Fechar D16 e calibração D20.
+5. Somente depois definir o SHA candidato ao congelamento experimental.
+
+O PR #4 permanece draft e a `main` não deve ser alterada nesta etapa.

@@ -226,6 +226,35 @@ class StreamlitFlowTests(unittest.TestCase):
         widget(moderator, "button", "Salvar mediação manual").click().run()
         self.assertFalse(moderator.exception, [str(e) for e in moderator.exception])
 
+    def test_database_connection_diagnostic_is_safe_and_classified(self):
+        from app import database_connection_diagnostic
+
+        class AuthError(Exception):
+            sqlstate = "28P01"
+
+        auth = database_connection_diagnostic(
+            AuthError("password authentication failed for user segredo@example.org")
+        )
+        self.assertEqual(auth["error_type"], "AuthError")
+        self.assertEqual(auth["category"], "AUTENTICACAO")
+        self.assertEqual(auth["sqlstate"], "28P01")
+        self.assertNotIn("segredo@example.org", str(auth))
+
+        cases = (
+            ("could not translate host name banco-invalido", "HOST_DNS"),
+            ("connection timed out", "TIMEOUT"),
+            ("SSL certificate verify failed", "SSL"),
+            ("connection refused", "CONEXAO_RECUSADA"),
+            ("network is unreachable", "REDE"),
+            ("falha não classificada", "CONEXAO_POSTGRESQL"),
+        )
+        for message, expected in cases:
+            with self.subTest(expected=expected):
+                result = database_connection_diagnostic(RuntimeError(message))
+                self.assertEqual(result["category"], expected)
+                self.assertIsNone(result["sqlstate"])
+                self.assertNotIn(message, str(result))
+
     def test_visibility_helper_requires_own_response_to_active_proposal(self):
         from app import participant_has_current_response, participant_visibility_blocked
         snap = {"actor": {"role": "participant", "id": "self"},
