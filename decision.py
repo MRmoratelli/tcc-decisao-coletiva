@@ -241,11 +241,13 @@ class Connection:
 
 
 class Repository:
-    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3", experimental_mode=False, app_commit=None):
+    def __init__(self, database_url="", sqlite_path="data/decisoes.sqlite3", experimental_mode=False, app_commit=None,
+                 checkout_commit=None):
         self.url = database_url.strip()
         self.postgres = self.url.startswith(("postgres://", "postgresql://"))
         self.experimental_mode = bool(experimental_mode)
         self.app_commit = declared_app_commit(os.getenv("APP_COMMIT") if app_commit is None else app_commit)
+        self.checkout_commit = declared_app_commit(checkout_commit)
         if self.url and not self.postgres:
             raise DecisionError("DATABASE_URL deve ser uma conexão PostgreSQL.")
         self.path = str(Path(sqlite_path).resolve())
@@ -324,9 +326,10 @@ class Repository:
         if (not isinstance(configuration, dict) or any(
                 not isinstance(configuration.get(k), str) or not configuration[k].strip()
                 or len(configuration[k]) > 200 for k in required)
-                or configuration.get("temperature") != 0):
+                or "temperature" not in configuration or configuration["temperature"] is not None
+                or configuration.get("temperature_policy") != "provider_default"):
             raise DecisionError("Configuração experimental de IA inválida.")
-        configuration = {k: configuration[k] for k in (*required, "temperature")}
+        configuration = {k: configuration[k] for k in (*required, "temperature", "temperature_policy")}
         existing = self._ai_configuration(conn, room)
         if existing is not None and existing != configuration:
             raise DecisionError("A configuração de IA difere da fixada nesta sessão. Restaure a configuração original ou cancele a sessão; não prossiga com outra configuração.")
@@ -458,7 +461,8 @@ class Repository:
                 "max_mediation_executions": MAX_MEDIATION_EXECUTIONS,
                 "defined_prompt_versions": {"classification": CLASSIFICATION_VERSION, "mediation": MEDIATION_VERSION},
                 "experimental_mode": self.experimental_mode,
-                "storage_type": "postgresql" if self.postgres else "sqlite", "app_commit": self.app_commit}
+                "storage_type": "postgresql" if self.postgres else "sqlite", "app_commit": self.app_commit,
+                "checkout_commit": self.checkout_commit}
 
     def snapshot(self, code, token):
         with self.transaction() as conn:
@@ -551,6 +555,9 @@ class Repository:
             self._bump(conn, room)
             self._event(conn, room, proposal_id, actor, "CLASSIFICACAO_IA", {
                 "response_id": response_id, "edit": edit, "category": category, "status": status,
+                "duration_ms": result.get("duration_ms"), "sdk_version": result.get("sdk_version"),
+                "diagnostics": {k: v for k, v in result.get("details", {}).get("diagnostics", {}).items()
+                                if k in ("stage", "error_type", "http_status", "reason", "sdk_version")},
             })
         return True
 
@@ -852,7 +859,8 @@ _EXPORT_PRIVATE_KEYS = frozenset({
     "secrets", "streamlit_secrets", "credentials",
 })
 _RUNTIME_FIELDS = ("experiment_release", "experiment_config_version", "taxonomy_version", "max_rounds",
-                   "max_mediation_executions", "defined_prompt_versions", "experimental_mode", "storage_type", "app_commit")
+                   "max_mediation_executions", "defined_prompt_versions", "experimental_mode", "storage_type", "app_commit",
+                   "checkout_commit")
 
 
 def _export_safe(value):
@@ -900,6 +908,8 @@ def _experiment_manifest(snapshot, events, exported_at):
         "max_mediation_executions": identity.get("max_mediation_executions", MAX_MEDIATION_EXECUTIONS),
         "exported_at": exported_at,
     })
+    if "temperature_policy" in fixed:
+        manifest["temperature_policy"] = fixed["temperature_policy"]
     # Identidade do exportador não é retroatribuída a uma sessão antiga.
     runtime["app_commit_source"] = "APP_COMMIT da configuração da implantação; não verificado externamente"
     runtime["build_changed_since_session_start"] = (
@@ -986,6 +996,12 @@ def research_export(snapshot):
         last_failure = failures[-1] if failures else None
         item["classification_failure_code"] = (last_failure["payload"].get("failure_code") or last_failure["payload"].get("status")) if last_failure else None
         item["classification_failure_event_id"] = last_failure["id"] if last_failure else None
+        calls = [e for e in related if e["action"] == "CLASSIFICACAO_IA"]
+        if calls:
+            last_call = calls[-1]["payload"]
+            item["classification_duration_ms"] = last_call.get("duration_ms")
+            item["classification_sdk_version"] = last_call.get("sdk_version")
+            item["classification_diagnostics"] = last_call.get("diagnostics")
         item["classification_fallback"] = row["classification_status"] == "FALLBACK_HUMANO"
         item["classification_fallback_event_id"] = fallbacks[-1]["id"] if fallbacks else None
         item["round"] = proposals[row["proposal_id"]]["round"]

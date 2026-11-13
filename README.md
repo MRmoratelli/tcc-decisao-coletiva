@@ -116,7 +116,7 @@ As variáveis de ambiente têm prioridade sobre `.streamlit/secrets.toml`/Secret
 EXPERIMENT_MODE = "1"
 DATABASE_URL = "postgresql://USUARIO:SENHA@HOST:5432/BANCO?sslmode=require"
 GEMINI_API_KEY = "SUBSTITUIR_FORA_DO_REPOSITORIO"
-GEMINI_MODEL = "SUBSTITUIR_PELO_MODELO_VALIDADO_NA_CONTA"
+GEMINI_MODEL = "gemini-3.5-flash-lite" # candidato técnico; validar na conta antes de usar
 # APP_COMMIT deve ser o SHA da build efetivamente selecionada; não preencher com suposição.
 # APP_COMMIT = "SHA_HEXADECIMAL_DA_BUILD"
 ```
@@ -131,13 +131,15 @@ GEMINI_MODEL = "SUBSTITUIR_PELO_MODELO_VALIDADO_NA_CONTA"
 | `APP_COMMIT` | Build declarada, hexadecimal de 7–40 caracteres; ausente/inválida vira `null`, sem bloquear criação |
 | `SQLITE_PATH` | Caminho de SQLite para demonstração/testes, não substitui PostgreSQL no experimento |
 
-Em A são fixados por sessão modelo, versões de prompts, taxonomia e temperatura 0. Configuração divergente bloqueia continuidade. `APP_COMMIT` não consulta GitHub, não prova deploy e não é inferido de `main`. A modalidade/conta Gemini continua em **D16**. Não há autorização de deploy nesta documentação; a conferência manual futura pertence ao checklist.
+Em A são fixados por sessão modelo, versões de prompts, taxonomia e política `temperature_policy=provider_default`, com `temperature=null`. O campo de temperatura é omitido da requisição; não se presume um valor numérico ou determinismo do provedor. O default experimental candidato é `gemini-3.5-flash-lite`; `GEMINI_MODEL` explícito continua tendo prioridade. O modo genérico mantém seu default e as regras de fallback anteriores; B não chama IA. Configuração divergente bloqueia continuidade. Sessões antigas conservam a configuração original: não continuar uma sala com outra configuração nem reescrever seu histórico.
+
+`APP_COMMIT` continua uma declaração, não prova de deploy. `checkout_commit` registra separadamente o HEAD lido do checkout Git sem alterações rastreadas, quando verificável; em ausência/erro retorna `null`, sem inferir a partir da declaração ou do HEAD remoto. A identidade da sessão não é retroatribuída pelo exportador. A modalidade/conta Gemini continua em **D16**. A conferência técnica não fecha G06/G10 nem libera experimento científico. Ver [recuperação técnica Gemini](docs/RECUPERACAO_GEMINI_v1.0.md).
 
 ## Arquitetura, exportação e testes
 
 `Prototipo TCC.py` chama `app.main()`. `app.py` contém interface/gates; `decision.py`, regras/transações e export; `ai_service.py`, integração/sanitização/validação de saída; `experiment_config.py`, versões, taxonomia e cenário. Há sete entidades operacionais, incluindo `dc_category_contests`. O mapeamento formal de RF/RNF permanece no pacote documental externo do TCC; não foram inventados IDs neste repositório.
 
-JSON schema 2 é o pacote de pesquisa/auditoria; CSV é uma visão simplificada. `experiment` descreve a identidade histórica registrada; `exporter`, o ambiente que gerou o arquivo. O JSON encadeia configuração, propostas, manifestações, classificações, contestações/fallbacks, mediações, revisões e encerramento. Campos ausentes em sessões antigas não são inventados. Edições guardam metadados; textos substituídos em uma mesma manifestação não são reconstruídos integralmente.
+JSON schema 2 é o pacote de pesquisa/auditoria; CSV é uma visão simplificada. `experiment` descreve a identidade histórica registrada; `exporter`, o ambiente que gerou o arquivo. O JSON encadeia configuração, propostas, manifestações, classificações, contestações/fallbacks, mediações, revisões e encerramento. Classificações IA passam a registrar duração/SDK e diagnóstico seguro nos eventos/JSON; mediações preservam duração e SDK em seus detalhes. O CSV mantém o contrato anterior. Campos ausentes em sessões antigas não são inventados. Edições guardam metadados; textos substituídos em uma mesma manifestação não são reconstruídos integralmente.
 
 ```bash
 # SQLite + IA simulada + Streamlit; em shells POSIX:
@@ -146,11 +148,11 @@ APP_TESTS_REQUIRED=1 GEMINI_API_KEY='' python -m unittest discover -s tests -v
 python -m unittest discover -s tests -p test_decision.py -v
 ```
 
-Não aponte `TEST_DATABASE_URL` para dados de pesquisa: a suíte cria salas e não limpa todos os registros. O workflow [Regras e interface](.github/workflows/tests.yml) usa Python 3.12 e PostgreSQL temporário. Baseline funcional do Commit 8: **142 testes SQLite/IA simulada/Streamlit e 84 testes de regras repetidos em PostgreSQL, aprovados** ([execução](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/42259638747)). O CI do commit documental deve confirmar as mesmas contagens; consulte o [PR #4](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/4).
+Não aponte `TEST_DATABASE_URL` para dados de pesquisa: a suíte cria salas e não limpa todos os registros. O workflow [Regras e interface](.github/workflows/tests.yml) usa Python 3.12 e PostgreSQL temporário. Referência anterior à recuperação: **143 testes gerais e 84 de regras PostgreSQL**, no [CI d07d15d](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/42733999999). A recuperação acrescenta testes de configuração, SDK, cobertura e identidade; as contagens/resultados do candidato devem ser conferidos no CI de seu SHA exato, sem tratar testes novos como execuções científicas. Consulte o [PR #4](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/4).
 
 ## Limites e próximos gates
 
-Não houve experimento científico nesta entrega. Testes automatizados não comprovam utilidade, fidelidade, neutralidade, precisão em português, satisfação, SUS, melhora decisória ou causalidade. A amostra prevista é pequena e a análise deverá ser predominantemente descritiva, sem generalização automática. Temperatura 0 não garante determinismo; a IA pode omitir, distorcer ou direcionar, exigindo revisão e avaliação. As dependências usam faixas de versões; o ambiente efetivo também precisa ser registrado antes da coleta.
+Não houve experimento científico nesta entrega. Testes automatizados não comprovam utilidade, fidelidade, neutralidade, precisão em português, satisfação, SUS, melhora decisória ou causalidade. A amostra prevista é pequena e a análise deverá ser predominantemente descritiva, sem generalização automática. O padrão do provedor não garante determinismo; a IA pode omitir, distorcer ou direcionar, exigindo revisão e avaliação. O SDK google-genai está fixado em 2.34.0; as demais dependências usam faixas e o ambiente efetivo precisa ser registrado antes da coleta.
 
 **D16:** modalidade/conta Gemini a definir. **D17:** confirmar com orientador origem dos participantes, consentimento e exigências institucionais de ética/CEP/TCLE, conforme aplicável. Não concluir esses itens automaticamente. Instrumentos, avaliação objetiva D20 e tratamento científico posterior não foram implementados por este commit.
 

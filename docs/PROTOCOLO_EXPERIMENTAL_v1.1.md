@@ -201,11 +201,13 @@ Falha de banco mostra erro e interrompe a operação; não há reconstrução ma
 | `MAX_ROUNDS` | 3 |
 | `MAX_MEDIATION_EXECUTIONS` | 2 por proposta/revisão |
 
-A revisão documental v1.1 **não altera** as constantes de release ou de prompt. A sessão A fixa configuração não secreta por evento `CONFIGURACAO_IA_FIXADA`: modelo, versões de classificação/mediação, taxonomia e temperatura 0. Divergência bloqueia a continuidade com outra configuração; restaurar a original ou cancelar. Isso não garante determinismo de um serviço externo nem fixa todas as condições internas do provedor.
+A revisão documental v1.1 **não altera** as constantes de release ou de prompt. A recuperação técnica de 13/11/2026 configura `gemini-3.5-flash-lite` como default experimental candidato, preservando `GEMINI_MODEL` explícito. A sessão A fixa configuração não secreta por evento `CONFIGURACAO_IA_FIXADA`: modelo, versões de classificação/mediação, taxonomia, `temperature_policy=provider_default` e `temperature=null`. O parâmetro não é enviado; o valor numérico efetivo é desconhecido. Divergência bloqueia a continuidade com outra configuração; restaurar a original ou cancelar. Sessões antigas mantêm o valor histórico 0 quando registrado, sem conversão retroativa. Isso não garante determinismo de um serviço externo nem fixa todas as condições internas do provedor.
 
 `APP_COMMIT` vem da configuração da implantação; aceita hexadecimal de 7–40 caracteres e ausente/inválido fica `null`. Não é consultado no GitHub, não é inferido da `main` e não comprova o código implantado. É registrado na criação da sessão, separado do build do exportador. Sua ausência não bloqueia criação no código, mas deve ser resolvida no precheck. Chave ausente também não é gate de criação; em A resulta em falha `SEM_CHAVE`, razão para verificar a configuração antes de uso com participantes.
 
 As configurações operacionais e exemplos sem segredos estão no [README](../README.md#executar-e-configurar). D16 continua aberta: a conta/modalidade Gemini e a disponibilidade do modelo precisam ser confirmadas, não inferidas do default codificado.
+
+`checkout_commit` acrescenta observação independente do HEAD Git do checkout limpo, ou `null` quando indisponível. A declaração APP_COMMIT não é usada como fallback dessa observação. Eventos históricos e a identidade do exportador continuam separados. Classificações IA acrescentam duração, versão do SDK e diagnóstico seguro em eventos/JSON; o contrato CSV e as regras de A/B permanecem os mesmos. A alteração de integração não encerra G06/G10, não aprova D16 e não altera D19/D20.
 
 ## 14. PostgreSQL e arquitetura operacional
 

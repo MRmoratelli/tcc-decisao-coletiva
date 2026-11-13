@@ -8,7 +8,8 @@ from pathlib import Path
 
 import streamlit as st
 
-from ai_service import AIService, DEFAULT_MODEL, FAILURE_MESSAGES, failure_message
+from ai_service import AIService, DEFAULT_MODEL, DEFAULT_EXPERIMENT_MODEL, FAILURE_MESSAGES, failure_message
+from build_identity import checkout_commit
 from experiment_config import (
     CLASSIFICATION_FAILURE_CODES, TAXONOMY_CODES, TECHNICAL_CANCEL_REASON, taxonomy_display,
     SCENARIO_THEME, SCENARIO_CONTEXT, SCENARIO_INITIAL_TEXT, validate_scenario_allocation,
@@ -57,9 +58,10 @@ def database_connection_diagnostic(error):
 
 
 @st.cache_resource
-def repository(database_url, sqlite_path, experimental_mode, app_commit=None):
+def repository(database_url, sqlite_path, experimental_mode, app_commit=None, observed_commit=None):
     # Compartilha apenas a configuração. Conexões são abertas por transação.
-    return Repository(database_url=database_url, sqlite_path=sqlite_path, experimental_mode=experimental_mode, app_commit=app_commit)
+    return Repository(database_url=database_url, sqlite_path=sqlite_path, experimental_mode=experimental_mode,
+                      app_commit=app_commit, checkout_commit=observed_commit)
 
 
 def notify(message):
@@ -629,6 +631,7 @@ def export_panel(snapshot):
     if experimental:
         st.caption("Versão experimental: " + (dataset["experiment"]["experiment_release"] or "não registrada nesta sessão"))
         st.caption("Build: " + (dataset["experiment"]["app_commit"] or "não informado"))
+        st.caption("Checkout Git verificado: " + (dataset["exporter"].get("checkout_commit") or "indisponível"))
         if dataset["exporter"]["app_commit"] != dataset["experiment"]["app_commit"]:
             st.caption("Build do exportador: " + (dataset["exporter"]["app_commit"] or "não informado"))
         st.caption("APP_COMMIT é declarado na configuração da implantação; não comprova por si só qual código foi implantado.")
@@ -763,7 +766,7 @@ def main():
     experimental_mode = setting("EXPERIMENT_MODE", "").strip().lower() in ("1", "true", "yes", "on")
     database_url = setting("DATABASE_URL")
     try:
-        repo = repository(database_url, sqlite_path, experimental_mode, setting("APP_COMMIT"))
+        repo = repository(database_url, sqlite_path, experimental_mode, setting("APP_COMMIT"), checkout_commit())
     except Exception as error:
         diagnostic = database_connection_diagnostic(error)
         st.error("O armazenamento não está disponível. A conexão PostgreSQL falhou.")
@@ -772,7 +775,7 @@ def main():
             + (f" | SQLSTATE {diagnostic['sqlstate']}" if diagnostic["sqlstate"] else "")
         )
         return
-    models = [setting("GEMINI_MODEL", DEFAULT_MODEL)]
+    models = [setting("GEMINI_MODEL", DEFAULT_EXPERIMENT_MODEL if experimental_mode else DEFAULT_MODEL)]
     if not experimental_mode:
         models += [m.strip() for m in setting("GEMINI_FALLBACK_MODELS").split(",") if m.strip()]
     ai = AIService(setting("GEMINI_API_KEY"), models=models, experimental_mode=experimental_mode)

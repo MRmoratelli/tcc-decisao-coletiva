@@ -643,7 +643,7 @@ class ExperimentalFailureProtocolTests(unittest.TestCase):
         self.token = self.access["invitations"][0]["token"]
         self.saved = self.repo.submit_response(self.code, self.token, self.proposal, "NAO_ACEITO", "Preservar esta justificativa")
         self.config = {"model": "primary", "classification_prompt": "classificacao-v1", "mediation_prompt": "mediacao-v1",
-                       "taxonomy_version": "taxonomia-v1", "temperature": 0}
+                       "taxonomy_version": "taxonomia-v1", "temperature": None, "temperature_policy": "provider_default"}
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -846,7 +846,8 @@ class ExperimentalExportTests(unittest.TestCase):
         with patch.dict(os.environ, {"APP_COMMIT": self.build}):
             self.repo = Repository(os.getenv("TEST_DATABASE_URL", ""), sqlite_path=self.path, experimental_mode=True)
         self.config = {"model": "modelo-fixado", "classification_prompt": CLASSIFICATION_VERSION,
-                       "mediation_prompt": MEDIATION_VERSION, "taxonomy_version": TAXONOMY_VERSION, "temperature": 0}
+                       "mediation_prompt": MEDIATION_VERSION, "taxonomy_version": TAXONOMY_VERSION,
+                       "temperature": None, "temperature_policy": "provider_default"}
         self.create(True)
 
     def tearDown(self):
@@ -879,7 +880,8 @@ class ExperimentalExportTests(unittest.TestCase):
         self.assertEqual(manifest["model"], self.config["model"])
         self.assertEqual(manifest["classification_prompt_version"], CLASSIFICATION_VERSION)
         self.assertEqual(manifest["mediation_prompt_version"], MEDIATION_VERSION)
-        self.assertEqual(manifest["temperature"], 0)
+        self.assertIsNone(manifest["temperature"])
+        self.assertEqual(manifest["temperature_policy"], "provider_default")
         self.assertEqual(manifest["app_commit"], self.build)
         self.assertEqual(manifest["storage_type"], "postgresql" if self.repo.postgres else "sqlite")
         self.assertEqual(manifest["exported_at"], data["exported_at"])

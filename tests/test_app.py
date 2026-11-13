@@ -657,6 +657,18 @@ class StreamlitFlowTests(unittest.TestCase):
             self.assertFalse(person.get("download_button"))
             self.assertNotIn("Build:", self.rendered_text(person))
 
+    def test_experimental_default_candidate_is_used_when_model_is_unset(self):
+        import streamlit as st
+        with patch.dict(os.environ, {"EXPERIMENT_MODE": "1", "GEMINI_API_KEY": ""}), \
+             patch("app.st.download_button", wraps=st.download_button) as downloads:
+            os.environ.pop("GEMINI_MODEL", None)
+            moderator, _ = self.create(enabled=True)
+            call = next(c for c in reversed(downloads.call_args_list) if c.args[0] == "Baixar histórico completo (JSON)")
+            manifest = json.loads(call.args[1])["experiment"]
+            self.assertEqual(manifest["model"], "gemini-3.5-flash-lite")
+            self.assertEqual(manifest["temperature_policy"], "provider_default")
+            self.assertFalse(moderator.exception)
+
     def test_first_a_export_uses_recorded_model_configuration_and_missing_build_is_explicit(self):
         import streamlit as st
         with patch.dict(os.environ, {"EXPERIMENT_MODE": "1", "APP_COMMIT": "", "GEMINI_MODEL": "modelo-de-teste"}), \
@@ -668,7 +680,8 @@ class StreamlitFlowTests(unittest.TestCase):
             self.assertEqual(manifest["model"], "modelo-de-teste")
             self.assertEqual(manifest["classification_prompt_version"], "classificacao-v1")
             self.assertEqual(manifest["mediation_prompt_version"], "mediacao-v1")
-            self.assertEqual(manifest["temperature"], 0)
+            self.assertIsNone(manifest["temperature"])
+            self.assertEqual(manifest["temperature_policy"], "provider_default")
             self.assertEqual(manifest["ai_configuration_status"], "recorded")
             self.assertIsNone(manifest["app_commit"])
             self.assertIn("Build: não informado", self.rendered_text(moderator))

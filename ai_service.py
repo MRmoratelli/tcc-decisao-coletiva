@@ -27,6 +27,16 @@ def sanitize_external_text(text):
 
 
 DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_EXPERIMENT_MODEL = "gemini-3.5-flash-lite"
+
+
+def sdk_version():
+    try:
+        return metadata.version("google-genai")
+    except metadata.PackageNotFoundError:
+        return None
+
+
 FAILURE_MESSAGES = {
     "SEM_CHAVE": "A chave Gemini não foi configurada. O registro das manifestações continua disponível.",
     "COTA_OU_LIMITE": "A API atingiu um limite de uso. Tente novamente mais tarde ou faça a mediação humana.",
@@ -120,7 +130,8 @@ def nonempty(value, limit):
 class AIService:
     def __init__(self, api_key="", models=None, client_factory=None, experimental_mode=False):
         self.api_key = api_key
-        self.models = list(dict.fromkeys(models or [DEFAULT_MODEL]))[:3]
+        default = DEFAULT_EXPERIMENT_MODEL if experimental_mode else DEFAULT_MODEL
+        self.models = list(dict.fromkeys(models or [default]))[:3]
         self.client_factory = client_factory
         self.experimental_mode = bool(experimental_mode)
         if self.experimental_mode:
@@ -130,7 +141,7 @@ class AIService:
         """Somente configuração não secreta necessária para impedir troca na sessão."""
         return {"model": self.models[0], "classification_prompt": CLASSIFICATION_VERSION,
                 "mediation_prompt": MEDIATION_VERSION, "taxonomy_version": TAXONOMY_VERSION,
-                "temperature": 0}
+                "temperature": None, "temperature_policy": "provider_default"}
 
     def _call_with_retry(self, client, **kwargs):
         for attempt in range(3):
@@ -144,7 +155,8 @@ class AIService:
 
     def _generate(self, instruction, data, schema, validator, prompt_version):
         start = time.monotonic()
-        result = {"origin": "IA", "ok": False, "prompt_version": prompt_version, "model": None}
+        result = {"origin": "IA", "ok": False, "prompt_version": prompt_version, "model": None,
+                  "sdk_version": sdk_version()}
         if not self.api_key:
             return result | {"failure_code": "SEM_CHAVE", "duration_ms": 0}
         client = None
@@ -159,18 +171,22 @@ class AIService:
                 result["model"] = model
                 try:
                     stage = "API_CALL"
+                    config = {"system_instruction": instruction,
+                              "response_mime_type": "application/json", "response_json_schema": schema}
+                    if not self.experimental_mode and not model.startswith("gemini-3"):
+                        config["temperature"] = 0
                     response = self._call_with_retry(client,
                         model=model,
                         contents=json.dumps(data, ensure_ascii=False),
-                        config={"system_instruction": instruction, "temperature": 0,
-                                "response_mime_type": "application/json", "response_json_schema": schema},
+                        config=config,
                     )
                     stage = "RESPONSE_VALIDATION"
                     payload = json.loads(response.text or "")
                     validated = validator(payload)
                     result.pop("failure_code", None)
                     result.pop("details", None)
-                    return result | validated | {"ok": True, "duration_ms": int((time.monotonic() - start) * 1000)}
+                    return result | validated | {"ok": True, "duration_ms": int((time.monotonic() - start) * 1000),
+                        "details": {**validated.get("details", {}), "sdk_version": result["sdk_version"]}}
                 except Exception as error:
                     result["failure_code"] = failure_code(error)
                     result["details"] = {"diagnostics": error_diagnostics(error, stage)}
