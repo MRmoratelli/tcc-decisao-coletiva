@@ -18,7 +18,7 @@ elif os.getenv("APP_TESTS_REQUIRED") == "1":
     raise RuntimeError("Instale Streamlit antes de executar os testes de interface.")
 
 from experiment_config import SCENARIO_THEME, SCENARIO_CONTEXT, SCENARIO_INITIAL_TEXT, SCENARIO_INITIAL_ALLOCATION, SCENARIO_ITEMS
-from ai_service import AIService, DEFAULT_MODEL
+from ai_service import AIService, DEFAULT_EXPERIMENT_MODEL
 from decision import (MANUAL_MEDIATION_FIELDS, MANUAL_RESTRICTION_CHECKS, NO_OBJECTION,
                       UNCHANGED_REVIEW_NOTE, Repository, current_proposal, current_responses, research_export)
 
@@ -565,7 +565,7 @@ class StreamlitFlowTests(unittest.TestCase):
         return moderator, access
 
     def test_second_mediation_failure_removes_retry_and_allows_only_technical_cancellation(self):
-        failure = {"origin": "IA", "ok": False, "failure_code": "SERVICO_INDISPONIVEL", "model": DEFAULT_MODEL,
+        failure = {"origin": "IA", "ok": False, "failure_code": "SERVICO_INDISPONIVEL", "model": DEFAULT_EXPERIMENT_MODEL,
                    "prompt_version": "mediacao-v1", "duration_ms": 1}
         with patch("ai_service.AIService.mediate", return_value=failure) as mediate:
             moderator, access = self.mediation_failure_setup()
@@ -593,8 +593,8 @@ class StreamlitFlowTests(unittest.TestCase):
             self.assertEqual(calls[0]["room"]["revision"], calls[1]["room"]["revision"])
 
     def test_second_mediation_success_allows_normal_reviewed_publication(self):
-        failure = {"origin": "IA", "ok": False, "failure_code": "TEMPO_ESGOTADO", "model": DEFAULT_MODEL, "prompt_version": "mediacao-v1"}
-        success = {"origin": "IA", "ok": True, "model": DEFAULT_MODEL, "prompt_version": "mediacao-v1",
+        failure = {"origin": "IA", "ok": False, "failure_code": "TEMPO_ESGOTADO", "model": DEFAULT_EXPERIMENT_MODEL, "prompt_version": "mediacao-v1"}
+        success = {"origin": "IA", "ok": True, "model": DEFAULT_EXPERIMENT_MODEL, "prompt_version": "mediacao-v1",
                    "summary": "Síntese da segunda execução", "suggested_text": "Proposta da segunda execução", "details": {"coverage": []}}
         with patch("ai_service.AIService.mediate", side_effect=[failure, success]):
             moderator, access = self.mediation_failure_setup()
@@ -618,7 +618,7 @@ class StreamlitFlowTests(unittest.TestCase):
         self.assertFalse(any(w.label in ("Gerar sugestão com IA", "Publicar nova versão") for w in moderator.button))
         snap = self.repo.snapshot(access["code"], access["moderator_token"])
         config = json.loads(next(e for e in snap["events"] if e["action"] == "CONFIGURACAO_IA_FIXADA")["payload_json"])
-        self.assertEqual(config["model"], DEFAULT_MODEL)
+        self.assertEqual(config["model"], DEFAULT_EXPERIMENT_MODEL)
         self.assertEqual(snap["mediations"], [])
 
     def test_database_read_failure_does_not_expose_private_exception_or_fabricate_state(self):
