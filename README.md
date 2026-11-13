@@ -1,122 +1,159 @@
-# Sistema de decisão coletiva com IA
+# Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva
 
-Aplicação web em Python/Streamlit para discutir e ajustar **uma proposta de tema livre**, em até três rodadas. A IA organiza objeções e sugere um texto de compromisso. A decisão pertence aos participantes; o moderador revisa sugestões, publica versões e confirma o encerramento.
+## Status técnico — documentação v1.1
 
-Esta implementação parte de `diiegosl/chatbot-ia`, branch `matheus-dev`, commit `85aed29862b28b7324e67742d2e9364996d87abf`. O código para demonstração está em [MRmoratelli/tcc-decisao-coletiva](https://github.com/MRmoratelli/tcc-decisao-coletiva), branch `main`. A branch original já compartilhava votos em memória com `st.cache_resource` e mantinha histórico de pareceres. Aqui, esses dados passam a ser separados por sala e armazenados em banco, com participantes definidos, controle de versões e regras explícitas de aceitação.
+**Implementação técnica candidata ao congelamento experimental, pendente dos gates pré-piloto.** A implementação funcional dos Commits 1–8 está concluída para o protocolo técnico descrito nesta v1.1. Isso não representa aprovação metodológica final, eficácia científica, experimento executado, deploy experimental congelado ou versão em produção. **D16 e D17 permanecem pendentes.**
 
-## Regras da decisão
+A documentação corresponde à branch `feat/protocolo-experimental-v1`, PR [#4, em rascunho](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/4), sobre a base funcional `25eff66cb970b63abb2b4561fb01793546f262f2`. A `main` continua na referência `b342030bb80eb4d03ff0ee39cb5d7751bfc88336`. Esta entrega documental não autoriza merge, deploy, piloto ou coleta com participantes reais.
 
-| Manifestação | Significado | Permite acordo? |
+A v1.1 substitui as instruções técnicas anteriores como referência desta branch. O [README anterior foi preservado literalmente](docs/historico/README_tecnico_pre_v1.1.md), e [APLICAR.md](APLICAR.md) está identificado como histórico. As funções experimentais foram introduzidas progressivamente nos Commits 1–8; não existiam todas na versão antiga.
+
+## Documentos de entrada
+
+- [Protocolo Experimental v1.1](docs/PROTOCOLO_EXPERIMENTAL_v1.1.md): regras, operação, arquitetura e exportação.
+- [Checklist pré-piloto v1.1](docs/CHECKLIST_PRE_PILOTO_v1.1.md): gates operacionais ainda a conferir.
+- [Mapa dos nove commits](docs/MAPA_COMMITS_v1.1.md): funcionalidades e identidade Git.
+- [Conferência da documentação anterior](docs/CONFERENCIA_DOCUMENTAL_v1.1.md): inventário, substituições e limites desta atualização.
+
+## Finalidade e método
+
+Artefato acadêmico desenvolvido no contexto de Design Science Research (DSR), em Python/Streamlit, para pequenos grupos discutirem **uma proposta evolutiva por sessão**, em até três rodadas. Estrutura posições e justificativas, classifica objeções, apresenta divergências descritivas e apoia mediação. A IA é consultiva: não vota, não publica versões nem encerra sessões. O moderador revisa e opera o fluxo; a decisão permanece com os participantes.
+
+| Posição exibida | Estado interno | Significado | Permite acordo? |
+|---|---|---|---|
+| ACEITO | `ACEITO` | Aceita a versão vigente | Sim |
+| ACEITO COM RESSALVAS | `ACEITO_COM_RESSALVAS` | Aceita a versão e mantém preocupações registradas | Sim |
+| NÃO ACEITO | `NAO_ACEITO` | Exige alteração para aceitar | Não |
+| Ausência | Não há resposta atual | Não equivale a aceite | Não |
+
+Justificativa é obrigatória para ressalva/rejeição. Cada pessoa mantém uma manifestação vigente por proposta; uma nova versão exige novas manifestações. Há V1, V2 e V3, sem V4. Acordo exige todos os participantes esperados na mesma versão e nenhuma rejeição; não depende de maioria, frequência ou corte de 80%. As ressalvas permanecem registradas.
+
+Os resultados são `ACORDO`, `SEM_ACORDO`, `INCONCLUSIVO` e `CANCELADA`. Antes da terceira rodada, o encerramento normal exige acordo; cancelamento exige motivo. Na terceira rodada, ausência tem precedência sobre rejeição para distinguir inconclusão de ausência de acordo. Consulte as regras completas no protocolo.
+
+## Condições experimentais e papel humano
+
+| Função | Condição A | Condição B |
 |---|---|---|
-| Aceito | Aceita o texto atual | Sim |
-| Aceito com ressalvas | Aceita o texto atual e registra preocupações, sem exigir uma alteração | Sim |
-| Não aceito | Uma alteração ou condição ainda é necessária para aceitar | Não |
-| Sem resposta | Participante ainda não se manifestou | Não |
+| Coleta individual e regra decisória | Mesmo processo estruturado | Mesmo processo estruturado |
+| Classificação | IA, com revisão humana e fallback técnico identificado quando necessário | Moderador, manualmente |
+| Taxonomia | CAT01–CAT09 | CAT01–CAT09 |
+| Divergências | Mesma contagem e visualização determinísticas | Mesma contagem e visualização determinísticas |
+| Mediação | Sugestão IA com revisão humana obrigatória | Template manual obrigatório com cobertura |
+| Publicação e alocação financeira | Ação humana, com validação das mesmas restrições | Ação humana, com validação das mesmas restrições |
 
-A regra de acordo é **todos os participantes cadastrados aceitarem a mesma versão**, com ou sem ressalvas. Não é uma regra de maioria. Uma nova versão exige novas manifestações de todos. Ninguém é removido da lista para facilitar o acordo. Cada participante tem uma manifestação atual por versão; suas edições anteriores ficam na trilha de eventos.
+B é a **contrapartida manual do mesmo processo**, não discussão livre sem estrutura. A origem da mediação precisa corresponder à condição. Publicar V2/V3 experimental exige uma mediação válida, vinculada à proposta e à revisão atuais. Em A, alteração do texto exige nota; texto mantido recebe registro explícito de publicação sem alteração. A sugestão original permanece recuperável.
 
-Há no máximo três versões: proposta inicial e duas revisões. Pode haver acordo já na primeira. Na terceira rodada, o encerramento registra `ACORDO`, `SEM_ACORDO` (todos responderam e existe recusa) ou `INCONCLUSIVO` (existe ausência). Interrupções antecipadas são `CANCELADA`, com motivo obrigatório. Encerramento impede alterações posteriores.
+O moderador classifica/revisa categorias durante `COLETA`, pausa para `REVISAO`, solicita/registra mediação e publica ou encerra. A credencial de moderador não vota. Usar o mesmo moderador entre condições é um controle operacional, não uma igualdade de identidade verificada pelo software.
 
-## Fluxo de uso
+## Taxonomia, contestação e divergências
 
-1. O moderador cria uma sala com tema, contexto, proposta inicial e participantes. A lista aceita de 2 a 30 pessoas; o experimento planejado reúne **3 a 5 pessoas no total**.
-2. Salva as credenciais de acesso. Cada pessoa recebe o mesmo endereço web e código da sala, mas uma credencial individual diferente. A credencial do moderador deve ser guardada separadamente. Ela não tem recuperação automática.
-3. Os participantes entram remotamente e registram ou editam sua posição. Os indicadores leem o banco a cada cinco segundos. Os formulários permanecem estáveis durante a edição; **Atualizar painel** carrega os detalhes mais recentes. Mudanças de etapa ou de versão são carregadas automaticamente.
-4. Durante a coleta, o moderador pode corrigir ou agrupar categorias. As categorias são livres e dependem do tema. Nenhuma preocupação é apagada ao aceitar a proposta.
-5. O moderador pausa a coleta. As manifestações ficam congeladas para revisão. Pode reabrir a coleta para completar ou corrigir respostas, gerar sugestão de IA ou escrever uma revisão humana.
-6. Revisa o texto e publica outra versão, ou encerra se a regra de acordo estiver satisfeita. Ao atingir a terceira rodada, pode encerrar com o resultado disponível.
-7. Exporta JSON e CSV para análise. O JSON inclui versões, manifestações, histórico de edições, categorias, sugestões, origens, modelos, versões dos prompts, falhas e horários em UTC.
+Os rótulos canônicos de `experiment_config.py` são:
 
-Se o moderador também participar da decisão, deve ser incluído na lista e usar sua credencial de participante em outro navegador/perfil. Acesso de moderador não vota. Convites perdidos podem ser redefinidos pelo moderador; isso invalida a credencial antiga e preserva a identidade e os votos.
+| Código | Categoria de objeção |
+|---|---|
+| CAT01 | Impacto pedagógico |
+| CAT02 | Abrangência de beneficiários |
+| CAT03 | Urgência e prioridade |
+| CAT04 | Viabilidade de implementação |
+| CAT05 | Inclusão e acessibilidade |
+| CAT06 | Sustentabilidade do investimento |
+| CAT07 | Adequação orçamentária |
+| CAT08 | Informação ou justificativa insuficiente |
+| CAT09 | Conflito entre múltiplos critérios |
 
-Uma credencial identifica o acesso autorizado dentro da sala, não autentica uma identidade civil. Compartilhá-la permite a outra pessoa agir como seu titular. Os membros da sala veem posições e justificativas uns dos outros. Os exports usam P01, P02 etc., excluem nomes de cadastro e credenciais; o texto livre ainda pode conter dados pessoais.
+`Sem objeção explicitada` e `Não classificada` são estados técnicos. Uma categoria principal não representa separadamente todas as objeções de um texto. O participante pode contestar a própria classificação uma vez por edição e sugerir outro código existente; a categoria só muda após decisão do moderador. A trilha mantém classificação, sugestão e categoria final.
 
-## IA e Pareto
+A análise ordena categorias por frequência decrescente, com desempate lexicográfico. O percentual acumulado usa apenas categorias contabilizadas; estados técnicos não entram no denominador. A linha de 80% é descritiva. Não existe corte automático, fronteira de Pareto, ranqueamento de pessoas ou otimização. Objeções raras continuam disponíveis; preservação técnica não comprova preservação semântica na mediação.
 
-- A classificação sugere **uma categoria principal por manifestação**, reutilizando categorias da sala quando possível. O texto original é preservado; portanto, múltiplas objeções num único comentário não são contadas separadamente no gráfico.
-- O Pareto conta categorias da versão atual em ordem decrescente e calcula o percentual acumulado. Não classificados e textos sem objeção explícita não entram nesse denominador. A interface informa os não classificados.
-- O referencial de 80% descreve concentração de frequências. Não mede gravidade, não garante resolver 80% dos conflitos e não dispensa analisar objeções minoritárias.
-- A mediação recebe contexto, proposta e todas as justificativas da versão, com pseudônimos e lista de ausentes. Produz síntese, sugestão e uma análise de cobertura por pessoa que respondeu. A validação confere formato e referências; não comprova a correção semântica dessa análise.
-- O moderador decide quais mudanças apresentar ao grupo. Publicar uma sugestão revisada registra `IA_REVISADA_POR_HUMANO`; uma redação independente registra `HUMANA` e sua justificativa.
-- Falhas da API são registradas como falhas. Não há proposta genérica fabricada para representar sucesso da IA. O voto é salvo **antes** da classificação. O fluxo humano continua disponível.
-- `GEMINI_FALLBACK_MODELS` permite modelos alternativos explicitamente configurados, sem prometer que trocar de modelo evita uma cota compartilhada. O modelo que respondeu fica registrado.
+## Cegamento e privacidade
 
-## Executar localmente
+No modo experimental, antes de responder à proposta vigente, o participante vê contexto, proposta, distribuição financeira, instruções e formulário. Posições, justificativas, categorias, contagens, faltantes, consenso, mediação e histórico detalhado ficam ocultos. Após resposta válida, a visualização permitida é liberada. V2/V3 restabelecem o bloqueio individual. O moderador mantém visão integral; o histórico anterior também é ocultado enquanto o participante está cego.
 
-Recomendado: Python 3.12.
+A criação experimental recebe quantidade de participantes e gera `P01…Pn`, sem exigir nome civil, e-mail ou matrícula. A classificação externa não recebe identidade de participante. A mediação usa `M01…Mn` temporários por chamada, remapeados localmente, e apenas a quantidade de ausentes. Há aviso ao participante e sanitização heurística antes da API; o texto original permanece local. Eventos de manifestação conservam metadados, sem duplicar justificativas integrais.
+
+JSON de pesquisa e CSV excluem campos de credenciais e aliases civis. **O arquivo separado de acessos contém credenciais e é confidencial; não faz parte do dataset de pesquisa.** Sanitização e pseudonimização não garantem anonimização de texto livre nem conformidade legal integral. Não há aprovação ética presumida.
+
+## Cenário e restrições financeiras
+
+O cenário simulado `cenario-escola-v1` fica habilitado por padrão na criação experimental. Seus itens financeiros **CAT_INV01–CAT_INV05 não são as categorias de objeção**:
+
+| Item financeiro | Demanda máxima | V1 |
+|---|---:|---:|
+| CAT_INV01 — Melhoria das salas de aula | R$ 40.000 | R$ 25.000 |
+| CAT_INV02 — Computadores/equipamentos de informática | R$ 35.000 | R$ 25.000 |
+| CAT_INV03 — Biblioteca/material de estudo | R$ 20.000 | R$ 10.000 |
+| CAT_INV04 — Climatização | R$ 30.000 | R$ 15.000 |
+| CAT_INV05 — Acessibilidade | R$ 20.000 | R$ 5.000 |
+| **Total** | **R$ 145.000** | **R$ 80.000** |
+
+V2/V3 exigem cinco valores estruturados em reais inteiros, não negativos, dentro de cada teto e com total até R$ 80.000. Saldo não alocado é permitido e pertence ao mesmo orçamento. Itens desconhecidos ou recursos adicionais estruturados são rejeitados. A/B usam a mesma função de validação. O moderador confirma os valores e sua coerência com o texto; a IA não precisa gerar JSON financeiro.
+
+A configuração do cenário e as alocações ficam nos eventos, associadas à proposta, e são exportadas no schema 2. A validação não interpreta números da prosa nem decide justiça, qualidade ou solução ótima. Sessões livres/antigas não são convertidas por inferência do texto. Para o exercício escolar, não desabilite o cenário na criação.
+
+## Falhas e armazenamento
+
+Em A, falha persistente de **classificação** preserva a manifestação e permite classificação humana de contingência com CAT01–CAT09, ação explícita e status `FALLBACK_HUMANO`. A falha original é rastreável; `category_ai` não recebe falsamente a categoria humana.
+
+Para **mediação IA**, uma reserva é persistida antes da API. Há uma execução inicial e, somente após falha, uma última execução controlada por `proposal_id + revision`. Cada execução conserva até três tentativas internas para falhas transitórias, com backoff; não se troca de modelo. Terceira execução e concorrência indevida são bloqueadas. Entre tentativas, as manifestações não podem ser reabertas/editadas. Duas falhas impedem continuidade normal em A e oferecem cancelamento técnico `CANCELADA`, sem substituição por mediação humana. Execução sem resultado confirmado permanece bloqueada; não há repetição automática em estado incerto. B continua manual e não chama IA.
+
+**A interface bloqueia criação experimental formal sem PostgreSQL.** SQLite continua válido no modo genérico e em testes de domínio. A disponibilidade/durabilidade do PostgreSQL externo precisa ser conferida; não é garantida apenas pela configuração. Falha de banco não provoca reconstrução manual de registros nem fallback silencioso para SQLite.
+
+## Executar e configurar
+
+Recomendado conforme o CI: Python 3.12. Para demonstração genérica com dados fictícios:
 
 ```bash
 python -m pip install -r requirements.txt
+# Configure EXPERIMENT_MODE=0 no ambiente, ou deixe ausente.
 python -m streamlit run "Prototipo TCC.py"
 ```
 
-O arquivo de entrada foi mantido para compatibilidade com a implantação existente. `app.py` contém a interface, `decision.py` contém as regras e o armazenamento, e `ai_service.py` contém a integração consultiva com Gemini.
+Sem `DATABASE_URL`, o modo genérico usa `data/decisoes.sqlite3`. Fora do modo experimental há categorias livres, visibilidade compartilhada e fluxo humano genérico; isso não representa o controle B do protocolo.
 
-Sem configuração, o sistema usa `data/decisoes.sqlite3`. SQLite compartilha os registros entre navegadores conectados à **mesma instância** e conserva dados enquanto o arquivo continuar disponível. Não usa `session_state` para armazenar votos; ele guarda apenas autenticação e estado temporário da interface.
-
-## Publicar no Streamlit Community Cloud
-
-Em [share.streamlit.io](https://share.streamlit.io/), crie uma aplicação usando estes campos:
-
-| Campo | Valor |
-|---|---|
-| Repository | `MRmoratelli/tcc-decisao-coletiva` |
-| Branch | `main` |
-| Main file path | `Prototipo TCC.py` |
-| Python version (Advanced settings) | `3.12` |
-
-A revisão foi integrada a `main` pelo [PR #1](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/1). Publicar os arquivos no GitHub é uma etapa separada de criar a aplicação no Streamlit. Confira o guia [Deploy an app](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy). A opção **Paste GitHub URL** aceita o [arquivo de entrada em main](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/main/Prototipo%20TCC.py).
-
-Configure em **Advanced settings → Secrets** antes da implantação, em **Settings → Secrets** de uma aplicação existente, ou localmente em `.streamlit/secrets.toml`, sem publicar o arquivo no GitHub:
+As variáveis de ambiente têm prioridade sobre `.streamlit/secrets.toml`/Secrets do Streamlit. Nunca versione esse arquivo nem valores reais de credenciais. Os exemplos abaixo são placeholders, não uma configuração pronta ou já executada:
 
 ```toml
-GEMINI_API_KEY = "SUA_CHAVE"
-GEMINI_MODEL = "gemini-3.8-flash"
-# Opcional: modelos disponíveis para sua chave, separados por vírgula.
-# GEMINI_FALLBACK_MODELS = "OUTRO_MODELO_DISPONIVEL"
-
-# Necessário para armazenamento durável no Community Cloud:
+EXPERIMENT_MODE = "1"
 DATABASE_URL = "postgresql://USUARIO:SENHA@HOST:5432/BANCO?sslmode=require"
+GEMINI_API_KEY = "SUBSTITUIR_FORA_DO_REPOSITORIO"
+GEMINI_MODEL = "gemini-3.5-flash-lite" # candidato técnico; validar na conta antes de usar
+# APP_COMMIT deve ser o SHA da build efetivamente selecionada; não preencher com suposição.
+# APP_COMMIT = "SHA_HEXADECIMAL_DA_BUILD"
 ```
 
-As mesmas configurações podem ser fornecidas como variáveis de ambiente, que têm prioridade. `SQLITE_PATH` permite mudar o caminho local de demonstração. O app não aceita outros tipos de URL de banco e não faz fallback silencioso para SQLite se o PostgreSQL configurado falhar.
+| Variável | Uso real |
+|---|---|
+| `EXPERIMENT_MODE` | Ativa com `1`, `true`, `yes` ou `on`; distingue o protocolo das funções genéricas |
+| `DATABASE_URL` | Conexão PostgreSQL; obrigatória no gate de criação experimental |
+| `GEMINI_API_KEY` | Autenticação do SDK, necessária operacionalmente para A; não usada em B |
+| `GEMINI_MODEL` | Modelo primário a verificar/congelar na conta; não presumir disponibilidade do default codificado |
+| `GEMINI_FALLBACK_MODELS` | Alternativos separados por vírgula apenas no modo genérico; ignorados no experimental |
+| `APP_COMMIT` | Build declarada, hexadecimal de 7–40 caracteres; ausente/inválida vira `null`, sem bloquear criação |
+| `SQLITE_PATH` | Caminho de SQLite para demonstração/testes, não substitui PostgreSQL no experimento |
 
-**Para o experimento formal, configure PostgreSQL externo antes da coleta.** A própria documentação do Streamlit informa que o Community Cloud não garante persistência dos arquivos locais: [armazenamento local](https://docs.streamlit.io/develop/concepts/connections/connecting-to-data). Nenhum banco externo foi criado ou configurado nesta entrega. Use uma conexão PostgreSQL fornecida pelo serviço escolhido, com TLS, e um usuário limitado ao banco do projeto. O app cria apenas tabelas com prefixo `dc_`. Baixe também os históricos de cada sessão.
+Em A são fixados por sessão modelo, versões de prompts, taxonomia e política `temperature_policy=provider_default`, com `temperature=null`. O campo de temperatura é omitido da requisição; não se presume um valor numérico ou determinismo do provedor. O default experimental candidato é `gemini-3.5-flash-lite`; `GEMINI_MODEL` explícito continua tendo prioridade. O modo genérico mantém seu default e as regras de fallback anteriores; B não chama IA. Configuração divergente bloqueia continuidade. Sessões antigas conservam a configuração original: não continuar uma sala com outra configuração nem reescrever seu histórico.
 
-As escritas no SQLite usam `BEGIN IMMEDIATE`. No PostgreSQL, alterações bloqueiam a linha da sala com `SELECT FOR UPDATE`. Cada operação verifica credencial, função, etapa e versão dentro da transação; chamadas da IA ficam fora dos bloqueios. Resultados atrasados da IA não substituem edições ou revisões humanas. O app não usa conexões SQLite globais entre threads.
+`APP_COMMIT` continua uma declaração, não prova de deploy. `checkout_commit` registra separadamente o HEAD lido do checkout Git sem alterações rastreadas, quando verificável; em ausência/erro retorna `null`, sem inferir a partir da declaração ou do HEAD remoto. A identidade da sessão não é retroatribuída pelo exportador. A modalidade/conta Gemini continua em **D16**. A conferência técnica não fecha G06/G10 nem libera experimento científico. Ver [recuperação técnica Gemini](docs/RECUPERACAO_GEMINI_v1.0.md).
 
-Modelo e disponibilidade de API dependem da conta. Confira o modelo habilitado antes do piloto e fixe seu identificador durante a coleta. Documentação utilizada: [SDK Google Gen AI](https://googleapis.github.io/python-genai/), [fragmentos Streamlit](https://docs.streamlit.io/develop/api-reference/execution-flow/st.fragment).
+## Arquitetura, exportação e testes
 
-Os votos antigos em memória não possuem participantes e versões compatíveis com estas regras e não são migrados automaticamente. Se precisarem ser preservados, exporte ou registre o histórico do app anterior antes de aplicar a mudança. Use uma sala nova para o piloto.
+`Prototipo TCC.py` chama `app.main()`. `app.py` contém interface/gates; `decision.py`, regras/transações e export; `ai_service.py`, integração/sanitização/validação de saída; `experiment_config.py`, versões, taxonomia e cenário. Há sete entidades operacionais, incluindo `dc_category_contests`. O mapeamento formal de RF/RNF permanece no pacote documental externo do TCC; não foram inventados IDs neste repositório.
 
-## Validação
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-Os testes de regras cobrem aceitação unânime com ressalvas, ausências, recusas, versões antigas, limite de rodadas, autenticação por sala, edições concorrentes, publicação simultânea, persistência, origem das revisões e exports sem credenciais. Os testes de IA usam respostas simuladas para verificar falhas e validação; não medem qualidade real de mediação.
-
-Os testes da interface usam `streamlit.testing.v1.AppTest` para criar sala, usar sessões independentes, manifestar posições, publicar revisão e encerrar. Se Streamlit não estiver instalado, são marcados como não executados. `APP_TESTS_REQUIRED=1` faz a execução falhar nesse caso. O workflow de CI instala as dependências, exige esses testes e repete as regras com PostgreSQL em um serviço temporário.
-
-**Validação remota aprovada (11/10/2026):** o commit `11f220bc8c57f39a0c0a73c972e0f48d9f78a70e` passou nos 44 testes com SQLite, incluindo três testes da interface com Streamlit/AppTest, e nos 31 testes de regras também executados com PostgreSQL 16. Consulte a [execução aprovada no GitHub Actions](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/38179742597). Os arquivos foram integrados a `main`. Testes automatizados não validam a qualidade real do Gemini nem substituem o piloto com navegadores e a avaliação do grupo.
-
-Para repetir as regras com um PostgreSQL de teste, configure `TEST_DATABASE_URL` e execute:
+JSON schema 2 é o pacote de pesquisa/auditoria; CSV é uma visão simplificada. `experiment` descreve a identidade histórica registrada; `exporter`, o ambiente que gerou o arquivo. O JSON encadeia configuração, propostas, manifestações, classificações, contestações/fallbacks, mediações, revisões e encerramento. Classificações IA passam a registrar duração/SDK e diagnóstico seguro nos eventos/JSON; mediações preservam duração e SDK em seus detalhes. O CSV mantém o contrato anterior. Campos ausentes em sessões antigas não são inventados. Edições guardam metadados; textos substituídos em uma mesma manifestação não são reconstruídos integralmente.
 
 ```bash
+# SQLite + IA simulada + Streamlit; em shells POSIX:
+APP_TESTS_REQUIRED=1 GEMINI_API_KEY='' python -m unittest discover -s tests -v
+# PostgreSQL de testes exclusivo, após configurar TEST_DATABASE_URL:
 python -m unittest discover -s tests -p test_decision.py -v
 ```
 
-Use um banco exclusivo para testes: eles criam salas próprias e não apagam registros. Para a confirmação final no ambiente implantado, faça um piloto com navegadores reais e verifique acesso remoto, atualização do painel, API Gemini e persistência após reiniciar o app.
+Não aponte `TEST_DATABASE_URL` para dados de pesquisa: a suíte cria salas e não limpa todos os registros. O workflow [Regras e interface](.github/workflows/tests.yml) usa Python 3.12 e PostgreSQL temporário. Referência anterior à recuperação: **143 testes gerais e 84 de regras PostgreSQL**, no [CI d07d15d](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/42733999999). A recuperação acrescenta testes de configuração, SDK, cobertura e identidade; as contagens/resultados do candidato devem ser conferidos no CI de seu SHA exato, sem tratar testes novos como execuções científicas. Consulte o [PR #4](https://github.com/MRmoratelli/tcc-decisao-coletiva/pull/4).
 
-## Decisões pendentes para o TCC
+## Limites e próximos gates
 
-| Decisão | Momento | Impacto no código |
-|---|---|---|
-| Serviço/banco PostgreSQL e credenciais da implantação | Antes do piloto remoto com dados a preservar | Só configuração em Secrets; suporte já implementado |
-| Tema, contexto, proposta e participantes do experimento | Com o grupo, antes da coleta | Preenchimento da sala; não exige alterar código |
-| Protocolo final de avaliação e instrumento de questionário | Com o orientador/grupo, antes da coleta | Exports e modo sem IA já disponíveis; questionário ainda externo |
+Não houve experimento científico nesta entrega. Testes automatizados não comprovam utilidade, fidelidade, neutralidade, precisão em português, satisfação, SUS, melhora decisória ou causalidade. A amostra prevista é pequena e a análise deverá ser predominantemente descritiva, sem generalização automática. O padrão do provedor não garante determinismo; a IA pode omitir, distorcer ou direcionar, exigindo revisão e avaliação. O SDK google-genai está fixado em 2.34.0; as demais dependências usam faixas e o ambiente efetivo precisa ser registrado antes da coleta.
 
-O modo sem IA existe para permitir uma eventual comparação, mas o desenho de duas sessões com o mesmo grupo ainda precisa ser aprovado. Um grupo de 3 a 5 pessoas permite uma avaliação exploratória, sem afirmar causalmente eficácia ou generalizar para outras populações. Registre tema, condição, ordem das sessões, tempo, número de rodadas, resultado e percepções dos participantes conforme o protocolo aprovado.
+**D16:** modalidade/conta Gemini a definir. **D17:** confirmar com orientador origem dos participantes, consentimento e exigências institucionais de ética/CEP/TCLE, conforme aplicável. Não concluir esses itens automaticamente. Instrumentos, avaliação objetiva D20 e tratamento científico posterior não foram implementados por este commit.
 
-No TCC, descreva o artefato como **sistema de apoio à decisão coletiva**, com IA consultiva, análise descritiva de objeções e validação humana. Testes de software demonstram o cumprimento das regras; o experimento é a etapa que deve avaliar utilidade, clareza e percepção de imparcialidade.
+Próxima etapa: **AUDITORIA FINAL DO PACOTE EXPERIMENTAL v1.1**, a solicitar separadamente. Não há Commit 10 previsto, e esta documentação não inicia a auditoria, o piloto ou o experimento.
