@@ -1,0 +1,25 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#192b31;background:#f5f8f7;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}
+.topbar{background:#fff;border-bottom:1px solid #e1e9e6;display:flex;align-items:center;justify-content:space-between;padding:22px max(24px,calc((100% - 1000px)/2))}
+.brand{display:flex;align-items:center;gap:12px}.brand b{display:block;font-size:17px}.brand small{display:block;color:#71817c;margin-top:2px}
+.mark{background:#0f665a;color:white;border-radius:12px;font-size:27px;width:42px;height:42px;display:grid;place-items:center}
+.pill{background:#e8f5ef;border-radius:25px;color:#075c4b;padding:8px 12px;font-size:12px;font-weight:700}
+.content{max-width:1000px;margin:auto;padding:42px 24px 80px}.intro{max-width:750px;margin-bottom:30px}.intro h1{font-size:clamp(30px,5vw,47px);line-height:1.13;letter-spacing:-.035em;margin:12px 0}.intro p{font-size:17px;color:#59716a;line-height:1.65}
+.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:#1b7565;font-size:11px;font-weight:800}
+.card{background:#fff;border:1px solid #e2eae7;border-radius:17px;padding:28px;margin-bottom:20px;box-shadow:0 6px 25px #102e2310}
+.card h2{margin:0 0 12px;font-size:24px}.card h3{margin:0 0 12px}.muted{color:#62746f;font-size:14px;line-height:1.5}
+.tabs{display:flex;gap:8px;margin:0 0 15px}.tabs button{border:1px solid #d6e3dd;border-radius:10px;background:white;color:#33554c;padding:11px 19px}.tabs button.active{background:#0c6655;color:white;border-color:#0c6655}
+form{display:grid;gap:18px;margin-top:22px}label{display:grid;gap:9px;font-weight:650;font-size:14px}
+input,textarea{width:100%;border:1px solid #ccdbd5;border-radius:9px;padding:13px;color:#19382f;outline:none;background:#fff}input:focus,textarea:focus{border-color:#138572;box-shadow:0 0 0 3px #e1f5ed}textarea{resize:vertical;min-height:100px}
+.primary,.secondary{padding:12px 18px;border-radius:10px;font-weight:700;border:1px solid transparent;justify-self:start}
+.primary{color:#fff;background:#116d5a}.primary:hover:not(:disabled){background:#0a5e4d}.secondary{color:#125746;background:white;border-color:#b9d2c8}.secondary:hover{background:#eaf5f0}
+.review{background:#f0f6f3;border:1px solid #d7e9df;border-radius:13px;padding:21px;margin:20px 0}.review-head{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:#437467}.review-head strong{color:#0b6352}.review p,.review li{line-height:1.6}.review ul{padding-left:22px}.review h4{font-size:14px;margin:20px 0 6px}.disclaimer{border-top:1px solid #d7e9df;padding-top:12px;font-size:12px;color:#526e66}
+.review-follow{margin-top:16px}.alert{border:1px solid #cbded4;border-radius:10px;background:#ebf6ee;color:#286448;padding:15px;margin-bottom:20px}.alert.error{background:#fff0ed;border-color:#f2c7bb;color:#a03b27}
+.secret{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #edf2ef}
+.secret code{overflow-wrap:anywhere;background:#f3f7f5;padding:9px;border-radius:6px}.secret button{border:1px solid #b8d1c6;background:white;padding:7px 12px;border-radius:7px}
+.room .row-between,.entry-card .row-between{display:flex;align-items:center;justify-content:space-between;gap:20px}.room .proposal{background:#f7faf8;padding:19px;border-radius:12px;margin:25px 0}.proposal p{white-space:pre-wrap;line-height:1.65}
+.entry{margin:30px 0;padding:20px;border-left:3px solid #177b64;background:#fbfdfa}.actions{display:flex;gap:10px;flex-wrap:wrap}
+.entry-card{border:1px solid #dfe8e3;border-radius:10px;padding:17px;margin:12px 0}.entry-card p{white-space:pre-wrap;line-height:1.6}.entry-card time,.entry-card small{font-size:12px;color:#63756c}.entry-card small{display:block}
+.text-button{border:0;background:none;color:#126957;text-decoration:underline;padding:12px 0;margin-top:20px}
+footer{text-align:center;color:#778981;padding:20px;font-size:12px;border-top:1px solid #e2eae7}
+@media(max-width:700px){.topbar{padding:16px 18px}.pill{display:none}.content{padding:29px 14px 50px}.card{padding:20px}.secret{grid-template-columns:1fr}.room .row-between{align-items:flex-start}.tabs button{flex:1}.review-head{align-items:flex-start;flex-direction:column}}
