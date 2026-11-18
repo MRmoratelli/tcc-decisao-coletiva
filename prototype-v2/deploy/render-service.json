@@ -1,0 +1,34 @@
+{
+  "type": "web_service",
+  "name": "tcc-decisao-v2-test",
+  "serviceId": "srv-dbugi3dg1s2s73bpt3f0",
+  "workspaceId": "tea-dbug9kkipgvc738rb21g",
+  "runtime": "node",
+  "plan": "free",
+  "region": "ohio",
+  "repo": "https://github.com/MRmoratelli/tcc-decisao-coletiva",
+  "branch": "feat/vite-typescript-decisao-generica",
+  "autoDeploy": "no",
+  "buildCommand": "cd prototype-v2 && npm ci --include=dev && npm run build",
+  "startCommand": "cd prototype-v2 && npm start",
+  "url": "https://tcc-decisao-v2-test.onrender.com",
+  "healthCheckPathRequired": "/api/health",
+  "healthCheckPathProviderConfigured": false,
+  "privateEnvironmentKeysRequired": [
+    "DATABASE_URL_V2",
+    "AUTH_PEPPER",
+    "REVIEW_SIGNING_KEY",
+    "GEMINI_API_KEY"
+  ],
+  "nonSecretEnvironmentRequired": {
+    "NODE_ENV": "production",
+    "NODE_VERSION": "22",
+    "API_HOST": "0.0.0.0",
+    "V2_DATABASE_ISOLATED": "true",
+    "PUBLIC_ORIGIN": "https://tcc-decisao-v2-test.onrender.com",
+    "GEMINI_MODEL": "VERIFY_AVAILABLE_MODEL"
+  },
+  "status": "PREPARADO_SEM_CREDENCIAIS",
+  "credentialTransfer": "PENDING_EXPLICIT_APPROVAL",
+  "publicApplicationFunctional": false
+}

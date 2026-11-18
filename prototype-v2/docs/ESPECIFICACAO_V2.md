@@ -183,10 +183,13 @@ UC05: participante responde DSR individual; moderador exporta dados e pesquisado
 UC06: responsável restaura exportação em outra sala, com novas credenciais e proveniência declarada.
 
 ## Pendências essenciais
-Provisionar Neon V2 e credenciais Gemini novas; migrar apenas a base isolada; executar integração real e teste de rede/HTTPS.
+O Neon V2 novo foi provisionado e validado com API local real, migrações e reconexão em novo processo. Permanecem a credencial Gemini nova, os quatro contratos reais e o teste remoto HTTPS; consultar INTEGRACAO_REAL_V2.md.
 Definir retenção/exclusão, consentimento e rubrica independente de fidelidade/argumentação; ratificar cenário, amostra, condições e instrumento.
 Não transportar resultados antigos para a V2, não alterar main/backup/PR4/Streamlit e não afirmar aprovação do orientador para diferenças de escopo.
 
 ## Documento acadêmico
 A monografia oficial recebeu uma aba adicional “V2 prospectiva — 17-11-2026”, preservando a aba histórica.
 https://docs.google.com/document/d/1ZGCZ-e4j87chplYk364C8eU5qUbcmH-fXIhdd6cqFx4/edit?tab=t.r4nlbwyv6bs0
+
+## Integração e execução de produção — 17/11/2026
+O Node pode servir dist e /api na mesma origem. O runtime valida PORT, bind, origem HTTPS e separação de segredos; /api/health informa o commit declarado e se há chave configurada, sem afirmar disponibilidade do Gemini. Migrações podem usar DATABASE_URL_V2_DIRECT, separada da conexão pooled de dc2_app. A função de aplicação no Neon real não possui UPDATE ou DELETE em snapshots. O serviço Render existe, porém não está funcional: o envio dos segredos aguarda autorização específica após rejeição da revisão automática.

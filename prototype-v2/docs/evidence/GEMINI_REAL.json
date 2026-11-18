@@ -1,0 +1,11 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO",
+  "at": "2026-11-18T02:24:04.787Z",
+  "provider": "Gemini real",
+  "model": "gemini-3.5-flash-lite",
+  "promptVersion": "consensus-consultive-v2.0",
+  "calls": [],
+  "scientificResults": false,
+  "status": "BLOQUEADO",
+  "reason": "NEW_API_KEY_NOT_CONFIGURED"
+}

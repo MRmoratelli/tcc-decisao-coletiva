@@ -1,0 +1,839 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-18T02:11:54.941Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+      "problem": "Prazo, capacidade e interesses diferentes precisam ser conciliados.",
+      "decision": "Estabelecer prioridades provisórias de um projeto colaborativo fictício.",
+      "goals": "Exercitar infraestrutura da V2, sem coleta científica.",
+      "alternatives": "",
+      "constraints": "Somente dados fictícios. Cenário científico pendente.",
+      "successCriteria": "Persistência, versão e unanimidade tecnicamente verificáveis.",
+      "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário oficial do experimento.",
+      "text": "Priorizar acessibilidade e organizar as demais atividades após revisar capacidade e dependências."
+    },
+    "decision": {
+      "id": "364b3f44-32da-4e2b-9cc8-0100d2e2b25c",
+      "originId": "364b3f44-32da-4e2b-9cc8-0100d2e2b25c",
+      "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-18T02:11:32.182Z",
+      "closedAt": "2026-11-18T02:11:48.445Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "alias": "P01"
+      },
+      {
+        "id": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "alias": "P02"
+      },
+      {
+        "id": "a5e9095f-915b-46b1-9aaf-20da4b0ff8e5",
+        "alias": "P03"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "4c3f0125-c5b8-4cf0-aa9b-16ca6592e1e8",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+          "problem": "Prazo, capacidade e interesses diferentes precisam ser conciliados.",
+          "decision": "Estabelecer prioridades provisórias de um projeto colaborativo fictício.",
+          "goals": "Exercitar infraestrutura da V2, sem coleta científica.",
+          "alternatives": "",
+          "constraints": "Somente dados fictícios. Cenário científico pendente.",
+          "successCriteria": "Persistência, versão e unanimidade tecnicamente verificáveis.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário oficial do experimento.",
+          "text": "Priorizar acessibilidade e organizar as demais atividades após revisar capacidade e dependências."
+        },
+        "createdAt": "2026-11-18T02:11:32.182Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.0",
+          "model": "none",
+          "reason": "Teste técnico do banco Neon real, sem executar Gemini."
+        }
+      },
+      {
+        "id": "fbc1f0fe-21c8-4326-bc4e-4b3da272c1cc",
+        "version": 2,
+        "parentId": "4c3f0125-c5b8-4cf0-aa9b-16ca6592e1e8",
+        "content": {
+          "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+          "problem": "Prazo, capacidade e interesses diferentes precisam ser conciliados.",
+          "decision": "Estabelecer prioridades provisórias de um projeto colaborativo fictício.",
+          "goals": "Exercitar infraestrutura da V2, sem coleta científica.",
+          "alternatives": "",
+          "constraints": "Somente dados fictícios. Cenário científico pendente.",
+          "successCriteria": "Persistência, versão e unanimidade tecnicamente verificáveis.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário oficial do experimento.",
+          "text": "Priorizar acessibilidade e organizar as demais atividades após revisar capacidade e dependências. Reservar uma etapa de validação e registrar um marco de revisão."
+        },
+        "createdAt": "2026-11-18T02:11:41.414Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1",
+          "model": "human",
+          "reason": "Revisão operacional sintética manual para testar persistência; não representa avaliação humana científica."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "e2cb9259-17db-457b-a194-438ffa025d6e",
+        "number": 1,
+        "proposalId": "4c3f0125-c5b8-4cf0-aa9b-16ca6592e1e8",
+        "status": "CLOSED",
+        "openedAt": "2026-11-18T02:11:32.182Z",
+        "closedAt": "2026-11-18T02:11:41.414Z"
+      },
+      {
+        "id": "83bf8c3a-e7f5-4003-ba1e-45d9ba156201",
+        "number": 2,
+        "proposalId": "fbc1f0fe-21c8-4326-bc4e-4b3da272c1cc",
+        "status": "CLOSED",
+        "openedAt": "2026-11-18T02:11:41.414Z",
+        "closedAt": "2026-11-18T02:11:48.445Z"
+      }
+    ],
+    "votes": [
+      {
+        "id": "21b36007-bbdb-449e-b02a-b52fad26a914",
+        "participantId": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "roundId": "e2cb9259-17db-457b-a194-438ffa025d6e",
+        "proposalId": "4c3f0125-c5b8-4cf0-aa9b-16ca6592e1e8",
+        "choice": "REJEITO",
+        "justification": "Reservar uma etapa de validação antes da entrega.",
+        "createdAt": "2026-11-18T02:11:37.412Z"
+      },
+      {
+        "id": "24d9fb73-060c-4123-9cdd-78a30dfd2032",
+        "participantId": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "roundId": "e2cb9259-17db-457b-a194-438ffa025d6e",
+        "proposalId": "4c3f0125-c5b8-4cf0-aa9b-16ca6592e1e8",
+        "choice": "ABSTENHO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:11:39.639Z"
+      },
+      {
+        "id": "35c27579-221b-48de-b3b0-22fb09889221",
+        "participantId": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "roundId": "83bf8c3a-e7f5-4003-ba1e-45d9ba156201",
+        "proposalId": "fbc1f0fe-21c8-4326-bc4e-4b3da272c1cc",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:11:44.124Z"
+      },
+      {
+        "id": "e2ab4a97-5349-47f3-aa13-ab0335c23106",
+        "participantId": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "roundId": "83bf8c3a-e7f5-4003-ba1e-45d9ba156201",
+        "proposalId": "fbc1f0fe-21c8-4326-bc4e-4b3da272c1cc",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:11:46.290Z"
+      },
+      {
+        "id": "ef5d8806-13ec-4ace-a0b6-8aaf7f5f70d3",
+        "participantId": "a5e9095f-915b-46b1-9aaf-20da4b0ff8e5",
+        "roundId": "83bf8c3a-e7f5-4003-ba1e-45d9ba156201",
+        "proposalId": "fbc1f0fe-21c8-4326-bc4e-4b3da272c1cc",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:11:48.445Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "b4ef29cf-377c-4f0b-968c-1874880ca1e7",
+        "participantId": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "roundId": "e2cb9259-17db-457b-a194-438ffa025d6e",
+        "proposalId": "4c3f0125-c5b8-4cf0-aa9b-16ca6592e1e8",
+        "originalText": "Reservar uma etapa de validação antes da entrega.",
+        "text": "Reservar uma etapa de validação antes da entrega.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.0",
+          "model": "none",
+          "reason": "Teste técnico explícito do Neon, sem uso de IA."
+        },
+        "contest": "",
+        "createdAt": "2026-11-18T02:11:37.412Z"
+      }
+    ],
+    "analyses": [],
+    "syntheses": [],
+    "contests": [],
+    "events": [
+      {
+        "id": "2d7df6cb-00b9-48bd-8d7b-360ff5ff0262",
+        "at": "2026-11-18T02:11:32.184Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "7b1f2298-d177-4ca9-a722-d11aae3a50d6",
+        "at": "2026-11-18T02:11:37.412Z",
+        "actor": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "5a4da8ba-8759-48de-9dd9-f0f86d2f51bf",
+        "at": "2026-11-18T02:11:37.412Z",
+        "actor": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "b73734d7-c703-45d2-a194-c2d14c4909e8",
+        "at": "2026-11-18T02:11:39.639Z",
+        "actor": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "de9ea47d-8034-4ce2-95d2-3d63c1f76ad7",
+        "at": "2026-11-18T02:11:41.414Z",
+        "actor": "moderator",
+        "type": "PROPOSAL_PUBLISHED",
+        "detail": "Revisão operacional sintética manual para testar persistência; não representa avaliação humana científica."
+      },
+      {
+        "id": "deaecd4c-5672-4233-91d3-cf4336844c0d",
+        "at": "2026-11-18T02:11:44.124Z",
+        "actor": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "d4f0df50-7b9c-4835-a193-3723435fe6e3",
+        "at": "2026-11-18T02:11:46.290Z",
+        "actor": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "e881b980-d2bb-4478-b1ce-b5b927dcbf60",
+        "at": "2026-11-18T02:11:48.445Z",
+        "actor": "a5e9095f-915b-46b1-9aaf-20da4b0ff8e5",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "6a091e53-eaba-464b-9c7f-f04d099d69a7",
+        "at": "2026-11-18T02:11:48.445Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      },
+      {
+        "id": "42f70363-8325-4f1c-b77b-81b0beafe46c",
+        "at": "2026-11-18T02:11:50.434Z",
+        "actor": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      },
+      {
+        "id": "9deb177b-2f01-4fb5-8a52-fc06ff25759d",
+        "at": "2026-11-18T02:11:52.173Z",
+        "actor": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      },
+      {
+        "id": "5f614a86-9da4-4f89-88e5-4ff098cc9c35",
+        "at": "2026-11-18T02:11:53.902Z",
+        "actor": "a5e9095f-915b-46b1-9aaf-20da4b0ff8e5",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "6035d5b2-bba4-4143-b1e2-a221961a062e",
+        "participantId": "4b3501a6-3eb6-49bd-9b5c-6e98521dd322",
+        "at": "2026-11-18T02:11:50.434Z",
+        "input": {
+          "instrumentVersion": "DSR-1.0-2026-11-16",
+          "answers": [
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A"
+          ],
+          "open": [
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real."
+          ],
+          "consent": true
+        }
+      },
+      {
+        "id": "461779d2-35f8-4e15-86a3-9d3ba33ef021",
+        "participantId": "38a6f9eb-ced6-483a-9531-40764310741a",
+        "at": "2026-11-18T02:11:52.173Z",
+        "input": {
+          "instrumentVersion": "DSR-1.0-2026-11-16",
+          "answers": [
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A"
+          ],
+          "open": [
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real."
+          ],
+          "consent": true
+        }
+      },
+      {
+        "id": "3e5cd484-89a3-4515-8000-f41731e11f1a",
+        "participantId": "a5e9095f-915b-46b1-9aaf-20da4b0ff8e5",
+        "at": "2026-11-18T02:11:53.902Z",
+        "input": {
+          "instrumentVersion": "DSR-1.0-2026-11-16",
+          "answers": [
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A"
+          ],
+          "open": [
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+            "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real."
+          ],
+          "consent": true
+        }
+      }
+    ]
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 2,
+      "deliberationMs": 16263,
+      "repeatedObjections": [],
+      "votes": 5,
+      "objections": 1,
+      "distinctObjectionsByRound": 1
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 3,
+    "received": 3,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 9,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 9,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "openResponses": [
+      {
+        "alias": "P01",
+        "answers": [
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real."
+        ]
+      },
+      {
+        "alias": "P02",
+        "answers": [
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real."
+        ]
+      },
+      {
+        "alias": "P03",
+        "answers": [
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real.",
+          "[SINTÉTICO] Registro de teste de armazenamento, sem opinião de participante real."
+        ]
+      }
+    ],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

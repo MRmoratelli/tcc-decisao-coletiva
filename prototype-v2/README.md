@@ -60,3 +60,15 @@ D19/SUS/D20 e o protocolo A/B anterior permanecem históricos. Sua aplicação n
 
 ## Fontes e decisões
 Documentos do orientador de 16/11/2026: análise SWOT/especificação v1.0 e questionário DSR v1.0, ambos consultados integralmente. React e participação remota autenticada são decisões do grupo, distintas da simulação Svelte/local proposta no documento.
+
+## Continuidade da integração real — 17/11/2026
+
+O Neon V2 novo foi validado com API local real, duas rodadas, exportação, restauração e reconexão em novo processo. A evidência anterior de PGlite continua distinta. Gemini real ainda depende da chave nova; nenhuma credencial antiga foi reutilizada.
+
+O serviço Render foi criado sem credenciais e ainda não iniciou com sucesso. Não há aplicação pública funcional. O envio dos segredos ao backend V2 depende de autorização específica após bloqueio da revisão automática.
+
+Consulte [integração real e bloqueios](docs/INTEGRACAO_REAL_V2.md), [protocolo prospectivo](docs/PROTOCOLO_AVALIACAO_DSR_V2.md), [comentários acadêmicos](docs/MATRIZ_COMENTARIOS_ORIENTADOR_V2.md) e [configuração pública do serviço](deploy/render-service.json).
+
+O runtime usa a conexão pooled de dc2_app. Migrações usam DATABASE_URL_V2_DIRECT de dc2_owner, que não deve ser enviada ao runtime de hospedagem. O cenário científico permanece PENDENTE DE DEFINIÇÃO.
+
+Verificadores opt-in, para o responsável técnico após configuração autorizada: npm run validate:neon; npm run validate:neon -- --verify-restart; npm run validate:gemini. Este último exige ALLOW_LIVE_GEMINI_TEST=true e uma chave nova, executa chamadas externas e não publica uma síntese automaticamente.
