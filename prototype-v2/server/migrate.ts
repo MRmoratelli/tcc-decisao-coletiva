@@ -18,6 +18,6 @@ export async function migrate(client:{query:(sql:string,values?:any[])=>Promise<
 }
 if(process.argv[1]?.endsWith('migrate.ts')){
  if(process.env.V2_DATABASE_ISOLATED!=='true'||!process.env.DATABASE_URL_V2)throw new Error('Configure uma base V2 NOVA e V2_DATABASE_ISOLATED=true. Não reutilize a base histórica.');
- const pool=new pg.Pool({connectionString:process.env.DATABASE_URL_V2,max:1});const client=await pool.connect();
+ const pool=new pg.Pool({connectionString:process.env.DATABASE_URL_V2_DIRECT||process.env.DATABASE_URL_V2,max:1});const client=await pool.connect();
  try{await migrate(client);console.log('Migrações aditivas 001/002 aplicadas.');}finally{client.release();await pool.end();}
 }

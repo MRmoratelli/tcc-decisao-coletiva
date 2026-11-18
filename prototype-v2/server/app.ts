@@ -5,7 +5,7 @@ import { ProposalSchema, ReviewSchema, ChoiceSchema, EvaluationSchema } from '..
 import { Repository, type Identity } from './db.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
 import { DomainError,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
-export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string}={}){
+export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean}={}){
  if(signingKey.length<32)throw new Error('REVIEW_SIGNING_KEY forte obrigatório.');
  const app=express();app.disable('x-powered-by');
  app.use((_req,res,next)=>{res.set({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});next();});
@@ -48,7 +48,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
    metrics:identity.role==='moderator'?metrics(s):null};
  }
- app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2});});
+ app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false});});
  app.post('/api/ai/proposal-review',aiLimit,async(req,res)=>{
   z.literal(true).parse(req.body.consent);const proposal=ProposalSchema.parse(req.body.proposal);
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});

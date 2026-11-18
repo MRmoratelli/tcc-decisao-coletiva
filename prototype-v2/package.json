@@ -15,7 +15,8 @@
     "start:api": "tsx server/index.ts",
     "migrate": "tsx server/migrate.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.server.json",
-    "report:cohort": "tsx server/cohort.ts"
+    "report:cohort": "tsx server/cohort.ts",
+    "start": "node --import tsx server/index.ts"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
