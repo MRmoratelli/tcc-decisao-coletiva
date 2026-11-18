@@ -6,3 +6,10 @@ test('02 parecer de proposta validado e consultivo, sem alegar fonte externa',as
 test('06 analyzeContribution identifica alegação sem checagem factual',async()=>{const result=await jsonAdapter({...review,assertions:[{text:'Ganhará 80% de eficiência',status:'PRECISA_DE_FONTE',note:'Solicite evidência'}]}).analyzeContribution(proposal,'Ganhará 80% de eficiência');assert.equal(result.assertions[0].status,'PRECISA_DE_FONTE');});
 test('17 adaptador rejeita JSON inválido, campos ausentes, fatos falsamente confirmados e erro de transporte',async()=>{for(const body of ['{invalido','{}',JSON.stringify({...review,assertions:[{text:'Fato',status:'CONFIRMADO_POR_FONTE',note:'inventada'}]})]){await assert.rejects(new GeminiAdapter('fake',async()=>body).analyzeProposal(proposal),AIUnavailable);}await assert.rejects(new GeminiAdapter('fake',async()=>{throw new Error('privado');}).analyzeProposal(proposal),AIUnavailable);});
 test('12-13 contratos de análise e síntese passam por schema',async()=>{const fake=new FakeAI(),a=await fake.analyzeObjections(proposal,[]),s=await fake.synthesizeProposal(proposal,a);assert.deepEqual(await jsonAdapter(a).analyzeObjections(proposal,[]),a);assert.deepEqual(await jsonAdapter(s).synthesizeProposal(proposal,a),s);});
+
+test('integração: códigos HTTP são categorizados com falhas simuladas sem expor mensagem privada',async()=>{
+ for(const [status,code] of [[429,'RATE_LIMIT'],[403,'AUTHENTICATION'],[404,'MODEL_UNAVAILABLE'],[504,'TIMEOUT']] as const){
+  const ai=new GeminiAdapter('synthetic',async()=>{throw {status,message:'SECRET_MUST_NOT_APPEAR'};});
+  await assert.rejects(ai.analyzeProposal(proposal),(e:unknown)=>e instanceof AIUnavailable&&e.code===code&&e.httpStatus===status&&!e.message.includes('SECRET_MUST_NOT_APPEAR'));
+ }
+});

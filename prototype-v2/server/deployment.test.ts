@@ -18,5 +18,5 @@ test('deploy: frontend e SPA são servidos; API ausente continua JSON 404',async
  try{const a=server.address();if(!a||typeof a==='string')throw new Error('server');const base='http://127.0.0.1:'+a.port;
  assert.ok((await (await fetch(base+'/')).text()).includes('React V2'));assert.ok((await (await fetch(base+'/sala/teste')).text()).includes('React V2'));
  const missing=await fetch(base+'/api/missing');assert.equal(missing.status,404);assert.match(missing.headers.get('content-type')??'',/json/);assert.deepEqual(await (await fetch(base+'/api/health')).json(),{status:'ok'});}
- finally{await new Promise<void>(r=>server.close(()=>r()));await rm(dir,{recursive:true});}
+ finally{await new Promise<void>(r=>server.close(()=>r()));assert.ok(dir.startsWith(join(tmpdir(),'dc2-web-')));await rm(dir,{recursive:true});}
 });
