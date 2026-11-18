@@ -91,14 +91,14 @@
     "Free-tier service may sleep and quotas may change"
   ],
   "redeployVerification": {
-    "at": "2026-11-18T03:06:49.407Z",
-    "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c",
+    "at": "2026-11-18T03:22:10.110Z",
+    "commit": "acf4aed64ae541cb1f9ec75a4cfef72f3d519a9a",
     "persistence": true,
     "unchangedState": true
   },
   "activeCredentialProbe": {
     "status": "PASS",
-    "at": "2026-11-18T03:03:34.545Z",
+    "at": "2026-11-18T03:22:11.991Z",
     "contract": "analyzeProposal",
     "privateBackendOnly": true
   },
@@ -106,5 +106,41 @@
     "Initial analysis call failed with sanitized TRANSPORT code; original provider status unavailable. Structural grammar simplified, full local validation retained, analysis and synthesis passed.",
     "Initial V2 key appeared in a UI tool output. Replacement stored privately on authorized backend and authenticated successfully. Revocation of initial key awaits confirmation of irreversible UI deletion.",
     "First reconnect verifier compared complete export envelope with dynamic exportedAt. Corrected to compare the full state; same room passed, without changing deliberation data."
-  ]
+  ],
+  "keyLifecycleClosure": {
+    "recordedAt": "2026-11-18T03:23:07.091Z",
+    "authorization": "EXPLICIT_USER_AUTHORIZATION_2026-11-18",
+    "deletedKeyDisplayName": "tcc-decisao-v2-desenvolvimento",
+    "deletedKeyStatus": "DELETED_AND_ABSENT_FROM_AI_STUDIO_ACTIVE_LIST",
+    "activeKeyDisplayName": "tcc-decisao-v2-render",
+    "activeKeyUnchanged": true,
+    "privateStoredValueMatchedReplacement": true,
+    "renderService": "srv-dbugi3dg1s2s73bpt3f0",
+    "deployId": "dep-dbuhisgm7kps73ce6420",
+    "deployedCommit": "acf4aed64ae541cb1f9ec75a4cfef72f3d519a9a",
+    "beforeDeletion": {
+      "contract": "analyzeProposal",
+      "provider": "Gemini real",
+      "status": "PASS",
+      "at": "2026-11-18T03:21:32.969Z"
+    },
+    "afterDeletion": {
+      "contract": "analyzeProposal",
+      "provider": "Gemini real",
+      "status": "PASS",
+      "at": "2026-11-18T03:22:11.991Z",
+      "mock": false
+    },
+    "https": {
+      "frontend": 200,
+      "health": 200,
+      "renderDeployStatus": "live",
+      "aiConfigured": true
+    },
+    "persistedSyntheticStateUnchanged": true,
+    "otherKeysUntouched": true,
+    "noCodeChanges": true,
+    "secretValuesIncluded": false,
+    "correction": "Direct comparison found the service still configured with the initial key. The private variable was corrected, reloaded and compared exactly without outputting values. A new process authenticated before deletion and again after deletion. Earlier successful probes alone did not establish the key identity."
+  }
 }

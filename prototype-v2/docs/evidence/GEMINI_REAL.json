@@ -63,9 +63,47 @@
     }
   ],
   "activeCredentialProbe": {
-    "status": "PASS",
-    "at": "2026-11-18T03:03:34.545Z",
     "contract": "analyzeProposal",
-    "privateBackendOnly": true
+    "provider": "Gemini real",
+    "status": "PASS",
+    "at": "2026-11-18T03:22:11.991Z",
+    "mock": false,
+    "keyIdentityConfirmedPrivately": true
+  },
+  "keyLifecycleClosure": {
+    "recordedAt": "2026-11-18T03:23:07.091Z",
+    "authorization": "EXPLICIT_USER_AUTHORIZATION_2026-11-18",
+    "deletedKeyDisplayName": "tcc-decisao-v2-desenvolvimento",
+    "deletedKeyStatus": "DELETED_AND_ABSENT_FROM_AI_STUDIO_ACTIVE_LIST",
+    "activeKeyDisplayName": "tcc-decisao-v2-render",
+    "activeKeyUnchanged": true,
+    "privateStoredValueMatchedReplacement": true,
+    "renderService": "srv-dbugi3dg1s2s73bpt3f0",
+    "deployId": "dep-dbuhisgm7kps73ce6420",
+    "deployedCommit": "acf4aed64ae541cb1f9ec75a4cfef72f3d519a9a",
+    "beforeDeletion": {
+      "contract": "analyzeProposal",
+      "provider": "Gemini real",
+      "status": "PASS",
+      "at": "2026-11-18T03:21:32.969Z"
+    },
+    "afterDeletion": {
+      "contract": "analyzeProposal",
+      "provider": "Gemini real",
+      "status": "PASS",
+      "at": "2026-11-18T03:22:11.991Z",
+      "mock": false
+    },
+    "https": {
+      "frontend": 200,
+      "health": 200,
+      "renderDeployStatus": "live",
+      "aiConfigured": true
+    },
+    "persistedSyntheticStateUnchanged": true,
+    "otherKeysUntouched": true,
+    "noCodeChanges": true,
+    "secretValuesIncluded": false,
+    "correction": "Direct comparison found the service still configured with the initial key. The private variable was corrected, reloaded and compared exactly without outputting values. A new process authenticated before deletion and again after deletion. Earlier successful probes alone did not establish the key identity."
   }
 }

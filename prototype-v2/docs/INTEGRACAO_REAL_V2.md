@@ -9,7 +9,7 @@ Branch: feat/vite-typescript-decisao-generica. Base preservada: af2f8097317326b2
 | Gemini | VALIDADO tecnicamente | analyzeProposal, analyzeContribution, analyzeObjections e synthesizeProposal reais, sem mocks; chave substituta autenticada |
 | Deploy HTTPS | PUBLICADO | https://tcc-decisao-v2-test.onrender.com; GET /api/health 200; frontend servido pela mesma API Node |
 | Sessão remota | EXECUTADA | Sala sintética 9658E82969, três participantes fictícios, duas rodadas, unanimidade explícita; restauração 7E22B89F29 |
-| Segurança da chave inicial | PENDENTE | Substituta ativa privada e validada. Retirada da inicial exibida em uma saída da interface aguarda confirmação de exclusão irreversível |
+| Segurança da chave inicial | CONCLUÍDA em 18/11/2026 | Chave inicial excluída com autorização expressa; substituta conferida privadamente e Gemini real aprovado antes e depois |
 | Protocolo DSR | PROSPECTIVO | Cenário, amostra, recrutamento, consentimento e rubricas sujeitos à ratificação |
 
 ## Destinos e configuração efetiva
@@ -36,9 +36,9 @@ O AI Studio mostrou nível gratuito; não foi ativado faturamento pago, cartão 
 6. Três novos ACEITO: somente o terceiro encerrou em CONSENSUS. Duas rodadas preservadas.
 7. DSR armazenado por identidade: 22 N/A e quatro textos sintéticos, sem inventar percepções. Resultados descritivos e JSON exportados.
 8. Importação em nova sala, novas credenciais, isolamento 401 e tentativa de operação de moderador por participante 403.
-9. Novo deploy e nova conexão recuperaram o estado integral idêntico da sala original. A chave substituta passou por nova chamada analyzeProposal no backend HTTPS.
+9. Novo deploy e nova conexão recuperaram o estado integral idêntico da sala original. Os probes iniciais confirmaram autenticação, mas não a identidade da chave. A conferência direta e a validação da substituta foram concluídas em 18/11/2026, conforme o fechamento abaixo.
 
-Foram seis chamadas bem-sucedidas na sessão (um parecer inicial, três contribuições, uma análise e uma síntese), mais uma chamada de autenticação da substituta. As primeiras quatro usaram o commit 29d5ebc; análise e síntese, 5c33e82. A falha intermediária permanece no histórico como AI_FAILURE. Os tempos isolados não demonstram desempenho sob carga.
+Foram seis chamadas bem-sucedidas na sessão (um parecer inicial, três contribuições, uma análise e uma síntese), mais chamadas de autenticação; a identidade da substituta foi confirmada por comparação privada em 18/11/2026. As primeiras quatro usaram o commit 29d5ebc; análise e síntese, 5c33e82. A falha intermediária permanece no histórico como AI_FAILURE. Os tempos isolados não demonstram desempenho sob carga.
 
 ## Evidências e execução reproduzível
 - evidence/REMOTE_REAL.json: resultado, commits por chamada, reconexão e autenticação da chave ativa.
@@ -56,7 +56,7 @@ A base de 39 testes não foi repetida como diagnóstico. Antes desta configuraç
 ## Incidentes saneados
 - A primeira análise de objeções falhou com TRANSPORT e sem status original conservado. A gramática foi simplificada removendo maxItems enviados ao provedor; Zod continua impondo todos os limites. Análise e síntese passaram na mesma sala após o ajuste. A causa exata da primeira resposta não é afirmada retrospectivamente. Foram acrescentados códigos HTTP 400 e diagnóstico saneado sem mensagens privadas do provedor.
 - A cópia da área de transferência da interface inicialmente não disponibilizou valor; o health check permaneceu aiConfigured=false. O campo privado foi corrigido e só depois as chamadas reais passaram.
-- A leitura inicial do diálogo da chave expôs o valor em uma saída da interface. Nenhum valor foi salvo no Git, frontend ou documentos. Foi criada uma substituta, configurada exclusivamente no backend e autenticada. A interface de retirada da inicial adverte que a ação não pode ser desfeita; essa exclusão aguarda confirmação específica. Não foi tocada a chave antiga do Streamlit.
+- A leitura inicial do diálogo da chave expôs o valor em uma saída da interface. Nenhum valor foi salvo no Git, frontend ou documentos. Foi criada uma substituta. Na conferência direta de 18/11/2026, constatou-se que a configuração ainda conservava a inicial: os probes anteriores não comprovavam a identidade da chave usada. A variável privada foi corrigida com persistência conferida após recarregar o Render; o novo processo autenticou com a substituta. A exclusão da inicial foi então autorizada expressamente, executada e confirmada pela ausência na lista ativa; outro probe Gemini real passou após a retirada. Não foi tocada a chave antiga do Streamlit.
 - O primeiro verificador de reconexão comparou envelopes com exportedAt variável. Foi corrigido para comparar o estado integral, e a mesma sala passou sem alteração dos registros. O hash da exportação original continua identificado como hash daquele arquivo.
 
 ## Documentação acadêmica e preservação
@@ -65,6 +65,9 @@ Apenas o parágrafo de evidências técnicas do capítulo 5 na aba prospectiva f
 backup b1ccffdbfcbcd638da56026b89adeabbcdd70c9d, main, PR #4 e deploy Streamlit preservados.
 
 ## Ações indispensáveis antes do pré-teste com pessoas
-1. Confirmar retirada irreversível apenas da chave inicial V2 tcc-decisao-v2-desenvolvimento; a substituta já funciona.
+1. Segurança da chave inicial: concluída em 18/11/2026. Nenhuma outra chave foi alterada.
 2. Ratificar com o orientador cenário, participantes, privacidade/consentimento e procedimento DSR; não reativar automaticamente A/B.
 3. Conferir a cota efetiva disponível no dia, iniciar o serviço gratuito antes da sessão e manter exportações protegidas. Não foi realizado ensaio de carga, auditoria independente ou coleta científica.
+
+## Fechamento da chave inicial — 18/11/2026
+Foi excluída exclusivamente tcc-decisao-v2-desenvolvimento, após conferir a variável privada contra tcc-decisao-v2-render e validar o novo processo. A substituta permaneceu inalterada. Deploy dep-dbuhisgm7kps73ce6420, SHA acf4aed64ae541cb1f9ec75a4cfef72f3d519a9a. Chamada Gemini real aprovada antes da retirada (03:21:32 UTC) e após a retirada (03:22:11 UTC); página e /api/health HTTP 200; Render live. A sessão sintética persistida permaneceu idêntica. Não houve alteração de código, novas migrações ou exclusão de outros recursos. Evidência saneada: keyLifecycleClosure em evidence/REMOTE_REAL.json e evidence/GEMINI_REAL.json.

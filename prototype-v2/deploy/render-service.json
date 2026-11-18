@@ -31,7 +31,9 @@
   "status": "PUBLICADO",
   "credentialTransfer": "EXPLICITLY_AUTHORIZED_BACKEND_ONLY",
   "publicApplicationFunctional": true,
-  "securityPending": "Confirm removal of initial V2 key exposed in UI output; replacement active and verified",
-  "deployedCommit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c",
-  "verifiedDeployId": "dep-dbuha91srm7s73esdu0g"
+  "securityPending": null,
+  "deployedCommit": "acf4aed64ae541cb1f9ec75a4cfef72f3d519a9a",
+  "verifiedDeployId": "dep-dbuhisgm7kps73ce6420",
+  "initialKeyDeleted": true,
+  "activeKeyDisplayName": "tcc-decisao-v2-render"
 }

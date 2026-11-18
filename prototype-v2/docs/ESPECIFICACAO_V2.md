@@ -183,7 +183,7 @@ UC05: participante responde DSR individual; moderador exporta dados e pesquisado
 UC06: responsável restaura exportação em outra sala, com novas credenciais e proveniência declarada.
 
 ## Pendências essenciais
-O Neon V2 novo foi provisionado e validado com API local real, migrações e reconexão em novo processo. Os quatro contratos Gemini reais e a sessão remota HTTPS também passaram; consultar INTEGRACAO_REAL_V2.md. A chave ativa foi substituída e validada; a retirada da chave inicial exibida na interface aguarda confirmação de exclusão.
+O Neon V2 novo foi provisionado e validado com API local real, migrações e reconexão em novo processo. Os quatro contratos Gemini reais e a sessão remota HTTPS também passaram; consultar INTEGRACAO_REAL_V2.md. Em 18/11/2026, a chave inicial exibida na interface foi excluída com autorização expressa. A correspondência da substituta no backend foi conferida privadamente e Gemini passou antes e após a exclusão.
 Definir retenção/exclusão, consentimento e rubrica independente de fidelidade/argumentação; ratificar cenário, amostra, condições e instrumento.
 Não transportar resultados antigos para a V2, não alterar main/backup/PR4/Streamlit e não afirmar aprovação do orientador para diferenças de escopo.
 

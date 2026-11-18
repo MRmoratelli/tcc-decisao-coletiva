@@ -65,7 +65,7 @@ Aplicação: https://tcc-decisao-v2-test.onrender.com. Health check: /api/health
 
 Neon V2 isolado e quatro contratos Gemini reais validados. A sessão remota sintética 9658E82969 utilizou três identidades, duas rodadas, contestação, revisão operacional explícita, unanimidade e DSR com N/A. Exportação/importação e persistência após novo deploy passaram. Não é coleta científica ou avaliação humana independente.
 
-Os quatro segredos foram autorizados e guardados nas variáveis privadas do backend. A chave ativa tcc-decisao-v2-render foi substituída e validada; a retirada da chave inicial, exibida durante leitura da interface, depende da confirmação da exclusão irreversível. Não há valores de credenciais nos arquivos versionados.
+Os quatro segredos foram autorizados e guardados nas variáveis privadas do backend. A chave ativa tcc-decisao-v2-render foi conferida por comparação privada no backend e validada após novo deploy. Em 18/11/2026, a chave inicial tcc-decisao-v2-desenvolvimento foi excluída com autorização expressa; Gemini e HTTPS continuaram operacionais. Não há valores de credenciais nos arquivos versionados.
 
 Consulte [integração real e pendências](docs/INTEGRACAO_REAL_V2.md), [evidência remota](docs/evidence/REMOTE_REAL.json), [protocolo DSR prospectivo](docs/PROTOCOLO_AVALIACAO_DSR_V2.md) e [comentários acadêmicos](docs/MATRIZ_COMENTARIOS_ORIENTADOR_V2.md).
 
