@@ -1,0 +1,13 @@
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 118 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.42 kB │ gzip:   0.29 kB
+dist/assets/index-C2nKvUR0.css    5.51 kB │ gzip:   1.84 kB
+dist/assets/index-Buq5v51F.js   337.76 kB │ gzip: 102.84 kB
+
+✓ built in 265ms
+
+npm notice run decisao-coletiva-v2@0.2.0 build
+npm notice run tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.server.json && vite build
