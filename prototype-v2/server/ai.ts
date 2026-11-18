@@ -27,11 +27,18 @@ Inclua interesses comuns, conflitos, incompatibilidades e condições inegociáv
 Reformulação depende de aprovação humana. Retorne apenas JSON segundo o schema.
 `;
 export type Generate=(mode:string,input:unknown,schema:Record<string,unknown>)=>Promise<string>;
+// Large nested maxItems multiply the provider's decoding states. Keep the full
+// bounds in Zod after generation; send a simpler structural grammar to Gemini.
+function providerSchema(value:any):any{
+ if(Array.isArray(value))return value.map(providerSchema);
+ if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([key])=>key!=='maxItems').map(([key,v])=>[key,providerSchema(v)]));
+ return value;
+}
 export class GeminiAdapter implements AIAdapter{
  constructor(public model=process.env.GEMINI_MODEL||'gemini-3.5-flash-lite',private generate?:Generate){}
  private async call<T>(mode:string,input:unknown,schema:z.ZodType<T>):Promise<T>{
   try{
-   const jsonSchema=z.toJSONSchema(schema) as Record<string,unknown>;
+   const jsonSchema=providerSchema(z.toJSONSchema(schema)) as Record<string,unknown>;
    let text:string|undefined;
    if(this.generate)text=await this.generate(mode,input,jsonSchema);
    else {
@@ -44,7 +51,7 @@ export class GeminiAdapter implements AIAdapter{
    if(!text)throw new AIUnavailable('EMPTY_RESPONSE');
    let parsed:unknown;try{parsed=JSON.parse(text);}catch{throw new AIUnavailable('INVALID_JSON');}
    const validated=schema.safeParse(parsed);if(!validated.success)throw new AIUnavailable('INVALID_SCHEMA');return validated.data;
-  }catch(e){if(e instanceof AIUnavailable)throw e;const error=e as {status?:number;code?:number;name?:string};const status=Number(error?.status??error?.code)||undefined;const code=status===429?'RATE_LIMIT':status===401||status===403?'AUTHENTICATION':status===404?'MODEL_UNAVAILABLE':status===408||status===504||/Timeout|Abort/.test(error?.name??'')?'TIMEOUT':'TRANSPORT';throw new AIUnavailable(code,status);}
+  }catch(e){if(e instanceof AIUnavailable)throw e;const error=e as {status?:number;code?:number;name?:string;message?:string};const status=Number(error?.status??error?.code)||undefined;const code=status===400?(/too many states|too much branching|schema.*complex/i.test(error.message??'')?'SCHEMA_COMPLEXITY':'REQUEST_REJECTED'):status===429?'RATE_LIMIT':status===401||status===403?'AUTHENTICATION':status===404?'MODEL_UNAVAILABLE':status===408||status===504||/Timeout|Abort/.test(error?.name??'')?'TIMEOUT':'TRANSPORT';throw new AIUnavailable(code,status);}
  }
  analyzeProposal(proposal:ProposalContent){return this.call('analyzeProposal',{proposal},ReviewSchema);}
  analyzeContribution(proposal:ProposalContent,contribution:string){return this.call('analyzeContribution',{proposal,contribution},ReviewSchema);}

@@ -117,7 +117,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.use((err:unknown,_req:express.Request,res:express.Response,_next:express.NextFunction)=>{
   if(err instanceof ZodError){res.status(400).json({error:'Dados inválidos. Revise os campos e vínculos.'});return;}
   if(err instanceof DomainError){res.status(err.status).json({error:err.message});return;}
-  if(err instanceof AIUnavailable){res.status(502).json({error:'IA indisponível. Você pode continuar sem parecer; registre essa escolha.'});return;}
+  if(err instanceof AIUnavailable){console.warn('AI failure',JSON.stringify({code:err.code,status:err.httpStatus??null,model:ai.model,promptVersion:PROMPT_VERSION}));res.status(502).json({error:'IA indisponível. Você pode continuar sem parecer; registre essa escolha.'});return;}
   const msg=err instanceof Error?err.message:'';
   if(/Comprovante|Avaliação expirada|avaliação corrompido/i.test(msg)){res.status(400).json({error:msg});return;}
   const code=(err as {code?:string})?.code;
