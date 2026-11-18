@@ -18,7 +18,8 @@
     "report:cohort": "tsx server/cohort.ts",
     "start": "node --import tsx server/index.ts",
     "validate:neon": "tsx server/live-neon.ts",
-    "validate:gemini": "tsx server/live-gemini.ts"
+    "validate:gemini": "tsx server/live-gemini.ts",
+    "validate:remote": "tsx server/live-remote.ts"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
