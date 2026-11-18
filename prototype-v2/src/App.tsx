@@ -1,34 +1,23 @@
 import { useState, type FormEvent } from 'react';
-import { request, type CreatedRoom, type Review, type ReviewResult, type RoomView } from './api';
-
-const relevanceLabels:Record<Review['relevance'],string>={
-  RELACIONADA:'Relacionada ao tema',PARCIAL:'Parcialmente relacionada',
-  DESALINHADA:'Possivelmente fora do escopo',INDETERMINADA:'Pertinência incerta',
-};
-
-function ReviewCard({review,label}:{review:Review;label:string}){
-  return <section className="review" aria-label={label}>
-    <div className="review-head"><span>Parecer consultivo de IA</span><strong>{relevanceLabels[review.relevance]}</strong></div>
-    <p>{review.summary}</p>
-    {review.recommendations.length>0&&<><h4>Perguntas e sugestões de melhoria</h4><ul>{review.recommendations.map((x,i)=><li key={i}>{x}</li>)}</ul></>}
-    {review.assertions.length>0&&<><h4>Afirmações que merecem atenção</h4><ul>{review.assertions.map((a,i)=><li key={i}><strong>{a.text}</strong> — {a.note} <span className="muted">({a.status.replaceAll('_',' ').toLowerCase()})</span></li>)}</ul></>}
-    {review.limitations.length>0&&<p className="muted">Limitações: {review.limitations.join(' · ')}</p>}
-    <p className="disclaimer">Este parecer não é um julgamento definitivo de pertinência ou veracidade. A IA pode errar; a decisão é das pessoas.</p>
-  </section>;
-}
+import { request, type CreatedRoom, type ReviewResult, type RoomView } from './api';
+import { ProposalEditor,emptyProposal } from './components/ProposalEditor';
+import { ReviewCard } from './components/ReviewCard';
+import { RoomWorkspace } from './components/RoomWorkspace';
+import { ProposalSchema } from '../shared/contracts';
 
 export default function App(){
   const [tab,setTab]=useState<'create'|'join'>('create');
-  const [topic,setTopic]=useState('');
-  const [proposal,setProposal]=useState('');
+  const [proposal,setProposal]=useState(emptyProposal);
+  const [aiConsent,setAiConsent]=useState(false);
+  const [bypass,setBypass]=useState(false);
+  const [reviewedProposal,setReviewedProposal]=useState<typeof emptyProposal|null>(null);
+  const [initialReceipt,setInitialReceipt]=useState<string|undefined>();
   const [count,setCount]=useState(5);
   const [proposalReview,setProposalReview]=useState<ReviewResult|null>(null);
   const [created,setCreated]=useState<CreatedRoom|null>(null);
   const [code,setCode]=useState('');
   const [credential,setCredential]=useState('');
   const [session,setSession]=useState<{code:string;credential:string;view:RoomView}|null>(null);
-  const [contribution,setContribution]=useState('');
-  const [contributionReview,setContributionReview]=useState<ReviewResult|null>(null);
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState('');
   const [notice,setNotice]=useState('');
@@ -36,14 +25,14 @@ export default function App(){
 
   async function previewProposal(e:FormEvent){
     e.preventDefault();setError('');setNotice('');setBusy(true);
-    try{setProposalReview(await request<ReviewResult>('/ai/proposal-review',{topic,proposal}));}
+    try{if(!aiConsent)throw new Error('Confirme o envio da proposta ao Gemini.');const validated=ProposalSchema.parse(proposal);const result=await request<ReviewResult>('/ai/proposal-review',{proposal:validated,consent:true});setProposalReview(result);if(!reviewedProposal){setReviewedProposal(validated);setInitialReceipt(result.receipt);}}
     catch(e){message(e);}finally{setBusy(false);}
   }
   async function createRoom(){
-    if(!proposalReview)return;
+    if(!proposalReview&&!bypass)return;
     setError('');setBusy(true);
     try{
-      const result=await request<CreatedRoom>('/rooms',{topic,proposal,participantCount:count,receipt:proposalReview.receipt});
+      const result=await request<CreatedRoom>('/rooms',{proposal:ProposalSchema.parse(proposal),participantCount:count,receipt:proposalReview?.receipt??(bypass?undefined:initialReceipt),reviewedProposal:proposalReview?proposal:reviewedProposal??undefined,bypassReason:!proposalReview?'Moderador optou por criar a sala sem parecer consultivo.':undefined});
       setCreated(result);setCode(result.code);setTab('join');
       setNotice('Sala criada. Guarde e distribua as credenciais individualmente; elas só aparecem nesta tela.');
     }catch(e){message(e);}finally{setBusy(false);}
@@ -53,29 +42,11 @@ export default function App(){
     try{
       const normalized=codeValue.trim().toUpperCase();
       const view=await request<RoomView>('/rooms/'+normalized+'/view',{credential:tokenValue.trim()});
-      setSession({code:normalized,credential:tokenValue.trim(),view});
-      setContribution('');setContributionReview(null);
+      setCreated(null);setCredential('');setSession({code:normalized,credential:tokenValue.trim(),view});
+
     }catch(e){message(e);}finally{setBusy(false);}
   }
   async function join(e:FormEvent){e.preventDefault();await openRoom(code,credential);}
-  async function reviewContribution(e:FormEvent){
-    e.preventDefault();if(!session)return;
-    setError('');setBusy(true);
-    try{
-      const r=await request<ReviewResult>('/rooms/'+session.code+'/contribution-review',{credential:session.credential,text:contribution});
-      setContributionReview(r);
-    }catch(e){message(e);}finally{setBusy(false);}
-  }
-  async function saveContribution(userChoice:'ENVIAR'|'ENVIAR_COM_RESSALVA'){
-    if(!session||!contributionReview)return;
-    setError('');setBusy(true);
-    try{
-      await request('/rooms/'+session.code+'/contributions',{credential:session.credential,text:contribution,receipt:contributionReview.receipt,userChoice});
-      const view=await request<RoomView>('/rooms/'+session.code+'/view',{credential:session.credential});
-      setSession({...session,view});setContribution('');setContributionReview(null);
-      setNotice('Contribuição registrada com o texto original e parecer da IA. Ela não foi alterada automaticamente.');
-    }catch(e){message(e);}finally{setBusy(false);}
-  }
   async function refreshRoom(){
     if(!session)return;
     setError('');setBusy(true);
@@ -84,10 +55,12 @@ export default function App(){
       setSession({...session,view});
     }catch(e){message(e);}finally{setBusy(false);}
   }
+  async function act(work:()=>Promise<void>){setError('');setBusy(true);try{await work();}catch(e){await refreshRoom();message(e);}finally{setBusy(false);}}
+  async function importFile(file:File){await act(async()=>{if(file.size>8*1024*1024)throw new Error('Arquivo excede 8 MB.');const value=JSON.parse(await file.text());const result=await request<CreatedRoom>('/import',value);setCreated(result);setCode(result.code);setTab('join');setNotice('Cópia restaurada em sala nova. Guarde as novas credenciais.');});}
   return <div className="shell">
     <header className="topbar">
-      <div className="brand"><span className="mark">◇</span><div><b>Decisão Coletiva</b><small>Ambiente de desenvolvimento · Versão 2</small></div></div>
-      <span className="pill">IA consultiva · TypeScript</span>
+      <div className="brand"><span className="mark">◇</span><div><b>Decisão Coletiva</b><small>Consenso assistido · Versão 2</small></div></div>
+      <span className="pill">Decisão humana · IA consultiva</span>
     </header>
     <main className="content">
       <section className="intro">
@@ -102,16 +75,19 @@ export default function App(){
         {tab==='create'?<div className="card">
           <h2>Apresente o desafio ao grupo</h2><p className="muted">O parecer é exibido antes da criação e não aprova nem rejeita automaticamente sua proposta.</p>
           <form onSubmit={previewProposal}>
-            <label>Tema ou problema<input value={topic} minLength={3} maxLength={180} required placeholder="Ex.: Como definir as prioridades do projeto?" onChange={e=>{setTopic(e.target.value);setProposalReview(null);}}/></label>
-            <label>Proposta inicial<textarea value={proposal} minLength={4} maxLength={5000} required rows={5} placeholder="Descreva a proposta em detalhes para iniciar a discussão..." onChange={e=>{setProposal(e.target.value);setProposalReview(null);}}/></label>
+            <ProposalEditor value={proposal} onChange={value=>{setProposal(value);setProposalReview(null);}}/>
+            <label className="check"><input type="checkbox" checked={aiConsent} onChange={e=>setAiConsent(e.target.checked)}/> Autorizo enviar a proposta ao Gemini para parecer consultivo. Evite dados pessoais ou sensíveis.</label>
             <label>Participantes<input type="number" min={2} max={30} value={count} onChange={e=>setCount(Number(e.target.value))}/></label>
-            <button className="primary" type="submit" disabled={busy||!topic.trim()||!proposal.trim()}>{busy?'Analisando...':'1. Solicitar parecer da IA'}</button>
+            <button className="primary" type="submit" disabled={busy||!aiConsent}>{busy?'Analisando...':'1. Solicitar parecer da IA'}</button>
           </form>
           {proposalReview&&<div className="review-follow">
             <ReviewCard review={proposalReview.review} label="Parecer da proposta"/>
+            {proposalReview.review.suggestedRewrite&&<button className="secondary" onClick={()=>{setProposal({...proposal,text:proposalReview.review.suggestedRewrite});setProposalReview(null);setBypass(true);}}>Aceitar reformulação para editar e confirmar</button>}
             <button className="primary" disabled={busy} onClick={createRoom}>{busy?'Criando sala...':'2. Criar sala com esta proposta'}</button>
             <p className="muted">O responsável pode seguir com a proposta mesmo que o parecer identifique dúvidas ou pontos de atenção.</p>
           </div>}
+          {!proposalReview&&<div className="review-follow"><label className="check"><input type="checkbox" checked={bypass} onChange={e=>setBypass(e.target.checked)}/> Criar sala com minha versão sem parecer da IA.</label><button className="secondary" disabled={busy||!bypass} onClick={createRoom}>Confirmar proposta e criar sala</button></div>}
+          <details><summary>Restaurar processo de arquivo JSON</summary><label>Arquivo exportado da V2<input type="file" accept=".json,application/json" onChange={e=>{const file=e.target.files?.[0];if(file)void importFile(file);}}/></label><p>Cria sala nova e novas credenciais; preserva a sala de origem.</p></details>
         </div>:<div className="card">
           <h2>Entrar em uma discussão</h2><p className="muted">O moderador distribui código e credencial individual. Não compartilhe sua credencial.</p>
           <form onSubmit={join}>
@@ -130,25 +106,12 @@ export default function App(){
       </>}
       {session&&<section className="card room">
         <div className="row-between"><div><span className="eyebrow">Sala {session.code} · {session.view.role==='moderator'?'Moderador':session.view.alias}</span><h2>{session.view.room.topic}</h2></div><button className="secondary" onClick={refreshRoom} disabled={busy}>Atualizar</button></div>
-        <div className="proposal"><h3>Proposta inicial</h3><p>{session.view.room.proposal}</p></div>
-        <ReviewCard review={session.view.room.proposal_review} label="Parecer inicial"/>
-        {session.view.role==='participant'&&<div className="entry">
-          <h3>Sua contribuição</h3><p className="muted">Avalie sua mensagem com a IA. Você poderá revisar o texto ou enviá-lo com ressalvas sobre o parecer.</p>
-          <form onSubmit={reviewContribution}><label>Ideia, preocupação ou sugestão<textarea rows={5} value={contribution} minLength={4} maxLength={5000} required onChange={e=>{setContribution(e.target.value);setContributionReview(null);}}/></label>
-          <button disabled={busy||!contribution.trim()} className="primary">{busy?'Analisando...':'Avaliar pertinência e afirmações'}</button></form>
-          {contributionReview&&<div className="review-follow"><ReviewCard review={contributionReview.review} label="Parecer da contribuição"/>
-            <div className="actions"><button className="primary" disabled={busy} onClick={()=>saveContribution('ENVIAR')}>Enviar minha contribuição</button><button className="secondary" disabled={busy} onClick={()=>saveContribution('ENVIAR_COM_RESSALVA')}>Enviar com ressalva ao parecer</button></div>
-            <p className="muted">Nenhuma opinião é bloqueada automaticamente por discordar da IA. O texto original é mantido.</p>
-          </div>}
-        </div>}
-        <div className="entries"><h3>Contribuições registradas</h3>
-          {!session.view.canViewGroup?<p className="muted">As manifestações do grupo ficam ocultas até você registrar a sua primeira contribuição válida.</p>:
-            session.view.contributions.length===0?<p className="muted">Nenhuma contribuição registrada.</p>:
-            session.view.contributions.map(x=><article className="entry-card" key={x.id}><div className="row-between"><b>{x.alias}</b><time>{new Date(x.created_at).toLocaleString('pt-BR')}</time></div><p>{x.text}</p><small>Parecer IA: {relevanceLabels[x.review.relevance]} · {x.user_choice==='ENVIAR_COM_RESSALVA'?'Enviada com ressalva':'Enviada'}</small></article>)}
-        </div>
+        <div className="proposal"><h3>Proposta atual</h3><p>{session.view.room.proposal}</p></div>
+        {session.view.room.proposal_review&&<ReviewCard review={session.view.room.proposal_review} label="Parecer inicial"/>}
+        <RoomWorkspace session={session} busy={busy} act={act} onRefresh={refreshRoom}/>
         <button className="text-button" onClick={()=>{setSession(null);setNotice('');}}>Sair desta sala</button>
       </section>}
     </main>
-    <footer>Versão inicial em desenvolvimento · A IA auxilia, mas não decide · Não utilize dados pessoais ou sensíveis.</footer>
+    <footer>Versão 2 em desenvolvimento · A IA auxilia, mas não decide · Não utilize dados pessoais ou sensíveis.</footer>
   </div>;
 }

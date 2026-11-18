@@ -23,3 +23,13 @@ input,textarea{width:100%;border:1px solid #ccdbd5;border-radius:9px;padding:13p
 .text-button{border:0;background:none;color:#126957;text-decoration:underline;padding:12px 0;margin-top:20px}
 footer{text-align:center;color:#778981;padding:20px;font-size:12px;border-top:1px solid #e2eae7}
 @media(max-width:700px){.topbar{padding:16px 18px}.pill{display:none}.content{padding:29px 14px 50px}.card{padding:20px}.secret{grid-template-columns:1fr}.room .row-between{align-items:flex-start}.tabs button{flex:1}.review-head{align-items:flex-start;flex-direction:column}}
+
+.proposal-editor{display:grid;gap:18px}.proposal-editor details{display:grid}.proposal-editor details label{margin-top:16px}
+select{font:inherit;padding:12px;border-radius:9px;border:1px solid #ccdbd5;width:100%;background:#fff;color:#19382f}
+.check{display:flex;align-items:flex-start;font-weight:400;line-height:1.5}.check input{width:auto;margin-top:5px}
+.status-strip{display:flex;gap:15px;flex-wrap:wrap;justify-content:space-between;background:#e8f5ef;padding:18px;border-radius:10px}
+.positions{display:flex;flex-wrap:wrap;gap:14px;list-style:none;padding:0}.positions li{border:1px solid #d7e9df;padding:10px;border-radius:8px}
+details{margin:18px 0}summary{cursor:pointer;font-weight:650}fieldset{border:1px solid #d7e9df;border-radius:10px;padding:18px;display:grid;gap:20px;min-width:0}
+dt{font-weight:700}dd{margin:6px 0 15px;white-space:pre-wrap}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.preserve{white-space:pre-wrap}button:focus-visible,summary:focus-visible{outline:3px solid #138572;outline-offset:3px}
+.workspace section{margin-top:24px}.workspace label{margin:16px 0}.workspace hr{margin:28px 0}.evaluation{padding-top:25px;border-top:1px solid #d7e9df}
