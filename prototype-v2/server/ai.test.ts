@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { GeminiAdapter,AIUnavailable } from './ai.js';
+import { proposal,review,FakeAI,jsonAdapter } from './fixtures.js';
+test('02 parecer de proposta validado e consultivo, sem alegar fonte externa',async()=>{const ai=jsonAdapter(review),result=await ai.analyzeProposal(proposal);assert.equal(result.assertions[0].status,'COMPATIVEL_COM_CONTEXTO');assert.ok(result.limitations.length);});
+test('06 analyzeContribution identifica alegação sem checagem factual',async()=>{const result=await jsonAdapter({...review,assertions:[{text:'Ganhará 80% de eficiência',status:'PRECISA_DE_FONTE',note:'Solicite evidência'}]}).analyzeContribution(proposal,'Ganhará 80% de eficiência');assert.equal(result.assertions[0].status,'PRECISA_DE_FONTE');});
+test('17 adaptador rejeita JSON inválido, campos ausentes, fatos falsamente confirmados e erro de transporte',async()=>{for(const body of ['{invalido','{}',JSON.stringify({...review,assertions:[{text:'Fato',status:'CONFIRMADO_POR_FONTE',note:'inventada'}]})]){await assert.rejects(new GeminiAdapter('fake',async()=>body).analyzeProposal(proposal),AIUnavailable);}await assert.rejects(new GeminiAdapter('fake',async()=>{throw new Error('privado');}).analyzeProposal(proposal),AIUnavailable);});
+test('12-13 contratos de análise e síntese passam por schema',async()=>{const fake=new FakeAI(),a=await fake.analyzeObjections(proposal,[]),s=await fake.synthesizeProposal(proposal,a);assert.deepEqual(await jsonAdapter(a).analyzeObjections(proposal,[]),a);assert.deepEqual(await jsonAdapter(s).synthesizeProposal(proposal,a),s);});

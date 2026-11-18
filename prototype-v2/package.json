@@ -1,7 +1,7 @@
 {
   "name": "decisao-coletiva-v2",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -11,8 +11,11 @@
     "dev:web": "vite --host 127.0.0.1",
     "dev:api": "tsx watch server/index.ts",
     "build": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.server.json && vite build",
-    "test": "node --import tsx --test server/*.test.ts",
-    "start:api": "tsx server/index.ts"
+    "test": "node --import tsx --test server/*.test.ts src/*.test.tsx",
+    "start:api": "tsx server/index.ts",
+    "migrate": "tsx server/migrate.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.server.json",
+    "report:cohort": "tsx server/cohort.ts"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
@@ -33,6 +36,9 @@
     "concurrently": "^9.0.0",
     "tsx": "^4.19.0",
     "typescript": "~5.9.0",
-    "vite": "^8.0.0"
+    "vite": "^8.0.0",
+    "@electric-sql/pglite": "^0.3.0",
+    "react-test-renderer": "^19.0.0",
+    "@types/react-test-renderer": "^19.0.0"
   }
 }

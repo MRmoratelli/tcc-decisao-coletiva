@@ -29,7 +29,7 @@ export function makeReceipt(secret: string, kind: Receipt['kind'], context: unkn
 
 export function verifyReceipt(secret: string, token: string, kind: Receipt['kind'], context: unknown): unknown {
   const parts = token.split('.');
-  if (parts.length !== 2 || parts[0].length > 10000 || !/^[a-f0-9]{64}$/.test(parts[1])) {
+  if (parts.length !== 2 || parts[0].length > 1000000 || !/^[a-f0-9]{64}$/.test(parts[1])) {
     throw new Error('Comprovante de avaliação inválido.');
   }
   const computed = createHmac('sha256', secret).update(parts[0]).digest();
