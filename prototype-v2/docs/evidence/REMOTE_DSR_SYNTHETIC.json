@@ -1,0 +1,431 @@
+{
+  "expected": 3,
+  "received": 3,
+  "items": [
+    {
+      "item": 1,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 2,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 3,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 4,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 5,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 6,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 7,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 8,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 9,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 10,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 11,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 12,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 13,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 14,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 15,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 16,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 17,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 18,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 19,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 20,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 21,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "item": 22,
+      "n": 0,
+      "na": 3,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    }
+  ],
+  "dimensions": [
+    {
+      "name": "Utilidade percebida",
+      "n": 0,
+      "na": 9,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "name": "Eficácia na construção de consenso",
+      "n": 0,
+      "na": 12,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "name": "Qualidade da IA",
+      "n": 0,
+      "na": 12,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "name": "Transparência e confiança",
+      "n": 0,
+      "na": 12,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "name": "Usabilidade",
+      "n": 0,
+      "na": 12,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    },
+    {
+      "name": "Adoção e aplicabilidade",
+      "n": 0,
+      "na": 9,
+      "missing": 0,
+      "frequencies": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "mean": null
+    }
+  ],
+  "openResponses": [
+    {
+      "alias": "P01",
+      "answers": [
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+      ]
+    },
+    {
+      "alias": "P02",
+      "answers": [
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+      ]
+    },
+    {
+      "alias": "P03",
+      "answers": [
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+        "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+      ]
+    }
+  ],
+  "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+  "psychometricValidation": false
+}

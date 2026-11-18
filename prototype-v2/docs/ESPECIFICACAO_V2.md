@@ -1,5 +1,5 @@
 # Especificação integrada V2 — base de 17/11/2026
-Estado: implementação de desenvolvimento; sem implantação ou ratificação metodológica presumida.
+Estado: deploy técnico V2 publicado em HTTPS; ratificação metodológica permanece pendente.
 
 ## Fontes e diferenças de escopo
 Fontes primárias de requisitos: `analise_swot_especificacao_consenso.docx` e `questionario_avaliacao_artefato_DSR.docx`, versões 1.0 de 16/11/2026, lidas integralmente (quatro páginas cada).
@@ -90,7 +90,7 @@ Todos usam schemas de entrada/saída, instruções versionadas `consensus-consul
 - analyzeObjections(ProposalContent, votos, contribuições) → Assessment: avaliações de todas as rejeições, citações exatas, premissas, evidências, riscos, interesses, convergências, conflitos, condições inegociáveis e incertezas.
 - synthesizeProposal(ProposalContent, Assessment) → SynthesisResult: proposta estruturada, alterações e justificativas, vínculos com rejeições, cobertura sugerida, impasses e viabilidade.
 
-Schemas são enviados como JSON Schema ao Gemini e novamente validados com Zod na resposta. O backend exige cobertura completa das rejeições, IDs existentes e citações literais presentes nas justificativas. Isso reduz erros de estrutura e omissão detectável; não certifica fidelidade semântica.
+Uma gramática JSON Schema estrutural é enviada ao Gemini, sem maxItems aninhados para evitar expansão excessiva de estados no provedor. Os limites completos de quantidade e tamanho permanecem no Zod do backend e são validados na resposta. O backend exige cobertura completa das rejeições, IDs existentes e citações literais presentes nas justificativas. Isso reduz erros de estrutura e omissão detectável; não certifica fidelidade semântica.
 Análises anteriores a novas manifestações não fundamentam síntese sem nova análise. Mudanças concorrentes durante chamada externa causam 409 e não sobrescrevem a sala.
 Pareceres de proposta/contribuição recebem comprovantes HMAC temporários vinculados ao conteúdo, sala, participante e versão, conforme o tipo. Alteração de texto exige novo parecer ou escolha explícita de prosseguir sem ele. Contestações não apagam o original.
 
@@ -120,7 +120,7 @@ Toda mutação exige revision vigente. A transação bloqueia a linha da sala, c
 Credenciais aleatórias de 32 bytes são exibidas apenas na criação/restauração. O banco conserva HMAC com pepper de servidor; não retorna hashes nem acessos alheios.
 Antes da primeira manifestação na versão atual, a API oculta manifestações, análises e sínteses alheias. Isso não apaga informação vista em rodadas anteriores nem equivale a cegamento experimental integral.
 Participantes não recebem respostas DSR de outras pessoas. Exportação de pesquisa é exclusiva do moderador.
-Não há CORS amplo; origens são comparadas à mesma origem ou PUBLIC_ORIGIN configurada. HTTPS e proxy são responsabilidades da hospedagem, ainda não realizada.
+Não há CORS amplo; origens são comparadas à mesma origem ou PUBLIC_ORIGIN configurada. O serviço Render V2 publicado utiliza HTTPS e serve frontend e /api na mesma origem, com health check /api/health.
 
 ## Exportação e recuperação
 Envelope `dc2-consensus`, version 2: state, metrics, evaluation e proveniência declarada.
@@ -183,7 +183,7 @@ UC05: participante responde DSR individual; moderador exporta dados e pesquisado
 UC06: responsável restaura exportação em outra sala, com novas credenciais e proveniência declarada.
 
 ## Pendências essenciais
-O Neon V2 novo foi provisionado e validado com API local real, migrações e reconexão em novo processo. Permanecem a credencial Gemini nova, os quatro contratos reais e o teste remoto HTTPS; consultar INTEGRACAO_REAL_V2.md.
+O Neon V2 novo foi provisionado e validado com API local real, migrações e reconexão em novo processo. Os quatro contratos Gemini reais e a sessão remota HTTPS também passaram; consultar INTEGRACAO_REAL_V2.md. A chave ativa foi substituída e validada; a retirada da chave inicial exibida na interface aguarda confirmação de exclusão.
 Definir retenção/exclusão, consentimento e rubrica independente de fidelidade/argumentação; ratificar cenário, amostra, condições e instrumento.
 Não transportar resultados antigos para a V2, não alterar main/backup/PR4/Streamlit e não afirmar aprovação do orientador para diferenças de escopo.
 
@@ -192,4 +192,4 @@ A monografia oficial recebeu uma aba adicional “V2 prospectiva — 17-11-2026�
 https://docs.google.com/document/d/1ZGCZ-e4j87chplYk364C8eU5qUbcmH-fXIhdd6cqFx4/edit?tab=t.r4nlbwyv6bs0
 
 ## Integração e execução de produção — 17/11/2026
-O Node pode servir dist e /api na mesma origem. O runtime valida PORT, bind, origem HTTPS e separação de segredos; /api/health informa o commit declarado e se há chave configurada, sem afirmar disponibilidade do Gemini. Migrações podem usar DATABASE_URL_V2_DIRECT, separada da conexão pooled de dc2_app. A função de aplicação no Neon real não possui UPDATE ou DELETE em snapshots. O serviço Render existe, porém não está funcional: o envio dos segredos aguarda autorização específica após rejeição da revisão automática.
+O Node pode servir dist e /api na mesma origem. O runtime valida PORT, bind, origem HTTPS e separação de segredos; /api/health informa o commit declarado e se há chave configurada, sem afirmar disponibilidade do Gemini. Migrações podem usar DATABASE_URL_V2_DIRECT, separada da conexão pooled de dc2_app. A função de aplicação no Neon real não possui UPDATE ou DELETE em snapshots. O serviço Render V2 está funcional, com segredos autorizados nas variáveis privadas e health check configurado. O ensaio sintético e a persistência após novo deploy foram verificados; cenários, percepções e fidelidade humana científica não foram avaliados.

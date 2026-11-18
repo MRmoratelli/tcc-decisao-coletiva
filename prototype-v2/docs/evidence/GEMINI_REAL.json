@@ -1,11 +1,71 @@
 {
   "type": "TESTE_TECNICO_SINTETICO",
-  "at": "2026-11-18T02:24:04.787Z",
-  "provider": "Gemini real",
+  "status": "PASS",
+  "mode": "HTTPS backend only",
   "model": "gemini-3.5-flash-lite",
   "promptVersion": "consensus-consultive-v2.0",
-  "calls": [],
-  "scientificResults": false,
-  "status": "BLOQUEADO",
-  "reason": "NEW_API_KEY_NOT_CONFIGURED"
+  "origin": "https://tcc-decisao-v2-test.onrender.com",
+  "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c",
+  "calls": [
+    {
+      "contract": "analyzeProposal",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:35.594Z",
+      "elapsedMs": 2994,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeContribution",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:38.652Z",
+      "elapsedMs": 2656,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeContribution",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:41.890Z",
+      "elapsedMs": 2409,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeContribution",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:44.644Z",
+      "elapsedMs": 2120,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeObjections",
+      "status": "PASS",
+      "at": "2026-11-18T02:58:51.306Z",
+      "elapsedMs": 3384,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c"
+    },
+    {
+      "contract": "synthesizeProposal",
+      "status": "PASS",
+      "at": "2026-11-18T02:58:54.611Z",
+      "elapsedMs": 2335,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c"
+    }
+  ],
+  "activeCredentialProbe": {
+    "status": "PASS",
+    "at": "2026-11-18T03:03:34.545Z",
+    "contract": "analyzeProposal",
+    "privateBackendOnly": true
+  }
 }

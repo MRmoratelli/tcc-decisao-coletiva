@@ -13,7 +13,7 @@
   "startCommand": "cd prototype-v2 && npm start",
   "url": "https://tcc-decisao-v2-test.onrender.com",
   "healthCheckPathRequired": "/api/health",
-  "healthCheckPathProviderConfigured": false,
+  "healthCheckPathProviderConfigured": true,
   "privateEnvironmentKeysRequired": [
     "DATABASE_URL_V2",
     "AUTH_PEPPER",
@@ -26,9 +26,12 @@
     "API_HOST": "0.0.0.0",
     "V2_DATABASE_ISOLATED": "true",
     "PUBLIC_ORIGIN": "https://tcc-decisao-v2-test.onrender.com",
-    "GEMINI_MODEL": "VERIFY_AVAILABLE_MODEL"
+    "GEMINI_MODEL": "gemini-3.5-flash-lite"
   },
-  "status": "PREPARADO_SEM_CREDENCIAIS",
-  "credentialTransfer": "PENDING_EXPLICIT_APPROVAL",
-  "publicApplicationFunctional": false
+  "status": "PUBLICADO",
+  "credentialTransfer": "EXPLICITLY_AUTHORIZED_BACKEND_ONLY",
+  "publicApplicationFunctional": true,
+  "securityPending": "Confirm removal of initial V2 key exposed in UI output; replacement active and verified",
+  "deployedCommit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c",
+  "verifiedDeployId": "dep-dbuha91srm7s73esdu0g"
 }

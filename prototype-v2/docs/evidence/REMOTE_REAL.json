@@ -1,0 +1,110 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO",
+  "status": "PASS",
+  "at": "2026-11-18T02:59:38.778Z",
+  "origin": "https://tcc-decisao-v2-test.onrender.com",
+  "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c",
+  "neonReal": true,
+  "geminiReal": true,
+  "mock": false,
+  "roomCode": "9658E82969",
+  "restoredCode": "7E22B89F29",
+  "participants": 3,
+  "rounds": 2,
+  "result": "CONSENSUS",
+  "humanScientificEvaluation": false,
+  "questionnaire": "22 N/A + 4 synthetic open texts per identity; no scientific opinions",
+  "calls": [
+    {
+      "contract": "analyzeProposal",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:35.594Z",
+      "elapsedMs": 2994,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeContribution",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:38.652Z",
+      "elapsedMs": 2656,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeContribution",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:41.890Z",
+      "elapsedMs": 2409,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeContribution",
+      "status": "PASS",
+      "at": "2026-11-18T02:53:44.644Z",
+      "elapsedMs": 2120,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "29d5ebcca4f1bcbf04b475e4d622fb4cfd97fd16"
+    },
+    {
+      "contract": "analyzeObjections",
+      "status": "PASS",
+      "at": "2026-11-18T02:58:51.306Z",
+      "elapsedMs": 3384,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c"
+    },
+    {
+      "contract": "synthesizeProposal",
+      "status": "PASS",
+      "at": "2026-11-18T02:58:54.611Z",
+      "elapsedMs": 2335,
+      "provider": "Gemini real",
+      "mock": false,
+      "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c"
+    }
+  ],
+  "checks": [
+    "Moderator review explicitly confirmed by technical operator; no scientific human rating",
+    "HTTPS health and database",
+    "3 individual credentials",
+    "reject with justification",
+    "abstention does not imply acceptance",
+    "analysis and synthesis cover every rejection",
+    "original texts and contest preserved",
+    "new round requires new positions",
+    "unanimous explicit acceptance",
+    "JSON export/import with new credentials",
+    "isolation and moderator permission",
+    "DSR storage and descriptive export"
+  ],
+  "exportSha256": "b5ae8fe3b0cf42a0bfa2b172159953641fd862e54447e60fb97337793e3e1b8e",
+  "limitations": [
+    "Operational moderator role performed by technical operator; no independent human study",
+    "Scientific scenario and protocol ratification pending",
+    "Free-tier service may sleep and quotas may change"
+  ],
+  "redeployVerification": {
+    "at": "2026-11-18T03:06:49.407Z",
+    "commit": "5c33e8293a0a56e5573a65a0b5fac1a51e26c11c",
+    "persistence": true,
+    "unchangedState": true
+  },
+  "activeCredentialProbe": {
+    "status": "PASS",
+    "at": "2026-11-18T03:03:34.545Z",
+    "contract": "analyzeProposal",
+    "privateBackendOnly": true
+  },
+  "incidents": [
+    "Initial analysis call failed with sanitized TRANSPORT code; original provider status unavailable. Structural grammar simplified, full local validation retained, analysis and synthesis passed.",
+    "Initial V2 key appeared in a UI tool output. Replacement stored privately on authorized backend and authenticated successfully. Revocation of initial key awaits confirmation of irreversible UI deletion.",
+    "First reconnect verifier compared complete export envelope with dynamic exportedAt. Corrected to compare the full state; same room passed, without changing deliberation data."
+  ]
+}

@@ -43,9 +43,7 @@ Não existe uso de localStorage como banco, nem cache de credenciais persistente
 ## Validação e limites
 Veja [evidências executadas](docs/VALIDACAO_V2.md), [especificação e rastreabilidade](docs/ESPECIFICACAO_V2.md) e [texto acadêmico prospectivo](docs/ACADEMICO_V2_PROSPECTIVO.md).
 
-Os testes de integração executam HTTP real e PostgreSQL embarcado PGlite, com IA sintética. PGlite é dependência de teste, não o banco do servidor de produção. **Isso não certifica Neon nem Gemini reais.** As novas credenciais não estavam disponíveis na execução; nenhuma base histórica foi acessada.
-
-Não houve deploy V2 nem teste com participantes reais. O controle de acesso foi testado na API; não houve auditoria de segurança independente ou ensaio de carga.
+A validação inicial usou PGlite e IA sintética. A integração posterior foi executada contra Neon real e Gemini real pelo deploy HTTPS V2; as evidências de cada ambiente permanecem separadas. Nenhuma base histórica foi acessada. Não houve participantes reais, auditoria de segurança independente ou ensaio de carga.
 
 ## Avaliação exploratória
 O instrumento está incorporado à sala, com identificação Pxx e aplicação após encerramento de pelo menos duas rodadas. Se houver consenso na primeira, registre a ocorrência e não force uma nova rodada para obter respostas. O questionário não tem validação psicométrica demonstrada.
@@ -61,14 +59,16 @@ D19/SUS/D20 e o protocolo A/B anterior permanecem históricos. Sua aplicação n
 ## Fontes e decisões
 Documentos do orientador de 16/11/2026: análise SWOT/especificação v1.0 e questionário DSR v1.0, ambos consultados integralmente. React e participação remota autenticada são decisões do grupo, distintas da simulação Svelte/local proposta no documento.
 
-## Continuidade da integração real — 17/11/2026
+## Integração e deploy reais — 17/11/2026
 
-O Neon V2 novo foi validado com API local real, duas rodadas, exportação, restauração e reconexão em novo processo. A evidência anterior de PGlite continua distinta. Gemini real ainda depende da chave nova; nenhuma credencial antiga foi reutilizada.
+Aplicação: https://tcc-decisao-v2-test.onrender.com. Health check: /api/health. Render free, Node 22, frontend e /api na mesma origem, PUBLIC_ORIGIN HTTPS. Build: cd prototype-v2 && npm ci --include=dev && npm run build. Start: cd prototype-v2 && npm start.
 
-O serviço Render foi criado sem credenciais e ainda não iniciou com sucesso. Não há aplicação pública funcional. O envio dos segredos ao backend V2 depende de autorização específica após bloqueio da revisão automática.
+Neon V2 isolado e quatro contratos Gemini reais validados. A sessão remota sintética 9658E82969 utilizou três identidades, duas rodadas, contestação, revisão operacional explícita, unanimidade e DSR com N/A. Exportação/importação e persistência após novo deploy passaram. Não é coleta científica ou avaliação humana independente.
 
-Consulte [integração real e bloqueios](docs/INTEGRACAO_REAL_V2.md), [protocolo prospectivo](docs/PROTOCOLO_AVALIACAO_DSR_V2.md), [comentários acadêmicos](docs/MATRIZ_COMENTARIOS_ORIENTADOR_V2.md) e [configuração pública do serviço](deploy/render-service.json).
+Os quatro segredos foram autorizados e guardados nas variáveis privadas do backend. A chave ativa tcc-decisao-v2-render foi substituída e validada; a retirada da chave inicial, exibida durante leitura da interface, depende da confirmação da exclusão irreversível. Não há valores de credenciais nos arquivos versionados.
 
-O runtime usa a conexão pooled de dc2_app. Migrações usam DATABASE_URL_V2_DIRECT de dc2_owner, que não deve ser enviada ao runtime de hospedagem. O cenário científico permanece PENDENTE DE DEFINIÇÃO.
+Consulte [integração real e pendências](docs/INTEGRACAO_REAL_V2.md), [evidência remota](docs/evidence/REMOTE_REAL.json), [protocolo DSR prospectivo](docs/PROTOCOLO_AVALIACAO_DSR_V2.md) e [comentários acadêmicos](docs/MATRIZ_COMENTARIOS_ORIENTADOR_V2.md).
 
-Verificadores opt-in, para o responsável técnico após configuração autorizada: npm run validate:neon; npm run validate:neon -- --verify-restart; npm run validate:gemini. Este último exige ALLOW_LIVE_GEMINI_TEST=true e uma chave nova, executa chamadas externas e não publica uma síntese automaticamente.
+O runtime usa somente a conexão pooled dc2_app; DATABASE_URL_V2_DIRECT de dc2_owner é exclusiva das migrações e não foi enviada ao Render. Cenário científico, amostra e consentimento permanecem pendentes de ratificação. A instância gratuita pode dormir e demorar a responder; cotas do Gemini podem mudar. Nenhum faturamento pago foi ativado.
+
+Verificação remota opt-in: definir ALLOW_LIVE_REMOTE_TEST=true e V2_REMOTE_ORIGIN com a origem HTTPS, executar npm run validate:remote. O script salva acessos somente em .private (ignorado pelo Git) e retoma o mesmo teste. A primeira etapa gera um rascunho; --finish exige o arquivo privado de revisão operacional explicitamente confirmado. Se o teste já terminou, verifica o estado após novo deploy; --probe-ai acrescenta uma chamada Gemini de autenticação. Não copie esses arquivos privados para repositórios ou relatórios.

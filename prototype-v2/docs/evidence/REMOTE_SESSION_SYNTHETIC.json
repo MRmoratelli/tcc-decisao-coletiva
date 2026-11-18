@@ -1,0 +1,1199 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-18T02:59:37.420Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+      "problem": "O grupo fictício precisa conciliar prazo de entrega, acessibilidade e validação.",
+      "decision": "Definir prioridades provisórias para um projeto colaborativo fictício.",
+      "goals": "Entregar uma demonstração utilizável com responsabilidades e revisão explícitas.",
+      "alternatives": "Priorizar entrega rápida ou reservar etapas de acessibilidade e validação.",
+      "constraints": "Capacidade ainda não medida. Não assumir duração nem recursos adicionais.",
+      "successCriteria": "Prioridades e condições de revisão explícitas, sem unanimidade presumida.",
+      "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário científico oficial nem coleta com pessoas reais.",
+      "text": "Priorizar uma demonstração rápida. Acessibilidade e validação serão consideradas depois da primeira entrega."
+    },
+    "decision": {
+      "id": "9a28523e-5f3a-49f9-a4c9-23f1bd16ef50",
+      "originId": "9a28523e-5f3a-49f9-a4c9-23f1bd16ef50",
+      "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-18T02:53:35.614Z",
+      "closedAt": "2026-11-18T02:59:35.551Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "alias": "P01"
+      },
+      {
+        "id": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "alias": "P02"
+      },
+      {
+        "id": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "alias": "P03"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+          "problem": "O grupo fictício precisa conciliar prazo de entrega, acessibilidade e validação.",
+          "decision": "Definir prioridades provisórias para um projeto colaborativo fictício.",
+          "goals": "Entregar uma demonstração utilizável com responsabilidades e revisão explícitas.",
+          "alternatives": "Priorizar entrega rápida ou reservar etapas de acessibilidade e validação.",
+          "constraints": "Capacidade ainda não medida. Não assumir duração nem recursos adicionais.",
+          "successCriteria": "Prioridades e condições de revisão explícitas, sem unanimidade presumida.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário científico oficial nem coleta com pessoas reais.",
+          "text": "Priorizar uma demonstração rápida. Acessibilidade e validação serão consideradas depois da primeira entrega."
+        },
+        "createdAt": "2026-11-18T02:53:35.614Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "A proposta sintetizada prioriza a entrega rápida de uma demonstração inicial, adiando acessibilidade e validação para momentos posteriores. O parecer examina a coerência interna, preservando posições minoritárias e explicitando limitações, premissas, vieses e incertezas associadas ao contexto sintético fornecido.",
+            "recommendations": [
+              "Manter clareza sobre o caráter provisório das prioridades estabelecidas.",
+              "Registrar formalmente as objeções minoritárias relativas à exclusão temporária da acessibilidade.",
+              "Evitar premissas sobre capacidade e recursos enquanto não houver medição real."
+            ],
+            "assertions": [
+              {
+                "text": "Acessibilidade e validação serão consideradas depois da primeira entrega.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Essa afirmação reflete diretamente o texto da proposta em análise."
+              }
+            ],
+            "limitations": [
+              "A capacidade do grupo não foi medida, limitando a previsibilidade do cronograma.",
+              "A ausência de recursos adicionais restringe o escopo de entregas paralelas."
+            ],
+            "clarity": "A proposta é direta quanto à escolha por entrega rápida, mas omite critérios específicos de qual seria o padrão aceitável para essa demonstração inicial.",
+            "biasFlags": [
+              "Viés de enquadramento voltado à urgência de entrega em detrimento de requisitos de acessibilidade."
+            ],
+            "assumptions": [
+              "Assume-se que uma demonstração rápida agregará mais valor imediato do que incluir acessibilidade desde o início."
+            ],
+            "missingInfo": [
+              "Métricas concretas sobre a capacidade real do grupo.",
+              "Definição exata do escopo mínimo viável para a demonstração."
+            ],
+            "questions": [
+              "Como serão tratadas as demandas de acessibilidade caso a primeira entrega sofra atrasos?",
+              "Quais critérios definirão o momento adequado para iniciar a validação?"
+            ],
+            "uncertainties": [
+              "Incerteza sobre a aceitação da demonstração por partes interessadas que priorizam acessibilidade.",
+              "Incerteza quanto à viabilidade de retroajustes de acessibilidade após a primeira entrega."
+            ],
+            "suggestedRewrite": "Priorizar uma demonstração rápida como marco inicial, estabelecendo critérios explícitos e prazos definidos para a posterior integração de acessibilidade e validação, reconhecendo as limitações de capacidade do grupo."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.0",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        }
+      },
+      {
+        "id": "b979aeaa-46b3-4901-ac51-5436897dce20",
+        "version": 2,
+        "parentId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "content": {
+          "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+          "problem": "O grupo fictício precisa conciliar prazo de entrega, acessibilidade e validação.",
+          "decision": "Definir prioridades provisórias para um projeto colaborativo fictício, integrando critérios de acessibilidade e revisão de riscos de forma iterativa sem assumir prazos ou recursos adicionais.",
+          "goals": "Entregar uma demonstração utilizável com responsabilidades, acessibilidade inicial e revisão de riscos explícitas.",
+          "alternatives": "Priorizar entrega rápida versus reservar etapas imediatas de acessibilidade e validação antes de qualquer divulgação.",
+          "constraints": "Capacidade ainda não medida. Não assumir duração nem recursos adicionais.",
+          "successCriteria": "Prioridades e condições de revisão explícitas, englobando critérios de acesso e riscos, sem unanimidade presumida.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário científico oficial nem coleta com pessoas reais.",
+          "text": "Priorizar uma demonstração com requisitos iniciais de acessibilidade integrados e uma revisão de riscos anterior à divulgação, equilibrando a velocidade com as condições exigidas. Antes de definir o marco de demonstração, levantar capacidade, responsabilidades e critérios mínimos de acesso e validação. A estimativa de quinze dias permanece sem comprovação e não constitui compromisso."
+        },
+        "createdAt": "2026-11-18T02:59:32.863Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1",
+          "model": "human",
+          "reason": "[SINTÉTICO] Operador técnico revisou o rascunho no papel fictício de moderador: preservou as duas objeções parciais e as incertezas de capacidade, acrescentando condição explícita de revisão. Sem avaliação humana científica ou ratificação do cenário."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "number": 1,
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "status": "CLOSED",
+        "openedAt": "2026-11-18T02:53:35.614Z",
+        "closedAt": "2026-11-18T02:59:32.863Z"
+      },
+      {
+        "id": "c0e4a3cb-026c-4dd3-99e6-0f180b9b4819",
+        "number": 2,
+        "proposalId": "b979aeaa-46b3-4901-ac51-5436897dce20",
+        "status": "CLOSED",
+        "openedAt": "2026-11-18T02:59:32.863Z",
+        "closedAt": "2026-11-18T02:59:35.551Z"
+      }
+    ],
+    "votes": [
+      {
+        "id": "18ff1897-1ff1-4249-9dc2-507c8258ab23",
+        "participantId": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "choice": "REJEITO",
+        "justification": "Rejeito adiar acessibilidade. Precisamos de critérios de acesso antes da demonstração.",
+        "createdAt": "2026-11-18T02:53:39.161Z"
+      },
+      {
+        "id": "f042b294-a08f-476a-8f78-4fad92f5f456",
+        "participantId": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "choice": "REJEITO",
+        "justification": "Rejeito entregar sem validação. Reservar uma revisão de riscos antes de divulgar.",
+        "createdAt": "2026-11-18T02:53:42.216Z"
+      },
+      {
+        "id": "bb39284b-cacd-47c5-8a66-c393c272fda4",
+        "participantId": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "choice": "ABSTENHO",
+        "justification": "A estimativa de quinze dias ainda não tem fonte nem levantamento de capacidade.",
+        "createdAt": "2026-11-18T02:53:45.073Z"
+      },
+      {
+        "id": "699b0b19-6d0e-4d29-b79d-d40f208aa027",
+        "participantId": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "roundId": "c0e4a3cb-026c-4dd3-99e6-0f180b9b4819",
+        "proposalId": "b979aeaa-46b3-4901-ac51-5436897dce20",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:59:33.704Z"
+      },
+      {
+        "id": "1c557a51-2ab3-46cc-9989-f4d3963adcfe",
+        "participantId": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "roundId": "c0e4a3cb-026c-4dd3-99e6-0f180b9b4819",
+        "proposalId": "b979aeaa-46b3-4901-ac51-5436897dce20",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:59:34.779Z"
+      },
+      {
+        "id": "61ed2137-cb68-4bbd-a25c-f708f059fa92",
+        "participantId": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "roundId": "c0e4a3cb-026c-4dd3-99e6-0f180b9b4819",
+        "proposalId": "b979aeaa-46b3-4901-ac51-5436897dce20",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-18T02:59:35.551Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "5e9c53fe-17f2-4ffe-b260-9174f9b17839",
+        "participantId": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "originalText": "Rejeito adiar acessibilidade. Precisamos de critérios de acesso antes da demonstração.",
+        "text": "Rejeito adiar acessibilidade. Precisamos de critérios de acesso antes da demonstração.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "A contribuição rejeita a proposta de adiar a acessibilidade, defendendo a inclusão de critérios de acesso antes da primeira demonstração em um projeto colaborativo fictício.",
+            "recommendations": [
+              "Preservar a posição minoritária contrária ao adiamento da acessibilidade.",
+              "Avaliar a viabilidade de integrar critérios mínimos de acesso na demonstração inicial.",
+              "Explicitar os impasses entre rapidez de entrega e conformidade de acessibilidade."
+            ],
+            "assertions": [
+              {
+                "text": "Precisamos de critérios de acesso antes da demonstração.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "A alegação reflete a objeção da contribuição em relação ao cronograma proposto no teste sintético."
+              }
+            ],
+            "limitations": [
+              "Capacidade de projeto ainda não medida.",
+              "Ausência de recursos adicionais ou duração definida no contexto sintético."
+            ],
+            "clarity": "A contribuição é direta e clara ao apontar a discordância quanto à priorização do tempo em detrimento da acessibilidade.",
+            "biasFlags": [
+              "Viés de enquadramento voltado à urgência de entrega na proposta original versus viés de inclusão obrigatória imediata na contribuição."
+            ],
+            "assumptions": [
+              "Pressupõe-se que a acessibilidade pode ser integrada sem comprometer totalmente o prazo da demonstração ou que o prazo deve ceder espaço à acessibilidade."
+            ],
+            "missingInfo": [
+              "Estimativa de esforço para incluir critérios de acessibilidade na primeira entrega.",
+              "Definição clara do escopo mínimo da demonstração."
+            ],
+            "questions": [
+              "É possível definir um subconjunto de critérios de acessibilidade que atenda à objeção sem inviabilizar a demonstração rápida?"
+            ],
+            "uncertainties": [
+              "Incerteza sobre o impacto exato da exigência de acessibilidade prévia no prazo total do projeto."
+            ],
+            "suggestedRewrite": "Manter a proposta original visando a demonstração rápida, registrando formalmente a objeção e a demanda por inclusão de critérios de acessibilidade na primeira entrega, sem declarar consenso."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.0",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        },
+        "contest": "[SINTÉTICO] O parecer é consultivo; mantenho minha objeção original.",
+        "createdAt": "2026-11-18T02:53:39.161Z"
+      },
+      {
+        "id": "598227d9-7f0b-4b19-afb4-fe6ea20990eb",
+        "participantId": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "originalText": "Rejeito entregar sem validação. Reservar uma revisão de riscos antes de divulgar.",
+        "text": "Rejeito entregar sem validação. Reservar uma revisão de riscos antes de divulgar.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "A contribuição rejeita a proposta de entrega rápida sem validação prévia e sugere reservar uma revisão de riscos antes de divulgar.",
+            "recommendations": [
+              "Incluir uma etapa de revisão de riscos antes de qualquer divulgação inicial.",
+              "Avaliar a viabilidade de conciliar uma entrega funcional mínima com critérios básicos de validação."
+            ],
+            "assertions": [
+              {
+                "text": "Rejeito entregar sem validação. Reservar uma revisão de riscos antes de divulgar.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "A declaração contesta diretamente o foco exclusivo em entrega rápida apresentado nas alternativas e no texto da proposta."
+              }
+            ],
+            "limitations": [
+              "O cenário é sintético e a capacidade da equipe ainda não foi medida.",
+              "Não há dados sobre o impacto temporal da inclusão de uma revisão de riscos."
+            ],
+            "clarity": "A contribuição é direta e aponta um ponto específico de desacordo, embora não especifique o escopo exato da revisão de riscos.",
+            "biasFlags": [
+              "Viés de enquadramento em prol da segurança e qualidade em detrimento da velocidade de entrega."
+            ],
+            "assumptions": [
+              "Assume-se que a revisão de riscos pode ser acomodada sem inviabilizar completamente o cronograma provisório."
+            ],
+            "missingInfo": [
+              "Detalhamento sobre o tempo necessário para a revisão de riscos sugerida."
+            ],
+            "questions": [
+              "Como a revisão de riscos se encaixa no prazo de entrega almejado pela proposta?"
+            ],
+            "uncertainties": [
+              "Incerteza sobre se a exigência de revisão de riscos constitui uma condição inegociável para a parte dissidentes."
+            ],
+            "suggestedRewrite": "Propor uma entrega que inclua uma breve revisão de riscos antes de qualquer divulgação pública, assegurando validação mínima sem descartar o prazo."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.0",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        },
+        "contest": "",
+        "createdAt": "2026-11-18T02:53:42.216Z"
+      },
+      {
+        "id": "1e97ddc1-cc02-4937-a4d9-b02198542742",
+        "participantId": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "originalText": "A estimativa de quinze dias ainda não tem fonte nem levantamento de capacidade.",
+        "text": "A estimativa de quinze dias ainda não tem fonte nem levantamento de capacidade.",
+        "review": {
+          "result": {
+            "relevance": "INDETERMINADA",
+            "summary": "A contribuição aponta que a estimativa de quinze dias carece de fonte ou levantamento de capacidade, o que se alinha com as restrições declaradas na proposta de que a capacidade ainda não foi medida.",
+            "recommendations": [
+              "Apresentar dados sobre a capacidade atual antes de fixar prazos.",
+              "Avaliar o impacto de postergar acessibilidade e validação."
+            ],
+            "assertions": [
+              {
+                "text": "A estimativa de quinze dias ainda não tem fonte nem levantamento de capacidade.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "A restrição da proposta indica que a capacidade ainda não foi medida e não se deve assumir duração."
+              }
+            ],
+            "limitations": [
+              "O cenário é puramente sintético e carece de dados empíricos."
+            ],
+            "clarity": "A contribuição é direta e aponta uma lacuna específica na estimativa temporal.",
+            "biasFlags": [
+              "Viés potencial de assumir que a carência de dados invalida a proposta inteira em vez de tratá-la como provisória."
+            ],
+            "assumptions": [
+              "Assume-se que estimativas temporais foram mencionadas ou inferidas externamente, embora não estejam explícitas no texto principal da proposta."
+            ],
+            "missingInfo": [
+              "Dados quantitativos sobre a capacidade real da equipe."
+            ],
+            "questions": [
+              "De onde surgiu a referência aos quinze dias citada na contribuição?"
+            ],
+            "uncertainties": [
+              "Se há prazos implícitos não documentados no texto base."
+            ],
+            "suggestedRewrite": "Considerando que a capacidade ainda não foi medida, recomenda-se realizar um levantamento preliminar antes de fixar prazos ou priorizar a entrega rápida em detrimento da acessibilidade."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.0",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        },
+        "contest": "",
+        "createdAt": "2026-11-18T02:53:45.073Z"
+      }
+    ],
+    "analyses": [
+      {
+        "id": "6d724818-6309-4a9e-b538-79e79d6b576f",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "sourceFingerprint": "acf3080c2044fb4bca78680c258368522f7704f69c32ea7e168233e42d47ce40",
+        "result": {
+          "individualAssessments": [
+            {
+              "voteId": "18ff1897-1ff1-4249-9dc2-507c8258ab23",
+              "relevance": "Aponta a necessidade de inclusão da acessibilidade desde o início em vez de postergá-la.",
+              "explanation": "O votante rejeita a proposta porque ela adia a acessibilidade, defendendo que critérios de acesso devem existir antes da demonstração.",
+              "quotedExcerpt": "Rejeito adiar acessibilidade. Precisamos de critérios de acesso antes da demonstração.",
+              "premises": [
+                "Acessibilidade não deve ser tratada apenas após a primeira entrega."
+              ],
+              "evidence": [
+                "Alegação de necessidade de critérios de acesso prévios."
+              ],
+              "risks": [
+                "Exclusão de usuários caso a acessibilidade seja negligenciada na primeira versão."
+              ],
+              "uncertainty": "Não há dados sobre o impacto técnico de implementar a acessibilidade na primeira fase."
+            },
+            {
+              "voteId": "f042b294-a08f-476a-8f78-4fad92f5f456",
+              "relevance": "Destaca a importância de validação e revisão de riscos prévias à divulgação.",
+              "explanation": "O votante rejeita a proposta por falta de validação, exigindo uma revisão de riscos antes de qualquer divulgação.",
+              "quotedExcerpt": "Rejeito entregar sem validação. Reservar uma revisão de riscos antes de divulgar.",
+              "premises": [
+                "Entregas sem validação e sem revisão de riscos são inaceitáveis."
+              ],
+              "evidence": [
+                "Alegação sobre a necessidade de revisão de riscos antes da divulgação."
+              ],
+              "risks": [
+                "Divulgação de um produto com falhas não mapeadas ou riscos não avaliados."
+              ],
+              "uncertainty": "Não está claro o formato ou o tempo necessário para realizar essa revisão de riscos."
+            }
+          ],
+          "sharedInterests": [
+            "Realizar um projeto colaborativo com clareza de responsabilidades e revisão explícita."
+          ],
+          "convergences": [
+            "Reconhecimento de que a proposta atual, focada apenas na entrega rápida sem critérios iniciais de acesso e validação, é insuficiente para todos os participantes."
+          ],
+          "conflicts": [
+            "Conflito entre a priorização de uma demonstração rápida e a exigência de incluir acessibilidade e validação antes dessa entrega."
+          ],
+          "incompatibleObjections": [
+            "A exigência de critérios de acessibilidade prévios choca-se com a premissa de priorizar a velocidade de uma primeira demonstração simples."
+          ],
+          "nonNegotiableConditions": [
+            "Inclusão de critérios de acessibilidade antes da demonstração.",
+            "Realização de revisão de riscos antes da divulgação."
+          ],
+          "uncertainties": [
+            "Qual é a capacidade real da equipe para absorver etapas adicionais de acessibilidade e validação sem prazos definidos?",
+            "Como conciliar a urgência da demonstração com as demandas de segurança e acesso?"
+          ]
+        },
+        "promptVersion": "consensus-consultive-v2.0",
+        "model": "gemini-3.5-flash-lite",
+        "createdAt": "2026-11-18T02:58:50.844Z"
+      }
+    ],
+    "syntheses": [
+      {
+        "id": "001f9dce-fbc7-42c6-9989-70f302f90444",
+        "proposalId": "db9eec21-11f5-4787-b157-15d957c7e084",
+        "roundId": "1e0512ec-f552-467a-bc0f-faa89035553a",
+        "analysisId": "6d724818-6309-4a9e-b538-79e79d6b576f",
+        "result": {
+          "revisedProposal": {
+            "title": "[SINTÉTICO] Prioridades de projeto colaborativo",
+            "problem": "O grupo fictício precisa conciliar prazo de entrega, acessibilidade e validação.",
+            "decision": "Definir prioridades provisórias para um projeto colaborativo fictício, integrando critérios de acessibilidade e revisão de riscos de forma iterativa sem assumir prazos ou recursos adicionais.",
+            "goals": "Entregar uma demonstração utilizável com responsabilidades, acessibilidade inicial e revisão de riscos explícitas.",
+            "alternatives": "Priorizar entrega rápida versus reservar etapas imediatas de acessibilidade e validação antes de qualquer divulgação.",
+            "constraints": "Capacidade ainda não medida. Não assumir duração nem recursos adicionais.",
+            "successCriteria": "Prioridades e condições de revisão explícitas, englobando critérios de acesso e riscos, sem unanimidade presumida.",
+            "context": "TESTE TÉCNICO SINTÉTICO. Não é cenário científico oficial nem coleta com pessoas reais.",
+            "text": "Priorizar uma demonstração com requisitos iniciais de acessibilidade integrados e uma revisão de riscos anterior à divulgação, equilibrando a velocidade com as condições exigidas."
+          },
+          "changeLog": [
+            {
+              "change": "Inclusão de critérios de acessibilidade na fase inicial e introdução de uma revisão de riscos prévia à divulgação.",
+              "reason": "Atender às demandas de inclusão de critérios de acesso prévios e revisão de riscos exigidas nas rejeições.",
+              "voteIds": [
+                "18ff1897-1ff1-4249-9dc2-507c8258ab23",
+                "f042b294-a08f-476a-8f78-4fad92f5f456"
+              ]
+            }
+          ],
+          "addressedObjections": [],
+          "partiallyAddressedObjections": [
+            "18ff1897-1ff1-4249-9dc2-507c8258ab23",
+            "f042b294-a08f-476a-8f78-4fad92f5f456"
+          ],
+          "unresolvedObjections": [],
+          "remainingImpasses": [
+            "A exigência de critérios de acessibilidade prévios choca-se com a premissa de priorizar a velocidade de uma primeira demonstração simples.",
+            "Falta de dados sobre a capacidade real da equipe para absorver etapas adicionais de acessibilidade e validação sem prazos definidos."
+          ],
+          "feasibilityWarnings": [
+            "A inclusão de acessibilidade e revisão de riscos sem prazos definidos ou recursos adicionais pode comprometer a viabilidade da demonstração rápida.",
+            "A capacidade da equipe ainda não foi medida, gerando incerteza sobre o cumprimento simultâneo de todas as condições não negociáveis."
+          ]
+        },
+        "promptVersion": "consensus-consultive-v2.0",
+        "model": "gemini-3.5-flash-lite",
+        "createdAt": "2026-11-18T02:58:54.451Z",
+        "publishedProposalId": "b979aeaa-46b3-4901-ac51-5436897dce20",
+        "humanCoverage": []
+      }
+    ],
+    "contests": [
+      {
+        "id": "02d7eb03-bb1b-48d2-9783-758d87a4f36f",
+        "participantId": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "targetId": "6d724818-6309-4a9e-b538-79e79d6b576f",
+        "text": "[SINTÉTICO] A aceitação exige revisão dos participantes; a análise não comprova viabilidade.",
+        "at": "2026-11-18T02:58:51.715Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "12100555-cb1b-491c-8d12-6a557a4c9af6",
+        "at": "2026-11-18T02:53:35.614Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "e6dae281-1f19-4d4e-a933-adb39ac786b8",
+        "at": "2026-11-18T02:53:39.161Z",
+        "actor": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Parecer contestado."
+      },
+      {
+        "id": "493f967e-6b8e-4c1a-8373-14ca688fddfd",
+        "at": "2026-11-18T02:53:39.161Z",
+        "actor": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "5793700a-4498-4f9b-a5b0-8d659979301f",
+        "at": "2026-11-18T02:53:42.216Z",
+        "actor": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "7660a9d3-93e5-4b80-8357-ed27f7ca1926",
+        "at": "2026-11-18T02:53:42.216Z",
+        "actor": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "6a5583a3-f878-4893-9611-84583917acfc",
+        "at": "2026-11-18T02:53:45.073Z",
+        "actor": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "476a296f-f684-4006-95f5-b6abd4984ff7",
+        "at": "2026-11-18T02:53:45.073Z",
+        "actor": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "752267b1-3f99-413e-98b6-0c96584ff711",
+        "at": "2026-11-18T02:53:46.251Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "60be7a9a-4289-4974-a2d6-68f38df3b598",
+        "at": "2026-11-18T02:58:50.844Z",
+        "actor": "moderator",
+        "type": "OBJECTIONS_ANALYZED",
+        "detail": ""
+      },
+      {
+        "id": "7e61b365-2222-441b-b9b2-f6767ddaa261",
+        "at": "2026-11-18T02:58:51.715Z",
+        "actor": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "type": "AI_CONTESTED",
+        "detail": "[SINTÉTICO] A aceitação exige revisão dos participantes; a análise não comprova viabilidade."
+      },
+      {
+        "id": "e1544ab3-e4fc-4765-a392-33c22a4c69d5",
+        "at": "2026-11-18T02:58:54.451Z",
+        "actor": "moderator",
+        "type": "SYNTHESIS_DRAFTED",
+        "detail": ""
+      },
+      {
+        "id": "52a242c3-eac1-416e-8d63-033a155c1319",
+        "at": "2026-11-18T02:59:32.863Z",
+        "actor": "moderator",
+        "type": "PROPOSAL_PUBLISHED",
+        "detail": "[SINTÉTICO] Operador técnico revisou o rascunho no papel fictício de moderador: preservou as duas objeções parciais e as incertezas de capacidade, acrescentando condição explícita de revisão. Sem avaliação humana científica ou ratificação do cenário."
+      },
+      {
+        "id": "b433822f-a149-4ffa-9f5e-0289e9bc13e9",
+        "at": "2026-11-18T02:59:33.704Z",
+        "actor": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "5b215bf0-7d5d-4714-8385-266a55dbbee2",
+        "at": "2026-11-18T02:59:34.779Z",
+        "actor": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "8891145c-9e13-475f-8e23-d9e67ebf2d50",
+        "at": "2026-11-18T02:59:35.551Z",
+        "actor": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "1a9961bc-0068-4cde-a131-35a0ecc4bab0",
+        "at": "2026-11-18T02:59:35.551Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      },
+      {
+        "id": "14667d51-872e-486e-a646-ce65089bb379",
+        "at": "2026-11-18T02:59:36.174Z",
+        "actor": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      },
+      {
+        "id": "90678379-a436-4bb4-ac77-c6f4ae61d1a7",
+        "at": "2026-11-18T02:59:36.646Z",
+        "actor": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      },
+      {
+        "id": "6bd3c73a-af95-4563-a6f8-7c244b70c38e",
+        "at": "2026-11-18T02:59:37.115Z",
+        "actor": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "7f322d86-5682-4dc3-82e0-901905b8ea8c",
+        "participantId": "7c30a3b5-75ff-4f3d-b0b2-c3a46b82dd73",
+        "at": "2026-11-18T02:59:36.174Z",
+        "input": {
+          "instrumentVersion": "DSR-1.0-2026-11-16",
+          "answers": [
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A"
+          ],
+          "open": [
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+          ],
+          "consent": true
+        }
+      },
+      {
+        "id": "6dcb7726-f80f-4ef5-9933-4e1765a32f79",
+        "participantId": "e84be35b-5d1b-4125-ac24-867459189e66",
+        "at": "2026-11-18T02:59:36.646Z",
+        "input": {
+          "instrumentVersion": "DSR-1.0-2026-11-16",
+          "answers": [
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A"
+          ],
+          "open": [
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+          ],
+          "consent": true
+        }
+      },
+      {
+        "id": "6450c641-6e53-4e8d-a5cd-b0b626335a56",
+        "participantId": "3151f419-b6de-4304-92b0-dd8887171f3f",
+        "at": "2026-11-18T02:59:37.115Z",
+        "input": {
+          "instrumentVersion": "DSR-1.0-2026-11-16",
+          "answers": [
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            "N/A"
+          ],
+          "open": [
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+            "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+          ],
+          "consent": true
+        }
+      }
+    ]
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 2,
+      "deliberationMs": 359937,
+      "repeatedObjections": [],
+      "votes": 6,
+      "objections": 2,
+      "distinctObjectionsByRound": 2
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 3,
+    "received": 3,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 3,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 9,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 12,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 9,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "openResponses": [
+      {
+        "alias": "P01",
+        "answers": [
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+        ]
+      },
+      {
+        "alias": "P02",
+        "answers": [
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+        ]
+      },
+      {
+        "alias": "P03",
+        "answers": [
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada.",
+          "[SINTÉTICO] Teste de armazenamento; nenhuma percepção de pessoa real foi coletada."
+        ]
+      }
+    ],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}
