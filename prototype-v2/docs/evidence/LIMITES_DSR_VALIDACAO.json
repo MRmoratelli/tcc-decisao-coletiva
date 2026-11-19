@@ -1,0 +1,60 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO",
+  "status": "LOCAL_PASS_PENDING_DEPLOY",
+  "at": "2026-11-19T17:28:40.390Z",
+  "tests": 74,
+  "failed": 0,
+  "typeScriptFrontend": true,
+  "typeScriptBackend": true,
+  "viteBuild": true,
+  "realTavilyCreditsConsumedThisTask": 0,
+  "geminiFreeQuotaObserved": {
+    "model": "gemini-3.5-flash-lite",
+    "rpm": 15,
+    "rpd": 500,
+    "inputTpm": 250000,
+    "source": "Authenticated AI Studio project tcc-decisao-v2, 19/11/2026",
+    "rpdReset": "Pacific midnight; provider controlled"
+  },
+  "localLimits": {
+    "search": {
+      "dailyUTC": 100,
+      "rollingMinute": 15,
+      "monthlyUTC": 1000
+    },
+    "factualGemini": {
+      "dailyUTC": 250,
+      "rollingMinute": 12
+    },
+    "concurrentExternalLeases": 10,
+    "leaseExpiryMs": 90000,
+    "factualRequestsPerIPMinute": 60,
+    "factualRecordsPerRoom": 200,
+    "persistentLedger": true
+  },
+  "checks": [
+    "100 synthetic complete checks: 200 mocked Gemini calls and 100 mocked searches",
+    "101st daily search blocked",
+    "15/16 rolling-minute reservations",
+    "Restart and concurrent PostgreSQL budget instances retain counters",
+    "Monthly reservation cap; unknown-charge failures are not refunded",
+    "Cache reuse consumes no duplicate Search reservation",
+    "Ten concurrent fictitious identities; nine accepts OPEN and tenth CONSENSUS",
+    "Post-closure variant on one-round consensus and one-round no-consensus",
+    "Two-round variant and original response import preserved",
+    "N/A, null, neutral score and participant nonresponse distinguished",
+    "Four original Gemini contract regression and consensus rules",
+    "Original instrument arrays and original protocol Annex A retained"
+  ],
+  "instrument": {
+    "base": "DSR-1.0-2026-11-16",
+    "version": "DSR-1.1-NATURALISTICO",
+    "variant": "POS_ENCERRAMENTO_NATURALISTICO",
+    "status": "PROPOSAL_REQUIRES_METHODOLOGICAL_REVIEW_AND_RESPONDENT_PRETEST",
+    "closedItems": 22,
+    "openQuestions": 4,
+    "a4ChangedExplicitly": true,
+    "psychometricValidation": false,
+    "scientificResponses": false
+  }
+}

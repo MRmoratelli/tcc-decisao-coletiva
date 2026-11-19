@@ -14,7 +14,7 @@ A implementação amplia o React existente da branch `feat/vite-typescript-decis
 - Encerramento sem consenso com razão registrada.
 - Snapshots PostgreSQL append-only pela aplicação, migrações 001/002 com checksum e controle de concorrência.
 - Exportação/importação JSON v2; restauração cria sala nova e reemite credenciais.
-- Questionário DSR integral de 22 itens e quatro abertas, pós-sessão com pelo menos duas rodadas.
+- Questionário DSR com 22 itens e quatro abertas; variante proposta DSR-1.1-NATURALISTICO após encerramento de uma ou mais rodadas, preservando o original 1.0.
 - Exportação das respostas, frequências, médias descritivas, N/A e ausências separados; indicadores e preparação de codificação temática humana.
 
 ## Executar
@@ -46,7 +46,7 @@ Veja [evidências executadas](docs/VALIDACAO_V2.md), [especificação e rastreab
 A validação inicial usou PGlite e IA sintética. A integração posterior foi executada contra Neon real e Gemini real pelo deploy HTTPS V2; as evidências de cada ambiente permanecem separadas. Nenhuma base histórica foi acessada. Não houve participantes reais, auditoria de segurança independente ou ensaio de carga.
 
 ## Avaliação exploratória
-O instrumento está incorporado à sala, com identificação Pxx e aplicação após encerramento de pelo menos duas rodadas. Se houver consenso na primeira, registre a ocorrência e não force uma nova rodada para obter respostas. O questionário não tem validação psicométrica demonstrada.
+A variante proposta DSR-1.1-NATURALISTICO está incorporada à sala, com identificação Pxx, após encerramento com ou sem consenso de uma ou mais rodadas. Não force nova rodada. Os 22 itens e A1–A3 permanecem originais; A4 trata de usos futuros. N/A e ausência são separados. Revisão metodológica e pré-teste de compreensão devem preceder coleta científica; não há validação psicométrica demonstrada. O instrumento 1.0 histórico e sua condição original continuam preservados.
 
 No moderador, exporte processo e estatísticas. Para consolidar exportações:
 ```sh
@@ -78,3 +78,9 @@ Verificação remota opt-in: definir ALLOW_LIVE_REMOTE_TEST=true e V2_REMOTE_ORI
 O mecanismo atual usa Tavily Search básica para recuperar até três resultados públicos e Gemini 3.5 Flash-Lite para classificação e interpretação consultiva. Os registros novos conservam URLs, trechos, relevância, data quando fornecida, request_id, créditos, horário e vínculos literais da interpretação. Não reutilizam widgets ou metadados exclusivos do Google Grounding. Registros antigos continuam legíveis como históricos.
 
 Chave Tavily somente no backend Render; ativação exige Researcher gratuito e pay-as-you-go desligado, confirmados por TAVILY_RESEARCHER_CONFIRMED=true. **64 testes**, TypeScript/build e CI passaram. Uma Search real retornou três fontes por **1 crédito**, interpretadas pelo Gemini 3.5; dez identidades fictícias, exportação/persistência e interface móvel foram verificadas. Falhas temporárias Gemini e limites constam nas [evidências Tavily](docs/VERIFICACAO_FACTUAL_V2.md). Sem chave ou confirmação de plano, o fluxo retorna indisponibilidade e não tenta ativar faturamento.
+
+## Ampliação Tavily e aplicação DSR — 19/11/2026
+
+Tavily basic: 100 buscas/dia UTC, 15/minuto e orçamento mensal conservador de 1.000 reservas. Gemini factual: 250 chamadas/dia UTC e 12/minuto; quota gratuita observada de 500/dia, 15/minuto e 250 mil tokens de entrada/minuto, compartilhada com mediação. Até dez operações externas simultâneas, 60 requisições factuais/IP/minuto e 200 registros por sala. Os tetos não garantem volume de verificações completas. A migração **003_provider_budget** cria somente o ledger persistente no PostgreSQL V2; aplicar com o responsável pela base isolada antes de publicar o runtime novo. Não executa migração no Neon histórico. Sem o ledger, a busca falha de forma segura.
+
+[Versão de aplicação proposta](docs/DSR_1_1_NATURALISTICO.md) · [Protocolo 0.3](docs/PROTOCOLO_AVALIACAO_DSR_V2.md) · [Trechos acadêmicos pontuais](docs/TRECHOS_ATUALIZACAO_CAP4_CAP5_V2.md). Frequências e médias excluem N/A e ausências; não respondentes são contados separadamente; relatórios identificam versão e contexto.

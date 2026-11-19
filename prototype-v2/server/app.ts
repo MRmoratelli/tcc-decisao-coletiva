@@ -21,7 +21,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  };}
  app.use('/api',rateLimit(300));
  const aiLimit=rateLimit(20),creationLimit=rateLimit(10);
- const factualLimit=rateLimit(12);
+ const factualLimit=rateLimit(60);
  const credential=z.string().min(20).max(128),revision=z.number().int().positive();
  const text=z.string().trim().min(1).max(5000);
  const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional()});
@@ -53,7 +53,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
    metrics:identity.role==='moderator'?metrics(s):null};
  }
- app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,factual:{enabled:factual.enabled,retrievalProvider:'TAVILY',model:FACTUAL_MODEL,version:FACTUAL_VERSION,...(factual.availability?{availability:factual.availability}:{})}});});
+ app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,factual:{enabled:factual.enabled,retrievalProvider:'TAVILY',model:FACTUAL_MODEL,version:FACTUAL_VERSION,...(factual.availability?{availability:factual.availability,limits:factual.limits}:{})}});});
  app.post('/api/ai/proposal-review',aiLimit,async(req,res)=>{
   z.literal(true).parse(req.body.consent);const proposal=ProposalSchema.parse(req.body.proposal);
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});
@@ -75,7 +75,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const x=await repo.read(i);if(x.state.decision.status!=='OPEN'||currentProposal(x.state).id!==b.proposalId||currentRound(x.state).id!==b.roundId)throw new DomainError('Proposta ou rodada desatualizada.',409);
   const existing=[...x.state.factualChecks].reverse().find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
   if(existing&&!retryableFactual(existing,factual.availability?.searchConfigured)){res.json({check:existing,cached:true});return;}
-  if(x.state.factualChecks.length>=40)throw new DomainError('Limite de verificações desta sala atingido.',429);
+  if(x.state.factualChecks.length>=200)throw new DomainError('Limite de verificações desta sala atingido.',429);
   const previous=[...x.state.factualChecks].reverse().filter(isTavilyCheck).find(f=>f.version===FACTUAL_VERSION&&f.provenance==='LIVE_PROVIDER'&&f.proposalId===b.proposalId&&f.originalText===b.text&&(i.role==='moderator'||f.participantId===(i.participantId??null))&&f.classificationModel?.startsWith(FACTUAL_MODEL));
   const report=await factual.check(b.text,i.roomId,previous);
   // Merge only an append-only factual record, retrying revision races without repeating provider calls.

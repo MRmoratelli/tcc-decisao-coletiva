@@ -1,0 +1,24 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO",
+  "at": "2026-11-19T17:26:56.350Z",
+  "results": [
+    {
+      "command": "node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "node_modules/typescript/bin/tsc --noEmit -p tsconfig.server.json",
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "node_modules/vite/bin/vite.js build",
+      "code": 0,
+      "stdout": "\u001b[36mvite v8.3.8 \u001b[32mbuilding client environment for production...\u001b[36m\u001b[39m\ntransforming...\n✓ 120 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:   0.30 kB\ndist/assets/index-pJN53RV_.css    6.19 kB │ gzip:   2.01 kB\ndist/assets/index-CXa7VLq5.js   353.54 kB │ gzip: 106.94 kB\n\n\u001b[32m✓ built in 290ms\u001b[39m\n",
+      "stderr": ""
+    }
+  ]
+}

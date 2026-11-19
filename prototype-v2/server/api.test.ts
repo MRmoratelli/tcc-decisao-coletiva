@@ -81,7 +81,7 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   const answers=[5,'N/A',null,...Array(19).fill(4)],input={instrumentVersion:INSTRUMENT_VERSION,answers,open:['Contribuiu','Interpretou prazo','Não observei','Melhorar exemplos'],consent:true};
   const sent=await action(room,'/evaluation',{input},room.participants[0].credential);assert.equal(sent.status,201);
   assert.equal((await action(room,'/evaluation',{input},room.participants[0].credential)).status,409);
-  const result=await action(room,'/evaluation-results');assert.equal(result.status,200);assert.equal(result.data.items[1].na,1);assert.equal(result.data.items[1].missing,2);
+  const result=await action(room,'/evaluation-results');assert.equal(result.status,200);assert.equal(result.data.items[1].na,1);assert.equal(result.data.items[1].missing,0);
   const p2=await view(room,room.participants[1].credential);assert.equal(p2.state.evaluations.length,0);
  });
  await t.test('18 exportação JSON não inclui segredos e preserva o histórico',async()=>{
@@ -111,6 +111,6 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
  await t.test('persistência append-only, migração idempotente e nenhuma alteração de dados históricos',async()=>{
   const snapshots=await query('SELECT revision FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision',[(await view(room)).room.id]);assert.ok(snapshots.rows.length>10);assert.equal(snapshots.rows[0].revision,1);
   const legacy=await query('SELECT count(*)::int AS count FROM dc2_contributions');assert.equal(legacy.rows[0].count,0);
-  const migrations=await query('SELECT version FROM dc2_migrations');assert.equal(migrations.rows.length,2);
+  const migrations=await query('SELECT version FROM dc2_migrations');assert.equal(migrations.rows.length,3);
  });
 });

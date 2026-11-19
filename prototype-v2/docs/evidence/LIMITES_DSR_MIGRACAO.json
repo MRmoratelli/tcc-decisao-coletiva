@@ -1,0 +1,37 @@
+{
+  "type": "VALIDACAO_TECNICA_ADITIVA",
+  "at": "2026-11-19T17:28:39.600Z",
+  "project": "tcc-decisao-v2-dev",
+  "database": "decisao_v2",
+  "migration": "003_provider_budget",
+  "checksum": "da2dfeb61db2e45aa0b8135fd89a30aed9b71a697797cea6b9d3fd5cf1e3b362",
+  "before": {
+    "snapshots": "94",
+    "cutoff": "2026-11-19T16:27:43.000Z",
+    "state_hash": "a5bf9773ea322ccdef00c6216d38d633"
+  },
+  "after": {
+    "state_hash": "a5bf9773ea322ccdef00c6216d38d633",
+    "snapshots": "94",
+    "budget": {
+      "gemini": {
+        "day": "",
+        "calls": 0,
+        "month": "",
+        "minute": [],
+        "monthly": 0
+      },
+      "leases": [],
+      "search": {
+        "day": "2026-11-19",
+        "calls": 1,
+        "month": "2026-11",
+        "minute": [],
+        "monthly": 1
+      }
+    },
+    "budget_update_allowed": true
+  },
+  "historicalStateUnchanged": true,
+  "providerCalls": 0
+}

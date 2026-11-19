@@ -1,6 +1,6 @@
 # PROTOCOLO AVALIAÇÃO DSR V2
 
-Versão 0.2 pré avaliação. Data-base 18/11/2026. Situação: documento atualizado para apreciação do orientador, sem ratificação formal presumida.
+Versão 0.3 pré-avaliação. Data-base 19/11/2026. Situação: documento atualizado para apreciação do orientador, sem ratificação formal presumida.
 
 Projeto Processo de decisao. TCC Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Engenharia da Computação, Universidade Veiga de Almeida. Orientador Carlos Alvaro de Macedo Soares Quintella.
 
@@ -18,9 +18,9 @@ Conforme orientação comunicada pelo orientador, não é necessária submissão
 
 ## 2 ARTEFATO E CONTROLE DE VERSÃO
 
-React, TypeScript e Vite no frontend; Node.js e TypeScript no backend; PostgreSQL Neon; Gemini no backend; HTTPS no Render. Referência documental e de código consultada: cbad67bff215f5fa4bbc961955b46bc13553da05. Referência implantada documentada: 5c33e8293a0a56e5573a65a0b5fac1a51e26c11c. Modelo registrado: gemini-3.5-flash-lite; prompt consensus-consultive-v2.0. Registrar configuração efetiva e disponibilidade para a sessão, sem expor credenciais.
+React, TypeScript e Vite no frontend; Node.js e TypeScript no backend; PostgreSQL Neon; Gemini no backend; HTTPS no Render. Base desta atualização: branch feat/vite-typescript-decisao-generica, HEAD ef8c588d206c201dcacd9fe53a71a6e94a280088 antes das alterações. Gemini 3.5 Flash-Lite e prompt consensus-consultive-v2.0 preservados. Registrar SHA implantado, versão factual e disponibilidade efetiva na sessão, sem expor credenciais.
 
-A verificação factual externa não está implementada: o adaptador apenas analisa o contexto e sinaliza necessidade de fonte. Se a capacidade for implementada posteriormente, atualizar versão do protocolo, informação ao participante, monografia e registro técnico antes de atribuí-la à intervenção.
+A verificação factual consultiva usa Tavily Search básica para recuperação e Gemini 3.5 Flash-Lite para classificação e interpretação. Uma consulta pública real, com três fontes e um crédito, foi validada tecnicamente em 19/11/2026; isso não demonstra acurácia geral. Fontes, trechos, datas disponíveis, horários, incertezas e contestações são exportáveis. Os novos tetos internos são 100 buscas/dia UTC e 15/minuto, com orçamento mensal conservador de 1.000 reservas e controle compartilhado persistente no PostgreSQL V2. Não são franquia diária do provedor nem garantia de 100 verificações completas. Gemini factual: 250 chamadas/dia UTC e 12/minuto; quota gratuita observada no projeto: 500/dia, 15/minuto e 250 mil tokens de entrada/minuto, compartilhada com mediação. A quota diária do provedor usa meia-noite do Pacífico. Falhas e limites serão relatados, sem ativar faturamento.
 
 ## 3 PROCEDIMENTO OPERACIONAL E ANÁLISE
 
@@ -32,9 +32,9 @@ Prevê-se aproximadamente dez participantes de um grupo preexistente que possui 
 
 O recrutamento será documentado antes da aplicação. A proposta de procedimento consiste em convite ao próprio grupo, com explicação da finalidade acadêmica, participação voluntária e possibilidade de recusa sem consequência para a convivência. O canal, o responsável pelo convite e a relação dos pesquisadores com os integrantes precisam ser registrados. Não há, nesta versão, evidência suficiente para declarar idade, profissão, escolaridade ou vínculos pessoais específicos.
 
-Propõem-se como critérios de participação: pertencer ao grupo envolvido na organização, ter interesse na decisão, compreender as informações sobre a pesquisa e conseguir utilizar a ferramenta com a orientação técnica oferecida. O perfil e os critérios finais serão ratificados e documentados, sem ampliar a coleta de dados pessoais além do necessário. A composição dos habilitados será definida antes da abertura; uma desistência durante a sessão será registrada, sem remover retroativamente uma objeção para produzir unanimidade.
+Propõem-se como critérios de participação: pertencer ao grupo envolvido na organização, ter interesse na decisão, compreender as informações sobre a pesquisa e conseguir utilizar a ferramenta com a orientação técnica oferecida. Não haverá cadastro formal adicional nem coleta de perfis pessoais para fins científicos; serão mantidas somente as identidades técnicas necessárias e as informações mínimas sobre participação e tratamento de dados. A composição dos habilitados será definida antes da abertura; uma desistência durante a sessão será registrada, sem remover retroativamente uma objeção para produzir unanimidade.
 
-O moderador publica propostas, examina as sugestões e registra razões de encerramento. Sua identidade funcional, vínculo com o grupo e eventual condição de participante decisor precisam ser definidos. Se também votar, utilizará uma credencial própria de participante, distinta da função de moderador; isso será explicitado na análise. O moderador não poderá votar pelos demais nem pressionar o grupo a concordar.
+O moderador será integrante do grupo responsável pelo TCC. Facilitará operacionalmente a utilização, revisará e publicará propostas e registrará o encerramento, sem votar pelos integrantes que organizam o churrasco ou pressionar consenso. Não será criado um voto de moderador para substituir manifestação de participante.
 
 Os pesquisadores disponibilizam o sistema, apresentam informações sobre o procedimento e oferecem suporte técnico. Intervenções de conteúdo, se excepcionalmente ocorrerem, deverão constar do diário de sessão como desvios, com sua possível influência discutida. Relações anteriores entre pesquisadores e participantes serão relatadas apenas na medida necessária para compreender acesso, influência e limites do caso.
 
@@ -50,7 +50,7 @@ Será conservado um registro inicial do contexto tal como apresentado pelo grupo
 
 O procedimento abaixo organiza a aplicação sem prescrever a posição dos integrantes ou um número mínimo de divergências. Data, modalidade presencial ou remota, duração disponível e responsáveis serão registrados antes da sessão. A aplicação poderá terminar com consenso ou sem consenso.
 
-1. Informar finalidade acadêmica, registros previstos, envio de textos ao Gemini, acesso aos dados, desistência e possibilidade de uso de trechos; registrar concordância voluntária.
+1. Informar finalidade acadêmica, registros previstos, envio autorizado de textos mínimos ao Gemini e alegações públicas à Tavily, acesso aos dados, desistência e possibilidade de uso de trechos; registrar concordância voluntária.
 2. Orientar o uso técnico da ferramenta, explicar os papéis, as posições possíveis e a diferença entre sugestão da IA e decisão humana.
 3. Solicitar ao próprio grupo que apresente sua necessidade e os aspectos que deseja resolver, conservando esse registro.
 4. Formular a proposta inicial com os participantes; solicitar parecer consultivo quando autorizado e registrar a decisão humana de manter, editar ou reformular.
@@ -62,14 +62,14 @@ O procedimento abaixo organiza a aplicação sem prescrever a posição dos inte
 10. Publicar nova versão somente por ação do moderador, com razão registrada e preservação do encadeamento.
 11. Receber novas manifestações sobre a versão publicada, sem reaproveitar votos anteriores como aceitação. Prosseguir apenas enquanto houver necessidade deliberativa legítima.
 12. Registrar consenso explícito ou encerramento sem consenso, com razão, incidentes e eventuais interrupções.
-13. Oferecer a avaliação individual pós-utilização conforme as condições do instrumento e a decisão documentada para sessões de uma rodada.
+13. Oferecer individualmente a variante DSR-1.1-NATURALISTICO após encerramento legítimo, com consenso ou sem consenso, independentemente do número de rodadas. Antes da coleta científica, concluir revisão metodológica e pré-teste da variante.
 14. Exportar e conferir os registros, separar dados científicos de ensaios sintéticos e executar o plano de análise.
 
 Uma falha do Gemini será registrada como incidente da condição assistida. A possibilidade de prosseguir sem parecer é uma salvaguarda de continuidade, não um grupo experimental sem IA. Se a falha impedir a aplicação prevista, seu impacto e o eventual encerramento serão relatados sem substituição silenciosa da intervenção.
 
 ### 3.4 INSTRUMENTOS DE COLETA
 
-O instrumento individual principal é o Questionário de Avaliação de Artefato — Design Science Research, versão 1.0, de 16/11/2026, fornecido pelo orientador. Serão preservados seus 22 itens fechados e quatro questões abertas. A escala corresponde a 1, discordo totalmente; 2, discordo; 3, nem concordo nem discordo; 4, concordo; e 5, concordo totalmente, com opção N/A, não se aplica. A ausência de resposta será registrada separadamente. O texto integral está no Anexo A.
+O instrumento de referência é o Questionário de Avaliação de Artefato — Design Science Research, versão 1.0, de 16/11/2026, fornecido pelo orientador. O original permanece integralmente preservado no Anexo A e no arquivo de origem. Para aplicação após uma ou mais rodadas, foi implementada a proposta DSR-1.1-NATURALISTICO, sujeita a revisão metodológica e pré-teste antes da coleta. Serão preservados seus 22 itens fechados e quatro questões abertas. A escala corresponde a 1, discordo totalmente; 2, discordo; 3, nem concordo nem discordo; 4, concordo; e 5, concordo totalmente, com opção N/A, não se aplica. A ausência de resposta será registrada separadamente. O texto original está no Anexo A; a versão de aplicação, suas instruções e a alteração explícita de A4 estão em DSR_1_1_NATURALISTICO.md. A1–A3 e os 22 itens fechados não mudaram; A4 passa a “Que funcionalidade deveria ser modificada ou acrescentada para usos futuros?”.
 
 As dimensões são utilidade percebida, itens 01–03; eficácia na construção de consenso, 04–07; qualidade da IA, 08–11; transparência e confiança, 12–15; usabilidade, 16–19; e adoção e aplicabilidade, 20–22. As denominações pertencem ao instrumento; respostas nessas dimensões não comprovam eficácia objetiva ou qualidade factual.
 
@@ -93,7 +93,7 @@ Quadro 4 — Indicadores previstos para o caso
 | Duração | Criação até encerramento, segundo carimbos de tempo | Inclui espera; discussão ativa exige diário próprio |
 | Resultado formal | Consenso ou encerramento sem consenso; abertos e interrupções discriminados | Consenso não equivale a qualidade, convicção ou justiça |
 | Percepções | Frequências por item e respostas abertas individuais | Observações vinculadas ao mesmo processo coletivo |
-| Fidelidade independente | Correspondência entre texto de origem e síntese, quando houver rubrica ratificada | Sem rubrica não haverá escore independente |
+| Fidelidade percebida e registros | Percepções do questionário e exame descritivo dos textos disponíveis | Não haverá avaliação independente adicional, rubrica ou nota de fidelidade |
 
 Fonte: autores, com base no instrumento do orientador e na implementação V2.
 
@@ -101,7 +101,7 @@ Com apenas um processo coletivo, o resultado será relatado como ocorrência sin
 
 ### 3.6 PLANO DE ANÁLISE
 
-A análise quantitativa será descritiva. Para cada item, serão apresentados número de participantes habilitados, respondentes, respostas válidas 1–5, frequências de cada valor, N/A e ausências. N/A e ausências não serão convertidos em zero nem incluídos no denominador da média. Percentuais, se utilizados, indicarão seu denominador.
+A análise quantitativa será descritiva. Para cada item, serão apresentados número de participantes habilitados, respondentes, respostas válidas 1–5, frequências de cada valor, N/A e ausências. N/A e ausências não serão convertidos em zero nem incluídos no denominador da média. A não resposta de um participante ao formulário inteiro será contada separadamente das questões ausentes em formulários enviados. Serão informados versão/variante, número de rodadas e resultado, sem misturar automaticamente condições de exposição. Percentuais, se utilizados, indicarão seu denominador.
 
 Médias dos valores 1–5 poderão complementar as frequências, com cautela por se tratar de respostas ordinais e amostra pequena. As médias por dimensão calculadas pelo software agregam os valores efetivamente respondidos; serão acompanhadas do número de respostas e não chamadas de escores psicométricos validados. Não serão imputados dados nem realizados testes de significância, comparações causais ou estimativas de eficácia geral.
 
@@ -109,21 +109,23 @@ As respostas abertas serão examinadas por codificação temática humana. O pro
 
 O processo coletivo será reconstruído em ordem temporal, associando proposta, rodada, manifestações, análises, síntese e revisão publicada. Serão examinados exemplos de objeções preservadas, parcialmente incorporadas e não atendidas, assim como casos que contradigam avaliações positivas do questionário. Falhas de IA, fontes inexistentes, omissões, direcionamento percebido e diferenças entre saída original e revisão humana receberão exame explícito.
 
-A fidelidade independente requer rubrica e avaliadores definidos antes da aplicação desse julgamento. Propõe-se analisar cada vínculo entre objeção e síntese quanto a preservação do sentido, das condições e da atribuição, distinguindo omissão, distorção e conteúdo acrescentado. Essa proposta não é um instrumento validado ou já ratificado. Sem definição, o relato ficará restrito a exemplos documentados e julgamentos identificados de participantes e moderador, sem nota de qualidade argumentativa.
+Não haverá avaliação humana independente adicional da fidelidade das sínteses. A análise utilizará a percepção captada pelo questionário e o exame descritivo dos registros disponíveis, sem inventar rubricas, avaliadores ou notas. As funções opcionais de cobertura existentes no software não constituem uma medida científica independente adotada neste protocolo.
 
-### 3.7 CONSENSO NA PRIMEIRA RODADA
+### 3.7 APLICAÇÃO APÓS UMA OU MAIS RODADAS
 
-O consenso na primeira rodada é um resultado legítimo e não autoriza fabricar discordância, alterar a composição dos habilitados ou publicar uma versão sem necessidade apenas para liberar o questionário. O instrumento original instrui responder após pelo menos duas rodadas; a V2 aplica essa condição no domínio. Por isso, uma sessão de uma rodada não poderá receber automaticamente o instrumento nas mesmas condições declaradas.
+O orientador comunicou a possibilidade de utilizar o instrumento existente ou elaborar instrumento fundamentado para processos encerrados antes da segunda rodada. O grupo optou pela proposta de variante DSR-1.1-NATURALISTICO: 22 itens e quatro abertas, com instruções de decisão real, N/A explícito para experiência não vivenciada e alteração identificada de A4. Isso não equivale a ratificação formal da redação adaptada nem validação psicométrica. A implementação está disponível para pré-teste; revisão metodológica e pré-teste com pessoas de características próximas às do grupo devem preceder a coleta científica.
 
-São submetidas à apreciação do orientador duas opções metodológicas. A primeira preserva integralmente as condições originais: o processo é descrito e analisado pelos registros, mas não recebe o questionário de duas rodadas; a perda de respostas e seu viés de seleção são explicitados. A segunda admite aplicação complementar por meio de adaptação previamente autorizada e versionada das instruções para uma rodada, mantendo os itens e prevendo N/A quando a experiência necessária não ocorreu. Essa segunda opção exige decisão acadêmica e posterior ajuste operacional ou meio autorizado de aplicação; não está implementada por esta tarefa.
+Consenso e encerramento sem consenso na primeira rodada são legítimos. O formulário abre somente após encerramento. Não se fabrica divergência, voto ou nova versão para desbloqueá-lo. Itens sobre objeções, aproximação de posições, reformulação, sínteses e alterações continuam visíveis, com N/A disponível, sem seleção automática da nota 3 ou de N/A. Qualquer resposta pode permanecer ausente. O item 20 permanece hipotético como no original e deve ser examinado no pré-teste; não foi reescrito silenciosamente.
 
-Uma eventual segunda rodada só será legítima se o próprio grupo identificar necessidade substantiva de revisão antes do encerramento. Não constitui solução metodológica imposta pela pesquisa. Até decisão expressa, a regra de trabalho é preservar o instrumento e a condição operacional existentes, registrar o caso de uma rodada e não aplicar silenciosamente o questionário fora de sua instrução original. O impasse entre o termo simulação do instrumento e a utilização real também deverá constar da decisão sobre instruções, sem alterar unilateralmente o documento do orientador.
+O FEDS fundamenta a escolha do episódio naturalístico e a explicitação da estratégia de avaliação (Venable, Pries-Heje e Baskerville, 2016). Não fornece validação do questionário ou uma regra de número de rodadas. A fundamentação de instruções, opções de resposta, não resposta, pré-teste e documentação da adaptação provém das boas práticas da AAPOR e do padrão A2 do U.S. Census Bureau. Essas recomendações orientam o procedimento; não constituem aprovação institucional do instrumento.
+
+Versão, variante, base original, quantidade de rodadas, resultado, encerramento e exposição operacional registrada são conservados com cada nova resposta. Dados antigos mantêm sua versão, respostas e condição original de duas rodadas. Não se preenchem retrospectivamente metadados ausentes. Relatórios separam versões e número de rodadas; A4 adaptada não é automaticamente equivalente à original.
 
 ### 3.8 PRIVACIDADE E PARTICIPAÇÃO VOLUNTÁRIA
 
 Conforme orientação comunicada pelo orientador ao grupo, o procedimento planejado neste Trabalho de Conclusão de Curso (TCC) não necessita de submissão ao Comitê de Ética da Universidade Veiga de Almeida (UVA). Registra-se essa orientação sem atribuir ao Comitê parecer formal de aprovação ou dispensa que não foi informado. A submissão não é tratada como pendência ou requisito de execução.
 
-Antes da utilização, os participantes receberão informação sobre finalidade acadêmica, dados registrados, assistência consultiva e envio de proposta, contribuições e justificativas à API Gemini, uma interface de programação de aplicações. Serão explicados os acessos dos pesquisadores e moderador, o uso de trechos na monografia e os limites da pseudonimização em um grupo pequeno. Participar da decisão e autorizar o uso de seus registros na pesquisa são questões que deverão ser esclarecidas sem coerção.
+Antes da utilização, os participantes receberão informação sobre finalidade acadêmica, dados registrados, assistência consultiva e envio autorizado de proposta, contribuições e justificativas à API Gemini e da pergunta pública mínima à Tavily Search, uma interface de programação de aplicações. Serão explicados os acessos dos pesquisadores e moderador, o uso de trechos na monografia e os limites da pseudonimização em um grupo pequeno. Participar da decisão e autorizar o uso de seus registros na pesquisa são questões que deverão ser esclarecidas sem coerção.
 
 A identificação utilizará P01, P02 e assim sucessivamente. Contatos de recrutamento e registros de concordância ficarão separados dos dados da sala. Textos livres serão revisados para minimizar identificadores antes da divulgação. Os participantes serão orientados a não inserir dados pessoais desnecessários ou sensíveis; os pseudônimos, sozinhos, não tornam anônimos os relatos.
 
@@ -139,11 +141,11 @@ O estudo contempla um único processo coletivo e uma amostra reduzida, sem grupo
 
 A dependência do Gemini envolve variação de respostas, configuração, disponibilidade e mudanças do serviço. A rastreabilidade permite identificar a configuração registrada, mas não garante reprodução textual idêntica. Os testes técnicos não substituem avaliação científica, e os julgamentos do moderador não substituem avaliação independente.
 
-O consenso formal informa apenas que todos os habilitados registraram aceitação sobre uma mesma versão. Não demonstra convicção, justiça, correção factual, qualidade substantiva ou execução do churrasco. Uma sessão sem consenso permanece informativa. A eventual não aplicação do questionário em uma rodada e a ausência de verificação factual externa serão explicitadas como limites, evitando seleção de evidências que favoreça uma conclusão.
+O consenso formal informa apenas que todos os habilitados registraram aceitação sobre uma mesma versão. Não demonstra convicção, justiça, correção factual, qualidade substantiva ou execução do churrasco. Uma sessão sem consenso permanece informativa. A ausência de experiência em certas funcionalidades será apresentada por N/A e pelos registros; a disponibilidade da verificação factual não garante sua correção. Falhas de provedores e fontes desatualizadas serão explicitadas, evitando seleção de evidências que favoreça uma conclusão.
 
 ## 4 PREPARAÇÃO E REGISTRO DA APLICAÇÃO
 
-Antes da aplicação, completar: data, modalidade, intervalo disponível, perfil mínimo, forma de recrutamento, vínculo do moderador, papéis dos pesquisadores, informação e concordância, guarda, prazo de retenção e contato responsável. Conferir acessos individualizados, conectividade, versão do instrumento e exportação disponível. Não executar testes sintéticos dentro da sala científica nem importar o ensaio fictício como caso real.
+Antes da aplicação, completar: data, modalidade, intervalo disponível, forma de recrutamento sem cadastro adicional, identidade funcional do moderador integrante do TCC, papéis dos pesquisadores, informação e concordância, guarda, prazo de retenção e contato responsável. Conferir acessos individualizados, conectividade, versão do instrumento e exportação disponível. Não executar testes sintéticos dentro da sala científica nem importar o ensaio fictício como caso real.
 
 Registrar a formulação espontânea do problema, composição inicial dos habilitados, proposta confirmada pelo grupo e mudanças de escopo. O diário de sessão deve indicar fases temáticas, pausas, auxílio técnico, intervenção de conteúdo excepcional, falha da IA e motivo de encerramento. A orientação técnica não poderá determinar votos.
 
@@ -154,20 +156,20 @@ Separar identificadores e consentimentos dos dados da sala. Exportações restau
 ## 5 DECISÕES A RATIFICAR OU COMPLETAR
 
 1. Ratificação do desenho naturalístico como estudo de caso único.
-2. Perfil, recrutamento e relação entre integrantes e pesquisadores.
-3. Identificação do moderador, eventual voto e intervenções permitidas.
-4. Procedimento para instrumento em uma rodada e instrução de simulação em utilização real; itens não alterados unilateralmente.
-5. Rubrica, avaliadores e conciliação para fidelidade independente, se essa medida for adotada; sem definição, não produzir escore.
-6. Responsável pela guarda, local, acessos, prazo, cópias, contato, retenção e retirada do uso acadêmico.
-7. Decisão sobre avaliação com capacidade factual atual ou implementação posterior, em tarefa própria.
+2. Canal e responsável pelo convite e relação de acesso ao grupo, sem cadastro científico ou coleta adicional de perfis.
+3. Revisão metodológica da proposta DSR-1.1-NATURALISTICO e pré-teste de compreensão, navegação e interpretação de N/A antes da coleta; registrar achados e versão final.
+4. Responsável pela guarda, local, acessos, prazo, cópias, contato, retenção e retirada do uso acadêmico.
 
-Não permanecem indefinidos o problema real, a autoria autônoma, um grupo de aproximadamente dez participantes, condição única com IA, legitimidade do encerramento sem consenso e orientação sobre desnecessidade de submissão ao Comitê.
+Estão definidos: problema autônomo do churrasco; grupo aproximado de dez integrantes; condição única com IA; moderador integrante do TCC sem voto pelos demais; ausência de avaliação independente adicional de fidelidade; encerramento com ou sem consenso; possibilidade técnica de questionário em uma rodada por variante identificada; orientação de desnecessidade de submissão ao Comitê. Nenhuma aprovação formal inexistente é atribuída.
 
 ## 6 HISTÓRICO E FONTES
 
-Versão 0.1 de 17/11/2026: preparação prospectiva, com contexto e amostra ainda indefinidos e menção a comparação alternativa. Versão 0.2 de 18/11/2026: incorpora decisões do grupo, retira comparação da execução atual e detalha avaliação naturalística, instrumentos e dados. O histórico anterior permanece nos commits, sem alterar main, backup ou Streamlit.
+Versão 0.1 de 17/11/2026: preparação prospectiva, com contexto e amostra ainda indefinidos e menção a comparação alternativa. Versão 0.2 de 18/11/2026: incorpora decisões do grupo, retira comparação da execução atual e detalha avaliação naturalística, instrumentos e dados. Versão 0.3 de 19/11/2026: registra Tavily/Gemini reais, tetos persistentes e variante proposta DSR-1.1-NATURALISTICO após encerramento de uma ou mais rodadas; incorpora moderador e ausência de avaliação independente adicional. O histórico anterior permanece nos commits, sem alterar main, backup ou Streamlit.
 
 Fontes: Hevner et al. (2004); Peffers et al. (2007); Venable, Pries-Heje e Baskerville (2016); Yin (2018); documentos do orientador de 16/11/2026; monografia oficial e sua aba V2; código e INTEGRACAO_REAL_V2.md na referência identificada. A orientação sobre Comitê e as decisões atuais do grupo foram comunicadas no comando de consolidação acadêmica de 18/11/2026, sem atribuir ratificação formal a todo o protocolo.
+
+
+Referências adicionais da adaptação: VENABLE, J.; PRIES-HEJE, J.; BASKERVILLE, R. FEDS: a Framework for Evaluation in Design Science Research. European Journal of Information Systems, v. 25, p. 77–89, 2016. DOI: 10.1057/ejis.2014.36. AAPOR. Best Practices for Survey Research. Disponível em: https://aapor.org/standards-and-ethics/best-practices/. U.S. CENSUS BUREAU. Statistical Quality Standards: A2, Developing Data Collection Instruments and Supporting Materials, especialmente A2-3.3 e A2-4. Revisão consultada de 29 set. 2026. Disponível em: https://www2.census.gov/about/policies/quality/quality-standards.pdf. Acesso às fontes em: 19 nov. 2026.
 
 # ANEXO A QUESTIONÁRIO ORIGINAL DO ORIENTADOR
 

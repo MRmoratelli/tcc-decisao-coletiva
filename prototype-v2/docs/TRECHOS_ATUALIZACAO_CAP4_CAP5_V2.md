@@ -1,0 +1,29 @@
+# Atualizações pontuais para apreciação — capítulos 4 e 5
+
+Data-base: 19/11/2026. Estes trechos são preparados para inserção nas seções correspondentes. A monografia consolidada não foi sobrescrita. Não há resultados de avaliação científica com usuários.
+
+## Capítulo 4 — instrumento e procedimento pós-utilização
+
+A avaliação individual será oferecida após o encerramento legítimo da decisão coletiva, com consenso ou sem consenso, independentemente do número de rodadas. A situação-problema pertence aos participantes, que necessitam organizar seu próprio churrasco; não serão criadas divergências ou versões artificiais para ampliar a exposição ao artefato. O moderador será integrante do grupo responsável pelo TCC e atuará na facilitação operacional e revisão de propostas, sem votar pelos participantes. Não haverá cadastro científico adicional ou avaliação humana independente da fidelidade das sínteses.
+
+O instrumento original do orientador, versão 1.0 de 16 de novembro de 2026, permanece preservado. Para adequar sua aplicação ao delineamento naturalístico, foi preparada a proposta DSR-1.1-NATURALISTICO, sujeita à revisão metodológica e a pré-teste antes da coleta. Mantêm-se os 22 itens fechados, as cinco posições da escala, a opção N/A e as questões abertas A1–A3. As instruções passam a tratar de uma decisão real encerrada após uma ou mais rodadas. A4 foi expressamente adaptada para “Que funcionalidade deveria ser modificada ou acrescentada para usos futuros?”, em substituição à referência a modificações anteriores ao uso real. O item 20 mantém sua redação hipotética original e sua compreensão será examinada no pré-teste.
+
+O FEDS oferece o enquadramento da estratégia de avaliação e distingue episódios naturalísticos e artificiais, bem como finalidades formativas e somativas (Venable, Pries-Heje e Baskerville, 2016). A adaptação de aplicação do questionário, por sua vez, apoia-se nas boas práticas da AAPOR e no padrão A2 do U.S. Census Bureau quanto à clareza, opções de resposta, pré-teste e documentação. Essas bases não demonstram validade psicométrica do instrumento nem autorizam presumir equivalência de medidas após mudanças de contexto.
+
+O participante poderá deixar qualquer questão sem resposta e utilizar N/A quando não tiver vivenciado a situação solicitada, sobretudo nos itens relativos a objeções, aproximação de posições, reformulação, sínteses e alterações. N/A e ausência serão categorias distintas, sem imputação da nota neutra. A análise apresentará frequências por item, número de notas válidas, N/A, questões ausentes e participantes que não responderam ao formulário. Médias descritivas poderão complementar as frequências, excluindo N/A e ausências, sem escore psicométrico validado. Versão, variante, número de rodadas e resultado serão discriminados; a comparação entre condições de exposição não terá interpretação causal. O item 03 indicará exclusivamente percepção subjetiva sobre valor agregado. As respostas abertas serão analisadas por codificação temática humana.
+
+## Capítulo 5 — controle de recuperação e registro da avaliação
+
+A operação factual utiliza exclusivamente Tavily Search básica para recuperar resultados públicos, posteriormente interpretados pelo Gemini 3.5 Flash-Lite. O backend adota tetos de 100 buscas por dia UTC e 15 por minuto, distintos da franquia mensal do provedor. Um controle conservador adicional limita as reservas a 1.000 no mês UTC. As reservas são realizadas antes das chamadas e permanecem contabilizadas em falhas de custo incerto, sem repetição automática. O PostgreSQL V2 mantém contadores compartilhados e reservas de concorrência com expiração, impedindo que um deploy zere o orçamento. A criação de uma tabela aditiva de controle não modifica snapshots, votos ou respostas anteriores.
+
+O projeto gratuito Gemini apresentou, na consulta ao painel de 19 de novembro de 2026, limites de 500 chamadas por dia, 15 por minuto e 250 mil tokens de entrada por minuto. Por essa razão, o orçamento factual foi dimensionado em 250 chamadas por dia UTC e 12 por minuto, mantendo margem para outras funções. Classificação e interpretação são operações distintas; uma alegação causal pode gerar múltiplas buscas e interpretações. O teto Tavily não demonstra capacidade de completar 100 verificações nem de realizar 15 verificações integrais por minuto. A disponibilidade efetiva depende de tokens, tráfego compartilhado, quotas e falhas dos provedores; a quota diária Gemini reinicia segundo o horário do Pacífico, enquanto o teto interno usa UTC.
+
+O formulário pós-sessão aceita a variante identificada após uma ou mais rodadas e mantém compatibilidade com respostas e exportações do instrumento original. Os registros novos incluem versão, variante, referência ao instrumento-base, número de rodadas, resultado e informações operacionais de exposição. A importação cria nova sala e reemite credenciais, sem alterar a versão ou as respostas do arquivo de origem. A IA não registra votos, não elimina objeções e não determina consenso. Os testes sintéticos verificam os limites e os caminhos de aplicação, sem equivaler a avaliação científica ou pré-teste de compreensão com participantes.
+
+## Referências a acrescentar ou conferir na lista existente
+
+VENABLE, J.; PRIES-HEJE, J.; BASKERVILLE, R. FEDS: a Framework for Evaluation in Design Science Research. *European Journal of Information Systems*, v. 25, p. 77–89, 2016. DOI: https://doi.org/10.1057/ejis.2014.36.
+
+AAPOR. *Best Practices for Survey Research*. Disponível em: https://aapor.org/standards-and-ethics/best-practices/. Acesso em: 19 nov. 2026.
+
+U.S. CENSUS BUREAU. *Statistical Quality Standards*. Revisão de 29 set. 2026. A2: Developing Data Collection Instruments and Supporting Materials, especialmente A2-3.3 e A2-4. Disponível em: https://www2.census.gov/about/policies/quality/quality-standards.pdf. Acesso em: 19 nov. 2026.

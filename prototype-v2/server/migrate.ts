@@ -6,7 +6,7 @@ export async function migrate(client:{query:(sql:string,values?:any[])=>Promise<
  await client.query('BEGIN');
  try{
   await client.query('CREATE TABLE IF NOT EXISTS dc2_migrations (version VARCHAR(80) PRIMARY KEY, checksum CHAR(64) NOT NULL, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW())');
-  for(const version of ['001_remote_rooms','002_consensus']){
+  for(const version of ['001_remote_rooms','002_consensus','003_provider_budget']){
    const sql=await readFile(new URL('./migrations/'+version+'.sql',import.meta.url),'utf8');
    const checksum=createHash('sha256').update(sql).digest('hex');
    const existing=await client.query('SELECT checksum FROM dc2_migrations WHERE version=$1',[version]);
@@ -19,5 +19,5 @@ export async function migrate(client:{query:(sql:string,values?:any[])=>Promise<
 if(process.argv[1]?.endsWith('migrate.ts')){
  if(process.env.V2_DATABASE_ISOLATED!=='true'||!process.env.DATABASE_URL_V2)throw new Error('Configure uma base V2 NOVA e V2_DATABASE_ISOLATED=true. Não reutilize a base histórica.');
  const pool=new pg.Pool({connectionString:process.env.DATABASE_URL_V2_DIRECT||process.env.DATABASE_URL_V2,max:1});const client=await pool.connect();
- try{await migrate(client);console.log('Migrações aditivas 001/002 aplicadas.');}finally{client.release();await pool.end();}
+ try{await migrate(client);console.log('Migrações aditivas 001/002/003 aplicadas.');}finally{client.release();await pool.end();}
 }

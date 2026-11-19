@@ -1,0 +1,99 @@
+✔ 02 parecer de proposta validado e consultivo, sem alegar fonte externa (37.8561ms)
+✔ 06 analyzeContribution identifica alegação sem checagem factual (1.5592ms)
+✔ 17 adaptador rejeita JSON inválido, campos ausentes, fatos falsamente confirmados e erro de transporte (5.6175ms)
+✔ 12-13 contratos de análise e síntese passam por schema (9.2957ms)
+✔ integração: códigos HTTP são categorizados com falhas simuladas sem expor mensagem privada (3.5597ms)
+✔ Gramática simplificada preserva limites completos do contrato após geração (1.8679ms)
+▶ Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três participantes
+  ✔ 03 criação com análise inicial e autenticação; recibo adulterado recusado (305.2654ms)
+  ✔ 04-05 credenciais, permissões, origem e isolamento entre salas (89.8691ms)
+  ✔ 06-08 parecer consultivo e contestação; rejeição exige justificativa (206.5409ms)
+  ✔ 09 abstenção e ausência mantêm processo aberto (65.7682ms)
+  ✔ 12 análise de objeções e contestação posterior preservadas (75.5086ms)
+  ✔ 13 síntese conciliadora é rascunho e mantém impasse (56.1144ms)
+  ✔ 14 revisão humana obrigatória antes de publicar V2 (42.2187ms)
+  ✔ 10-11 novas manifestações por versão; recibo antigo e revisão concorrente recusados (132.7137ms)
+  ✔ 15 consenso somente com os três aceites explícitos na V2 (110.4619ms)
+  ✔ 20 DSR individual pós-sessão; ausência e N/A distintos; exportação restrita (98.6674ms)
+  ✔ 18 exportação JSON não inclui segredos e preserva o histórico (21.5651ms)
+  ✔ 19 importação recupera dados em sala nova, sem sobrescrever origem; formato inválido rejeitado (99.7467ms)
+AI failure {"code":"TRANSPORT","status":null,"model":"synthetic-test-only","promptVersion":"consensus-consultive-v2.1-factual-context"}
+AI failure {"code":"TRANSPORT","status":null,"model":"synthetic-test-only","promptVersion":"consensus-consultive-v2.1-factual-context"}
+  ✔ 17 falhas Gemini são auditadas e não bloqueiam manifestações ou revisões humanas (177.6853ms)
+  ✔ 16 encerramento sem consenso independente da IA e sem alterar outra sala (67.4ms)
+  ✔ persistência append-only, migração idempotente e nenhuma alteração de dados históricos (21.9509ms)
+✔ Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três participantes (1578.2974ms)
+✔ Tavily: 100 complete synthetic checks admitted; 101st search blocked; cache consumes no duplicate (136.1076ms)
+✔ Tavily: 15 reservations per rolling minute; 16th blocked; UTC day/month reset independently (1.2973ms)
+✔ Tavily: failures retain reservations; concurrency leases expire after process interruption (0.5104ms)
+✔ PostgreSQL ledger: concurrent instances, 100/101, restart, monthly barrier and fail-closed (7191.8667ms)
+✔ indicadores de coorte usam apenas processos concluídos e deduplicam restaurações (15.7102ms)
+✔ deploy: porta da plataforma, bind público e origem HTTPS de mesma origem (36.5611ms)
+✔ deploy: frontend e SPA são servidos; API ausente continua JSON 404 (228.2544ms)
+✔ 01 proposta genérica e campos opcionais; sem orçamento nem taxonomia (2.8659ms)
+✔ 08-09 rejeição fundamentada; abstenção e silêncio não são aceite (4.7684ms)
+✔ 10-11 histórico de versões; nova versão exige novas posições (0.9435ms)
+✔ 15 aceitação explícita unânime na mesma versão encerra; IA não declara (0.4503ms)
+✔ 16 encerramento sem consenso requer razão e não força aceite (2.9928ms)
+✔ 12-14 análise e síntese cobrem todas objeções; revisão humana explícita (2.5656ms)
+✔ 07 contribuições originais e contestações são preservadas (0.7134ms)
+✔ 18-19 JSON versionado valida encadeamento, participantes e consenso (52.9775ms)
+✔ 20 instrumento integral, ausências e N/A; aplicação após duas rodadas (16.5944ms)
+✔ rascunho original, repetições e alteração após análise permanecem rastreáveis (0.9289ms)
+✔ HTTP DSR: ten simultaneous identities; one-round consensus/impasse, two rounds, restart and historical import (11720.3066ms)
+✔ DSR A/D: one-round consensus unlocks variant; N/A and missing stay distinct; metadata server-derived (70.5166ms)
+✔ DSR B/E: two-round variant works; original historical response and version remain byte-equivalent (10.6511ms)
+✔ DSR C: one-round closure without consensus unlocks variant; original retains two-round condition (6.7388ms)
+✔ DSR: 22 items and A1–A3 unchanged; A4 adaptation explicit; omission never becomes neutral (0.662ms)
+✔ Factual 10–14: dez identidades simultâneas, autorização, contestação, persistência, importação e consenso (11077.9964ms)
+✔ Tavily: apenas Search básica fixa, três resultados, usage e nenhum segredo no registro (172.7517ms)
+✔ Tavily: URL interna, dados inválidos, duplicatas e data ausente não viram fontes inventadas (8.1526ms)
+✔ Tavily: falhas, créditos e limite de tamanho são saneados e não repetem a chamada (38.8253ms)
+✔ Factual 01/02/03: apoio, contradição e insuficiência dependem de interpretação e trechos (4.2458ms)
+✔ Factual: Gemini 3.5 classifica e interpreta resultados Tavily sem campos Google (72.4698ms)
+✔ Factual 04: preferência e restrição individual não são transmitidas nem pesquisadas (50.5916ms)
+✔ Factual: opinião e hipótese classificadas não acionam Tavily (22.4086ms)
+✔ Factual 05: evento, preço e nexo causal têm consultas e interpretações independentes (18.1306ms)
+✔ Factual 06: fonte antiga ou sem data não comprova preço atual; data não é inventada (1.6383ms)
+✔ Factual 07: nenhuma fonte encontrada não aciona interpretação nem gera confirmação (3.198ms)
+✔ Factual 08/09: falha Tavily, créditos, limites locais e falha Gemini não simulam sucesso (38.9294ms)
+✔ Factual: cache de dez consultas simultâneas usa uma busca e não cruza salas (8.019ms)
+✔ Factual: trechos originais ou consultas privadas inventados são recusados antes de Tavily (0.9414ms)
+✔ Factual: registros Google históricos continuam legíveis sem conversão artificial para Tavily (43.7205ms)
+✔ Factual: uma preferência ou restrição misturada a causa factual não encobre o fato (4.9562ms)
+✔ Factual: retoma classificação persistida confiável e nunca usa arquivo importado como plano (11.2432ms)
+✔ Factual: falha temporária permite retomar interpretação sem consumir nova busca Tavily (2.5577ms)
+✔ comprovante exige texto original sem modificação (4.2293ms)
+✔ comprovante recusa assinatura adulterada (0.4673ms)
+✔ comprovante expirado não pode ser reutilizado (3.8966ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: proposta estruturada mantém campos opcionais e texto ao editar (74.4113ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: questionário conserva 22 itens, quatro abertas e separa N/A de ausência (154.6951ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: parecer mostra incertezas e limitação factual, sem editar o texto (15.4755ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: sala permite abstenção, parecer opcional e impede funções de moderador a participante (96.0936ms)
+✔ React: entrada preservada com fluxo de criação e login por credenciais (12.4493ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+✔ React DSR: all 22 items, four open questions, voluntary omissions and explicit N/A; no neutral defaults (70.0131ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React factual Tavily: trechos, relevância, datas, fontes e nenhum widget Google (47.8243ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React factual: registro antigo é exibido como histórico e preserva seu modelo original (14.0804ms)
+✔ React factual: pesquisa exige alegação mínima e concordância, sem alterar manifestação (7.784ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 74
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25837.8074
+

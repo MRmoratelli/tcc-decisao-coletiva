@@ -30,3 +30,13 @@ export const openItems=[
   "Que funcionalidade deveria ser modificada ou acrescentada antes do uso real?"
 ];
 export const scale=['Discordo totalmente','Discordo','Nem concordo nem discordo','Concordo','Concordo totalmente'];
+
+// Original arrays above remain verbatim. Adaptation changes instructions and A4 only.
+export const NATURALISTIC_VERSION='DSR-1.1-NATURALISTICO' as const;
+export const APPLICATION_VARIANT='POS_ENCERRAMENTO_NATURALISTICO' as const;
+export const naturalisticOpenItems=[...openItems.slice(0,3),'Que funcionalidade deveria ser modificada ou acrescentada para usos futuros?'];
+export const originalInstructions='Responda após realizar uma simulação de decisão coletiva com pelo menos duas rodadas.';
+export const naturalisticInstructions='Responda individualmente após o encerramento desta decisão coletiva real, com consenso ou sem consenso, independentemente do número de rodadas. Avalie somente o que vivenciou. Não há respostas certas ou erradas. A participação e cada resposta são voluntárias.';
+export const notApplicableInstructions='Se não vivenciou a funcionalidade, escolha N/A (não se aplica), especialmente nos itens sobre objeções, aproximação de posições, reformulação, sínteses e alterações de propostas. Não use a nota 3 para substituir uma experiência não observada. Você também pode deixar qualquer questão sem resposta.';
+export const conditionalItemNumbers=[4,5,6,7,9,10,12,13,15,18];
+export const displayedOpenItems=(version:string)=>version===NATURALISTIC_VERSION?naturalisticOpenItems:openItems;

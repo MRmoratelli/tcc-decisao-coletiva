@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NATURALISTIC_VERSION,APPLICATION_VARIANT } from './instrument.js';
 
 const field = z.string().trim().max(5000);
 export const ProposalSchema = z.object({
@@ -34,10 +35,14 @@ export const SynthesisSchema=z.object({
 export type SynthesisResult=z.infer<typeof SynthesisSchema>;
 export const ChoiceSchema=z.enum(['ACEITO','REJEITO','ABSTENHO']);
 export type Choice=z.infer<typeof ChoiceSchema>;
-export const EvaluationSchema=z.object({
+const LegacyEvaluationSchema=z.object({
  instrumentVersion:z.literal('DSR-1.0-2026-11-16'),
  answers:z.array(z.union([z.number().int().min(1).max(5),z.literal('N/A'),z.null()])).length(22),
  open:z.array(z.string().trim().max(5000)).length(4),consent:z.literal(true),
 });
+export const EvaluationSchema=z.discriminatedUnion('instrumentVersion',[
+ LegacyEvaluationSchema,
+ LegacyEvaluationSchema.extend({instrumentVersion:z.literal(NATURALISTIC_VERSION),applicationVariant:z.literal(APPLICATION_VARIANT),baseInstrumentVersion:z.literal('DSR-1.0-2026-11-16')}),
+]);
 export type EvaluationInput=z.infer<typeof EvaluationSchema>;
 export const INSTRUMENT_VERSION='DSR-1.0-2026-11-16' as const;
