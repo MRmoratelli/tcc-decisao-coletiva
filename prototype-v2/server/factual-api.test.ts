@@ -28,6 +28,12 @@ test('Factual 10–14: dez identidades simultâneas, autorização, contestaçã
   const all=await view();assert.equal(all.state.factualChecks.length,10);assert.equal(all.state.votes.length,0);assert.equal(all.state.decision.status,'OPEN');
   const own=hidden[0].state.factualChecks[0];assert.equal((await post('/rooms/'+c.code+'/contest',{credential:c.participants[0].credential,revision:all.revision,targetId:own.id,text:'Contesto a interpretação sintética e mantenho minha posição.'})).status,201);
   const unauthorized=await post('/rooms/'+c.code+'/fact-check',{credential:'x'.repeat(43),...binding,consent:true,text:fact.text});assert.equal(unauthorized.status,401);
+  // Imported evidence must not poison the live cache: an immediate fresh check is allowed.
+  const openArchive=(await post('/rooms/'+c.code+'/export',{credential:c.moderatorCredential})).data;
+  openArchive.state.factualChecks[0].createdAt='2099-01-01T00:00:00Z';
+  const openCopy=(await post('/import',openArchive)).data;
+  const fresh=await post('/rooms/'+openCopy.code+'/fact-check',{credential:openCopy.participants[0].credential,...binding,consent:true,text:'Alegação pública sintética número 0.'});
+  assert.equal(fresh.status,201);assert.equal(fresh.data.cached,false);assert.equal(fresh.data.check.provenance,'SYNTHETIC_TEST');assert.equal(calls,11);
   // The first simultaneous vote submissions may race: retry only 409, never duplicate an accepted write.
   const cast=async(p:any)=>{for(let n=0;n<15;n++){const w=await view(p.credential),r=await post('/rooms/'+c.code+'/votes',{credential:p.credential,revision:w.revision,...binding,choice:'ACEITO'});if(r.status===201)return;if(r.status!==409)assert.fail('Vote failed: '+r.status);}assert.fail('Concurrent vote retry exhausted');};
   await Promise.all(c.participants.slice(0,9).map(cast));assert.equal((await view()).state.decision.status,'OPEN');await cast(c.participants[9]);assert.equal((await view()).state.decision.status,'CONSENSUS');

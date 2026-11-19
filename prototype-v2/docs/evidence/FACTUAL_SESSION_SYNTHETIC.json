@@ -1,0 +1,1234 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-19T03:28:26.205Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO] Verificação factual e autonomia",
+      "problem": "Grupo fictício verifica fatos públicos em um teste exclusivamente técnico.",
+      "decision": "Decidir como registrar afirmações públicas no relatório fictício.",
+      "goals": "Exercitar evidências, contestação e revisão por moderador.",
+      "alternatives": "Publicar afirmações sem ressalvas ou registrar fontes e incertezas.",
+      "constraints": "Sem dados pessoais ou participantes reais; não é avaliação científica.",
+      "successCriteria": "Autonomia preservada e fontes rastreáveis, sem unanimidade presumida.",
+      "context": "TESTE TÉCNICO SINTÉTICO, dez identidades fictícias. Não define o cenário da pesquisa.",
+      "text": "Publicar uma nota fictícia afirmando que a Lua é um satélite natural da Terra, registrando que a confirmação exige fontes e revisão humana."
+    },
+    "decision": {
+      "id": "e441986c-5a35-4739-b8e8-cc637d4c0ad8",
+      "originId": "e441986c-5a35-4739-b8e8-cc637d4c0ad8",
+      "title": "[SINTÉTICO] Verificação factual e autonomia",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-19T03:26:45.615Z",
+      "closedAt": "2026-11-19T03:28:25.900Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "alias": "P01"
+      },
+      {
+        "id": "9f65cef3-c7ee-496b-8668-f34f87ee77e6",
+        "alias": "P02"
+      },
+      {
+        "id": "002e535a-b366-4328-8966-41c9d49978bd",
+        "alias": "P03"
+      },
+      {
+        "id": "40dc4121-6391-466a-b2c9-27afd77c1e0e",
+        "alias": "P04"
+      },
+      {
+        "id": "59d7d0a1-9180-4f5d-9fca-e5670cd3e4b3",
+        "alias": "P05"
+      },
+      {
+        "id": "a104b0cd-5733-48c9-b5d9-16fe07c346b0",
+        "alias": "P06"
+      },
+      {
+        "id": "c96e7a41-9eb6-407b-85cc-32b1b10adc9b",
+        "alias": "P07"
+      },
+      {
+        "id": "5306b5cd-febb-4cf9-ba00-7f8b6bcf6ed9",
+        "alias": "P08"
+      },
+      {
+        "id": "9dbc5000-619c-4c14-946b-5c4c16d39267",
+        "alias": "P09"
+      },
+      {
+        "id": "451bf08f-d358-4be5-80d6-a2ee2c41e3c1",
+        "alias": "P10"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO] Verificação factual e autonomia",
+          "problem": "Grupo fictício verifica fatos públicos em um teste exclusivamente técnico.",
+          "decision": "Decidir como registrar afirmações públicas no relatório fictício.",
+          "goals": "Exercitar evidências, contestação e revisão por moderador.",
+          "alternatives": "Publicar afirmações sem ressalvas ou registrar fontes e incertezas.",
+          "constraints": "Sem dados pessoais ou participantes reais; não é avaliação científica.",
+          "successCriteria": "Autonomia preservada e fontes rastreáveis, sem unanimidade presumida.",
+          "context": "TESTE TÉCNICO SINTÉTICO, dez identidades fictícias. Não define o cenário da pesquisa.",
+          "text": "Publicar uma nota fictícia afirmando que a Lua é um satélite natural da Terra, registrando que a confirmação exige fontes e revisão humana."
+        },
+        "createdAt": "2026-11-19T03:26:45.615Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "O grupo fictício avalia a publicação de uma nota sobre a Lua ser um satélite natural da Terra, registrando a necessidade de fontes e revisão humana. A proposta prioriza a rastreabilidade e a preservação da autonomia, sem buscar unanimidade forçada.",
+            "recommendations": [
+              "Manter o registro explícito de fontes e incertezas nas afirmações públicas.",
+              "Garantir que a revisão humana aprove qualquer reformulação.",
+              "Preservar posições minoritárias e contestações no processo deliberativo."
+            ],
+            "assertions": [
+              {
+                "text": "A Lua é um satélite natural da Terra.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Fato amplamente estabelecido e compatível com o contexto geral de verificação."
+              },
+              {
+                "text": "A confirmação exige fontes e revisão humana.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Alinhado com a premissa de rastreabilidade e controle procedimental do teste técnico."
+              }
+            ],
+            "limitations": [
+              "Trata-se de um teste técnico sintético com dez identidades fictícias, sem abranger cenários reais de pesquisa.",
+              "A análise é estritamente consultiva e falível."
+            ],
+            "clarity": "A proposta está descrita de forma clara, delimitando o problema, a decisão, as metas, as alternativas e as restrições de um ambiente sintético.",
+            "biasFlags": [
+              "Viés de enquadramento técnico que assume a premissa de que toda afirmação pública necessita do mesmo rigor de rastreabilidade."
+            ],
+            "assumptions": [
+              "Assume-se que o registro de fontes e incertezas é suficiente para garantir a autonomia dos participantes no teste técnico."
+            ],
+            "missingInfo": [
+              "Faltam critérios detalhados sobre como eventuais contestações minoritárias serão ponderadas no relatório final."
+            ],
+            "questions": [
+              "Como serão tratadas as divergências irredutíveis entre as identidades fictícias durante a deliberação?"
+            ],
+            "uncertainties": [
+              "Incerteza sobre a eficácia do modelo em cenários reais fora do ambiente sintético proposto."
+            ],
+            "suggestedRewrite": "Publicar uma nota fictícia afirmando que a Lua é um satélite natural da Terra, registrando expressamente as fontes utilizadas, as limitações metodológicas e mantendo a abertura para contestações e revisão humana obrigatória."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        }
+      },
+      {
+        "id": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "version": 2,
+        "parentId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "content": {
+          "title": "[SINTÉTICO] Verificação factual, autonomia e restrição de fontes",
+          "problem": "Grupo fictício verifica fatos públicos em um teste exclusivamente técnico, gerando impasses sobre a publicação de afirmações quando faltam fontes.",
+          "decision": "Registrar afirmações públicas no relatório fictício explicitando a indisponibilidade de fontes externas e preservando contestações, sem assumir confirmação factual.",
+          "goals": "Exercitar evidências, contestação e revisão por moderador com rastreabilidade explícita.",
+          "alternatives": "Publicar afirmações sem ressalvas ou abster-se totalmente de registrar notas sem fontes recuperadas.",
+          "constraints": "Sem dados pessoais ou participantes reais; não é avaliação científica. EVIDÊNCIA EXTERNA CONSULTIVA, NÃO DECISÓRIA: id 1d81cea3-b540-41f9-85bc-67eff2386c0c aponta verificação indisponível.",
+          "successCriteria": "Autonomia preservada e fontes rastreáveis, sem unanimidade presumida e com manutenção clara das objeções minoritárias.",
+          "context": "TESTE TÉCNICO SINTÉTICO, dez identidades fictícias. Não define o cenário da pesquisa. Inclui contestação explícita de que a pesquisa falhou e nenhuma fonte foi recuperada.",
+          "text": "[SINTÉTICO] Esta nota registra exclusivamente a indisponibilidade da verificação externa; não publica a alegação como fato confirmado. A contestação original permanece no histórico. Somente manifestações explícitas definirão o encerramento."
+        },
+        "createdAt": "2026-11-19T03:28:22.065Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1",
+          "model": "human",
+          "reason": "[SINTÉTICO] Revisão operacional técnica: preservar ausência de fontes, contestação e autonomia; sem avaliação científica."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "number": 1,
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "status": "CLOSED",
+        "openedAt": "2026-11-19T03:26:45.615Z",
+        "closedAt": "2026-11-19T03:28:22.065Z"
+      },
+      {
+        "id": "39df805d-4649-4600-b190-ab5244883ba0",
+        "number": 2,
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "status": "CLOSED",
+        "openedAt": "2026-11-19T03:28:22.065Z",
+        "closedAt": "2026-11-19T03:28:25.900Z"
+      }
+    ],
+    "factualChecks": [
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "model": "gemini-2.5-flash-lite",
+        "version": "factual-grounding-v1.0",
+        "createdAt": "2026-11-19T03:26:46.230Z",
+        "provenance": "LIVE_PROVIDER",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é um satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "INFORMACAO_INSUFICIENTE",
+              "query": "",
+              "timeSensitive": false,
+              "reason": "Não foi possível identificar e decompor a alegação com segurança."
+            },
+            "status": "VERIFICACAO_INDISPONIVEL",
+            "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+            "providerText": "",
+            "responseModel": null,
+            "sources": [],
+            "supports": [],
+            "searchQueries": [],
+            "searchSuggestionHtml": "",
+            "queriedAt": "2026-11-19T03:26:46.230Z",
+            "limitations": [
+              "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+            ],
+            "failureCode": "MODEL_UNAVAILABLE"
+          }
+        ],
+        "id": "1d81cea3-b540-41f9-85bc-67eff2386c0c",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "participantId": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98"
+      },
+      {
+        "originalText": "Prefiro legumes grelhados.",
+        "model": "gemini-2.5-flash-lite",
+        "version": "factual-grounding-v1.0",
+        "createdAt": "2026-11-19T03:27:32.886Z",
+        "provenance": "LOCAL_CLASSIFICATION",
+        "claims": [
+          {
+            "claim": {
+              "text": "Prefiro legumes grelhados.",
+              "originalExcerpt": "Prefiro legumes grelhados.",
+              "kind": "PREFERENCIA",
+              "query": "",
+              "timeSensitive": false,
+              "reason": "Preferência pessoal não exige confirmação na internet."
+            },
+            "status": "NAO_VERIFICAVEL",
+            "explanation": "Preferência pessoal não exige confirmação na internet.",
+            "providerText": "",
+            "responseModel": null,
+            "sources": [],
+            "supports": [],
+            "searchQueries": [],
+            "searchSuggestionHtml": "",
+            "queriedAt": "2026-11-19T03:27:32.886Z",
+            "limitations": [
+              "Não houve pesquisa externa para esta preferência, restrição, opinião, hipótese ou informação insuficiente."
+            ],
+            "failureCode": null
+          }
+        ],
+        "id": "f0c77682-a9f4-4591-86bf-b5135df254c2",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "participantId": "9f65cef3-c7ee-496b-8668-f34f87ee77e6"
+      }
+    ],
+    "votes": [
+      {
+        "id": "90d7846b-5d5c-40e2-b483-023341159653",
+        "participantId": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "REJEITO",
+        "justification": "[SINTÉTICO] Rejeito publicar afirmações sem fontes. Mantenho a objeção mesmo quando a pesquisa externa estiver indisponível.",
+        "createdAt": "2026-11-19T03:27:35.426Z"
+      },
+      {
+        "id": "178345a3-d760-4d56-b08c-9b420e49694b",
+        "participantId": "9f65cef3-c7ee-496b-8668-f34f87ee77e6",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ABSTENHO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:35.757Z"
+      },
+      {
+        "id": "df9e85e5-b1aa-42e0-a193-6869df39c11b",
+        "participantId": "40dc4121-6391-466a-b2c9-27afd77c1e0e",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:36.119Z"
+      },
+      {
+        "id": "ba3be5f1-0e5a-4db1-aa47-d8e545aab2f3",
+        "participantId": "5306b5cd-febb-4cf9-ba00-7f8b6bcf6ed9",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:36.316Z"
+      },
+      {
+        "id": "ba37ed2c-6b38-414f-be39-33bfdceb4fce",
+        "participantId": "a104b0cd-5733-48c9-b5d9-16fe07c346b0",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:36.571Z"
+      },
+      {
+        "id": "e51425a9-a3cb-4596-87a5-9ccdf7c97deb",
+        "participantId": "451bf08f-d358-4be5-80d6-a2ee2c41e3c1",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:37.217Z"
+      },
+      {
+        "id": "2cb07fc3-7041-48ea-bde0-1e2cfd2ad57a",
+        "participantId": "59d7d0a1-9180-4f5d-9fca-e5670cd3e4b3",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:37.519Z"
+      },
+      {
+        "id": "c15b7892-40bf-46bb-a0e8-6d1d9cbfaccc",
+        "participantId": "9dbc5000-619c-4c14-946b-5c4c16d39267",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:37.824Z"
+      },
+      {
+        "id": "e45f2fe2-05e9-4fdd-9083-0e2fd3565fd7",
+        "participantId": "c96e7a41-9eb6-407b-85cc-32b1b10adc9b",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:38.144Z"
+      },
+      {
+        "id": "bc6548f7-e302-4a86-9847-2d5507dd13d5",
+        "participantId": "002e535a-b366-4328-8966-41c9d49978bd",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:27:38.528Z"
+      },
+      {
+        "id": "86c010ab-d629-4315-aaa2-3028ddd5eb97",
+        "participantId": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:22.616Z"
+      },
+      {
+        "id": "26d91b91-8d0b-459c-b63c-c04a6056ed02",
+        "participantId": "59d7d0a1-9180-4f5d-9fca-e5670cd3e4b3",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:22.825Z"
+      },
+      {
+        "id": "2b9f2036-5a04-4c33-94cf-892799a14999",
+        "participantId": "9dbc5000-619c-4c14-946b-5c4c16d39267",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:23.226Z"
+      },
+      {
+        "id": "60903172-e1d0-4d35-a5de-61b3f112b002",
+        "participantId": "40dc4121-6391-466a-b2c9-27afd77c1e0e",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:23.728Z"
+      },
+      {
+        "id": "35489838-c2ba-47bf-b209-f78a0c06a628",
+        "participantId": "5306b5cd-febb-4cf9-ba00-7f8b6bcf6ed9",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:24.047Z"
+      },
+      {
+        "id": "32b58b4a-6220-450c-a7fd-43350469d0bf",
+        "participantId": "c96e7a41-9eb6-407b-85cc-32b1b10adc9b",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:24.379Z"
+      },
+      {
+        "id": "e7c41902-4bfa-4516-b47e-813425077bd3",
+        "participantId": "9f65cef3-c7ee-496b-8668-f34f87ee77e6",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:24.706Z"
+      },
+      {
+        "id": "4e29ad53-66e6-4de3-b591-458eeadb1fc1",
+        "participantId": "a104b0cd-5733-48c9-b5d9-16fe07c346b0",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:25.088Z"
+      },
+      {
+        "id": "1ca66709-cc36-4eb9-a066-a5ad20c46789",
+        "participantId": "002e535a-b366-4328-8966-41c9d49978bd",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:25.423Z"
+      },
+      {
+        "id": "a81a490a-4608-4fba-8f81-7870a4246526",
+        "participantId": "451bf08f-d358-4be5-80d6-a2ee2c41e3c1",
+        "roundId": "39df805d-4649-4600-b190-ab5244883ba0",
+        "proposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T03:28:25.900Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "00168544-b3f4-4b91-9882-7e51abfce0d0",
+        "participantId": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "originalText": "[SINTÉTICO] Rejeito publicar afirmações sem fontes. Mantenho a objeção mesmo quando a pesquisa externa estiver indisponível.",
+        "text": "[SINTÉTICO] Rejeito publicar afirmações sem fontes. Mantenho a objeção mesmo quando a pesquisa externa estiver indisponível.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "A contribuição sintética rejeita a publicação de afirmações sem fontes e mantém a objeção mesmo na ausência de pesquisa externa.",
+            "recommendations": [
+              "Preservar a posição minoritária e registrar a objeção integralmente.",
+              "Evitar declarar consenso com base em dados sintéticos e parciais."
+            ],
+            "assertions": [
+              {
+                "text": "Rejeito publicar afirmações sem fontes.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "A posição está alinhada ao problema e às restrições do teste sintético."
+              }
+            ],
+            "limitations": [
+              "Teste exclusivamente sintético, sem impacto em cenários reais."
+            ],
+            "clarity": "A contribuição é direta e compreensível dentro do escopo do teste.",
+            "biasFlags": [
+              "Viés de enquadramento em prol estrito da rastreabilidade sem ponderar prazos."
+            ],
+            "assumptions": [
+              "Supõe-se que a ausência de fontes invalida por completo qualquer registro."
+            ],
+            "missingInfo": [
+              "Falta detalhar critérios alternativos para dados de verificação urgente."
+            ],
+            "questions": [
+              "Como proceder em casos onde fontes primárias são permanentemente inacessíveis?"
+            ],
+            "uncertainties": [
+              "O grau de inflexibilidade da objeção frente a urgências operacionais."
+            ],
+            "suggestedRewrite": "Rejeitar a publicação de afirmações públicas sem rastreabilidade documental, mantendo a contestação ativa mesmo quando houver indisponibilidade temporal de fontes externas."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        },
+        "contest": "",
+        "createdAt": "2026-11-19T03:27:35.426Z"
+      }
+    ],
+    "analyses": [
+      {
+        "id": "695000be-9474-4060-a352-e880f3e843a9",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "sourceFingerprint": "30369adbc0ba5c79a931f6d31b578322de044329cbfd7689a2e3dcff2d9c3fb2",
+        "factualCheckIds": [
+          "1d81cea3-b540-41f9-85bc-67eff2386c0c",
+          "f0c77682-a9f4-4591-86bf-b5135df254c2"
+        ],
+        "result": {
+          "individualAssessments": [
+            {
+              "voteId": "90d7846b-5d5c-40e2-b483-023341159653",
+              "relevance": "A rejeição aponta diretamente para o risco de publicar afirmações sem fontes, mantendo a postura crítica mesmo sem pesquisa externa disponível.",
+              "explanation": "O participante recusa a publicação de afirmações sem respaldo, exigindo rigor na rastreabilidade.",
+              "quotedExcerpt": "[SINTÉTICO] Rejeito publicar afirmações sem fontes. Mantenho a objeção mesmo quando a pesquisa externa estiver indisponível.",
+              "premises": [
+                "Afirmações públicas exigem fontes verificáveis.",
+                "A indisponibilidade de pesquisa externa não justifica a publicação sem fontes."
+              ],
+              "evidence": [
+                "Evidência consultiva 1d81cea3-b540-41f9-85bc-67eff2386c0c aponta verificação indisponível e ausência de fontes recuperadas."
+              ],
+              "risks": [
+                "Publicar informações sem suporte factual verificável."
+              ],
+              "uncertainty": "Incerteza sobre como proceder quando fontes externas estiverem indisponíveis."
+            }
+          ],
+          "sharedInterests": [
+            "Garantir a integridade do registro factual no relatório fictício."
+          ],
+          "convergences": [
+            "A maioria dos participantes aceitou a proposta de registrar fontes e incertezas."
+          ],
+          "conflicts": [
+            "Tensão entre a publicação da nota proposta e a exigência estrita de fontes verificáveis quando a pesquisa externa falha."
+          ],
+          "incompatibleObjections": [
+            "Recusa absoluta em publicar qualquer afirmação sem fontes recuperadas, independentemente do contexto de teste."
+          ],
+          "nonNegotiableConditions": [
+            "Manutenção da autonomia da objeção e registro de contestações sem imposição de consenso artificial."
+          ],
+          "uncertainties": [
+            "Como tratar afirmações cujas fontes externas permaneçam indisponíveis em testes futuros."
+          ]
+        },
+        "promptVersion": "consensus-consultive-v2.1-factual-context",
+        "model": "gemini-3.5-flash-lite",
+        "createdAt": "2026-11-19T03:27:41.323Z"
+      }
+    ],
+    "syntheses": [
+      {
+        "id": "435c51a7-aeaf-4d8c-b90b-892f2194f794",
+        "proposalId": "3288e2d2-1767-4513-973d-14c97eb0e9cd",
+        "roundId": "de1fb960-5a91-446d-9157-5fe9d56c8642",
+        "analysisId": "695000be-9474-4060-a352-e880f3e843a9",
+        "factualCheckIds": [
+          "1d81cea3-b540-41f9-85bc-67eff2386c0c",
+          "f0c77682-a9f4-4591-86bf-b5135df254c2"
+        ],
+        "result": {
+          "revisedProposal": {
+            "title": "[SINTÉTICO] Verificação factual, autonomia e restrição de fontes",
+            "problem": "Grupo fictício verifica fatos públicos em um teste exclusivamente técnico, gerando impasses sobre a publicação de afirmações quando faltam fontes.",
+            "decision": "Registrar afirmações públicas no relatório fictício explicitando a indisponibilidade de fontes externas e preservando contestações, sem assumir confirmação factual.",
+            "goals": "Exercitar evidências, contestação e revisão por moderador com rastreabilidade explícita.",
+            "alternatives": "Publicar afirmações sem ressalvas ou abster-se totalmente de registrar notas sem fontes recuperadas.",
+            "constraints": "Sem dados pessoais ou participantes reais; não é avaliação científica. EVIDÊNCIA EXTERNA CONSULTIVA, NÃO DECISÓRIA: id 1d81cea3-b540-41f9-85bc-67eff2386c0c aponta verificação indisponível.",
+            "successCriteria": "Autonomia preservada e fontes rastreáveis, sem unanimidade presumida e com manutenção clara das objeções minoritárias.",
+            "context": "TESTE TÉCNICO SINTÉTICO, dez identidades fictícias. Não define o cenário da pesquisa. Inclui contestação explícita de que a pesquisa falhou e nenhuma fonte foi recuperada.",
+            "text": "Publicar uma nota fictícia com a ressalva estrita de que a verificação está indisponível e nenhuma fonte foi recuperada, mantendo explícita a contestação e a exigência de rigor na rastreabilidade."
+          },
+          "changeLog": [
+            {
+              "change": "Adicionada ressalva explícita sobre a indisponibilidade de fontes e inclusão da contestação formal no texto da proposta.",
+              "reason": "Atender parcialmente à objeção sobre publicação sem suporte factual, refletindo o estado de verificação indisponível da evidência consultiva sem eliminar a posição minoritária.",
+              "voteIds": [
+                "90d7846b-5d5c-40e2-b483-023341159653"
+              ]
+            }
+          ],
+          "addressedObjections": [],
+          "partiallyAddressedObjections": [
+            "90d7846b-5d5c-40e2-b483-023341159653"
+          ],
+          "unresolvedObjections": [],
+          "remainingImpasses": [
+            "Tensão irredutível entre a publicação da nota com ressalvas de verificação indisponível e a recusa absoluta do participante em publicar qualquer afirmação sem fontes recuperadas."
+          ],
+          "feasibilityWarnings": [
+            "Aviso de viabilidade: A evidência consultiva 1d81cea3-b540-41f9-85bc-67eff2386c0c indica status VERIFICACAO_INDISPONIVEL e contestação ativa. Nenhuma confirmação factual foi obtida."
+          ]
+        },
+        "promptVersion": "consensus-consultive-v2.1-factual-context",
+        "model": "gemini-3.5-flash-lite",
+        "createdAt": "2026-11-19T03:27:44.187Z",
+        "publishedProposalId": "5d59d760-df7e-4ef1-bc62-a9ecf675dbbd",
+        "humanCoverage": []
+      }
+    ],
+    "contests": [
+      {
+        "id": "b95fe7bd-d2ff-4888-92a3-82f2637e7552",
+        "participantId": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "targetId": "1d81cea3-b540-41f9-85bc-67eff2386c0c",
+        "text": "[SINTÉTICO] Contesto qualquer leitura como confirmação: a pesquisa falhou e nenhuma fonte foi recuperada.",
+        "at": "2026-11-19T03:27:35.119Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "406eb1fc-d148-42ba-bb64-a29659c971f7",
+        "at": "2026-11-19T03:26:45.615Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "f6a9eebb-3623-4578-bea9-0467cd7591c0",
+        "at": "2026-11-19T03:26:46.349Z",
+        "actor": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "1d81cea3-b540-41f9-85bc-67eff2386c0c; factual-grounding-v1.0; gemini-2.5-flash-lite"
+      },
+      {
+        "id": "167e974f-7ff6-4bcc-b1ed-a99716516d6c",
+        "at": "2026-11-19T03:27:32.893Z",
+        "actor": "9f65cef3-c7ee-496b-8668-f34f87ee77e6",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "f0c77682-a9f4-4591-86bf-b5135df254c2; factual-grounding-v1.0; gemini-2.5-flash-lite"
+      },
+      {
+        "id": "97ab076a-9a72-49e3-8811-2e360b37c818",
+        "at": "2026-11-19T03:27:35.119Z",
+        "actor": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "type": "AI_CONTESTED",
+        "detail": "[SINTÉTICO] Contesto qualquer leitura como confirmação: a pesquisa falhou e nenhuma fonte foi recuperada."
+      },
+      {
+        "id": "c4c7d26c-fde2-43f2-b53a-df8c4f9e0f8c",
+        "at": "2026-11-19T03:27:35.426Z",
+        "actor": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "e1735c40-c1a4-45ac-af2f-6601efb2c720",
+        "at": "2026-11-19T03:27:35.426Z",
+        "actor": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "6c1d6a8c-4fd9-497d-abdc-d5421e85843d",
+        "at": "2026-11-19T03:27:35.757Z",
+        "actor": "9f65cef3-c7ee-496b-8668-f34f87ee77e6",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "11b68680-fa3a-4499-9e97-9731164045e5",
+        "at": "2026-11-19T03:27:36.119Z",
+        "actor": "40dc4121-6391-466a-b2c9-27afd77c1e0e",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "34e66463-5b10-4dc5-a32b-716354d21eb0",
+        "at": "2026-11-19T03:27:36.316Z",
+        "actor": "5306b5cd-febb-4cf9-ba00-7f8b6bcf6ed9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3e275cd6-9e85-40ff-905e-a47d6a6da72c",
+        "at": "2026-11-19T03:27:36.571Z",
+        "actor": "a104b0cd-5733-48c9-b5d9-16fe07c346b0",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "adfb586c-f238-4094-86bf-0f0520205e8d",
+        "at": "2026-11-19T03:27:37.217Z",
+        "actor": "451bf08f-d358-4be5-80d6-a2ee2c41e3c1",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "d36e695a-8a8b-4b87-a379-eb8dfafa9446",
+        "at": "2026-11-19T03:27:37.519Z",
+        "actor": "59d7d0a1-9180-4f5d-9fca-e5670cd3e4b3",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "1dbf2a6e-2bb8-4347-a853-b9a02cc0e28c",
+        "at": "2026-11-19T03:27:37.824Z",
+        "actor": "9dbc5000-619c-4c14-946b-5c4c16d39267",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "f1beb0e9-5d13-4f0f-93db-edd339521236",
+        "at": "2026-11-19T03:27:38.144Z",
+        "actor": "c96e7a41-9eb6-407b-85cc-32b1b10adc9b",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "72392a5e-addf-4630-bf04-70ae4a1c0931",
+        "at": "2026-11-19T03:27:38.528Z",
+        "actor": "002e535a-b366-4328-8966-41c9d49978bd",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "1a03904c-a119-4ab9-aeee-e01cf560630f",
+        "at": "2026-11-19T03:27:41.323Z",
+        "actor": "moderator",
+        "type": "OBJECTIONS_ANALYZED",
+        "detail": ""
+      },
+      {
+        "id": "c0a44712-b224-48b8-ab69-625672571125",
+        "at": "2026-11-19T03:27:44.187Z",
+        "actor": "moderator",
+        "type": "SYNTHESIS_DRAFTED",
+        "detail": ""
+      },
+      {
+        "id": "3c1649ba-f470-4ef0-a0b6-cd332369b44c",
+        "at": "2026-11-19T03:28:22.065Z",
+        "actor": "moderator",
+        "type": "PROPOSAL_PUBLISHED",
+        "detail": "[SINTÉTICO] Revisão operacional técnica: preservar ausência de fontes, contestação e autonomia; sem avaliação científica."
+      },
+      {
+        "id": "25b4c9c0-09dd-4a63-912e-8aebcd65c856",
+        "at": "2026-11-19T03:28:22.616Z",
+        "actor": "4fd0e368-49fa-4582-ad7b-acd1a5a24d98",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "60c78a5f-0b2b-41b4-97e0-9364106a1df8",
+        "at": "2026-11-19T03:28:22.825Z",
+        "actor": "59d7d0a1-9180-4f5d-9fca-e5670cd3e4b3",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "6aa68e8a-9af7-4b06-837e-16d1b3e01db5",
+        "at": "2026-11-19T03:28:23.226Z",
+        "actor": "9dbc5000-619c-4c14-946b-5c4c16d39267",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "1394d6ec-cb92-45c6-b544-06efce698c9d",
+        "at": "2026-11-19T03:28:23.728Z",
+        "actor": "40dc4121-6391-466a-b2c9-27afd77c1e0e",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "d063456c-e0e8-493c-95bc-4ab0e121daaf",
+        "at": "2026-11-19T03:28:24.047Z",
+        "actor": "5306b5cd-febb-4cf9-ba00-7f8b6bcf6ed9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "0ce9c6ca-49fc-4c51-961c-d4f70fc0f3a6",
+        "at": "2026-11-19T03:28:24.379Z",
+        "actor": "c96e7a41-9eb6-407b-85cc-32b1b10adc9b",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "bfe9ebc2-bf41-4b22-85bb-cf214126637d",
+        "at": "2026-11-19T03:28:24.706Z",
+        "actor": "9f65cef3-c7ee-496b-8668-f34f87ee77e6",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "75ad112b-7ef3-4d0a-9784-9aaffd95314d",
+        "at": "2026-11-19T03:28:25.088Z",
+        "actor": "a104b0cd-5733-48c9-b5d9-16fe07c346b0",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "8dcc6b67-76d7-4f81-8efd-4b106d3260aa",
+        "at": "2026-11-19T03:28:25.423Z",
+        "actor": "002e535a-b366-4328-8966-41c9d49978bd",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "0cfe5fd8-97b2-4510-aef1-65a2a1ce2cac",
+        "at": "2026-11-19T03:28:25.900Z",
+        "actor": "451bf08f-d358-4be5-80d6-a2ee2c41e3c1",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "ba5d7181-8eba-4415-8c91-3739a7f171f3",
+        "at": "2026-11-19T03:28:25.900Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      }
+    ],
+    "evaluations": []
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 2,
+      "deliberationMs": 100285,
+      "repeatedObjections": [],
+      "votes": 20,
+      "objections": 1,
+      "distinctObjectionsByRound": 1
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 10,
+    "received": 0,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 30,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 30,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "openResponses": [],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

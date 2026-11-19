@@ -71,3 +71,9 @@ backup b1ccffdbfcbcd638da56026b89adeabbcdd70c9d, main, PR #4 e deploy Streamlit 
 
 ## Fechamento da chave inicial — 18/11/2026
 Foi excluída exclusivamente tcc-decisao-v2-desenvolvimento, após conferir a variável privada contra tcc-decisao-v2-render e validar o novo processo. A substituta permaneceu inalterada. Deploy dep-dbuhisgm7kps73ce6420, SHA acf4aed64ae541cb1f9ec75a4cfef72f3d519a9a. Chamada Gemini real aprovada antes da retirada (03:21:32 UTC) e após a retirada (03:22:11 UTC); página e /api/health HTTP 200; Render live. A sessão sintética persistida permaneceu idêntica. Não houve alteração de código, novas migrações ou exclusão de outros recursos. Evidência saneada: keyLifecycleClosure em evidence/REMOTE_REAL.json e evidence/GEMINI_REAL.json.
+
+## Verificação factual externa — 18/11/2026
+
+A entrega 1392e68992ea7a05d20f5fb2f3a14b74a8f8627a acrescentou uma operação consultiva separada, sem alterar os schemas dos quatro contratos Gemini. CI 44451108859, 56 testes sintéticos, TypeScript e build passaram. O deploy V2 dep-dbv6ntjm8hqs7394de1g ficou live; os quatro contratos Gemini, HTTPS e persistência Neon foram exercitados novamente em sala nova, com dez identidades fictícias e duas rodadas. Nenhuma sessão histórica foi modificada.
+
+A consulta real ao modelo gemini-2.5-flash-lite recebeu MODEL_UNAVAILABLE (HTTP 404) já na classificação, tanto na API quanto na interface móvel. Nenhuma pesquisa Google, fonte, URL ou confirmação factual real foi produzida. O painel gratuito e suas quotas não garantiram acesso efetivo ao modelo legado. Não houve ativação de faturamento, fallback pago ou alteração de credenciais. A implementação e os testes sintéticos estão disponíveis, mas a capacidade de recuperar evidências reais permanece BLOQUEADA no projeto atual. Detalhes, decisões metodológicas atualizadas e limitações em [VERIFICACAO_FACTUAL_V2.md](VERIFICACAO_FACTUAL_V2.md); evidências saneadas em [FACTUAL_REMOTE.json](evidence/FACTUAL_REMOTE.json).

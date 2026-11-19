@@ -53,3 +53,5 @@ test('Factual: plano com trecho inventado não é enviado ao mecanismo de pesqui
 });
 
 test('Factual: preferência longa respeita os limites de armazenamento sem pesquisa',async()=>{let calls=0;const s=service(async()=>{calls++;throw Error();});const r=await s.check('Prefiro '+'carne '.repeat(180),'r');assert.equal(r.claims[0].status,'NAO_VERIFICAVEL');assert.equal(calls,0);assert.equal(r.provenance,'LOCAL_CLASSIFICATION');assert.ok(r.claims[0].claim.text.length<=700);});
+
+test('Factual: opinião, hipótese e falta de informação classificadas não acionam pesquisa',async()=>{for(const kind of ['OPINIAO','HIPOTESE','INFORMACAO_INSUFICIENTE']){let searches=0;const s=service(async mode=>{if(mode==='search'){searches++;throw Error('Should not search');}return {text:JSON.stringify({claims:[{...fact,kind,query:'',reason:'Não exige pesquisa factual.'}]})};});const r=await s.check(fact.text,'room');assert.equal(r.claims[0].status,'NAO_VERIFICAVEL');assert.equal(searches,0);}});

@@ -2,6 +2,20 @@
 
 Versão funcional: `factual-grounding-v1.0`. Data-base: 18/11/2026, America/Sao_Paulo. Implementação técnica pré-avaliação; não constitui resultado científico.
 
+## Estado comprovado da entrega
+
+Código publicado no serviço V2 de testes: `1392e68992ea7a05d20f5fb2f3a14b74a8f8627a`; CI 44451108859 aprovado, 56 testes sintéticos aprovados e build/TypeScript aprovados. Deploy Render `dep-dbv6ntjm8hqs7394de1g` ficou live; HTTPS e Neon funcionaram.
+
+**A recuperação externa real está bloqueada.** Duas tentativas reais, uma pela API e outra pela interface móvel, receberam `MODEL_UNAVAILABLE` (HTTP 404 do provedor) ao solicitar o modelo 2.5 Flash-Lite na classificação. Portanto, nenhuma chamada de grounding chegou a ser executada e nenhuma fonte foi recuperada. O painel de cota não comprovou acesso ao modelo. Não é possível afirmar verificação factual real nesta conta; nenhum modelo pago foi substituído nem faturamento ativado. A restrição de modelos 2.5 documentada pelo Google é compatível com o bloqueio, mas a causa específica da conta não foi confirmada.
+
+Os quatro contratos atuais passaram em chamadas Gemini reais pelo backend. Uma sala exclusivamente sintética, com dez identidades, exercitou rejeição, abstenção, contestação, análise, síntese, revisão operacional, duas versões e unanimidade somente após o décimo aceite. A exportação e a releitura conservaram fatos indisponíveis, preferência não pesquisada e contestação no Neon. A interface foi conferida em 375 × 812, com largura de conteúdo de 360 pixels e sem rolagem horizontal. Não foi possível validar links ou sugestões reais de pesquisa, pois o provedor não os retornou.
+
+Evidências: [relatório remoto](evidence/FACTUAL_REMOTE.json), [sessão técnica sintética sem credenciais](evidence/FACTUAL_SESSION_SYNTHETIC.json), [resultado móvel](evidence/FACTUAL_MOBILE_RESULT.jpg), [testes](evidence/FACTUAL_TESTS.txt) e [build](evidence/FACTUAL_BUILD.json). Os domínios de fixtures dos testes não são apresentados como fontes reais. O caso público tentado foi “A Lua é um satélite natural da Terra.”; seu resultado foi indisponível, sem qualquer fonte atribuída.
+
+## Revisão incremental de integridade
+
+Na revisão final, o cache persistido passou a excluir registros importados sem autenticação e horários futuros. Isso permite uma nova consulta imediata após importar um arquivo, sem reutilizar uma alegada evidência não autenticada. O teste usa inclusive uma data futura no arquivo importado para verificar que o cache não pode ser contaminado. A suíte final tem **57 testes aprovados**, incluindo opinião, hipótese e informação insuficiente sem pesquisa. TypeScript e build continuam aprovados.
+
 ## Escopo e arquitetura
 
 A operação `POST /api/rooms/:code/fact-check` é independente de `analyzeProposal`, `analyzeContribution`, `analyzeObjections` e `synthesizeProposal`. Esses quatro contratos conservam seus schemas e o modelo operacional existente. O prompt consultivo passa a `consensus-consultive-v2.1-factual-context` para reconhecer evidências registradas sem lhes atribuir autoridade decisória.
@@ -34,7 +48,7 @@ As sugestões de pesquisa Google são apresentadas a partir do HTML original ret
 
 A consulta exige credencial da sala e vínculo com a proposta e rodada atuais. Até se manifestar, o participante acessa somente seus próprios registros factuais; o moderador mantém a visão operacional da sala. A gravação é incremental, com repetição apenas da transação em conflitos de revisão; não repete a chamada externa. Se a proposta mudar durante a consulta, o resultado não é aplicado.
 
-Consultar, falhar ou contestar não registra voto, altera objeção, publica proposta nem declara consenso. O participante pode contestar seu próprio parecer antes de votar e manter sua objeção. Pareceres visíveis ao grupo podem ser contestados segundo a autorização já existente. Na mediação, os registros identificados e suas incertezas são contexto consultivo; a análise e a síntese guardam os identificadores factuais considerados. Evidências novas invalidam uma análise anterior para publicação sem nova análise. A revisão e a publicação permanecem humanas e consenso continua exigindo ACEITO explícito de todos na mesma versão. Abstenção e ausência de resposta não são aceitação.
+Consultar, falhar ou contestar não registra voto, altera objeção, publica proposta nem declara consenso. O participante pode contestar seu próprio parecer antes de votar e manter sua objeção. Pareceres visíveis ao grupo podem ser contestados segundo a autorização já existente. Na mediação, os registros identificados e suas incertezas são contexto consultivo; a análise e a síntese guardam os identificadores factuais considerados. Evidências novas exigem nova análise antes de gerar outra síntese. A revisão e a publicação permanecem humanas e consenso continua exigindo ACEITO explícito de todos na mesma versão. Abstenção e ausência de resposta não são aceitação.
 
 Exportação conserva as evidências, fontes, vínculos, horários e contestações, sem credenciais. Importação cria uma sala nova e marca as evidências `IMPORTED_UNAUTHENTICATED`: não há prova criptográfica de origem externa, por isso esses registros não alimentam a mediação como evidências verificadas. Snapshots anteriores sem campos factuais continuam legíveis. Nenhum registro histórico é convertido em pesquisa externa retrospectiva.
 

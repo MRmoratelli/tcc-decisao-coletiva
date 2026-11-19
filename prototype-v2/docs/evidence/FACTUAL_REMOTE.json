@@ -1,0 +1,164 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO",
+  "status": "PARTIAL_PROVIDER_BLOCKED",
+  "startedAt": "2026-11-19T03:24:21.897Z",
+  "completedAt": "2026-11-19T03:28:26.524Z",
+  "origin": "https://tcc-decisao-v2-test.onrender.com",
+  "commit": "1392e68992ea7a05d20f5fb2f3a14b74a8f8627a",
+  "health": {
+    "status": "ok",
+    "version": 2,
+    "commit": "1392e68992ea7a05d20f5fb2f3a14b74a8f8627a",
+    "aiConfigured": true,
+    "factual": {
+      "enabled": true,
+      "model": "gemini-2.5-flash-lite",
+      "version": "factual-grounding-v1.0"
+    },
+    "httpStatus": 200,
+    "at": "2026-11-19T03:26:37.245Z"
+  },
+  "deployId": "dep-dbv6ntjm8hqs7394de1g",
+  "ci": {
+    "runId": 44451108859,
+    "conclusion": "success",
+    "url": "https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44451108859"
+  },
+  "participants": 10,
+  "simultaneousReadIdentities": 10,
+  "rounds": 2,
+  "finalResult": "CONSENSUS",
+  "neonPersistence": true,
+  "scientificEvaluation": false,
+  "questionnaireChanged": false,
+  "independentFidelityRatings": false,
+  "externalRetrieval": {
+    "status": "BLOCKED_BEFORE_GROUNDING",
+    "requestedModel": "gemini-2.5-flash-lite",
+    "observedHttpStatus": 404,
+    "failureCode": "MODEL_UNAVAILABLE",
+    "failedStage": "classify",
+    "realProviderAttempts": 2,
+    "groundedSearchCalls": 0,
+    "sourcesRetrieved": 0,
+    "actualClaim": "A Lua é um satélite natural da Terra.",
+    "claimResult": "VERIFICACAO_INDISPONIVEL",
+    "freeTierObserved": true,
+    "paidBillingActivated": false,
+    "automaticPaidFallback": false,
+    "explanation": "The actual model call was rejected as unavailable; no search operation, evidence or source was claimed. Public docs warn 2.5 access is restricted; individual account root cause is not confirmed.",
+    "attemptContexts": [
+      "Backend synthetic room",
+      "Mobile UI separate synthetic room"
+    ]
+  },
+  "modelQuotaObserved": {
+    "requestsPerMinute": 10,
+    "tokensPerMinute": 250000,
+    "requestsPerDay": 20
+  },
+  "localBudget": {
+    "providerCallsPerDayPerProcess": 10,
+    "providerCallsPerMinute": 4,
+    "maxConcurrent": 2
+  },
+  "contracts": [
+    {
+      "contract": "analyzeProposal",
+      "at": "2026-11-19T03:26:45.574Z",
+      "elapsedMs": 8324,
+      "provider": "Gemini real, backend HTTPS",
+      "status": "PASS",
+      "mock": false
+    },
+    {
+      "contract": "analyzeContribution",
+      "at": "2026-11-19T03:27:34.965Z",
+      "elapsedMs": 1913,
+      "provider": "Gemini real, backend HTTPS",
+      "status": "PASS",
+      "mock": false
+    },
+    {
+      "contract": "analyzeObjections",
+      "at": "2026-11-19T03:27:41.492Z",
+      "elapsedMs": 2065,
+      "provider": "Gemini real, backend HTTPS",
+      "status": "PASS",
+      "mock": false
+    },
+    {
+      "contract": "synthesizeProposal",
+      "at": "2026-11-19T03:27:44.356Z",
+      "elapsedMs": 2566,
+      "provider": "Gemini real, backend HTTPS",
+      "status": "PASS",
+      "mock": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "10 simultaneous fictitious identities",
+      "pass": true
+    },
+    {
+      "name": "Rejection and abstention preserve OPEN",
+      "pass": true
+    },
+    {
+      "name": "Factual failure does not block rejection",
+      "pass": true
+    },
+    {
+      "name": "Preference not researched",
+      "pass": true
+    },
+    {
+      "name": "Nine explicit accepts keep OPEN; tenth concludes same version",
+      "pass": true
+    },
+    {
+      "name": "Neon persistence reread and export evidence/contest",
+      "pass": true
+    },
+    {
+      "name": "No credentials in export",
+      "pass": true
+    },
+    {
+      "name": "Four real Gemini contracts preserved with no source invention",
+      "pass": true
+    }
+  ],
+  "exportSha256": "68d8bbdbdc57a1389f0a3442c56bacb575b83439967730f18c3a9cc3e361ff2e",
+  "sourceIntegrity": "No source was recovered or invented in the real attempt; synthetic source fixtures remain explicitly separate.",
+  "limitations": [
+    "Actual external retrieval is NOT validated due to provider model access block.",
+    "Source dates generally may be absent; time-sensitive facts remain insufficient without metadata freshness.",
+    "No paid service was enabled or substituted.",
+    "All identities, votes and review actions are synthetic technical tests, not scientific observations."
+  ],
+  "mobile": {
+    "status": "PASS_WITH_PROVIDER_BLOCK",
+    "requestedViewport": {
+      "width": 375,
+      "height": 812
+    },
+    "measuredContentWidth": 360,
+    "measuredDocumentWidth": 360,
+    "horizontalOverflow": false,
+    "sourceLinksLiveValidation": false,
+    "preferenceNoSearch": true,
+    "unavailableAndNoSourcesVisible": true,
+    "at": "2026-11-19T03:29:44Z",
+    "additionalProviderAttempt": {
+      "requestedModel": "gemini-2.5-flash-lite",
+      "failureCode": "MODEL_UNAVAILABLE",
+      "stage": "classify"
+    },
+    "screenshots": [
+      "FACTUAL_MOBILE.jpg",
+      "FACTUAL_MOBILE_RESULT.jpg"
+    ]
+  }
+}
