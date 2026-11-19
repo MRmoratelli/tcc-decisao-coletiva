@@ -6,16 +6,13 @@ import { Repository,type SQLPool } from './db.js';
 import { migrate } from './migrate.js';
 import { createApp } from './app.js';
 import { FakeAI,proposal } from './fixtures.js';
-import { FactualService,type FactualAdapter } from './factual.js';
-import { FACTUAL_MODEL,FACTUAL_VERSION,type FactualReport } from '../shared/factual.js';
-import { normalizeGrounding } from './factual.js';
-const fact={text:'A alegação sintética está fundamentada.',originalExcerpt:'A alegação sintética está fundamentada.',kind:'FATO_VERIFICAVEL' as const,query:'Consulta fictícia',timeSensitive:false,reason:'Teste técnico'};
-const raw={text:'ESTADO: EVIDENCIA_FAVORAVEL\nTrecho sintético com suporte externo simulado para este teste.',candidates:[{groundingMetadata:{webSearchQueries:['consulta fictícia'],groundingChunks:[{web:{title:'Fonte exclusivamente sintética',uri:'https://example.org/synthetic'}}],groundingSupports:[{segment:{text:'Trecho sintético com suporte externo simulado para este teste.'},groundingChunkIndices:[0]}],searchEntryPoint:{renderedContent:'<div>Sugestões sintéticas</div>'}}}]};
+import {type FactualAdapter} from './factual.js';
+import {syntheticReport,fact} from './factual-fixtures.js';
 test('Factual 10–14: dez identidades simultâneas, autorização, contestação, persistência, importação e consenso',async()=>{
  const db=new PGlite(),query=async(sql:string,values?:any[])=>{if(sql.includes('CREATE TABLE')){await db.exec(sql);return {rows:[]};}return db.query(sql,values);};let tail=Promise.resolve();
  const pool:SQLPool={query,async connect(){const prior=tail;let release!:()=>void;tail=new Promise<void>(r=>{release=r;});await prior;return {query,release};}};await migrate({query});
  const repo=new Repository(pool,'synthetic-pepper-for-ten-participant-test'),ai=new FakeAI();let calls=0;
- const factual:FactualAdapter={enabled:true,async check(text){calls++;await new Promise(r=>setTimeout(r,10));return {originalText:text,model:FACTUAL_MODEL,version:FACTUAL_VERSION,createdAt:new Date().toISOString(),provenance:'SYNTHETIC_TEST',claims:[normalizeGrounding({...fact,text,originalExcerpt:text},raw)]};}};
+ const factual:FactualAdapter={enabled:true,async check(text){calls++;await new Promise(r=>setTimeout(r,10));return syntheticReport(text);}};
  const server=createApp(repo,ai,'synthetic-signing-for-ten-participant-test',{factual}).listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const addr=server.address();assert.ok(addr&&typeof addr!=='string');const base='http://127.0.0.1:'+addr.port+'/api';
  const post=async(path:string,body:any)=>{const r=await fetch(base+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return {status:r.status,data:await r.json() as any};};
  try{
@@ -41,6 +38,6 @@ test('Factual 10–14: dez identidades simultâneas, autorização, contestaçã
   const restored=await post('/import',archive);assert.equal(restored.status,201);const copy=(await post('/rooms/'+restored.data.code+'/view',{credential:restored.data.moderatorCredential})).data;assert.equal(copy.state.factualChecks.length,10);assert.ok(copy.state.factualChecks.every((f:any)=>f.provenance==='IMPORTED_UNAUTHENTICATED'));
   const legacy=structuredClone(archive);delete legacy.state.factualChecks;legacy.state.contests=[];assert.equal((await post('/import',legacy)).status,201);
   // A forged favorable result with missing metadata links is rejected on import.
-  const invalid=structuredClone(archive);invalid.state.factualChecks[0].claims[0].supports=[];assert.equal((await post('/import',invalid)).status,400);
+  const invalid=structuredClone(archive);invalid.state.factualChecks[0].claims[0].evidenceLinks=[];assert.equal((await post('/import',invalid)).status,400);
  }finally{await new Promise<void>(r=>server.close(()=>r()));await db.close();}
 });

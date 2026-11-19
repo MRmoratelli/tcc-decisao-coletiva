@@ -53,7 +53,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
    metrics:identity.role==='moderator'?metrics(s):null};
  }
- app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,factual:{enabled:factual.enabled,model:FACTUAL_MODEL,version:FACTUAL_VERSION}});});
+ app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,factual:{enabled:factual.enabled,retrievalProvider:'TAVILY',model:FACTUAL_MODEL,version:FACTUAL_VERSION,...(factual.availability?{availability:factual.availability}:{})}});});
  app.post('/api/ai/proposal-review',aiLimit,async(req,res)=>{
   z.literal(true).parse(req.body.consent);const proposal=ProposalSchema.parse(req.body.proposal);
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});
@@ -73,7 +73,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const i=await auth(req),b=z.object({text:z.string().trim().min(4).max(1200),proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body);
   if(privateData(b.text))throw new DomainError('Remova dados pessoais, informações privadas e URLs. Envie somente a alegação pública mínima.');
   const x=await repo.read(i);if(x.state.decision.status!=='OPEN'||currentProposal(x.state).id!==b.proposalId||currentRound(x.state).id!==b.roundId)throw new DomainError('Proposta ou rodada desatualizada.',409);
-  const existing=x.state.factualChecks.find(f=>f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
+  const existing=x.state.factualChecks.find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
   if(existing){res.json({check:existing,cached:true});return;}
   if(x.state.factualChecks.length>=40)throw new DomainError('Limite de verificações desta sala atingido.',429);
   const report=await factual.check(b.text,i.roomId);
@@ -81,7 +81,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   for(let attempt=0;attempt<12;attempt++){
    const current=await repo.read(i);
    if(current.state.decision.status!=='OPEN'||currentProposal(current.state).id!==b.proposalId)throw new DomainError('A proposta mudou durante a consulta. O resultado não foi aplicado.',409);
-   const duplicate=current.state.factualChecks.find(f=>f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
+   const duplicate=current.state.factualChecks.find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
    if(duplicate){res.json({check:duplicate,cached:true});return;}
    try{const saved=await repo.mutate(i,current.revision,s=>addFactualCheck(s,report,i.participantId??null));res.status(201).json({check:saved.state.factualChecks.at(-1),cached:false});return;}
    catch(e){if(e instanceof DomainError&&e.status===409&&attempt<11)continue;throw e;}

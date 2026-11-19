@@ -1,95 +1,82 @@
-# Verificação factual externa consultiva — V2
+# Verificação factual consultiva — Tavily + Gemini 3.5
 
-Versão funcional: `factual-grounding-v1.0`. Data-base: 18/11/2026, America/Sao_Paulo. Implementação técnica pré-avaliação; não constitui resultado científico.
+Versão: `factual-tavily-gemini-v2.0`. Data-base: 19/11/2026. Exclusivamente implementação e validação técnicas; não constitui avaliação científica com participantes.
 
-## Estado comprovado da entrega
+## Estado de validação
 
-Código publicado no serviço V2 de testes: `1392e68992ea7a05d20f5fb2f3a14b74a8f8627a`; CI 44451108859 aprovado, 56 testes sintéticos aprovados e build/TypeScript aprovados. Deploy Render `dep-dbv6ntjm8hqs7394de1g` ficou live; HTTPS e Neon funcionaram.
+A implementação local passou em **62 testes sintéticos**, TypeScript frontend/backend e build Vite. Os testes utilizam respostas simuladas identificadas e PostgreSQL embarcado; não comprovam acesso externo real. Evidências: `evidence/TAVILY_TESTS.txt` e `evidence/TAVILY_BUILD.json`.
 
-**A recuperação externa real está bloqueada.** Duas tentativas reais, uma pela API e outra pela interface móvel, receberam `MODEL_UNAVAILABLE` (HTTP 404 do provedor) ao solicitar o modelo 2.5 Flash-Lite na classificação. Portanto, nenhuma chamada de grounding chegou a ser executada e nenhuma fonte foi recuperada. O painel de cota não comprovou acesso ao modelo. Não é possível afirmar verificação factual real nesta conta; nenhum modelo pago foi substituído nem faturamento ativado. A restrição de modelos 2.5 documentada pelo Google é compatível com o bloqueio, mas a causa específica da conta não foi confirmada.
+Na preparação, o painel Tavily apresentou a tela de login. A presença de chave no backend, plano Researcher e pay-as-you-go desligado ainda precisam ser confirmados. Não foi criada conta nem credencial, ativado faturamento ou realizada chamada Tavily real nesta etapa preparatória. O resultado externo deve ser atualizado somente após execução efetiva. Uma tela de cota, uma chave configurada ou os testes sintéticos não demonstram recuperação de fontes.
 
-Os quatro contratos atuais passaram em chamadas Gemini reais pelo backend. Uma sala exclusivamente sintética, com dez identidades, exercitou rejeição, abstenção, contestação, análise, síntese, revisão operacional, duas versões e unanimidade somente após o décimo aceite. A exportação e a releitura conservaram fatos indisponíveis, preferência não pesquisada e contestação no Neon. A interface foi conferida em 375 × 812, com largura de conteúdo de 360 pixels e sem rolagem horizontal. Não foi possível validar links ou sugestões reais de pesquisa, pois o provedor não os retornou.
+## Fluxo e preservação
 
-Evidências: [relatório remoto](evidence/FACTUAL_REMOTE.json), [sessão técnica sintética sem credenciais](evidence/FACTUAL_SESSION_SYNTHETIC.json), [resultado móvel](evidence/FACTUAL_MOBILE_RESULT.jpg), [testes](evidence/FACTUAL_TESTS.txt) e [build](evidence/FACTUAL_BUILD.json). Os domínios de fixtures dos testes não são apresentados como fontes reais. O caso público tentado foi “A Lua é um satélite natural da Terra.”; seu resultado foi indisponível, sem qualquer fonte atribuída.
+1. O usuário separa uma alegação pública mínima, com até 1.200 caracteres, e concorda com o envio ao Gemini e à Tavily quando necessário.
+2. Preferências explícitas, restrições e identificadores reconhecidos são tratados localmente, sem pesquisa. Outros textos são classificados pelo `gemini-3.5-flash-lite`, sem ferramentas externas, em até três unidades: fato verificável, preferência, restrição individual, opinião, hipótese ou informação insuficiente.
+3. Cada fato público recebe sua própria Tavily **Search API**, sempre `basic`, `max_results: 3`, `topic: general`, `auto_parameters: false`, sem resposta gerada Tavily, extração integral, imagens ou endpoints Extract/Crawl/Research/Map. A solicitação pede metadados de data e uso de créditos. Para fatos atuais, o filtro semanal ajuda a recuperação, mas não prova atualidade.
+4. O backend conserva os resultados reais utilizáveis e envia ao Gemini a alegação e esses resultados como dados não confiáveis. O modelo interpreta os trechos e devolve referências a identificadores existentes, com citação literal do trecho correspondente.
+5. O backend valida os vínculos, comunica limitações e grava o parecer no histórico da sala. A interface mostra a alegação, a interpretação, os trechos vinculados, as fontes e as incertezas separadamente.
 
-## Revisão incremental de integridade
+Os quatro contratos Gemini anteriores, seus schemas e o modelo operacional não foram modificados. A integração factual continua uma operação separada. Análises e sínteses recebem somente contexto factual Tavily da proposta atual, com identificadores, fontes, limites e texto das contestações. Nenhuma consulta registra voto, elimina objeção, publica proposta ou declara consenso. Publicação permanece humana, consenso exige ACEITO explícito de todos na mesma versão e encerramento sem consenso continua possível.
 
-Na revisão final, o cache persistido passou a excluir registros importados sem autenticação e horários futuros. Isso permite uma nova consulta imediata após importar um arquivo, sem reutilizar uma alegada evidência não autenticada. O teste usa inclusive uma data futura no arquivo importado para verificar que o cache não pode ser contaminado. A suíte final tem **57 testes aprovados**, incluindo opinião, hipótese e informação insuficiente sem pesquisa. TypeScript e build continuam aprovados.
+## Contratos e integridade das fontes
 
-## Escopo e arquitetura
+Novos registros informam `retrievalProvider: TAVILY`, `classificationModel`, `model`, `version`, `provenance` e os vínculos da sala/proposta/rodada/participante. Cada alegação conserva:
 
-A operação `POST /api/rooms/:code/fact-check` é independente de `analyzeProposal`, `analyzeContribution`, `analyzeObjections` e `synthesizeProposal`. Esses quatro contratos conservam seus schemas e o modelo operacional existente. O prompt consultivo passa a `consensus-consultive-v2.1-factual-context` para reconhecer evidências registradas sem lhes atribuir autoridade decisória.
+- Texto original e trecho literal que a originou, categoria, pergunta pública mínima e necessidade de atualidade.
+- Estado, explicação consultiva, modelo efetivamente retornado, horário UTC, limitações e código de falha saneado.
+- Resultados Tavily com URL e título recebidos, trecho (`excerpt`), escore de relevância quando fornecido, identificador opcional do provedor, hash do conteúdo e indicação de truncamento em 3.500 caracteres.
+- Data original de metadados (`publishedAtRaw`) e normalização quando reconhecida; valores ausentes permanecem nulos. A data é estimativa Tavily de publicação ou atualização, não certificação da publicação original. Nenhuma data é preenchida pelo Gemini.
+- Metadados da Search API: busca básica, consulta efetiva, `request_id`, horário, resultados recebidos/retidos, `usage.credits`, tempo de resposta quando disponível e hash da resposta. Uso ausente permanece nulo, sem estimativa apresentada como medição.
+- `evidenceLinks`, referências interpretativas com sourceId, citação literal, relação de apoio/contradição/contexto e explicação. São vínculos produzidos pelo Gemini e validados contra o conteúdo Tavily, não metadados Google Grounding.
 
-Somente o backend utiliza a chave Gemini existente. O novo adaptador fixa `gemini-2.5-flash-lite`, sem fallback automático para modelos ou serviços pagos. A implementação usa o SDK já instalado; não adiciona dependências, tabelas ou migrações. Os registros são campos opcionais com valores padrão nos snapshots JSONB V2 existentes.
+Resultados recuperados não são confirmação automática. EVIDÊNCIA FAVORÁVEL/CONTRÁRIA exige um vínculo literal utilizável, escopo declarado compatível e relação correspondente; fontes conflitantes, referências inventadas ou escopo incompatível resultam em EVIDÊNCIA INSUFICIENTE. Um escore alto de relevância não é probabilidade de verdade. Relevância abaixo de 0,35 em fonte vinculada leva a insuficiência. Alegações atuais exigem datas de fontes vinculadas dentro das últimas 72 horas, sem datas futuras; datas antigas ou ausentes não comprovam preços, clima ou câmbio atuais.
 
-O participante ou moderador separa uma alegação pública, de até 1.200 caracteres, e concorda com seu envio. Uma heurística local evita pesquisar preferências explícitas, restrições e identificadores reconhecidos. Quando necessário, uma chamada sem ferramentas classifica o texto e o decompõe em até três unidades: fatos, preferências, restrições individuais, opiniões, hipóteses ou informação insuficiente. Uma relação causal pode ser decomposta em evento, efeito e nexo causal. Cada fato público recebe sua própria chamada com `tools: [{ googleSearch: {} }]`; as demais categorias não recebem pesquisa externa.
+Os estados são EVIDÊNCIA FAVORÁVEL, EVIDÊNCIA CONTRÁRIA, EVIDÊNCIA INSUFICIENTE, NÃO VERIFICÁVEL e VERIFICAÇÃO INDISPONÍVEL. Nenhum significa comprovação absoluta. O participante pode contestar e manter sua posição.
 
-O filtro de privacidade é preventivo e limitado, não um detector completo de dados pessoais. A interface solicita apenas o fato público mínimo e proíbe nomes, contatos, endereços privados e URLs. A rota rejeita identificadores comuns antes de persistir ou transmitir. Não existe recuperação de URLs arbitrárias pelo servidor; o Google Search seleciona as fontes. O fato de uma preferência não exigir pesquisa não confirma nem invalida a escolha do participante. Argumentos mistos podem exigir reformulação para separar os fatos.
+O Gemini não recebe autorização para inventar URLs ou datas e não fornece esses campos no contrato de interpretação. Apenas URLs HTTPS públicas retornadas pela Tavily são exibidas; URLs internas, endereços IP, credenciais embutidas e portas são recusados. O servidor não navega nem faz fetch nas URLs retornadas ou fornecidas pelo usuário: a única requisição de busca é ao endpoint fixo `https://api.tavily.com/search`, com redirecionamentos HTTP desabilitados.
 
-## Evidências e estados
+## Histórico, persistência e autorização
 
-São conservados: texto original, trecho literal que originou a unidade, classificação, consulta, interpretação da IA, fontes, URLs, trechos associados, horário UTC, modelo solicitado e retornado, versão, limitações e código de falha saneado. Datas das fontes são preenchidas somente quando fornecidas nos metadados; não são deduzidas de datas escritas pelo modelo.
+Os schemas aceitam explicitamente tanto a versão histórica `factual-grounding-v1.0`, com modelo 2.5, quanto a nova versão Tavily. Nenhum registro antigo é reescrito ou rotulado como pesquisa Tavily. Seus campos Google permanecem exclusivamente no contrato e na apresentação históricos. Não há `groundingSupports`, `searchEntryPoint` ou sugestões Google nos novos registros Tavily.
 
-| Estado | Significado operacional |
-| --- | --- |
-| EVIDÊNCIA FAVORÁVEL | O mecanismo retornou fontes e trechos vinculados, interpretados como favoráveis à alegação. |
-| EVIDÊNCIA CONTRÁRIA | O mecanismo retornou fontes e trechos vinculados, interpretados como contrários à alegação. |
-| EVIDÊNCIA INSUFICIENTE | Não foi demonstrado suporte rastreável suficiente, associação, atualidade ou resposta conclusiva. |
-| NÃO VERIFICÁVEL | Preferência, restrição, opinião, hipótese ou informação insuficiente; não equivale a falsidade. |
-| VERIFICAÇÃO INDISPONÍVEL | Serviço desativado, sem acesso, quota atingida, erro de classificação ou falha externa. |
+Exportações conservam fontes, trechos, metadados, interpretação e contestação. Importação cria uma sala nova, reemite credenciais e marca as evidências `IMPORTED_UNAUTHENTICATED`; elas não alimentam a mediação como evidências autenticadas e não são reutilizadas pelo cache. Arquivos anteriores sem fatos continuam legíveis. Não há nova dependência, tabela ou migração SQL; são usados os snapshots JSONB V2 existentes.
 
-Nenhum estado demonstra verdade absoluta. URLs escritas no texto do modelo não são usadas como fontes. A normalização aceita apenas `groundingMetadata.groundingChunks[].web`, relaciona `groundingSupports[].groundingChunkIndices` a trechos presentes na resposta e exige consultas e `searchEntryPoint.renderedContent`. Fontes sem vínculo não sustentam os dois estados conclusivos. Metadados ausentes, inválidos ou incompletos não viram confirmação. Os trechos exibidos são trechos da resposta associados pelo provedor, não citações literais certificadas da página de origem. Não há uma leitura independente das páginas.
+A rota continua exigindo credencial da sala e vínculo com versão/rodada atual. Visibilidade preserva o isolamento antes da primeira manifestação. Novas evidências exigem nova análise antes de gerar outra síntese. Conflitos de revisão repetem somente a gravação incremental, sem repetir a pesquisa externa. Dados de sessões existentes e histórico não são alterados por essa integração.
 
-Para preços atuais, câmbio, clima ou outros fatos temporais, a classificação solicita `timeSensitive=true`; a confirmação exige datas fornecidas pelo provedor dentro das últimas 72 horas, sem datas futuras. A falta dessas datas resulta em evidência insuficiente, mesmo quando há links. Esse critério conservador não torna uma previsão meteorológica adequada à data ou ao local por si só: a interpretação ainda pode errar. Informações antigas continuam identificadas por seu horário de consulta e não devem ser tratadas como atualização permanente.
+## Segurança e gratuidade
 
-As sugestões de pesquisa Google são apresentadas a partir do HTML original retornado, em iframe isolado, sem scripts nem acesso à origem da aplicação, com abertura de links. O HTML não é reconstruído a partir do texto do modelo. Os links de fontes abrem em nova aba com `noopener noreferrer`.
+`TAVILY_API_KEY` permanece exclusivamente no backend Render. Não usar variável `VITE_*`, parâmetro de URL, frontend, logs, exemplos, exportações ou relatórios para o valor da chave. Nenhuma conta ou chave de terceiros é criada por esta implementação.
 
-## Autonomia, autorização e histórico
+Os dois guardas existentes `FACTUAL_SEARCH_ENABLED` e `FACTUAL_FREE_TIER_CONFIRMED` continuam aplicáveis. O novo `TAVILY_RESEARCHER_CONFIRMED=true` somente deve ser definido após confirmar o plano Researcher e pay-as-you-go desligado. É uma declaração operacional, não consulta automática ao estado de faturamento. Sem confirmação/chave, a operação retorna indisponibilidade e não ativa pagamentos nem tenta outro provedor pago.
 
-A consulta exige credencial da sala e vínculo com a proposta e rodada atuais. Até se manifestar, o participante acessa somente seus próprios registros factuais; o moderador mantém a visão operacional da sala. A gravação é incremental, com repetição apenas da transação em conflitos de revisão; não repete a chamada externa. Se a proposta mudar durante a consulta, o resultado não é aplicado.
+A documentação primária Tavily, consultada em 19/11/2026, informa Researcher gratuito com 1.000 créditos mensais e **1 crédito por Search básica**. Isso é regra pública, distinta do consumo observado da conta. O sistema solicita `include_usage: true` e só informa como medido o valor efetivamente retornado.
 
-Consultar, falhar ou contestar não registra voto, altera objeção, publica proposta nem declara consenso. O participante pode contestar seu próprio parecer antes de votar e manter sua objeção. Pareceres visíveis ao grupo podem ser contestados segundo a autorização já existente. Na mediação, os registros identificados e suas incertezas são contexto consultivo; a análise e a síntese guardam os identificadores factuais considerados. Evidências novas exigem nova análise antes de gerar outra síntese. A revisão e a publicação permanecem humanas e consenso continua exigindo ACEITO explícito de todos na mesma versão. Abstenção e ausência de resposta não são aceitação.
+Limites locais por processo e dia UTC: **10 buscas Tavily/dia e 3/minuto**, **30 chamadas Gemini factuais/dia e 6/minuto**, no máximo duas operações externas simultâneas. Classificação e interpretação consomem chamadas Gemini distintas; uma frase causal com três fatos pode consumir três buscas e quatro chamadas Gemini. Cache por sala/texto/versão por dez minutos deduplica solicitações simultâneas. A rota mantém 12 requisições factuais por IP/minuto e 40 registros por sala.
 
-Exportação conserva as evidências, fontes, vínculos, horários e contestações, sem credenciais. Importação cria uma sala nova e marca as evidências `IMPORTED_UNAUTHENTICATED`: não há prova criptográfica de origem externa, por isso esses registros não alimentam a mediação como evidências verificadas. Snapshots anteriores sem campos factuais continuam legíveis. Nenhum registro histórico é convertido em pesquisa externa retrospectiva.
+Os contadores e o cache em memória reiniciam com o processo; não coordenam múltiplas instâncias. Manter a instância única e o plano gratuito sem pay-as-you-go. Para escalar, seria necessário orçamento compartilhado persistente e nova avaliação de custos. Quota esgotada, 429, 432/433, erros de autenticação, timeout, JSON inválido ou resposta acima de 256 KB são tratados sem retry automático, contratação ou troca de provedor. Timeout Tavily: 25 segundos; Gemini: 30 segundos. A deliberação continua disponível sem a pesquisa.
 
-## Gratuidade, acesso e limites
+O filtro de dados pessoais é preventivo, não completo. Não incluir nomes, contatos, endereço privado, informações de saúde ou URLs na consulta. O classificador recebe somente o texto mínimo autorizado. Conteúdo de fontes pode conter erros ou instruções maliciosas; é tratado como dado não confiável. Não há leitura independente das páginas, garantia de exaustividade, prova causal automática ou auditoria externa de segurança.
 
-As variáveis `FACTUAL_SEARCH_ENABLED` e `FACTUAL_FREE_TIER_CONFIRMED` ficam desligadas por padrão. A segunda é uma declaração operacional após inspeção da conta, não uma consulta automática ao faturamento. Não há função para ativar billing, cadastrar cartão ou contratar serviços.
+## Cobertura técnica
 
-Inspeção autenticada do projeto exclusivo `tcc-decisao-v2` em 18/11/2026: painel indicou **Nível gratuito**; a cota do modelo 2.5 Flash-Lite era **10 RPM, 250 mil TPM e 20 RPD**, sem consumo prévio exibido. A cota agregada da família Search Grounding 2.5 não substitui o limite menor do modelo. A documentação pública de preços informa grounding gratuito para 2.5 Flash-Lite, enquanto a documentação de modelos alerta para restrição de acesso a projetos que não utilizaram 2.5 anteriormente. A presença de uma cota no painel não comprova acesso efetivo; somente uma chamada real pode confirmá-lo.
+A suíte contempla fato corroborado/contradito, evidência inconclusiva, preferência/restrição/opinião sem pesquisa, decomposição causal, fonte antiga/sem data, nenhum resultado, citação inventada, escopo incompatível, falha Tavily, créditos, limites locais, privacidade, cache, compatibilidade histórica, autorização, contestação, persistência/exportação/importação, dez identidades simultâneas, quatro contratos Gemini e regras de consenso. Testes React verificam fontes, datas, relevância e ausência de widget Google nos registros novos.
 
-Limites locais conservadores: 10 chamadas totais ao provedor por dia UTC e processo, 4 por minuto, no máximo duas simultâneas, 12 requisições factuais por IP/minuto e 40 registros por sala. Classificação também consome uma chamada: um texto com três fatos pode consumir quatro chamadas. Não são dez pesquisas completas por dia. Cache por sala, texto e versão por dez minutos reduz repetições; a resposta informa o horário original. O cache em memória e os contadores reiniciam com o processo e não coordenam múltiplas instâncias. O limite efetivo do provedor e o projeto gratuito permanecem a barreira de conta; não se recomenda escalar essa configuração para múltiplas instâncias sem um orçamento persistente compartilhado.
+A consulta real de baixo consumo, a observação móvel e a persistência remota só poderão ser marcadas como aprovadas após execução efetiva. A monografia, o questionário DSR e suas regras operacionais não foram alterados. Permanecem as decisões metodológicas já comunicadas: grupo com problema próprio, moderador integrante do TCC sem voto pelos participantes, sem coleta adicional de perfis, sem avaliação humana independente adicional e decisão do questionário em uma rodada pendente do orientador.
 
-Timeout externo de 30 segundos, saída limitada, até três alegações, doze fontes por alegação e limite serializado por registro. 429/403/404/400, falta de chave, falhas e ausência de metadados são conservados como indisponibilidade/insuficiência, sem retry automático ou troca de modelo. A aplicação pode continuar deliberando sem a pesquisa. Antes de cada sessão, conferir novamente tier, disponibilidade, quotas e políticas do provedor. O conteúdo transmitido está sujeito ao tratamento previsto para a modalidade gratuita Gemini; não enviar dados pessoais ou sensíveis.
+## Referências técnicas primárias
 
-## Testes e evidências
+- https://docs.tavily.com/documentation/api-reference/endpoint/search
+- https://docs.tavily.com/documentation/api-credits
+- https://docs.tavily.com/documentation/rate-limits
+- https://ai.google.dev/gemini-api/docs/structured-output
+- https://render.com/docs/configure-environment-variables
 
-`server/factual.test.ts` usa exclusivamente fixtures sintéticas e não realiza chamadas externas. Abrange suporte favorável e contrário, fontes escritas apenas pelo modelo, vínculo ausente, opinião/preferência/restrição, decomposição causal, fonte antiga, ausência de datas, falhas/quotas, cache, privacidade e trechos originais inventados. `server/factual-api.test.ts` usa PGlite e adaptadores sintéticos: dez identidades enviam verificações simultaneamente, com autorização, visibilidade, contestação, exportação/importação e consenso apenas após o décimo ACEITO. Os testes React verificam fontes, isolamento das sugestões e concordância explícita.
+O mecanismo anterior e seu bloqueio real 404 estão preservados na revisão Git `4cb80ec27c6734567df53c48640703c63f3838dc` e nos arquivos `evidence/FACTUAL_*`. Esses arquivos históricos não comprovam a nova integração Tavily.
 
-As regressões dos quatro contratos e das regras de consenso permanecem na suíte. Resultados de execução: `docs/evidence/FACTUAL_TESTS.txt`. TypeScript frontend/backend e build Vite são verificados separadamente e no CI. Testes locais não comprovam acesso ao Google Search. O relatório de execução remota deve registrar separadamente o sucesso ou bloqueio real, SHA, HTTPS, persistência Neon, contratos Gemini e observação da interface móvel. Nenhuma identidade sintética corresponde a participante da avaliação acadêmica.
+## Execução remota de baixo consumo
 
-## Decisões metodológicas recebidas nesta execução
+Executar somente após conferir a presença da chave privada no Render, Researcher gratuito e pay-as-you-go desligado:
 
-Não foi modificada a monografia consolidada ou a redação do instrumento DSR. Para a próxima revisão acadêmica:
+    node --import tsx server/live-tavily.ts --run --origin=https://tcc-decisao-v2-test.onrender.com
 
-- O grupo preexistente, com aproximadamente dez integrantes, organiza seu próprio churrasco; os pesquisadores não criaram ou impuseram a situação-problema.
-- O moderador será um integrante do grupo responsável pelo TCC: facilita a operação e revisa propostas, sem votar pelos participantes que organizam o churrasco.
-- Não será exigido cadastro formal adicional ou coleta de perfis pessoais. Identidades técnicas, participação voluntária e informação mínima sobre tratamento dos dados permanecem necessárias.
-- Não haverá avaliação humana independente adicional da fidelidade das sínteses; a análise utilizará o questionário DSR e os registros disponíveis. Não se presume rubrica, avaliador ou nota científica de fidelidade.
-- A aplicação do questionário em uma rodada aguarda decisão do orientador. O instrumento e a regra operacional atual de pelo menos duas rodadas foram preservados. Não fabricar discordância ou nova rodada.
-- A orientação já comunicada pelo orientador é de desnecessidade de submissão ao Comitê de Ética da UVA para o procedimento previsto; isso não constitui parecer formal do Comitê nem elimina deveres de privacidade.
-
-## Fontes técnicas primárias
-
-Consultadas em 18/11/2026; políticas e acesso podem mudar:
-
-- https://ai.google.dev/gemini-api/docs/google-search — ferramentas, metadados e apresentação de grounding.
-- https://ai.google.dev/gemini-api/docs/grounding/search-suggestions — apresentação das sugestões de pesquisa.
-- https://ai.google.dev/gemini-api/docs/pricing — preços e modalidade gratuita por modelo.
-- https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash-lite — capacidades e restrições de acesso.
-- https://ai.google.dev/gemini-api/docs/rate-limits — limites por projeto e modalidade.
-- Painel autenticado do projeto exclusivo V2 no Google AI Studio: tier e limites efetivos. Nenhuma credencial foi copiada para esta documentação.
-
-## Publicação final e persistência
-
-A revisão de integridade foi publicada no commit `384d931cfb18772ead4c2f7a5e48ace4735250a2`, CI [44452382382](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44452382382) aprovado e deploy `dep-dbv6t1gu01pc73d0eleg` live. Após o novo processo iniciar, `/api/health` respondeu HTTP 200 com esse SHA; a releitura/exportação do estado sintético foi idêntica à anterior, incluindo dois registros factuais, contestação e consenso. Não foram repetidas chamadas Gemini desnecessárias. O bloqueio externo documentado permanece sem comprovação de grounding real.
+O roteiro verifica os guardas sem consumir busca quando a configuração está incompleta, cria somente uma sala nova com dez identidades fictícias e realiza uma busca para uma alegação pública. Credenciais técnicas da sala ficam em `.private/tavily-validation-access.json`, ignorado pelo Git; nenhuma chave de provedor é lida no cliente. O resultado e os metadados reais ficam em `evidence/TAVILY_REAL.json`. A etapa inicial para no rascunho da síntese. Para concluir o teste, o operador técnico precisa revisar a proposta e registrar `confirm: true`, `synthesisId`, `proposal` e `reason` em `.private/tavily-approved-proposal.json`; somente então usar `--finish`. Isso é revisão operacional de dados sintéticos, não avaliação humana científica. Após concluído, novas execuções com o checkpoint verificam persistência sem repetir as chamadas externas. Não distribuir arquivos privados.

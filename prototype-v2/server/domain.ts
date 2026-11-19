@@ -1,7 +1,7 @@
 import { randomUUID, createHash } from 'node:crypto';
 import { z } from 'zod';
 import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, EvaluationSchema, ChoiceSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult, type EvaluationInput, type Choice } from '../shared/contracts.js';
-import { FactualCheckSchema,FactualReportSchema,soundEvidence,type FactualReport } from '../shared/factual.js';
+import { FactualCheckSchema,FactualReportSchema,soundEvidence,isTavilyCheck,type FactualReport } from '../shared/factual.js';
 import { dimensions } from '../shared/instrument.js';
 
 export class DomainError extends Error { constructor(message:string, public status=400){super(message);} }
@@ -164,5 +164,5 @@ export function addFactualCheck(s:State,report:FactualReport,participantId:strin
  s.factualChecks.push(entry);event(s,participantId??'moderator','FACTUAL_CHECK_RECORDED',entry.id+'; '+report.version+'; '+report.model);return entry;
 }
 export function factualContext(s:State){
- return s.factualChecks.filter(f=>f.proposalId===currentProposal(s).id&&f.provenance!=='IMPORTED_UNAUTHENTICATED').slice(-12).map(f=>({id:f.id,version:f.version,queriedAt:f.createdAt,contested:s.contests.some(c=>c.targetId===f.id),contests:s.contests.filter(c=>c.targetId===f.id).map(c=>({text:c.text,at:c.at})),claims:f.claims.map(c=>({claim:c.claim.text,status:c.status,interpretation:c.explanation,sources:c.sources,supports:c.supports,limitations:c.limitations}))}));
+ return s.factualChecks.filter(isTavilyCheck).filter(f=>f.proposalId===currentProposal(s).id&&f.provenance!=='IMPORTED_UNAUTHENTICATED').slice(-12).map(f=>({id:f.id,provider:'TAVILY',version:f.version,queriedAt:f.createdAt,contested:s.contests.some(c=>c.targetId===f.id),contests:s.contests.filter(c=>c.targetId===f.id).map(c=>({text:c.text,at:c.at})),claims:f.claims.map(c=>({claim:c.claim.text,status:c.status,interpretation:c.explanation,sources:c.sources,evidenceLinks:c.evidenceLinks,retrieval:c.retrieval,limitations:c.limitations}))}));
 }
