@@ -4,9 +4,9 @@ Versão: `factual-tavily-gemini-v2.0`. Data-base: 19/11/2026. Exclusivamente imp
 
 ## Estado de validação
 
-A implementação local passou em **62 testes sintéticos**, TypeScript frontend/backend e build Vite. Os testes utilizam respostas simuladas identificadas e PostgreSQL embarcado; não comprovam acesso externo real. Evidências: `evidence/TAVILY_TESTS.txt` e `evidence/TAVILY_BUILD.json`.
+A implementação local passou em **64 testes sintéticos**, TypeScript frontend/backend e build Vite. Os testes utilizam respostas simuladas identificadas e PostgreSQL embarcado; não comprovam acesso externo real. Evidências: `evidence/TAVILY_TESTS.txt` e `evidence/TAVILY_BUILD.json`.
 
-Na preparação, o painel Tavily apresentou a tela de login. A presença de chave no backend, plano Researcher e pay-as-you-go desligado ainda precisam ser confirmados. Não foi criada conta nem credencial, ativado faturamento ou realizada chamada Tavily real nesta etapa preparatória. O resultado externo deve ser atualizado somente após execução efetiva. Uma tela de cota, uma chave configurada ou os testes sintéticos não demonstram recuperação de fontes.
+O acesso Tavily foi autenticado pelo usuário. A inspeção confirmou Researcher, pay-as-you-go desligado e uso inicial zero da chave existente. Essa chave foi configurada somente no backend Render, sem criar conta/credencial, ativar faturamento ou persistir o valor em arquivos/repositório. O diagnóstico após deploy confirmou presença de chave e guarda de gratuidade ativo. Até a execução de Search, nenhuma recuperação real deve ser presumida. O resultado externo deve ser atualizado somente após execução efetiva. Uma tela de cota, uma chave configurada ou os testes sintéticos não demonstram recuperação de fontes.
 
 ## Fluxo e preservação
 
@@ -80,3 +80,9 @@ Executar somente após conferir a presença da chave privada no Render, Research
     node --import tsx server/live-tavily.ts --run --origin=https://tcc-decisao-v2-test.onrender.com
 
 O roteiro verifica os guardas sem consumir busca quando a configuração está incompleta, cria somente uma sala nova com dez identidades fictícias e realiza uma busca para uma alegação pública. Credenciais técnicas da sala ficam em `.private/tavily-validation-access.json`, ignorado pelo Git; nenhuma chave de provedor é lida no cliente. O resultado e os metadados reais ficam em `evidence/TAVILY_REAL.json`. A etapa inicial para no rascunho da síntese. Para concluir o teste, o operador técnico precisa revisar a proposta e registrar `confirm: true`, `synthesisId`, `proposal` e `reason` em `.private/tavily-approved-proposal.json`; somente então usar `--finish`. Isso é revisão operacional de dados sintéticos, não avaliação humana científica. Após concluído, novas execuções com o checkpoint verificam persistência sem repetir as chamadas externas. Não distribuir arquivos privados.
+
+## Retomada após falha temporária Gemini
+
+A revalidação remota encontrou TIMEOUT 504 e TRANSPORT 503 no parecer inicial existente, além de uma classificação factual indisponível. Esses eventos não foram apresentados como sucesso. A classificação factual pelo Gemini 3.5 também teve uma chamada real aprovada, preservada no preflight. A nova operação pode retomar essa classificação persistida do mesmo texto/proposta, versão e dia UTC, quando a proveniência é LIVE_PROVIDER e o modelo é o autorizado. Arquivos importados e dados enviados pelo cliente não fornecem esse plano. `classificationSourceCheckId` explicita a origem; não há nova classificação presumida.
+
+Se a recuperação Tavily tiver ocorrido e somente a interpretação falhar temporariamente, uma tentativa posterior reutiliza as fontes e metadados persistidos por até dez minutos, mantendo o request_id e o horário originais. `retrieval.reusedFromCheckId` registra a origem. O valor `creditsUsed` continua sendo o valor retornado da chamada original e não deve ser somado novamente: deduplicar por request_id. A interface identifica que nenhuma nova busca ocorreu. Datas e escopo ainda passam pelas mesmas validações. Resultados positivos continuam no cache normal; somente falhas recuperáveis permitem nova tentativa, sempre dentro dos limites locais. Não há retry externo automático nem troca de modelo/provedor pago. Testes verificam uma busca e duas tentativas de interpretação, com um único crédito original de fixture.

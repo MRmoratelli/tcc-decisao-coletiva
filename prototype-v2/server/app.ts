@@ -3,8 +3,8 @@ import { z, ZodError } from 'zod';
 import { makeReceipt, verifyReceipt } from './receipts.js';
 import { ProposalSchema, ReviewSchema, ChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
 import { Repository, type Identity } from './db.js';
-import { FactualService,privateData,type FactualAdapter } from './factual.js';
-import { FACTUAL_MODEL,FACTUAL_VERSION } from '../shared/factual.js';
+import { FactualService,privateData,retryableFactual,type FactualAdapter } from './factual.js';
+import { FACTUAL_MODEL,FACTUAL_VERSION,isTavilyCheck } from '../shared/factual.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
 import { DomainError,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema,addFactualCheck,factualContext, type State, type ReviewRecordType } from './domain.js';
 export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean;factual?:FactualAdapter}={}){
@@ -73,16 +73,17 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const i=await auth(req),b=z.object({text:z.string().trim().min(4).max(1200),proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body);
   if(privateData(b.text))throw new DomainError('Remova dados pessoais, informações privadas e URLs. Envie somente a alegação pública mínima.');
   const x=await repo.read(i);if(x.state.decision.status!=='OPEN'||currentProposal(x.state).id!==b.proposalId||currentRound(x.state).id!==b.roundId)throw new DomainError('Proposta ou rodada desatualizada.',409);
-  const existing=x.state.factualChecks.find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
-  if(existing){res.json({check:existing,cached:true});return;}
+  const existing=[...x.state.factualChecks].reverse().find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
+  if(existing&&!retryableFactual(existing,factual.availability?.searchConfigured)){res.json({check:existing,cached:true});return;}
   if(x.state.factualChecks.length>=40)throw new DomainError('Limite de verificações desta sala atingido.',429);
-  const report=await factual.check(b.text,i.roomId);
+  const previous=[...x.state.factualChecks].reverse().filter(isTavilyCheck).find(f=>f.version===FACTUAL_VERSION&&f.provenance==='LIVE_PROVIDER'&&f.proposalId===b.proposalId&&f.originalText===b.text&&(i.role==='moderator'||f.participantId===(i.participantId??null))&&f.classificationModel?.startsWith(FACTUAL_MODEL));
+  const report=await factual.check(b.text,i.roomId,previous);
   // Merge only an append-only factual record, retrying revision races without repeating provider calls.
   for(let attempt=0;attempt<12;attempt++){
    const current=await repo.read(i);
    if(current.state.decision.status!=='OPEN'||currentProposal(current.state).id!==b.proposalId)throw new DomainError('A proposta mudou durante a consulta. O resultado não foi aplicado.',409);
-   const duplicate=current.state.factualChecks.find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
-   if(duplicate){res.json({check:duplicate,cached:true});return;}
+   const duplicate=[...current.state.factualChecks].reverse().find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
+   if(duplicate&&!retryableFactual(duplicate,factual.availability?.searchConfigured)){res.json({check:duplicate,cached:true});return;}
    try{const saved=await repo.mutate(i,current.revision,s=>addFactualCheck(s,report,i.participantId??null));res.status(201).json({check:saved.state.factualChecks.at(-1),cached:false});return;}
    catch(e){if(e instanceof DomainError&&e.status===409&&attempt<11)continue;throw e;}
   }

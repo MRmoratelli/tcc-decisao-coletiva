@@ -2,10 +2,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import {randomUUID} from 'node:crypto';
 import {FactualService,interpretEvidence,type GeminiFactualTransport} from './factual.js';
 import {TavilySearchAdapter,SearchFailure,normalizeTavily,type SearchAdapter} from './tavily.js';
 import {FACTUAL_MODEL,FACTUAL_VERSION,FactualReportSchema,soundEvidence} from '../shared/factual.js';
-import {fact,excerpt,syntheticNow,rawResults,retrieved,verdict} from './factual-fixtures.js';
+import {fact,excerpt,syntheticNow,rawResults,retrieved,verdict,syntheticReport} from './factual-fixtures.js';
 const at=new Date(syntheticNow).toISOString();
 const service=(extra:object={})=>new FactualService({enabled:true,freeTierConfirmed:true,now:()=>syntheticNow,maxDailyGeminiCalls:100,maxMinuteGeminiCalls:100,maxDailySearches:100,maxMinuteSearches:100,search:{configured:true,synthetic:true,async search(){return retrieved();}},geminiTransport:async mode=>mode==='classify'?{text:JSON.stringify({claims:[fact]}),modelVersion:FACTUAL_MODEL}:verdict(),...extra});
 test('Tavily: apenas Search básica fixa, três resultados, usage e nenhum segredo no registro',async()=>{
@@ -63,4 +64,16 @@ test('Factual: registros Google históricos continuam legíveis sem conversão a
 
 test('Factual: uma preferência ou restrição misturada a causa factual não encobre o fato',async()=>{
  for(const text of ['Prefiro menos carne porque o dólar subiu.','Não posso comprar carne porque o dólar subiu.']){let searches=0;const claims=[{...fact,text:'O dólar subiu.',originalExcerpt:'o dólar subiu',query:'cotação dólar período informado'}];const s=service({geminiTransport:async(mode:'classify'|'interpret')=>mode==='classify'?{text:JSON.stringify({claims})}:verdict('EVIDENCIA_INSUFICIENTE'),search:{configured:true,async search(){searches++;return retrieved();}}});const r=await s.check(text,'room');assert.equal(searches,1);assert.equal(r.claims[0].claim.kind,'FATO_VERIFICAVEL');}
+});
+
+test('Factual: retoma classificação persistida confiável e nunca usa arquivo importado como plano',async()=>{
+ const prior={...syntheticReport(),createdAt:at,id:randomUUID(),proposalId:randomUUID(),roundId:randomUUID(),participantId:null,provenance:'LIVE_PROVIDER' as const};prior.claims[0].sources=[];prior.claims[0].retrieval=null;prior.claims[0].evidenceLinks=[];prior.claims[0].status='VERIFICACAO_INDISPONIVEL';let classify=0,search=0;
+ const s=service({search:{configured:true,async search(){search++;return retrieved();}},geminiTransport:async(mode:'classify'|'interpret')=>{if(mode==='classify')classify++;return mode==='classify'?{text:JSON.stringify({claims:[fact]}),modelVersion:FACTUAL_MODEL}:verdict();}});
+ const report=await s.check(fact.text,'resume',prior);assert.equal(classify,0);assert.equal(search,1);assert.equal(report.classificationSourceCheckId,prior.id);
+ await s.check(fact.text,'imported',{...prior,provenance:'IMPORTED_UNAUTHENTICATED'});assert.equal(classify,1);
+});
+test('Factual: falha temporária permite retomar interpretação sem consumir nova busca Tavily',async()=>{
+ let searches=0,interpretations=0;const s=service({search:{configured:true,async search(){searches++;return retrieved();}},geminiTransport:async(mode:'classify'|'interpret')=>{if(mode==='classify')return {text:JSON.stringify({claims:[fact]}),modelVersion:FACTUAL_MODEL};interpretations++;if(interpretations===1)throw {status:503};return verdict();}});
+ const first=await s.check(fact.text,'resume');assert.equal(first.claims[0].failureCode,'GEMINI_TEMPORARILY_UNAVAILABLE');assert.equal(first.claims[0].sources.length,1);
+ const previous={...first,provenance:'LIVE_PROVIDER' as const,id:randomUUID(),proposalId:randomUUID(),roundId:randomUUID(),participantId:null};const second=await s.check(fact.text,'resume',previous);assert.equal(searches,1);assert.equal(interpretations,2);assert.equal(second.claims[0].status,'EVIDENCIA_FAVORAVEL');assert.equal(second.claims[0].retrieval?.reusedFromCheckId,previous.id);assert.equal(second.claims[0].retrieval?.creditsUsed,1);
 });
