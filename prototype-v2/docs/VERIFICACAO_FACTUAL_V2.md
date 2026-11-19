@@ -6,7 +6,7 @@ Versão: `factual-tavily-gemini-v2.0`. Data-base: 19/11/2026. Exclusivamente imp
 
 A implementação local passou em **64 testes sintéticos**, TypeScript frontend/backend e build Vite. Os testes utilizam respostas simuladas identificadas e PostgreSQL embarcado; não comprovam acesso externo real. Evidências: `evidence/TAVILY_TESTS.txt` e `evidence/TAVILY_BUILD.json`.
 
-O acesso Tavily foi autenticado pelo usuário. A inspeção confirmou Researcher, pay-as-you-go desligado e uso inicial zero da chave existente. Essa chave foi configurada somente no backend Render, sem criar conta/credencial, ativar faturamento ou persistir o valor em arquivos/repositório. O diagnóstico após deploy confirmou presença de chave e guarda de gratuidade ativo. Até a execução de Search, nenhuma recuperação real deve ser presumida. O resultado externo deve ser atualizado somente após execução efetiva. Uma tela de cota, uma chave configurada ou os testes sintéticos não demonstram recuperação de fontes.
+O acesso Tavily foi autenticado pelo usuário. A inspeção confirmou Researcher, pay-as-you-go desligado e uso inicial zero da chave existente. Essa chave foi configurada somente no backend Render, sem criar conta/credencial, ativar faturamento ou persistir o valor em arquivos/repositório. O diagnóstico após deploy confirmou presença de chave e guarda de gratuidade ativo. A consulta real foi executada: uma Search básica retornou três fontes e uso de um crédito. O Gemini 3.5 classificou e interpretou a alegação. Os detalhes observados estão no fechamento abaixo e em `evidence/TAVILY_REAL.json`.
 
 ## Fluxo e preservação
 
@@ -61,7 +61,7 @@ O filtro de dados pessoais é preventivo, não completo. Não incluir nomes, con
 
 A suíte contempla fato corroborado/contradito, evidência inconclusiva, preferência/restrição/opinião sem pesquisa, decomposição causal, fonte antiga/sem data, nenhum resultado, citação inventada, escopo incompatível, falha Tavily, créditos, limites locais, privacidade, cache, compatibilidade histórica, autorização, contestação, persistência/exportação/importação, dez identidades simultâneas, quatro contratos Gemini e regras de consenso. Testes React verificam fontes, datas, relevância e ausência de widget Google nos registros novos.
 
-A consulta real de baixo consumo, a observação móvel e a persistência remota só poderão ser marcadas como aprovadas após execução efetiva. A monografia, o questionário DSR e suas regras operacionais não foram alterados. Permanecem as decisões metodológicas já comunicadas: grupo com problema próprio, moderador integrante do TCC sem voto pelos participantes, sem coleta adicional de perfis, sem avaliação humana independente adicional e decisão do questionário em uma rodada pendente do orientador.
+A consulta real de baixo consumo, a observação móvel, a exportação/importação e a persistência remota foram executadas e aprovadas nos limites do fechamento técnico abaixo. A monografia, o questionário DSR e suas regras operacionais não foram alterados. Permanecem as decisões metodológicas já comunicadas: grupo com problema próprio, moderador integrante do TCC sem voto pelos participantes, sem coleta adicional de perfis, sem avaliação humana independente adicional e decisão do questionário em uma rodada pendente do orientador.
 
 ## Referências técnicas primárias
 
@@ -86,3 +86,25 @@ O roteiro verifica os guardas sem consumir busca quando a configuração está i
 A revalidação remota encontrou TIMEOUT 504 e TRANSPORT 503 no parecer inicial existente, além de uma classificação factual indisponível. Esses eventos não foram apresentados como sucesso. A classificação factual pelo Gemini 3.5 também teve uma chamada real aprovada, preservada no preflight. A nova operação pode retomar essa classificação persistida do mesmo texto/proposta, versão e dia UTC, quando a proveniência é LIVE_PROVIDER e o modelo é o autorizado. Arquivos importados e dados enviados pelo cliente não fornecem esse plano. `classificationSourceCheckId` explicita a origem; não há nova classificação presumida.
 
 Se a recuperação Tavily tiver ocorrido e somente a interpretação falhar temporariamente, uma tentativa posterior reutiliza as fontes e metadados persistidos por até dez minutos, mantendo o request_id e o horário originais. `retrieval.reusedFromCheckId` registra a origem. O valor `creditsUsed` continua sendo o valor retornado da chamada original e não deve ser somado novamente: deduplicar por request_id. A interface identifica que nenhuma nova busca ocorreu. Datas e escopo ainda passam pelas mesmas validações. Resultados positivos continuam no cache normal; somente falhas recuperáveis permitem nova tentativa, sempre dentro dos limites locais. Não há retry externo automático nem troca de modelo/provedor pago. Testes verificam uma busca e duas tentativas de interpretação, com um único crédito original de fixture.
+
+## Fechamento executado — 19/11/2026
+
+Código publicado: `43e6dc5c216c59f636670f9c601d7e28d133256b`; Render `dep-dbvi2t2fngtc73cb9pvg` live. HTTPS e `/api/health` responderam 200, com Tavily configurada, guarda gratuito ativo e Gemini 3.5. [CI 44564443893](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44564443893) aprovado: **64 testes**, TypeScript frontend/backend e build Vite.
+
+Às **13:21:05 de 19/11/2026 (Brasília)**, a Tavily recuperou três resultados para “A Lua é um satélite natural da Terra”. Requisição `70e04d3c-95f2-40e9-be4c-b19dec026cb7`; Search básica; **1 crédito informado pela API**, também observado na conta (0 → 1). Plano Researcher e pay-as-you-go desligado conferidos. Nenhuma nova conta/chave ou cobrança foi ativada.
+
+Fontes recebidas, com títulos, URLs, trechos e escores efetivos conservados no relatório:
+
+1. [Escola Kids/UOL — Lua](https://escolakids.uol.com.br/geografia/lua-satelite-da-terra.htm).
+2. [Material educacional de Praia Grande — A Lua (PDF)](https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf).
+3. [Segredos do Mundo/R7 — Lua](https://segredosdomundo.r7.com/lua).
+
+As três datas de publicação vieram ausentes e permaneceram nulas. A aplicação não obteve essas referências da prosa do Gemini: elas vieram dos resultados Tavily, com identificadores e hash da resposta. Os trechos usados pelo Gemini foram conferidos literalmente contra os trechos retornados. Isso demonstra a origem recuperada e o vínculo da interpretação, sem certificar a exatidão integral das páginas.
+
+O Gemini 3.5 retornou **EVIDÊNCIA FAVORÁVEL** às 13:24:05, com três vínculos literais. Houve falhas temporárias 503/504: classificação persistida e recuperação recente foram retomadas com proveniência explícita; a interpretação bem-sucedida usou a mesma requisição Tavily, sem nova busca. O preflight dos contratos antigos encontrou falha temporária no parecer de proposta; os quatro contratos passaram na regressão automatizada, mas não foram todos revalidados com chamadas reais nesta execução. Uma tentativa posterior do roteiro autônomo também recebeu 502 no parecer antigo; a conferência final de persistência foi feita por leitura/exportação, sem novas chamadas de provedores.
+
+A sala técnica com dez identidades fictícias teve duas rodadas, 20 votos, dois registros de contestação e cinco registros factuais (incluindo falhas/preferência). O parecer favorável não alterou a rejeição nem a abstenção. O operador técnico revisou a proposta pelo papel de moderador; na nova versão, nove aceitações mantiveram OPEN e a décima concluiu CONSENSUS. Nenhuma resposta DSR ou nota humana foi fabricada. Exportação, importação em sala nova com credenciais reemitidas e marcação de proveniência importada, e leitura persistida Neon foram verificadas. A sala Google histórica permaneceu idêntica.
+
+Interface conferida em viewport 375 × 812, sem transbordamento horizontal (largura útil 360). Fontes, incertezas, escores e ausência de datas foram exibidos; o link Escola Kids abriu a URL recebida. Evidências: [parecer móvel](evidence/TAVILY_MOBILE_INTERPRETATION.jpg), [fontes móveis](evidence/TAVILY_MOBILE_SOURCES.jpg), [relatório real](evidence/TAVILY_REAL.json), [exportação sintética](evidence/TAVILY_SESSION_SYNTHETIC.json). As imagens são recortes da página responsiva para documentar os painéis.
+
+O ensaio demonstra o fluxo técnico para uma alegação pública estável. Não demonstra acurácia geral, verificação eficaz de preços/clima atuais, inferência causal ou avaliação científica com o grupo do churrasco. Fontes atuais continuam sujeitas à exigência de metadados temporais; ausência de data pode levar à insuficiência. Monografia e questionário não foram alterados.

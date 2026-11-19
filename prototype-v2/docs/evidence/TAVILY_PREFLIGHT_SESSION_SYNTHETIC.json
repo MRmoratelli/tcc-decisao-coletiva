@@ -1,0 +1,840 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-19T15:51:58.117Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO] Preflight Tavily e Gemini 3.5",
+      "problem": "Validar funcionamento técnico durante ausência de configuração Tavily.",
+      "decision": "Definir como registrar a ausência de evidência externa sem presumir aceitação.",
+      "goals": "Preservar falibilidade, contestação e autonomia.",
+      "alternatives": "Registrar limitações ou encerrar sem consenso.",
+      "constraints": "Dez identidades fictícias, sem participantes reais e sem pesquisa Tavily.",
+      "successCriteria": "Nenhuma fonte inventada; manifestações e revisões rastreáveis.",
+      "context": "TESTE TÉCNICO SINTÉTICO. Nenhuma observação científica; não define o problema do grupo real.",
+      "text": "Registrar que nenhuma alegação será tratada como confirmada sem evidência externa rastreável e revisão humana."
+    },
+    "decision": {
+      "id": "e0f518c6-9932-46dc-8a87-0d08894a24a0",
+      "originId": "e0f518c6-9932-46dc-8a87-0d08894a24a0",
+      "title": "[SINTÉTICO] Preflight Tavily e Gemini 3.5",
+      "status": "OPEN",
+      "createdAt": "2026-11-19T15:50:00.883Z",
+      "closedAt": null,
+      "closureReason": ""
+    },
+    "participants": [
+      {
+        "id": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "alias": "P01"
+      },
+      {
+        "id": "138270a8-8724-4be0-be17-43e541ac676f",
+        "alias": "P02"
+      },
+      {
+        "id": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "alias": "P03"
+      },
+      {
+        "id": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "alias": "P04"
+      },
+      {
+        "id": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "alias": "P05"
+      },
+      {
+        "id": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "alias": "P06"
+      },
+      {
+        "id": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "alias": "P07"
+      },
+      {
+        "id": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "alias": "P08"
+      },
+      {
+        "id": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "alias": "P09"
+      },
+      {
+        "id": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "alias": "P10"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO] Preflight Tavily e Gemini 3.5",
+          "problem": "Validar funcionamento técnico durante ausência de configuração Tavily.",
+          "decision": "Definir como registrar a ausência de evidência externa sem presumir aceitação.",
+          "goals": "Preservar falibilidade, contestação e autonomia.",
+          "alternatives": "Registrar limitações ou encerrar sem consenso.",
+          "constraints": "Dez identidades fictícias, sem participantes reais e sem pesquisa Tavily.",
+          "successCriteria": "Nenhuma fonte inventada; manifestações e revisões rastreáveis.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Nenhuma observação científica; não define o problema do grupo real.",
+          "text": "Registrar que nenhuma alegação será tratada como confirmada sem evidência externa rastreável e revisão humana."
+        },
+        "createdAt": "2026-11-19T15:50:00.883Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "none",
+          "reason": "[SINTÉTICO] Indisponibilidade do parecer no preflight técnico; nenhuma aceitação presumida."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "number": 1,
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "status": "OPEN",
+        "openedAt": "2026-11-19T15:50:00.883Z",
+        "closedAt": null
+      }
+    ],
+    "factualChecks": [
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "createdAt": "2026-11-19T15:50:14.210Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é um satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "FATO_VERIFICAVEL",
+              "query": "A Lua é um satélite natural da Terra",
+              "timeSensitive": false,
+              "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+            },
+            "status": "VERIFICACAO_INDISPONIVEL",
+            "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-19T15:50:23.641Z",
+            "limitations": [
+              "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+            ],
+            "failureCode": "TAVILY_NOT_CONFIGURED",
+            "sources": [],
+            "retrieval": null,
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "52f28010-1892-4b4b-a921-be0d390661ae",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2"
+      },
+      {
+        "originalText": "Prefiro legumes grelhados.",
+        "createdAt": "2026-11-19T15:51:52.329Z",
+        "provenance": "LOCAL_CLASSIFICATION",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationModel": null,
+        "claims": [
+          {
+            "claim": {
+              "text": "Prefiro legumes grelhados.",
+              "originalExcerpt": "Prefiro legumes grelhados.",
+              "kind": "PREFERENCIA",
+              "query": "",
+              "timeSensitive": false,
+              "reason": "Preferência pessoal não exige confirmação na internet."
+            },
+            "status": "NAO_VERIFICAVEL",
+            "explanation": "Preferência pessoal não exige confirmação na internet.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-19T15:51:52.329Z",
+            "limitations": [
+              "Não houve pesquisa externa para esta preferência, restrição, opinião, hipótese ou informação insuficiente."
+            ],
+            "failureCode": null,
+            "sources": [],
+            "retrieval": null,
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "1dc05095-1156-4d11-bddc-b4e4b05aa148",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "138270a8-8724-4be0-be17-43e541ac676f"
+      }
+    ],
+    "votes": [
+      {
+        "id": "4adca964-4db8-42fe-ae6f-77545eb1e877",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "REJEITO",
+        "justification": "[SINTÉTICO] Exijo fontes reais e mantenho minha objeção durante a indisponibilidade.",
+        "createdAt": "2026-11-19T15:51:53.644Z"
+      },
+      {
+        "id": "f17802c2-f5ae-48d6-9ab6-8ecc816fe48f",
+        "participantId": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:54.091Z"
+      },
+      {
+        "id": "ca7b33e7-b7bd-4b2c-a80e-65b171ee5937",
+        "participantId": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:54.342Z"
+      },
+      {
+        "id": "88410c00-c13c-4a31-abec-8223e1f5bd1a",
+        "participantId": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:54.942Z"
+      },
+      {
+        "id": "634b0ba6-bac5-4a7b-a596-ae8c5e617da9",
+        "participantId": "138270a8-8724-4be0-be17-43e541ac676f",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ABSTENHO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:55.238Z"
+      },
+      {
+        "id": "2eb1c31b-abf4-450e-9ea5-522d9a6ff286",
+        "participantId": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:55.675Z"
+      },
+      {
+        "id": "37df67da-5279-441b-a3a8-291bc8b1093d",
+        "participantId": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:56.040Z"
+      },
+      {
+        "id": "9cf9955c-86fa-4dea-8dee-a0c2a9d3cdc2",
+        "participantId": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:56.367Z"
+      },
+      {
+        "id": "94067952-34c6-44bf-b32a-7606a592c743",
+        "participantId": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:56.800Z"
+      },
+      {
+        "id": "584837c3-60d5-4fa6-b3a2-91b5f13f4e84",
+        "participantId": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:57.348Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "07a71d66-358e-4c9c-ab13-a65e7ce99b03",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "originalText": "[SINTÉTICO] Exijo fontes reais e mantenho minha objeção durante a indisponibilidade.",
+        "text": "[SINTÉTICO] Exijo fontes reais e mantenho minha objeção durante a indisponibilidade.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "none",
+          "reason": "[SINTÉTICO] Sem novo parecer durante indisponibilidade do provedor."
+        },
+        "contest": "",
+        "createdAt": "2026-11-19T15:51:53.644Z"
+      }
+    ],
+    "analyses": [],
+    "syntheses": [],
+    "contests": [
+      {
+        "id": "9b693851-dddc-4bdf-8308-9264e55cdd07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "targetId": "52f28010-1892-4b4b-a921-be0d390661ae",
+        "text": "[SINTÉTICO] Mantenho a exigência de fontes: o parecer indisponível não deve ser tratado como confirmação.",
+        "at": "2026-11-19T15:51:52.866Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "dbab40ae-ffe5-4bf9-9759-0f6e95282651",
+        "at": "2026-11-19T15:50:00.883Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "f7189955-fffb-4a31-9b07-c8768368f364",
+        "at": "2026-11-19T15:50:23.658Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "52f28010-1892-4b4b-a921-be0d390661ae; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "119e5279-fb42-4feb-bd09-76aa422be4cc",
+        "at": "2026-11-19T15:51:52.342Z",
+        "actor": "138270a8-8724-4be0-be17-43e541ac676f",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "1dc05095-1156-4d11-bddc-b4e4b05aa148; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "2cb32fa4-3628-4166-b3f7-3ada171e27bd",
+        "at": "2026-11-19T15:51:52.866Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "AI_CONTESTED",
+        "detail": "[SINTÉTICO] Mantenho a exigência de fontes: o parecer indisponível não deve ser tratado como confirmação."
+      },
+      {
+        "id": "c1ed4199-dcd7-44db-bbcc-6b0ffffd8ffd",
+        "at": "2026-11-19T15:51:53.644Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "dc72f1d6-66ef-4c2f-97a2-7d6d25235d1a",
+        "at": "2026-11-19T15:51:53.644Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "67e228c6-b411-4b70-8586-ea1378c01636",
+        "at": "2026-11-19T15:51:54.091Z",
+        "actor": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "6c308d85-ea1e-4f24-b4fa-3890d543e1bb",
+        "at": "2026-11-19T15:51:54.342Z",
+        "actor": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "860d41b9-9e8a-4f8c-b921-b29a4809f184",
+        "at": "2026-11-19T15:51:54.942Z",
+        "actor": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "db7e5806-26ae-4d15-a56a-5cfece15de91",
+        "at": "2026-11-19T15:51:55.238Z",
+        "actor": "138270a8-8724-4be0-be17-43e541ac676f",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "0a93231f-451f-440e-9fda-3c2af3b38f62",
+        "at": "2026-11-19T15:51:55.675Z",
+        "actor": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "227c2c70-e6a4-4a98-8f18-d72f553a61ab",
+        "at": "2026-11-19T15:51:56.040Z",
+        "actor": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3a000879-d6e0-422a-9970-c312d7d1e0f5",
+        "at": "2026-11-19T15:51:56.367Z",
+        "actor": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "a15dddf1-bcdc-47fe-828b-90d60a7a175d",
+        "at": "2026-11-19T15:51:56.800Z",
+        "actor": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "da8b06c6-ce71-44b1-899c-7ac8753e20d6",
+        "at": "2026-11-19T15:51:57.348Z",
+        "actor": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      }
+    ],
+    "evaluations": []
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": false,
+      "rounds": 1,
+      "deliberationMs": null,
+      "repeatedObjections": [],
+      "votes": 10,
+      "objections": 1,
+      "distinctObjectionsByRound": 1
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 10,
+    "received": 0,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 30,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 30,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "openResponses": [],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

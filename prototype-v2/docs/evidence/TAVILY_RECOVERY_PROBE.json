@@ -1,0 +1,101 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO",
+  "at": "2026-11-19T16:21:06.942Z",
+  "commit": "43e6dc5c216c59f636670f9c601d7e28d133256b",
+  "httpStatus": 201,
+  "elapsedMs": 4288,
+  "record": {
+    "originalText": "A Lua é um satélite natural da Terra.",
+    "createdAt": "2026-11-19T16:21:02.520Z",
+    "provenance": "LIVE_PROVIDER",
+    "model": "gemini-3.5-flash-lite",
+    "version": "factual-tavily-gemini-v2.0",
+    "retrievalProvider": "TAVILY",
+    "classificationSourceCheckId": "52f28010-1892-4b4b-a921-be0d390661ae",
+    "classificationModel": "gemini-3.5-flash-lite",
+    "claims": [
+      {
+        "claim": {
+          "text": "A Lua é um satélite natural da Terra.",
+          "originalExcerpt": "A Lua é um satélite natural da Terra.",
+          "kind": "FATO_VERIFICAVEL",
+          "query": "A Lua é um satélite natural da Terra",
+          "timeSensitive": false,
+          "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+        },
+        "status": "VERIFICACAO_INDISPONIVEL",
+        "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+        "providerText": "",
+        "responseModel": null,
+        "queriedAt": "2026-11-19T16:21:06.505Z",
+        "limitations": [
+          "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+        ],
+        "failureCode": "GEMINI_TEMPORARILY_UNAVAILABLE",
+        "sources": [
+          {
+            "id": "S1",
+            "title": "Lua – Características da Lua, o único satélite natural da Terra",
+            "url": "https://escolakids.uol.com.br/geografia/lua-satelite-da-terra.htm",
+            "publishedAt": null,
+            "provider": "TAVILY",
+            "providerId": "59b016-00",
+            "excerpt": "Title: Lua – Características da Lua, o único satélite natural da Terra\n#### Qual matéria está procurando ? 3. Lua – Satélite da Terra. # Lua – Satélite da Terra. Satélite natural da Terra, a Lua é objeto de muita curiosidade entre os seres humanos. Lua: o único satélite natural da Terra. **A Terra possui apenas um satélite natural, a Lua. Conforme informações da União Astronômica Internacional (IAU), existem mais de 160 Luas no sistema solar.**. **A Lua do planeta Terra tem dimetro de aproximadamente 3.476 quilômetros, sendo 80 vezes menor que o nosso planeta. Sua distncia para a Terra pode variar de 356.800 quilômetros a 406.400 quilômetros.**. Assim como a Terra, **a Lua também não permanece estática, realizando, portanto, alguns movimentos. Os três principais são o de rotação (deslocamento em torno de seu próprio eixo), translação (deslocamento em torno do Sol) e revolução em torno da Terra.**. Tem mais depois da publicidade ;). **A Lua sempre foi objeto de muita curiosidade entre os seres humanos. Tanto que em 20 de julho de 1969, três astronautas dos Estados Unidos (Edwin Aldrin Jr., Neil Armstrong e Michael Collins), tripulantes da nave espacial Apolo XI, atingiram a Lua.**. Essa missão ficou marcada pela seguinte frase de Neil Armstrong: “**Este é um pequeno passo para o homem, mas um grande salto para a humanidade”.**. **Outras missões com o intuito de obter maiores informações sobre o satélite natural da Terra continuam sendo realizadas. A última descoberta significativa foi a existência de moléculas de água na Lua.**. Por Wagner de Cerqueira e Francisco. ##### Por Wagner de Cerqueira e Francisco. ## Você pode se interessar também. ##### História. ### Corrida espacial. ##### Geografia. ### Eclipse. ##### Geografia. ### Estrelas. ##### Geografia. ### Fases da Lua.",
+            "excerptTruncated": false,
+            "contentSha256": "e9ebc16bc161eb7acdfc0ae8300dad66a00d3724a77ef3a1a7f90caae4878029",
+            "score": 0.87048715,
+            "publishedAtRaw": null,
+            "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+          },
+          {
+            "id": "S2",
+            "title": "[PDF] A Lua – satélite natural da Terra",
+            "url": "https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf",
+            "publishedAt": null,
+            "provider": "TAVILY",
+            "providerId": "77769e-01",
+            "excerpt": "A Lua – satélite natural da Terra A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km. A nossa Lua é o único corpo celeste a receber seres humanos. O seu diâmetro é de aproximadamente 3.500 km, por essa razão seu tamanho é 80 vezes inferior ao do planeta Terra. A imagem abaixo mostra a diferença entre o tamanho da Terra e a Lua: Imagem: Comparação de diâmetros da Terra e da Lua. Arquivo criado pela NASA no domínio público. Esse corpo celeste é visto da Terra [...] é visto da Terra e exibe várias fases, mesmo assim expõe sempre a mesma face. O tempo gasto para realização do movimento de rotação é o mesmo para o de translação. Apesar de ser o segundo corpo mais brilhante no céu, atrás somente do Sol, a Lua não possui brilho próprio, sendo iluminada pela luz solar. À medida que a Lua viaja ao redor da Terra ao longo do mês, ela passa por um ciclo de fases, durante o qual sua forma parece variar gradualmente. O ciclo completo dura aproximadamente 29,5 dias. [...] é marcada por pouca luminosidade, pois sua face voltada para a Terra não está sendo iluminada pelo Sol.  Lua crescente: considerada a fase de transição da Lua nova para a Lua cheia, a Lua crescente é caracterizada por receber luminosidade em apenas uma face (no lado oposto da minguante). Responda as questões colocando a resposta em seu caderno: 1) Qual é o satélite natural da Terra? 2) Complete: “A Lua é ____________ menor que a Terra.” 3) A Lua tem brilho próprio? 4) Explique cada movimento",
+            "excerptTruncated": false,
+            "contentSha256": "4ccc28bf5eb31bb214f7468739499692331f039944468beb098869c8719a8af8",
+            "score": 0.8614217,
+            "publishedAtRaw": null,
+            "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+          },
+          {
+            "id": "S3",
+            "title": "Lua - Fases do satélite natural da terra e curiosidades",
+            "url": "https://segredosdomundo.r7.com/lua",
+            "publishedAt": null,
+            "provider": "TAVILY",
+            "providerId": "9c58e9-02",
+            "excerpt": "Title: Lua - Fases do satélite natural da terra e curiosidades\n# Lua – Fases do satélite natural da terra e curiosidades. A Lua é o satélite natural da terra, e diferente do nosso planeta não possui condições para o desenvolvimento de vida. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Sendo algo que sempre despertou e ainda desperta bastante curiosidade do ser humano, a lua é o único satélite natural da Terra. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Conhecendo a Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Assim, com o movimento de translação que ela faz ao redor da Terra, após cerca de 7 dias da Lua anterior a fase da Quarta Crescente chega. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. É a fase em que a face iluminada ela está totalmente virada para o planeta. #### Super Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Super Lua #### Lado escuro da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Lado escuro da Lua Além de que ela também realizar o movimento de translação em volta da Terra, sendo ele feito ao mesmo tempo da rotação. Desta forma, a sincronia entre o tempo que leva para dar volta em si mesma, bem como em volta da Terra deixa apenas um dos seus lados visíveis para nós. Assim sendo da esquerda para a direta, pois a medida que você se move do hemisfério norte para o sul o seu ponto de vista do satélite vira de cabeça para baixo.",
+            "excerptTruncated": false,
+            "contentSha256": "669647a664e206d96d2cccbf4a86f7e58fcb1ad7d4e9c56a89c30cc72431087c",
+            "score": 0.8413048,
+            "publishedAtRaw": null,
+            "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+          }
+        ],
+        "retrieval": {
+          "provider": "TAVILY",
+          "endpoint": "SEARCH",
+          "searchDepth": "basic",
+          "query": "A Lua é um satélite natural da Terra",
+          "requestId": "70e04d3c-95f2-40e9-be4c-b19dec026cb7",
+          "queriedAt": "2026-11-19T16:21:05.851Z",
+          "creditsUsed": 1,
+          "responseTimeSeconds": 3.15,
+          "resultsReceived": 3,
+          "resultsRetained": 3,
+          "rawResponseSha256": "5f140e85b11d1a1c70ca796314951f7845813143959c2222101768bd2a4d24fa"
+        },
+        "scopeMatches": false,
+        "evidenceLinks": []
+      }
+    ],
+    "id": "0fb6d518-55df-4eab-b4d3-5cdcdf41c3e2",
+    "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+    "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+    "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07"
+  }
+}

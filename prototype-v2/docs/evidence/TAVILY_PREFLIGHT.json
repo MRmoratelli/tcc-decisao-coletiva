@@ -1,0 +1,92 @@
+{
+  "type": "TESTE_TECNICO_SINTETICO_SEM_BUSCA_TAVILY",
+  "status": "PARTIAL_CONFIGURATION_REQUIRED",
+  "at": "2026-11-19T15:51:58.546Z",
+  "origin": "https://tcc-decisao-v2-test.onrender.com",
+  "commit": "0fca83004976e8a2005c5ef704a3b7c8535c2541",
+  "httpsStatus": 200,
+  "neonPersistence": true,
+  "legacyStateUnchanged": true,
+  "legacyStateSha256": "8d086c87bdcc7ca0f554dc0f5e3cd19528e0dc60f4e804f397ec5c1c0b32ebfd",
+  "participants": 10,
+  "simultaneousViews": 10,
+  "currentResult": "OPEN",
+  "objectionPreserved": true,
+  "abstentionDoesNotAccept": true,
+  "contestPersisted": true,
+  "classification": {
+    "status": "PASS",
+    "model": "gemini-3.5-flash-lite",
+    "kind": "FATO_VERIFICAVEL",
+    "at": "2026-11-19T15:50:14.210Z"
+  },
+  "preferenceNotSearched": true,
+  "factualRecord": {
+    "originalText": "A Lua é um satélite natural da Terra.",
+    "createdAt": "2026-11-19T15:50:14.210Z",
+    "provenance": "LIVE_PROVIDER",
+    "model": "gemini-3.5-flash-lite",
+    "version": "factual-tavily-gemini-v2.0",
+    "retrievalProvider": "TAVILY",
+    "classificationModel": "gemini-3.5-flash-lite",
+    "claims": [
+      {
+        "claim": {
+          "text": "A Lua é um satélite natural da Terra.",
+          "originalExcerpt": "A Lua é um satélite natural da Terra.",
+          "kind": "FATO_VERIFICAVEL",
+          "query": "A Lua é um satélite natural da Terra",
+          "timeSensitive": false,
+          "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+        },
+        "status": "VERIFICACAO_INDISPONIVEL",
+        "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+        "providerText": "",
+        "responseModel": null,
+        "queriedAt": "2026-11-19T15:50:23.641Z",
+        "limitations": [
+          "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+        ],
+        "failureCode": "TAVILY_NOT_CONFIGURED",
+        "sources": [],
+        "retrieval": null,
+        "scopeMatches": false,
+        "evidenceLinks": []
+      }
+    ],
+    "id": "52f28010-1892-4b4b-a921-be0d390661ae",
+    "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+    "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+    "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07"
+  },
+  "existingContractCalls": [
+    {
+      "contract": "analyzeProposal",
+      "status": "TIMEOUT",
+      "at": "2026-11-19T15:48:30.133Z",
+      "providerHttpStatus": 504,
+      "source": "Sanitized Render application log",
+      "attempt": 1
+    },
+    {
+      "contract": "analyzeProposal",
+      "status": "FAILED_SECOND_ATTEMPT",
+      "at": "2026-11-19T15:50:01.172Z",
+      "message": "HTTP 502 at /ai/proposal-review",
+      "providerHttpStatus": 503,
+      "failureCode": "TRANSPORT"
+    }
+  ],
+  "automatedRegression": {
+    "tests": 62,
+    "passed": 62,
+    "ci": "https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44558338970",
+    "conclusion": "success"
+  },
+  "tavilySearchCalls": 0,
+  "observedTavilyCredits": null,
+  "tavilyKeyConfigured": false,
+  "researcherGuardConfirmed": false,
+  "scientificEvaluation": false,
+  "limitation": "No real Tavily result or source was recovered. Existing proposal-review endpoint encountered sanitized provider TIMEOUT 504 and TRANSPORT 503; no contract was changed or success inferred."
+}

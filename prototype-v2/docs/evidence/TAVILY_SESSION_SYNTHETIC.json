@@ -1,0 +1,1387 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-19T16:27:42.411Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO] Preflight Tavily e Gemini 3.5",
+      "problem": "Validar funcionamento técnico durante ausência de configuração Tavily.",
+      "decision": "Definir como registrar a ausência de evidência externa sem presumir aceitação.",
+      "goals": "Preservar falibilidade, contestação e autonomia.",
+      "alternatives": "Registrar limitações ou encerrar sem consenso.",
+      "constraints": "Dez identidades fictícias, sem participantes reais e sem pesquisa Tavily.",
+      "successCriteria": "Nenhuma fonte inventada; manifestações e revisões rastreáveis.",
+      "context": "TESTE TÉCNICO SINTÉTICO. Nenhuma observação científica; não define o problema do grupo real.",
+      "text": "Registrar que nenhuma alegação será tratada como confirmada sem evidência externa rastreável e revisão humana."
+    },
+    "decision": {
+      "id": "e0f518c6-9932-46dc-8a87-0d08894a24a0",
+      "originId": "e0f518c6-9932-46dc-8a87-0d08894a24a0",
+      "title": "[SINTÉTICO] Preflight Tavily e Gemini 3.5",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-19T15:50:00.883Z",
+      "closedAt": "2026-11-19T16:27:42.099Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "alias": "P01"
+      },
+      {
+        "id": "138270a8-8724-4be0-be17-43e541ac676f",
+        "alias": "P02"
+      },
+      {
+        "id": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "alias": "P03"
+      },
+      {
+        "id": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "alias": "P04"
+      },
+      {
+        "id": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "alias": "P05"
+      },
+      {
+        "id": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "alias": "P06"
+      },
+      {
+        "id": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "alias": "P07"
+      },
+      {
+        "id": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "alias": "P08"
+      },
+      {
+        "id": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "alias": "P09"
+      },
+      {
+        "id": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "alias": "P10"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO] Preflight Tavily e Gemini 3.5",
+          "problem": "Validar funcionamento técnico durante ausência de configuração Tavily.",
+          "decision": "Definir como registrar a ausência de evidência externa sem presumir aceitação.",
+          "goals": "Preservar falibilidade, contestação e autonomia.",
+          "alternatives": "Registrar limitações ou encerrar sem consenso.",
+          "constraints": "Dez identidades fictícias, sem participantes reais e sem pesquisa Tavily.",
+          "successCriteria": "Nenhuma fonte inventada; manifestações e revisões rastreáveis.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Nenhuma observação científica; não define o problema do grupo real.",
+          "text": "Registrar que nenhuma alegação será tratada como confirmada sem evidência externa rastreável e revisão humana."
+        },
+        "createdAt": "2026-11-19T15:50:00.883Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "none",
+          "reason": "[SINTÉTICO] Indisponibilidade do parecer no preflight técnico; nenhuma aceitação presumida."
+        }
+      },
+      {
+        "id": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "version": 2,
+        "parentId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "content": {
+          "title": "[SINTÉTICO TAVILY] Registro com fontes e ressalvas",
+          "problem": "Validar funcionamento técnico durante ausência de configuração Tavily.",
+          "decision": "Registrar a alegação pública com fontes e limites explícitos, mantendo a decisão dos participantes.",
+          "goals": "Preservar falibilidade, contestação e autonomia.",
+          "alternatives": "Registrar limitações ou encerrar sem consenso.",
+          "constraints": "Uma busca básica Tavily, três resultados; datas de publicação não informadas. Sem inferência causal ou comprovação absoluta.",
+          "successCriteria": "Nenhuma fonte inventada; manifestações e revisões rastreáveis.",
+          "context": "TESTE TÉCNICO SINTÉTICO. Revisão operacional executada pelo agente de teste no papel de moderador; não é avaliação científica nem revisão humana independente. Fontes: https://escolakids.uol.com.br/geografia/lua-satelite-da-terra.htm ; https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf ; https://segredosdomundo.r7.com/lua",
+          "text": "[SINTÉTICO] Registrar que a consulta Tavily recuperou três fontes com apoio à alegação de que a Lua é um satélite natural da Terra. A interpretação do Gemini 3.5 é consultiva e falível. As datas das fontes não foram fornecidas; não se estende a confirmação a preços, clima ou outras alegações. Os participantes podem consultar as URLs, contestar a interpretação e manter suas objeções. O encerramento exige aceitação explícita de todos nesta versão."
+        },
+        "createdAt": "2026-11-19T16:27:38.027Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1",
+          "model": "human",
+          "reason": "[SINTÉTICO] Revisão operacional com fontes reais, limites e contestações preservados. Nenhuma avaliação humana científica foi realizada."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "number": 1,
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "status": "CLOSED",
+        "openedAt": "2026-11-19T15:50:00.883Z",
+        "closedAt": "2026-11-19T16:27:38.027Z"
+      },
+      {
+        "id": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "number": 2,
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "status": "CLOSED",
+        "openedAt": "2026-11-19T16:27:38.027Z",
+        "closedAt": "2026-11-19T16:27:42.099Z"
+      }
+    ],
+    "factualChecks": [
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "createdAt": "2026-11-19T15:50:14.210Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é um satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "FATO_VERIFICAVEL",
+              "query": "A Lua é um satélite natural da Terra",
+              "timeSensitive": false,
+              "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+            },
+            "status": "VERIFICACAO_INDISPONIVEL",
+            "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-19T15:50:23.641Z",
+            "limitations": [
+              "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+            ],
+            "failureCode": "TAVILY_NOT_CONFIGURED",
+            "sources": [],
+            "retrieval": null,
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "52f28010-1892-4b4b-a921-be0d390661ae",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2"
+      },
+      {
+        "originalText": "Prefiro legumes grelhados.",
+        "createdAt": "2026-11-19T15:51:52.329Z",
+        "provenance": "LOCAL_CLASSIFICATION",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationModel": null,
+        "claims": [
+          {
+            "claim": {
+              "text": "Prefiro legumes grelhados.",
+              "originalExcerpt": "Prefiro legumes grelhados.",
+              "kind": "PREFERENCIA",
+              "query": "",
+              "timeSensitive": false,
+              "reason": "Preferência pessoal não exige confirmação na internet."
+            },
+            "status": "NAO_VERIFICAVEL",
+            "explanation": "Preferência pessoal não exige confirmação na internet.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-19T15:51:52.329Z",
+            "limitations": [
+              "Não houve pesquisa externa para esta preferência, restrição, opinião, hipótese ou informação insuficiente."
+            ],
+            "failureCode": null,
+            "sources": [],
+            "retrieval": null,
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "1dc05095-1156-4d11-bddc-b4e4b05aa148",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "138270a8-8724-4be0-be17-43e541ac676f"
+      },
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "createdAt": "2026-11-19T16:21:02.520Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationSourceCheckId": "52f28010-1892-4b4b-a921-be0d390661ae",
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é um satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "FATO_VERIFICAVEL",
+              "query": "A Lua é um satélite natural da Terra",
+              "timeSensitive": false,
+              "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+            },
+            "status": "VERIFICACAO_INDISPONIVEL",
+            "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-19T16:21:06.505Z",
+            "limitations": [
+              "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+            ],
+            "failureCode": "GEMINI_TEMPORARILY_UNAVAILABLE",
+            "sources": [
+              {
+                "id": "S1",
+                "title": "Lua – Características da Lua, o único satélite natural da Terra",
+                "url": "https://escolakids.uol.com.br/geografia/lua-satelite-da-terra.htm",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "59b016-00",
+                "excerpt": "Title: Lua – Características da Lua, o único satélite natural da Terra\n#### Qual matéria está procurando ? 3. Lua – Satélite da Terra. # Lua – Satélite da Terra. Satélite natural da Terra, a Lua é objeto de muita curiosidade entre os seres humanos. Lua: o único satélite natural da Terra. **A Terra possui apenas um satélite natural, a Lua. Conforme informações da União Astronômica Internacional (IAU), existem mais de 160 Luas no sistema solar.**. **A Lua do planeta Terra tem dimetro de aproximadamente 3.476 quilômetros, sendo 80 vezes menor que o nosso planeta. Sua distncia para a Terra pode variar de 356.800 quilômetros a 406.400 quilômetros.**. Assim como a Terra, **a Lua também não permanece estática, realizando, portanto, alguns movimentos. Os três principais são o de rotação (deslocamento em torno de seu próprio eixo), translação (deslocamento em torno do Sol) e revolução em torno da Terra.**. Tem mais depois da publicidade ;). **A Lua sempre foi objeto de muita curiosidade entre os seres humanos. Tanto que em 20 de julho de 1969, três astronautas dos Estados Unidos (Edwin Aldrin Jr., Neil Armstrong e Michael Collins), tripulantes da nave espacial Apolo XI, atingiram a Lua.**. Essa missão ficou marcada pela seguinte frase de Neil Armstrong: “**Este é um pequeno passo para o homem, mas um grande salto para a humanidade”.**. **Outras missões com o intuito de obter maiores informações sobre o satélite natural da Terra continuam sendo realizadas. A última descoberta significativa foi a existência de moléculas de água na Lua.**. Por Wagner de Cerqueira e Francisco. ##### Por Wagner de Cerqueira e Francisco. ## Você pode se interessar também. ##### História. ### Corrida espacial. ##### Geografia. ### Eclipse. ##### Geografia. ### Estrelas. ##### Geografia. ### Fases da Lua.",
+                "excerptTruncated": false,
+                "contentSha256": "e9ebc16bc161eb7acdfc0ae8300dad66a00d3724a77ef3a1a7f90caae4878029",
+                "score": 0.87048715,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S2",
+                "title": "[PDF] A Lua – satélite natural da Terra",
+                "url": "https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "77769e-01",
+                "excerpt": "A Lua – satélite natural da Terra A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km. A nossa Lua é o único corpo celeste a receber seres humanos. O seu diâmetro é de aproximadamente 3.500 km, por essa razão seu tamanho é 80 vezes inferior ao do planeta Terra. A imagem abaixo mostra a diferença entre o tamanho da Terra e a Lua: Imagem: Comparação de diâmetros da Terra e da Lua. Arquivo criado pela NASA no domínio público. Esse corpo celeste é visto da Terra [...] é visto da Terra e exibe várias fases, mesmo assim expõe sempre a mesma face. O tempo gasto para realização do movimento de rotação é o mesmo para o de translação. Apesar de ser o segundo corpo mais brilhante no céu, atrás somente do Sol, a Lua não possui brilho próprio, sendo iluminada pela luz solar. À medida que a Lua viaja ao redor da Terra ao longo do mês, ela passa por um ciclo de fases, durante o qual sua forma parece variar gradualmente. O ciclo completo dura aproximadamente 29,5 dias. [...] é marcada por pouca luminosidade, pois sua face voltada para a Terra não está sendo iluminada pelo Sol.  Lua crescente: considerada a fase de transição da Lua nova para a Lua cheia, a Lua crescente é caracterizada por receber luminosidade em apenas uma face (no lado oposto da minguante). Responda as questões colocando a resposta em seu caderno: 1) Qual é o satélite natural da Terra? 2) Complete: “A Lua é ____________ menor que a Terra.” 3) A Lua tem brilho próprio? 4) Explique cada movimento",
+                "excerptTruncated": false,
+                "contentSha256": "4ccc28bf5eb31bb214f7468739499692331f039944468beb098869c8719a8af8",
+                "score": 0.8614217,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S3",
+                "title": "Lua - Fases do satélite natural da terra e curiosidades",
+                "url": "https://segredosdomundo.r7.com/lua",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "9c58e9-02",
+                "excerpt": "Title: Lua - Fases do satélite natural da terra e curiosidades\n# Lua – Fases do satélite natural da terra e curiosidades. A Lua é o satélite natural da terra, e diferente do nosso planeta não possui condições para o desenvolvimento de vida. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Sendo algo que sempre despertou e ainda desperta bastante curiosidade do ser humano, a lua é o único satélite natural da Terra. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Conhecendo a Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Assim, com o movimento de translação que ela faz ao redor da Terra, após cerca de 7 dias da Lua anterior a fase da Quarta Crescente chega. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. É a fase em que a face iluminada ela está totalmente virada para o planeta. #### Super Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Super Lua #### Lado escuro da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Lado escuro da Lua Além de que ela também realizar o movimento de translação em volta da Terra, sendo ele feito ao mesmo tempo da rotação. Desta forma, a sincronia entre o tempo que leva para dar volta em si mesma, bem como em volta da Terra deixa apenas um dos seus lados visíveis para nós. Assim sendo da esquerda para a direta, pois a medida que você se move do hemisfério norte para o sul o seu ponto de vista do satélite vira de cabeça para baixo.",
+                "excerptTruncated": false,
+                "contentSha256": "669647a664e206d96d2cccbf4a86f7e58fcb1ad7d4e9c56a89c30cc72431087c",
+                "score": 0.8413048,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              }
+            ],
+            "retrieval": {
+              "provider": "TAVILY",
+              "endpoint": "SEARCH",
+              "searchDepth": "basic",
+              "query": "A Lua é um satélite natural da Terra",
+              "requestId": "70e04d3c-95f2-40e9-be4c-b19dec026cb7",
+              "queriedAt": "2026-11-19T16:21:05.851Z",
+              "creditsUsed": 1,
+              "responseTimeSeconds": 3.15,
+              "resultsReceived": 3,
+              "resultsRetained": 3,
+              "rawResponseSha256": "5f140e85b11d1a1c70ca796314951f7845813143959c2222101768bd2a4d24fa"
+            },
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "0fb6d518-55df-4eab-b4d3-5cdcdf41c3e2",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2"
+      },
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "createdAt": "2026-11-19T16:21:33.241Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationSourceCheckId": "0fb6d518-55df-4eab-b4d3-5cdcdf41c3e2",
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é um satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "FATO_VERIFICAVEL",
+              "query": "A Lua é um satélite natural da Terra",
+              "timeSensitive": false,
+              "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+            },
+            "status": "VERIFICACAO_INDISPONIVEL",
+            "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-19T16:21:33.502Z",
+            "limitations": [
+              "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+            ],
+            "failureCode": "GEMINI_TEMPORARILY_UNAVAILABLE",
+            "sources": [
+              {
+                "id": "S1",
+                "title": "Lua – Características da Lua, o único satélite natural da Terra",
+                "url": "https://escolakids.uol.com.br/geografia/lua-satelite-da-terra.htm",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "59b016-00",
+                "excerpt": "Title: Lua – Características da Lua, o único satélite natural da Terra\n#### Qual matéria está procurando ? 3. Lua – Satélite da Terra. # Lua – Satélite da Terra. Satélite natural da Terra, a Lua é objeto de muita curiosidade entre os seres humanos. Lua: o único satélite natural da Terra. **A Terra possui apenas um satélite natural, a Lua. Conforme informações da União Astronômica Internacional (IAU), existem mais de 160 Luas no sistema solar.**. **A Lua do planeta Terra tem dimetro de aproximadamente 3.476 quilômetros, sendo 80 vezes menor que o nosso planeta. Sua distncia para a Terra pode variar de 356.800 quilômetros a 406.400 quilômetros.**. Assim como a Terra, **a Lua também não permanece estática, realizando, portanto, alguns movimentos. Os três principais são o de rotação (deslocamento em torno de seu próprio eixo), translação (deslocamento em torno do Sol) e revolução em torno da Terra.**. Tem mais depois da publicidade ;). **A Lua sempre foi objeto de muita curiosidade entre os seres humanos. Tanto que em 20 de julho de 1969, três astronautas dos Estados Unidos (Edwin Aldrin Jr., Neil Armstrong e Michael Collins), tripulantes da nave espacial Apolo XI, atingiram a Lua.**. Essa missão ficou marcada pela seguinte frase de Neil Armstrong: “**Este é um pequeno passo para o homem, mas um grande salto para a humanidade”.**. **Outras missões com o intuito de obter maiores informações sobre o satélite natural da Terra continuam sendo realizadas. A última descoberta significativa foi a existência de moléculas de água na Lua.**. Por Wagner de Cerqueira e Francisco. ##### Por Wagner de Cerqueira e Francisco. ## Você pode se interessar também. ##### História. ### Corrida espacial. ##### Geografia. ### Eclipse. ##### Geografia. ### Estrelas. ##### Geografia. ### Fases da Lua.",
+                "excerptTruncated": false,
+                "contentSha256": "e9ebc16bc161eb7acdfc0ae8300dad66a00d3724a77ef3a1a7f90caae4878029",
+                "score": 0.87048715,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S2",
+                "title": "[PDF] A Lua – satélite natural da Terra",
+                "url": "https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "77769e-01",
+                "excerpt": "A Lua – satélite natural da Terra A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km. A nossa Lua é o único corpo celeste a receber seres humanos. O seu diâmetro é de aproximadamente 3.500 km, por essa razão seu tamanho é 80 vezes inferior ao do planeta Terra. A imagem abaixo mostra a diferença entre o tamanho da Terra e a Lua: Imagem: Comparação de diâmetros da Terra e da Lua. Arquivo criado pela NASA no domínio público. Esse corpo celeste é visto da Terra [...] é visto da Terra e exibe várias fases, mesmo assim expõe sempre a mesma face. O tempo gasto para realização do movimento de rotação é o mesmo para o de translação. Apesar de ser o segundo corpo mais brilhante no céu, atrás somente do Sol, a Lua não possui brilho próprio, sendo iluminada pela luz solar. À medida que a Lua viaja ao redor da Terra ao longo do mês, ela passa por um ciclo de fases, durante o qual sua forma parece variar gradualmente. O ciclo completo dura aproximadamente 29,5 dias. [...] é marcada por pouca luminosidade, pois sua face voltada para a Terra não está sendo iluminada pelo Sol.  Lua crescente: considerada a fase de transição da Lua nova para a Lua cheia, a Lua crescente é caracterizada por receber luminosidade em apenas uma face (no lado oposto da minguante). Responda as questões colocando a resposta em seu caderno: 1) Qual é o satélite natural da Terra? 2) Complete: “A Lua é ____________ menor que a Terra.” 3) A Lua tem brilho próprio? 4) Explique cada movimento",
+                "excerptTruncated": false,
+                "contentSha256": "4ccc28bf5eb31bb214f7468739499692331f039944468beb098869c8719a8af8",
+                "score": 0.8614217,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S3",
+                "title": "Lua - Fases do satélite natural da terra e curiosidades",
+                "url": "https://segredosdomundo.r7.com/lua",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "9c58e9-02",
+                "excerpt": "Title: Lua - Fases do satélite natural da terra e curiosidades\n# Lua – Fases do satélite natural da terra e curiosidades. A Lua é o satélite natural da terra, e diferente do nosso planeta não possui condições para o desenvolvimento de vida. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Sendo algo que sempre despertou e ainda desperta bastante curiosidade do ser humano, a lua é o único satélite natural da Terra. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Conhecendo a Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Assim, com o movimento de translação que ela faz ao redor da Terra, após cerca de 7 dias da Lua anterior a fase da Quarta Crescente chega. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. É a fase em que a face iluminada ela está totalmente virada para o planeta. #### Super Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Super Lua #### Lado escuro da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Lado escuro da Lua Além de que ela também realizar o movimento de translação em volta da Terra, sendo ele feito ao mesmo tempo da rotação. Desta forma, a sincronia entre o tempo que leva para dar volta em si mesma, bem como em volta da Terra deixa apenas um dos seus lados visíveis para nós. Assim sendo da esquerda para a direta, pois a medida que você se move do hemisfério norte para o sul o seu ponto de vista do satélite vira de cabeça para baixo.",
+                "excerptTruncated": false,
+                "contentSha256": "669647a664e206d96d2cccbf4a86f7e58fcb1ad7d4e9c56a89c30cc72431087c",
+                "score": 0.8413048,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              }
+            ],
+            "retrieval": {
+              "provider": "TAVILY",
+              "endpoint": "SEARCH",
+              "searchDepth": "basic",
+              "query": "A Lua é um satélite natural da Terra",
+              "reusedFromCheckId": "0fb6d518-55df-4eab-b4d3-5cdcdf41c3e2",
+              "requestId": "70e04d3c-95f2-40e9-be4c-b19dec026cb7",
+              "queriedAt": "2026-11-19T16:21:05.851Z",
+              "creditsUsed": 1,
+              "responseTimeSeconds": 3.15,
+              "resultsReceived": 3,
+              "resultsRetained": 3,
+              "rawResponseSha256": "5f140e85b11d1a1c70ca796314951f7845813143959c2222101768bd2a4d24fa"
+            },
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "bfdd905d-ad04-492e-81e5-604cf46e2da3",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2"
+      },
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "createdAt": "2026-11-19T16:23:47.294Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "retrievalProvider": "TAVILY",
+        "classificationSourceCheckId": "bfdd905d-ad04-492e-81e5-604cf46e2da3",
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é um satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "FATO_VERIFICAVEL",
+              "query": "A Lua é um satélite natural da Terra",
+              "timeSensitive": false,
+              "reason": "Trata-se de um fato astronômico publicamente verificável e de conhecimento geral."
+            },
+            "status": "EVIDENCIA_FAVORAVEL",
+            "explanation": "A alegação de que a Lua é um satélite natural da Terra é amplamente confirmada pelas evidências fornecidas, que atestam explicitamente essa condição astronômica.",
+            "providerText": "{\n  \"status\": \"EVIDENCIA_FAVORAVEL\",\n  \"explanation\": \"A alegação de que a Lua é um satélite natural da Terra é amplamente confirmada pelas evidências fornecidas, que atestam explicitamente essa condição astronômica.\",\n  \"scopeMatches\": true,\n  \"evidenceLinks\": [\n    {\n      \"sourceId\": \"S1\",\n      \"quote\": \"A Terra possui apenas um satélite natural, a Lua.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"A fonte afirma diretamente que a Lua é o satélite natural da Terra.\"\n    },\n    {\n      \"sourceId\": \"S2\",\n      \"quote\": \"A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Confirma de forma explícita que a Lua é o satélite natural da Terra.\"\n    },\n    {\n      \"sourceId\": \"S3\",\n      \"quote\": \"A Lua é o satélite natural da terra, e diferente do nosso planeta não possui condições para o desenvolvimento de vida.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Reitera que a Lua é o satélite natural da Terra.\"\n    }\n  ],\n  \"uncertainties\": []\n}",
+            "responseModel": "gemini-3.5-flash-lite",
+            "queriedAt": "2026-11-19T16:24:05.346Z",
+            "limitations": [
+              "Recuperar um resultado não comprova a alegação. A interpretação do Gemini é consultiva e falível.",
+              "O trecho é o conteúdo retornado pela Tavily; a aplicação não realizou leitura independente da página.",
+              "Data não fornecida ou não reconhecida nos metadados; nenhuma data foi criada pelo Gemini."
+            ],
+            "failureCode": null,
+            "sources": [
+              {
+                "id": "S1",
+                "title": "Lua – Características da Lua, o único satélite natural da Terra",
+                "url": "https://escolakids.uol.com.br/geografia/lua-satelite-da-terra.htm",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "59b016-00",
+                "excerpt": "Title: Lua – Características da Lua, o único satélite natural da Terra\n#### Qual matéria está procurando ? 3. Lua – Satélite da Terra. # Lua – Satélite da Terra. Satélite natural da Terra, a Lua é objeto de muita curiosidade entre os seres humanos. Lua: o único satélite natural da Terra. **A Terra possui apenas um satélite natural, a Lua. Conforme informações da União Astronômica Internacional (IAU), existem mais de 160 Luas no sistema solar.**. **A Lua do planeta Terra tem dimetro de aproximadamente 3.476 quilômetros, sendo 80 vezes menor que o nosso planeta. Sua distncia para a Terra pode variar de 356.800 quilômetros a 406.400 quilômetros.**. Assim como a Terra, **a Lua também não permanece estática, realizando, portanto, alguns movimentos. Os três principais são o de rotação (deslocamento em torno de seu próprio eixo), translação (deslocamento em torno do Sol) e revolução em torno da Terra.**. Tem mais depois da publicidade ;). **A Lua sempre foi objeto de muita curiosidade entre os seres humanos. Tanto que em 20 de julho de 1969, três astronautas dos Estados Unidos (Edwin Aldrin Jr., Neil Armstrong e Michael Collins), tripulantes da nave espacial Apolo XI, atingiram a Lua.**. Essa missão ficou marcada pela seguinte frase de Neil Armstrong: “**Este é um pequeno passo para o homem, mas um grande salto para a humanidade”.**. **Outras missões com o intuito de obter maiores informações sobre o satélite natural da Terra continuam sendo realizadas. A última descoberta significativa foi a existência de moléculas de água na Lua.**. Por Wagner de Cerqueira e Francisco. ##### Por Wagner de Cerqueira e Francisco. ## Você pode se interessar também. ##### História. ### Corrida espacial. ##### Geografia. ### Eclipse. ##### Geografia. ### Estrelas. ##### Geografia. ### Fases da Lua.",
+                "excerptTruncated": false,
+                "contentSha256": "e9ebc16bc161eb7acdfc0ae8300dad66a00d3724a77ef3a1a7f90caae4878029",
+                "score": 0.87048715,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S2",
+                "title": "[PDF] A Lua – satélite natural da Terra",
+                "url": "https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "77769e-01",
+                "excerpt": "A Lua – satélite natural da Terra A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km. A nossa Lua é o único corpo celeste a receber seres humanos. O seu diâmetro é de aproximadamente 3.500 km, por essa razão seu tamanho é 80 vezes inferior ao do planeta Terra. A imagem abaixo mostra a diferença entre o tamanho da Terra e a Lua: Imagem: Comparação de diâmetros da Terra e da Lua. Arquivo criado pela NASA no domínio público. Esse corpo celeste é visto da Terra [...] é visto da Terra e exibe várias fases, mesmo assim expõe sempre a mesma face. O tempo gasto para realização do movimento de rotação é o mesmo para o de translação. Apesar de ser o segundo corpo mais brilhante no céu, atrás somente do Sol, a Lua não possui brilho próprio, sendo iluminada pela luz solar. À medida que a Lua viaja ao redor da Terra ao longo do mês, ela passa por um ciclo de fases, durante o qual sua forma parece variar gradualmente. O ciclo completo dura aproximadamente 29,5 dias. [...] é marcada por pouca luminosidade, pois sua face voltada para a Terra não está sendo iluminada pelo Sol.  Lua crescente: considerada a fase de transição da Lua nova para a Lua cheia, a Lua crescente é caracterizada por receber luminosidade em apenas uma face (no lado oposto da minguante). Responda as questões colocando a resposta em seu caderno: 1) Qual é o satélite natural da Terra? 2) Complete: “A Lua é ____________ menor que a Terra.” 3) A Lua tem brilho próprio? 4) Explique cada movimento",
+                "excerptTruncated": false,
+                "contentSha256": "4ccc28bf5eb31bb214f7468739499692331f039944468beb098869c8719a8af8",
+                "score": 0.8614217,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S3",
+                "title": "Lua - Fases do satélite natural da terra e curiosidades",
+                "url": "https://segredosdomundo.r7.com/lua",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "9c58e9-02",
+                "excerpt": "Title: Lua - Fases do satélite natural da terra e curiosidades\n# Lua – Fases do satélite natural da terra e curiosidades. A Lua é o satélite natural da terra, e diferente do nosso planeta não possui condições para o desenvolvimento de vida. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Sendo algo que sempre despertou e ainda desperta bastante curiosidade do ser humano, a lua é o único satélite natural da Terra. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Conhecendo a Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. ## Fazes da Lua Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. Assim, com o movimento de translação que ela faz ao redor da Terra, após cerca de 7 dias da Lua anterior a fase da Quarta Crescente chega. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. É a fase em que a face iluminada ela está totalmente virada para o planeta. #### Super Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Super Lua #### Lado escuro da Lua. Lua - conheça o satélite natural da terra que aguça curiosidade de muitos. #### Lado escuro da Lua Além de que ela também realizar o movimento de translação em volta da Terra, sendo ele feito ao mesmo tempo da rotação. Desta forma, a sincronia entre o tempo que leva para dar volta em si mesma, bem como em volta da Terra deixa apenas um dos seus lados visíveis para nós. Assim sendo da esquerda para a direta, pois a medida que você se move do hemisfério norte para o sul o seu ponto de vista do satélite vira de cabeça para baixo.",
+                "excerptTruncated": false,
+                "contentSha256": "669647a664e206d96d2cccbf4a86f7e58fcb1ad7d4e9c56a89c30cc72431087c",
+                "score": 0.8413048,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              }
+            ],
+            "retrieval": {
+              "provider": "TAVILY",
+              "endpoint": "SEARCH",
+              "searchDepth": "basic",
+              "query": "A Lua é um satélite natural da Terra",
+              "reusedFromCheckId": "bfdd905d-ad04-492e-81e5-604cf46e2da3",
+              "requestId": "70e04d3c-95f2-40e9-be4c-b19dec026cb7",
+              "queriedAt": "2026-11-19T16:21:05.851Z",
+              "creditsUsed": 1,
+              "responseTimeSeconds": 3.15,
+              "resultsReceived": 3,
+              "resultsRetained": 3,
+              "rawResponseSha256": "5f140e85b11d1a1c70ca796314951f7845813143959c2222101768bd2a4d24fa"
+            },
+            "scopeMatches": true,
+            "evidenceLinks": [
+              {
+                "sourceId": "S1",
+                "quote": "A Terra possui apenas um satélite natural, a Lua.",
+                "relation": "SUPPORTS",
+                "explanation": "A fonte afirma diretamente que a Lua é o satélite natural da Terra."
+              },
+              {
+                "sourceId": "S2",
+                "quote": "A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km.",
+                "relation": "SUPPORTS",
+                "explanation": "Confirma de forma explícita que a Lua é o satélite natural da Terra."
+              },
+              {
+                "sourceId": "S3",
+                "quote": "A Lua é o satélite natural da terra, e diferente do nosso planeta não possui condições para o desenvolvimento de vida.",
+                "relation": "SUPPORTS",
+                "explanation": "Reitera que a Lua é o satélite natural da Terra."
+              }
+            ]
+          }
+        ],
+        "id": "df5cbbf8-9cca-436a-a598-ae0f458b98d7",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2"
+      }
+    ],
+    "votes": [
+      {
+        "id": "4adca964-4db8-42fe-ae6f-77545eb1e877",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "REJEITO",
+        "justification": "[SINTÉTICO] Exijo fontes reais e mantenho minha objeção durante a indisponibilidade.",
+        "createdAt": "2026-11-19T15:51:53.644Z"
+      },
+      {
+        "id": "f17802c2-f5ae-48d6-9ab6-8ecc816fe48f",
+        "participantId": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:54.091Z"
+      },
+      {
+        "id": "ca7b33e7-b7bd-4b2c-a80e-65b171ee5937",
+        "participantId": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:54.342Z"
+      },
+      {
+        "id": "88410c00-c13c-4a31-abec-8223e1f5bd1a",
+        "participantId": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:54.942Z"
+      },
+      {
+        "id": "634b0ba6-bac5-4a7b-a596-ae8c5e617da9",
+        "participantId": "138270a8-8724-4be0-be17-43e541ac676f",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ABSTENHO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:55.238Z"
+      },
+      {
+        "id": "2eb1c31b-abf4-450e-9ea5-522d9a6ff286",
+        "participantId": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:55.675Z"
+      },
+      {
+        "id": "37df67da-5279-441b-a3a8-291bc8b1093d",
+        "participantId": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:56.040Z"
+      },
+      {
+        "id": "9cf9955c-86fa-4dea-8dee-a0c2a9d3cdc2",
+        "participantId": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:56.367Z"
+      },
+      {
+        "id": "94067952-34c6-44bf-b32a-7606a592c743",
+        "participantId": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:56.800Z"
+      },
+      {
+        "id": "584837c3-60d5-4fa6-b3a2-91b5f13f4e84",
+        "participantId": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T15:51:57.348Z"
+      },
+      {
+        "id": "0057455f-4302-4726-a0ca-9d71a631ace0",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:38.526Z"
+      },
+      {
+        "id": "2f1dcf26-2e1b-4d7c-acdd-61504935e1fb",
+        "participantId": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:38.965Z"
+      },
+      {
+        "id": "14a14f25-ef70-4756-9058-0fa5b14f8ea9",
+        "participantId": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:39.274Z"
+      },
+      {
+        "id": "f6f5f3b4-7425-4a29-a47c-2856b7170009",
+        "participantId": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:39.610Z"
+      },
+      {
+        "id": "6182c661-1b7d-49d1-84d5-f413062d147d",
+        "participantId": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:39.982Z"
+      },
+      {
+        "id": "638d3c34-c7bc-4b7a-bbd6-20dec27173a0",
+        "participantId": "138270a8-8724-4be0-be17-43e541ac676f",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:40.551Z"
+      },
+      {
+        "id": "f7518418-c93e-434e-9601-6aa4ea192a8d",
+        "participantId": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:40.873Z"
+      },
+      {
+        "id": "7b0ab74d-c374-4b44-b931-77e4035db7f0",
+        "participantId": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:41.247Z"
+      },
+      {
+        "id": "9967b68f-cbaa-4d35-8bc7-f8961fc22373",
+        "participantId": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:41.631Z"
+      },
+      {
+        "id": "8ca1540a-d7ea-48b3-b9ee-211c3c1f697f",
+        "participantId": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "roundId": "33ed96cf-6a51-4153-ae38-d79da70b6c12",
+        "proposalId": "6cb523c0-3efc-46d7-be0d-8129dc696930",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T16:27:42.099Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "07a71d66-358e-4c9c-ab13-a65e7ce99b03",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "roundId": "daa8be39-0e83-4eb0-9661-9dbefdd9bf07",
+        "proposalId": "d01d231b-8e26-461e-a50c-4f1dcf08dd05",
+        "originalText": "[SINTÉTICO] Exijo fontes reais e mantenho minha objeção durante a indisponibilidade.",
+        "text": "[SINTÉTICO] Exijo fontes reais e mantenho minha objeção durante a indisponibilidade.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "none",
+          "reason": "[SINTÉTICO] Sem novo parecer durante indisponibilidade do provedor."
+        },
+        "contest": "",
+        "createdAt": "2026-11-19T15:51:53.644Z"
+      }
+    ],
+    "analyses": [],
+    "syntheses": [],
+    "contests": [
+      {
+        "id": "9b693851-dddc-4bdf-8308-9264e55cdd07",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "targetId": "52f28010-1892-4b4b-a921-be0d390661ae",
+        "text": "[SINTÉTICO] Mantenho a exigência de fontes: o parecer indisponível não deve ser tratado como confirmação.",
+        "at": "2026-11-19T15:51:52.866Z"
+      },
+      {
+        "id": "30715373-87c0-4e97-929a-8ed2eeae54fa",
+        "participantId": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "targetId": "df5cbbf8-9cca-436a-a598-ae0f458b98d7",
+        "text": "[SINTÉTICO] A evidência favorável não é comprovação absoluta; mantenho minha posição e solicito revisão das fontes e limitações.",
+        "at": "2026-11-19T16:27:37.352Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "dbab40ae-ffe5-4bf9-9759-0f6e95282651",
+        "at": "2026-11-19T15:50:00.883Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "f7189955-fffb-4a31-9b07-c8768368f364",
+        "at": "2026-11-19T15:50:23.658Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "52f28010-1892-4b4b-a921-be0d390661ae; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "119e5279-fb42-4feb-bd09-76aa422be4cc",
+        "at": "2026-11-19T15:51:52.342Z",
+        "actor": "138270a8-8724-4be0-be17-43e541ac676f",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "1dc05095-1156-4d11-bddc-b4e4b05aa148; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "2cb32fa4-3628-4166-b3f7-3ada171e27bd",
+        "at": "2026-11-19T15:51:52.866Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "AI_CONTESTED",
+        "detail": "[SINTÉTICO] Mantenho a exigência de fontes: o parecer indisponível não deve ser tratado como confirmação."
+      },
+      {
+        "id": "c1ed4199-dcd7-44db-bbcc-6b0ffffd8ffd",
+        "at": "2026-11-19T15:51:53.644Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "dc72f1d6-66ef-4c2f-97a2-7d6d25235d1a",
+        "at": "2026-11-19T15:51:53.644Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "67e228c6-b411-4b70-8586-ea1378c01636",
+        "at": "2026-11-19T15:51:54.091Z",
+        "actor": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "6c308d85-ea1e-4f24-b4fa-3890d543e1bb",
+        "at": "2026-11-19T15:51:54.342Z",
+        "actor": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "860d41b9-9e8a-4f8c-b921-b29a4809f184",
+        "at": "2026-11-19T15:51:54.942Z",
+        "actor": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "db7e5806-26ae-4d15-a56a-5cfece15de91",
+        "at": "2026-11-19T15:51:55.238Z",
+        "actor": "138270a8-8724-4be0-be17-43e541ac676f",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "0a93231f-451f-440e-9fda-3c2af3b38f62",
+        "at": "2026-11-19T15:51:55.675Z",
+        "actor": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "227c2c70-e6a4-4a98-8f18-d72f553a61ab",
+        "at": "2026-11-19T15:51:56.040Z",
+        "actor": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3a000879-d6e0-422a-9970-c312d7d1e0f5",
+        "at": "2026-11-19T15:51:56.367Z",
+        "actor": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "a15dddf1-bcdc-47fe-828b-90d60a7a175d",
+        "at": "2026-11-19T15:51:56.800Z",
+        "actor": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "da8b06c6-ce71-44b1-899c-7ac8753e20d6",
+        "at": "2026-11-19T15:51:57.348Z",
+        "actor": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "75945cd6-d736-4eef-b7db-6aa231580a63",
+        "at": "2026-11-19T16:21:06.555Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "0fb6d518-55df-4eab-b4d3-5cdcdf41c3e2; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "02796799-86a7-4ca3-8566-c7f828d2a51f",
+        "at": "2026-11-19T16:21:33.512Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "bfdd905d-ad04-492e-81e5-604cf46e2da3; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "36289b49-d3eb-49f3-9ed3-36f011169abf",
+        "at": "2026-11-19T16:24:05.359Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "df5cbbf8-9cca-436a-a598-ae0f458b98d7; factual-tavily-gemini-v2.0; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "a8a4e665-3a28-455a-9eb3-556d5d95afd9",
+        "at": "2026-11-19T16:27:37.352Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "AI_CONTESTED",
+        "detail": "[SINTÉTICO] A evidência favorável não é comprovação absoluta; mantenho minha posição e solicito revisão das fontes e limitações."
+      },
+      {
+        "id": "49bbc64b-d4ec-4098-abae-2dae4745621a",
+        "at": "2026-11-19T16:27:38.027Z",
+        "actor": "moderator",
+        "type": "PROPOSAL_PUBLISHED",
+        "detail": "[SINTÉTICO] Revisão operacional com fontes reais, limites e contestações preservados. Nenhuma avaliação humana científica foi realizada."
+      },
+      {
+        "id": "1fe013d4-79c8-49e7-b102-1233c68c900c",
+        "at": "2026-11-19T16:27:38.526Z",
+        "actor": "cc935ef7-2a40-4c12-bf27-487c6c7f8cb2",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "0a76d096-2dd8-4cf7-b62e-b28de86d8f92",
+        "at": "2026-11-19T16:27:38.965Z",
+        "actor": "b102e50f-6437-4fad-920d-085d10c5c403",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "bab0c809-9725-40b5-9c5a-4b104c252fcd",
+        "at": "2026-11-19T16:27:39.274Z",
+        "actor": "5f1aaca4-0c34-4693-ac80-2f24d9e42d58",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "72966d15-9b0f-4b0f-8b31-268e35dee1dd",
+        "at": "2026-11-19T16:27:39.610Z",
+        "actor": "1247a9e7-2a1f-4de3-aedd-5f1717d31a2c",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "d550d054-f8fb-4e1a-b64d-92e5c2966752",
+        "at": "2026-11-19T16:27:39.982Z",
+        "actor": "bfc4be43-9a15-4fd2-a137-9bafa4c2ba46",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "2894b725-65d8-43c2-b5d0-9bcc3571a996",
+        "at": "2026-11-19T16:27:40.551Z",
+        "actor": "138270a8-8724-4be0-be17-43e541ac676f",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "9506a795-8de8-41ec-9467-dcb0299655f7",
+        "at": "2026-11-19T16:27:40.873Z",
+        "actor": "ebe40e7c-3adb-4a0e-88c7-8c6adb9870e9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "e809c31f-455e-413b-b5e8-6c48a2d7b8d6",
+        "at": "2026-11-19T16:27:41.247Z",
+        "actor": "f179fe52-9290-4680-bd9b-41d627a622f0",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "19e5e1aa-2ef2-4e84-ae20-0e2f62f8f64c",
+        "at": "2026-11-19T16:27:41.631Z",
+        "actor": "f4c43b33-466c-4f00-8ef4-5f4a8b613daf",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3252a82d-d997-4690-a809-789980452452",
+        "at": "2026-11-19T16:27:42.099Z",
+        "actor": "a3065032-a943-4d40-929a-1d0c000bafec",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "2594c61e-25f4-44d0-a7d3-cf9cc2ffd290",
+        "at": "2026-11-19T16:27:42.099Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      }
+    ],
+    "evaluations": []
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 2,
+      "deliberationMs": 2261216,
+      "repeatedObjections": [],
+      "votes": 20,
+      "objections": 1,
+      "distinctObjectionsByRound": 1
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 10,
+    "received": 0,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 10,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 30,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 40,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 30,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "openResponses": [],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}
