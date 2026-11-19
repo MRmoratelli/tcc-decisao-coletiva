@@ -160,5 +160,35 @@
       "FACTUAL_MOBILE.jpg",
       "FACTUAL_MOBILE_RESULT.jpg"
     ]
+  },
+  "integrityFix": {
+    "commit": "384d931cfb18772ead4c2f7a5e48ace4735250a2",
+    "change": "Imported unauthenticated or future-dated evidence excluded from persisted live cache",
+    "tests": 57,
+    "ci": {
+      "runId": 44452382382,
+      "conclusion": "success",
+      "url": "https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44452382382"
+    }
+  },
+  "preservation": {
+    "main": "b342030bb80eb4d03ff0ee39cb5d7751bfc88336",
+    "backup": "b1ccffdbfcbcd638da56026b89adeabbcdd70c9d",
+    "pr4": {
+      "state": "open",
+      "draft": true,
+      "merged": false
+    }
+  },
+  "redeploy": {
+    "at": "2026-11-19T03:36:26.014Z",
+    "commit": "384d931cfb18772ead4c2f7a5e48ace4735250a2",
+    "deployId": "dep-dbv6t1gu01pc73d0eleg",
+    "httpStatus": 200,
+    "neonUnchangedState": true,
+    "existingRecords": 2,
+    "existingContests": 1,
+    "consensusPreserved": true,
+    "repeatedModelCalls": 0
   }
 }

@@ -89,3 +89,7 @@ Consultadas em 18/11/2026; políticas e acesso podem mudar:
 - https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash-lite — capacidades e restrições de acesso.
 - https://ai.google.dev/gemini-api/docs/rate-limits — limites por projeto e modalidade.
 - Painel autenticado do projeto exclusivo V2 no Google AI Studio: tier e limites efetivos. Nenhuma credencial foi copiada para esta documentação.
+
+## Publicação final e persistência
+
+A revisão de integridade foi publicada no commit `384d931cfb18772ead4c2f7a5e48ace4735250a2`, CI [44452382382](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44452382382) aprovado e deploy `dep-dbv6t1gu01pc73d0eleg` live. Após o novo processo iniciar, `/api/health` respondeu HTTP 200 com esse SHA; a releitura/exportação do estado sintético foi idêntica à anterior, incluindo dois registros factuais, contestação e consenso. Não foram repetidas chamadas Gemini desnecessárias. O bloqueio externo documentado permanece sem comprovação de grounding real.
