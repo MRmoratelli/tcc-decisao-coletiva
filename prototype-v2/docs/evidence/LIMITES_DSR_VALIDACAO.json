@@ -1,6 +1,6 @@
 {
   "type": "TESTE_TECNICO_SINTETICO",
-  "status": "LOCAL_PASS_PENDING_DEPLOY",
+  "status": "PASS_LOCAL_CI_AND_REMOTE_SYNTHETIC",
   "at": "2026-11-19T17:28:40.390Z",
   "tests": 74,
   "failed": 0,
@@ -56,5 +56,136 @@
     "a4ChangedExplicitly": true,
     "psychometricValidation": false,
     "scientificResponses": false
-  }
+  },
+  "completedAt": "2026-11-19T17:35:13.870Z",
+  "codeCommit": "98781dca1a4ca58a548c8d4b6f4be8bcb8432bcf",
+  "ci": {
+    "id": 44577662452,
+    "conclusion": "success",
+    "url": "https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44577662452"
+  },
+  "deploy": {
+    "id": "dep-dbvj4559fdbs73bdb5jg",
+    "status": "live",
+    "httpsStatus": 200,
+    "health": {
+      "status": "ok",
+      "version": 2,
+      "commit": "98781dca1a4ca58a548c8d4b6f4be8bcb8432bcf",
+      "aiConfigured": true,
+      "factual": {
+        "enabled": true,
+        "retrievalProvider": "TAVILY",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.0",
+        "availability": {
+          "searchConfigured": true,
+          "freePlanConfirmed": true
+        },
+        "limits": {
+          "maxDailySearches": 100,
+          "maxMinuteSearches": 15,
+          "maxMonthlySearches": 1000,
+          "maxDailyGeminiCalls": 250,
+          "maxMinuteGeminiCalls": 12,
+          "maxConcurrent": 10,
+          "persistent": true
+        }
+      }
+    }
+  },
+  "remoteCases": {
+    "A": {
+      "synthetic": true,
+      "rounds": 1,
+      "result": "CONSENSUS",
+      "identities": 10,
+      "simultaneousReads": 10,
+      "nineAcceptancesResult": "OPEN",
+      "tenthAcceptanceResult": "CONSENSUS",
+      "responses": 1,
+      "viaBrowser": true,
+      "context": {
+        "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+        "baseInstrumentVersion": "DSR-1.0-2026-11-16",
+        "status": "PROPOSTA_SUJEITA_A_REVISAO_E_PRE_TESTE",
+        "rounds": 1,
+        "processResult": "CONSENSUS",
+        "closedAt": "2026-11-19T17:31:08.834Z",
+        "proposalVersions": 1,
+        "objectionsRecorded": 0,
+        "analysesRecorded": 0,
+        "synthesesRecorded": 0
+      },
+      "nAtItem05": 1,
+      "missingAtItem01": 1,
+      "nonrespondents": 9
+    },
+    "B": {
+      "synthetic": true,
+      "rounds": 2,
+      "result": "CONSENSUS",
+      "versions": [
+        "DSR-1.0-2026-11-16",
+        "DSR-1.1-NATURALISTICO"
+      ],
+      "mixedVersionsReported": true
+    },
+    "C": {
+      "synthetic": true,
+      "rounds": 1,
+      "result": "CLOSED_WITHOUT_CONSENSUS",
+      "questionnaireRecorded": true
+    },
+    "D": {
+      "noReformulation": true,
+      "nAStoredAsCategory": true,
+      "missingRetainedAsNull": true,
+      "neutralNotSelected": true
+    },
+    "E": {
+      "newRoomImport": true,
+      "originalInputsPreserved": true,
+      "credentialsReissued": true
+    }
+  },
+  "historicalPreservation": {
+    "before": {
+      "snapshots": "94",
+      "cutoff": "2026-11-19T16:27:43.000Z",
+      "state_hash": "a5bf9773ea322ccdef00c6216d38d633"
+    },
+    "after": {
+      "historical_snapshots": "94",
+      "historical_state_hash": "a5bf9773ea322ccdef00c6216d38d633"
+    },
+    "unchanged": true,
+    "comparisonFilter": "created_at < 2026-11-19T17:00:00Z; all 94 baseline snapshots predate this boundary, all new tests postdate it"
+  },
+  "budgetAfterDeployment": {
+    "searchDayReservations": 1,
+    "searchMonthReservations": 1,
+    "newGeminiFactualReservations": 0,
+    "newTavilyReservations": 0,
+    "persistentAcrossDeployment": true
+  },
+  "screenshots": [
+    "DSR_UMA_RODADA_FORMULARIO.jpg",
+    "DSR_UMA_RODADA_NA.jpg",
+    "DSR_UMA_RODADA_ENCERRADA.jpg"
+  ],
+  "syntheticExports": [
+    {
+      "file": "DSR_SINTETICO_CASO_A.json",
+      "sha256": "0b00cb06c71b06407f94ed81cf2cb0fcab8fd66d16216810aac1cddbc5d06cc7"
+    },
+    {
+      "file": "DSR_SINTETICO_CASO_B.json",
+      "sha256": "8abea35cd46baffb36f170c2696efae0897831ecfb360f51562a83355ac8daea"
+    },
+    {
+      "file": "DSR_SINTETICO_CASO_C.json",
+      "sha256": "f8734dd9c79c5b3c71205928fcc5ea6d8e54cfec7cf35971139f17e71f540d0e"
+    }
+  ]
 }

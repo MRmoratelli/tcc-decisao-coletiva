@@ -1,0 +1,1217 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-19T17:33:47.683Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO DSR] Encerramento em uma rodada",
+      "problem": "Confirmar tecnicamente a liberação do questionário depois de encerramento legítimo.",
+      "decision": "Registrar aceitação explícita de uma proposta técnica fictícia.",
+      "goals": "Testar fluxo e exportação, sem participantes reais.",
+      "alternatives": "Encerrar com consenso ou sem consenso.",
+      "constraints": "Dados exclusivamente sintéticos; não é avaliação científica.",
+      "successCriteria": "Não criar segunda rodada artificial.",
+      "context": "ENSAIO TÉCNICO SINTÉTICO. Não pertence ao grupo real do churrasco.",
+      "text": "[SINTÉTICO] Encerrar após manifestação explícita das dez identidades fictícias e disponibilizar a variante pós-sessão."
+    },
+    "decision": {
+      "id": "0ee046b2-1515-4a14-9617-e607b2cfbd22",
+      "originId": "0ee046b2-1515-4a14-9617-e607b2cfbd22",
+      "title": "[SINTÉTICO DSR] Encerramento em uma rodada",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-19T17:31:04.208Z",
+      "closedAt": "2026-11-19T17:31:08.834Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "0521f043-f601-4e1c-a7b5-05fb88c20b81",
+        "alias": "P01"
+      },
+      {
+        "id": "e040b6d6-d199-4fd7-8db8-c84c778205a1",
+        "alias": "P02"
+      },
+      {
+        "id": "c5f185ce-ee56-439d-bf01-52703d9bf3c5",
+        "alias": "P03"
+      },
+      {
+        "id": "b8de06e1-0b8e-4463-a462-ee729e1b627c",
+        "alias": "P04"
+      },
+      {
+        "id": "5a6bc085-756b-43e8-835b-548508c4dd84",
+        "alias": "P05"
+      },
+      {
+        "id": "c24f67a6-54e5-437b-af6c-3ac4d9b1b142",
+        "alias": "P06"
+      },
+      {
+        "id": "d5dca2db-ce3f-4fe4-a672-c61c835fed7b",
+        "alias": "P07"
+      },
+      {
+        "id": "4a38cf15-9c65-447a-b594-661579d6f56d",
+        "alias": "P08"
+      },
+      {
+        "id": "d041d58f-bac5-4632-acf8-e89e68364af4",
+        "alias": "P09"
+      },
+      {
+        "id": "c932fc78-c69e-4322-917a-a9bcd25d2ba1",
+        "alias": "P10"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO DSR] Encerramento em uma rodada",
+          "problem": "Confirmar tecnicamente a liberação do questionário depois de encerramento legítimo.",
+          "decision": "Registrar aceitação explícita de uma proposta técnica fictícia.",
+          "goals": "Testar fluxo e exportação, sem participantes reais.",
+          "alternatives": "Encerrar com consenso ou sem consenso.",
+          "constraints": "Dados exclusivamente sintéticos; não é avaliação científica.",
+          "successCriteria": "Não criar segunda rodada artificial.",
+          "context": "ENSAIO TÉCNICO SINTÉTICO. Não pertence ao grupo real do churrasco.",
+          "text": "[SINTÉTICO] Encerrar após manifestação explícita das dez identidades fictícias e disponibilizar a variante pós-sessão."
+        },
+        "createdAt": "2026-11-19T17:31:04.208Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "none",
+          "reason": "Ensaio técnico autorizado, sem solicitar parecer externo."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "08dea6c1-130e-4799-a510-3f741f538349",
+        "number": 1,
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "status": "CLOSED",
+        "openedAt": "2026-11-19T17:31:04.208Z",
+        "closedAt": "2026-11-19T17:31:08.834Z"
+      }
+    ],
+    "factualChecks": [],
+    "votes": [
+      {
+        "id": "9d302345-055f-487a-8cf4-980b03565973",
+        "participantId": "0521f043-f601-4e1c-a7b5-05fb88c20b81",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:05.623Z"
+      },
+      {
+        "id": "6f574f18-23f3-45f7-9197-9d69e89981ad",
+        "participantId": "e040b6d6-d199-4fd7-8db8-c84c778205a1",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:05.931Z"
+      },
+      {
+        "id": "0bdec620-5a61-41a3-aaa7-9280c365a510",
+        "participantId": "c5f185ce-ee56-439d-bf01-52703d9bf3c5",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:06.246Z"
+      },
+      {
+        "id": "abeaa137-62db-417b-b9c7-07c84462c138",
+        "participantId": "b8de06e1-0b8e-4463-a462-ee729e1b627c",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:06.584Z"
+      },
+      {
+        "id": "c993cad5-6ea1-4f69-83c6-1a433ea14634",
+        "participantId": "5a6bc085-756b-43e8-835b-548508c4dd84",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:06.883Z"
+      },
+      {
+        "id": "859b103c-8cd5-425f-8a1d-d4858d2a2e73",
+        "participantId": "c24f67a6-54e5-437b-af6c-3ac4d9b1b142",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:07.184Z"
+      },
+      {
+        "id": "60fd0063-f82d-4b6e-ae82-708732f4bc19",
+        "participantId": "d5dca2db-ce3f-4fe4-a672-c61c835fed7b",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:07.493Z"
+      },
+      {
+        "id": "392c6525-5992-49b9-9db2-6fa876eb54f3",
+        "participantId": "4a38cf15-9c65-447a-b594-661579d6f56d",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:08.038Z"
+      },
+      {
+        "id": "8610b878-34d4-4b05-bdc7-4cdeaf3744c8",
+        "participantId": "d041d58f-bac5-4632-acf8-e89e68364af4",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:08.348Z"
+      },
+      {
+        "id": "cffbd4ef-a59b-45fd-b257-e372778ed573",
+        "participantId": "c932fc78-c69e-4322-917a-a9bcd25d2ba1",
+        "roundId": "08dea6c1-130e-4799-a510-3f741f538349",
+        "proposalId": "f75035b6-3169-4570-936f-8dc0a9f911df",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-19T17:31:08.834Z"
+      }
+    ],
+    "contributions": [],
+    "analyses": [],
+    "syntheses": [],
+    "contests": [],
+    "events": [
+      {
+        "id": "cc355ea0-f45c-46c1-aab2-6f6b597c16cc",
+        "at": "2026-11-19T17:31:04.208Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "90bdf453-33bb-4fb8-bfb8-83717c0b1fde",
+        "at": "2026-11-19T17:31:05.623Z",
+        "actor": "0521f043-f601-4e1c-a7b5-05fb88c20b81",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "41a13dbe-1151-41d5-9f09-01f058f625cf",
+        "at": "2026-11-19T17:31:05.931Z",
+        "actor": "e040b6d6-d199-4fd7-8db8-c84c778205a1",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "ad200efc-ec88-4412-b5e3-be0dd323c97a",
+        "at": "2026-11-19T17:31:06.246Z",
+        "actor": "c5f185ce-ee56-439d-bf01-52703d9bf3c5",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "f3255db5-597e-44a6-a7cc-fc4cce502cd6",
+        "at": "2026-11-19T17:31:06.584Z",
+        "actor": "b8de06e1-0b8e-4463-a462-ee729e1b627c",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "60997343-007a-4127-893b-bcd3457c67ac",
+        "at": "2026-11-19T17:31:06.883Z",
+        "actor": "5a6bc085-756b-43e8-835b-548508c4dd84",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "863ac4d8-718e-4b02-ab97-7b92c4d6e530",
+        "at": "2026-11-19T17:31:07.184Z",
+        "actor": "c24f67a6-54e5-437b-af6c-3ac4d9b1b142",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "c1212640-c9ed-4e00-a26e-d1a67910826a",
+        "at": "2026-11-19T17:31:07.493Z",
+        "actor": "d5dca2db-ce3f-4fe4-a672-c61c835fed7b",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "a2361dd5-640d-4d48-ac82-dfd142852e6d",
+        "at": "2026-11-19T17:31:08.038Z",
+        "actor": "4a38cf15-9c65-447a-b594-661579d6f56d",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3ea4b2b7-fa2f-4091-afcc-adfe7a0af41f",
+        "at": "2026-11-19T17:31:08.348Z",
+        "actor": "d041d58f-bac5-4632-acf8-e89e68364af4",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "287238f7-8149-4678-890a-574b92ec3473",
+        "at": "2026-11-19T17:31:08.834Z",
+        "actor": "c932fc78-c69e-4322-917a-a9bcd25d2ba1",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "f07aac76-7ecc-4195-835b-d6c260a7fee4",
+        "at": "2026-11-19T17:31:08.834Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      },
+      {
+        "id": "bd52f976-4ba0-4bad-a6ac-0957a36cf81b",
+        "at": "2026-11-19T17:33:00.598Z",
+        "actor": "0521f043-f601-4e1c-a7b5-05fb88c20b81",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "c42dc9b2-c375-475b-b352-7bd0873b52db",
+        "participantId": "0521f043-f601-4e1c-a7b5-05fb88c20b81",
+        "at": "2026-11-19T17:33:00.598Z",
+        "input": {
+          "instrumentVersion": "DSR-1.1-NATURALISTICO",
+          "answers": [
+            null,
+            null,
+            null,
+            null,
+            "N/A",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "open": [
+            "",
+            "",
+            "",
+            "[SINTÉTICO] Teste de registro da A4 adaptada; não é resposta científica."
+          ],
+          "consent": true,
+          "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+          "baseInstrumentVersion": "DSR-1.0-2026-11-16"
+        },
+        "applicationContext": {
+          "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+          "baseInstrumentVersion": "DSR-1.0-2026-11-16",
+          "status": "PROPOSTA_SUJEITA_A_REVISAO_E_PRE_TESTE",
+          "rounds": 1,
+          "processResult": "CONSENSUS",
+          "closedAt": "2026-11-19T17:31:08.834Z",
+          "proposalVersions": 1,
+          "objectionsRecorded": 0,
+          "analysesRecorded": 0,
+          "synthesesRecorded": 0
+        }
+      }
+    ]
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 1,
+      "deliberationMs": 4626,
+      "repeatedObjections": [],
+      "votes": 10,
+      "objections": 0,
+      "distinctObjectionsByRound": 0
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 10,
+    "received": 1,
+    "nonrespondents": 9,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 1,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 3,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 1,
+        "missing": 3,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 4,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 4,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 4,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 3,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "groups": [
+      {
+        "instrumentVersion": "DSR-1.1-NATURALISTICO",
+        "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+        "rounds": 1,
+        "processResult": "CONSENSUS",
+        "expected": 10,
+        "received": 1,
+        "nonrespondents": 9,
+        "items": [
+          {
+            "item": 1,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 2,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 3,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 4,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 5,
+            "n": 0,
+            "na": 1,
+            "missing": 0,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 6,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 7,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 8,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 9,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 10,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 11,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 12,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 13,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 14,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 15,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 16,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 17,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 18,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 19,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 20,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 21,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 22,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          }
+        ],
+        "dimensions": [
+          {
+            "name": "Utilidade percebida",
+            "n": 0,
+            "na": 0,
+            "missing": 3,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Eficácia na construção de consenso",
+            "n": 0,
+            "na": 1,
+            "missing": 3,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Qualidade da IA",
+            "n": 0,
+            "na": 0,
+            "missing": 4,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Transparência e confiança",
+            "n": 0,
+            "na": 0,
+            "missing": 4,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Usabilidade",
+            "n": 0,
+            "na": 0,
+            "missing": 4,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Adoção e aplicabilidade",
+            "n": 0,
+            "na": 0,
+            "missing": 3,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          }
+        ]
+      }
+    ],
+    "mixedVersions": false,
+    "pooledSummary": "UMA_VERSAO",
+    "denominator": "Frequências e médias usam somente respostas individuais enviadas; n inclui apenas notas 1–5. N/A, itens ausentes e participantes não respondentes são separados. Dimensões agrupam respostas a itens, não um escore validado.",
+    "openResponses": [
+      {
+        "alias": "P01",
+        "instrumentVersion": "DSR-1.1-NATURALISTICO",
+        "questions": [
+          "Qual foi a principal contribuição do sistema para a tomada de decisão?",
+          "Em que momento a IA interpretou inadequadamente uma proposta ou objeção?",
+          "Você percebeu favorecimento de alguma posição? Descreva.",
+          "Que funcionalidade deveria ser modificada ou acrescentada para usos futuros?"
+        ],
+        "answers": [
+          "",
+          "",
+          "",
+          "[SINTÉTICO] Teste de registro da A4 adaptada; não é resposta científica."
+        ],
+        "applicationContext": {
+          "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+          "baseInstrumentVersion": "DSR-1.0-2026-11-16",
+          "status": "PROPOSTA_SUJEITA_A_REVISAO_E_PRE_TESTE",
+          "rounds": 1,
+          "processResult": "CONSENSUS",
+          "closedAt": "2026-11-19T17:31:08.834Z",
+          "proposalVersions": 1,
+          "objectionsRecorded": 0,
+          "analysesRecorded": 0,
+          "synthesesRecorded": 0
+        }
+      }
+    ],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

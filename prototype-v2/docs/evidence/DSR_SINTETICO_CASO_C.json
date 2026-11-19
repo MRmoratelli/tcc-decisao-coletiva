@@ -1,0 +1,1024 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-19T17:33:49.016Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO DSR] Uma rodada sem consenso",
+      "problem": "Confirmar tecnicamente a liberação do questionário depois de encerramento legítimo.",
+      "decision": "Registrar aceitação explícita de uma proposta técnica fictícia.",
+      "goals": "Testar fluxo e exportação, sem participantes reais.",
+      "alternatives": "Encerrar com consenso ou sem consenso.",
+      "constraints": "Dados exclusivamente sintéticos; não é avaliação científica.",
+      "successCriteria": "Não criar segunda rodada artificial.",
+      "context": "ENSAIO TÉCNICO SINTÉTICO. Não pertence ao grupo real do churrasco.",
+      "text": "[SINTÉTICO] Encerrar após manifestação explícita das dez identidades fictícias e disponibilizar a variante pós-sessão."
+    },
+    "decision": {
+      "id": "cc941928-4323-4373-b96c-979aaa062a9e",
+      "originId": "cc941928-4323-4373-b96c-979aaa062a9e",
+      "title": "[SINTÉTICO DSR] Uma rodada sem consenso",
+      "status": "CLOSED_WITHOUT_CONSENSUS",
+      "createdAt": "2026-11-19T17:33:48.084Z",
+      "closedAt": "2026-11-19T17:33:48.401Z",
+      "closureReason": "[SINTÉTICO] Encerramento legítimo sem obter acordo; não criar rodada artificial."
+    },
+    "participants": [
+      {
+        "id": "d210679d-0149-43d6-a44e-3f84ef7c196c",
+        "alias": "P01"
+      },
+      {
+        "id": "023b0a42-cfb8-45ad-b4c8-35ae7dcf3bda",
+        "alias": "P02"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "b1cfc8ff-14cd-401b-b1f3-80511ed6598e",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO DSR] Uma rodada sem consenso",
+          "problem": "Confirmar tecnicamente a liberação do questionário depois de encerramento legítimo.",
+          "decision": "Registrar aceitação explícita de uma proposta técnica fictícia.",
+          "goals": "Testar fluxo e exportação, sem participantes reais.",
+          "alternatives": "Encerrar com consenso ou sem consenso.",
+          "constraints": "Dados exclusivamente sintéticos; não é avaliação científica.",
+          "successCriteria": "Não criar segunda rodada artificial.",
+          "context": "ENSAIO TÉCNICO SINTÉTICO. Não pertence ao grupo real do churrasco.",
+          "text": "[SINTÉTICO] Encerrar após manifestação explícita das dez identidades fictícias e disponibilizar a variante pós-sessão."
+        },
+        "createdAt": "2026-11-19T17:33:48.084Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.1-factual-context",
+          "model": "none",
+          "reason": "Ensaio técnico autorizado, sem chamadas externas."
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "68f3202d-79ed-4a49-8275-80bc480ba1b1",
+        "number": 1,
+        "proposalId": "b1cfc8ff-14cd-401b-b1f3-80511ed6598e",
+        "status": "CLOSED",
+        "openedAt": "2026-11-19T17:33:48.084Z",
+        "closedAt": "2026-11-19T17:33:48.401Z"
+      }
+    ],
+    "factualChecks": [],
+    "votes": [],
+    "contributions": [],
+    "analyses": [],
+    "syntheses": [],
+    "contests": [],
+    "events": [
+      {
+        "id": "e46ef64f-2a3b-41f6-b185-b1e1133783d3",
+        "at": "2026-11-19T17:33:48.084Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "9c60e39f-57d3-48af-ba81-7aadab808dbf",
+        "at": "2026-11-19T17:33:48.401Z",
+        "actor": "moderator",
+        "type": "CLOSED_WITHOUT_CONSENSUS",
+        "detail": "[SINTÉTICO] Encerramento legítimo sem obter acordo; não criar rodada artificial."
+      },
+      {
+        "id": "f4f5cb91-0448-46f4-ac79-eb418a7a68f7",
+        "at": "2026-11-19T17:33:48.707Z",
+        "actor": "d210679d-0149-43d6-a44e-3f84ef7c196c",
+        "type": "DSR_SUBMITTED",
+        "detail": ""
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1e55727a-7f83-4ad7-bd0f-d270e3cac6cc",
+        "participantId": "d210679d-0149-43d6-a44e-3f84ef7c196c",
+        "at": "2026-11-19T17:33:48.706Z",
+        "input": {
+          "instrumentVersion": "DSR-1.1-NATURALISTICO",
+          "answers": [
+            null,
+            null,
+            null,
+            null,
+            "N/A",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "open": [
+            "[SINTÉTICO] Ensaio técnico.",
+            "",
+            "",
+            ""
+          ],
+          "consent": true,
+          "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+          "baseInstrumentVersion": "DSR-1.0-2026-11-16"
+        },
+        "applicationContext": {
+          "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+          "baseInstrumentVersion": "DSR-1.0-2026-11-16",
+          "status": "PROPOSTA_SUJEITA_A_REVISAO_E_PRE_TESTE",
+          "rounds": 1,
+          "processResult": "CLOSED_WITHOUT_CONSENSUS",
+          "closedAt": "2026-11-19T17:33:48.401Z",
+          "proposalVersions": 1,
+          "objectionsRecorded": 0,
+          "analysesRecorded": 0,
+          "synthesesRecorded": 0
+        }
+      }
+    ]
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": false,
+      "rounds": 1,
+      "deliberationMs": 317,
+      "repeatedObjections": [],
+      "votes": 0,
+      "objections": 0,
+      "distinctObjectionsByRound": 0
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 2,
+    "received": 1,
+    "nonrespondents": 1,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 1,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 1,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 3,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 1,
+        "missing": 3,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 4,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 4,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 4,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 3,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "groups": [
+      {
+        "instrumentVersion": "DSR-1.1-NATURALISTICO",
+        "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+        "rounds": 1,
+        "processResult": "CLOSED_WITHOUT_CONSENSUS",
+        "expected": 2,
+        "received": 1,
+        "nonrespondents": 1,
+        "items": [
+          {
+            "item": 1,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 2,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 3,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 4,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 5,
+            "n": 0,
+            "na": 1,
+            "missing": 0,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 6,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 7,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 8,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 9,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 10,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 11,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 12,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 13,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 14,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 15,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 16,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 17,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 18,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 19,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 20,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 21,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "item": 22,
+            "n": 0,
+            "na": 0,
+            "missing": 1,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          }
+        ],
+        "dimensions": [
+          {
+            "name": "Utilidade percebida",
+            "n": 0,
+            "na": 0,
+            "missing": 3,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Eficácia na construção de consenso",
+            "n": 0,
+            "na": 1,
+            "missing": 3,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Qualidade da IA",
+            "n": 0,
+            "na": 0,
+            "missing": 4,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Transparência e confiança",
+            "n": 0,
+            "na": 0,
+            "missing": 4,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Usabilidade",
+            "n": 0,
+            "na": 0,
+            "missing": 4,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          },
+          {
+            "name": "Adoção e aplicabilidade",
+            "n": 0,
+            "na": 0,
+            "missing": 3,
+            "frequencies": {
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0,
+              "5": 0
+            },
+            "mean": null
+          }
+        ]
+      }
+    ],
+    "mixedVersions": false,
+    "pooledSummary": "UMA_VERSAO",
+    "denominator": "Frequências e médias usam somente respostas individuais enviadas; n inclui apenas notas 1–5. N/A, itens ausentes e participantes não respondentes são separados. Dimensões agrupam respostas a itens, não um escore validado.",
+    "openResponses": [
+      {
+        "alias": "P01",
+        "instrumentVersion": "DSR-1.1-NATURALISTICO",
+        "questions": [
+          "Qual foi a principal contribuição do sistema para a tomada de decisão?",
+          "Em que momento a IA interpretou inadequadamente uma proposta ou objeção?",
+          "Você percebeu favorecimento de alguma posição? Descreva.",
+          "Que funcionalidade deveria ser modificada ou acrescentada para usos futuros?"
+        ],
+        "answers": [
+          "[SINTÉTICO] Ensaio técnico.",
+          "",
+          "",
+          ""
+        ],
+        "applicationContext": {
+          "applicationVariant": "POS_ENCERRAMENTO_NATURALISTICO",
+          "baseInstrumentVersion": "DSR-1.0-2026-11-16",
+          "status": "PROPOSTA_SUJEITA_A_REVISAO_E_PRE_TESTE",
+          "rounds": 1,
+          "processResult": "CLOSED_WITHOUT_CONSENSUS",
+          "closedAt": "2026-11-19T17:33:48.401Z",
+          "proposalVersions": 1,
+          "objectionsRecorded": 0,
+          "analysesRecorded": 0,
+          "synthesesRecorded": 0
+        }
+      }
+    ],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

@@ -145,3 +145,7 @@ Apresentar habilitados, formulários enviados e não respondentes; por item, fre
 - VENABLE, J.; PRIES-HEJE, J.; BASKERVILLE, R. FEDS: a Framework for Evaluation in Design Science Research. European Journal of Information Systems, v. 25, p. 77–89, 2016. DOI: https://doi.org/10.1057/ejis.2014.36. Registro e acesso pelo portal dos autores: https://forskning.ruc.dk/da/publications/feds-a-framework-for-evaluation-in-design-science-research/.
 - AAPOR. Best Practices for Survey Research. https://aapor.org/standards-and-ethics/best-practices/ (desenho de perguntas, testes e relato).
 - U.S. CENSUS BUREAU. Statistical Quality Standards, revisão de 29 set. 2026. A2-3.3 (pré-teste), A2-3.4 (verificação) e A2-4 (documentação): https://www2.census.gov/about/policies/quality/quality-standards.pdf.
+
+## Validação técnica de implementação
+
+Foram aprovados 74 testes, TypeScript, build e CI do código 98781dca1a4ca58a548c8d4b6f4be8bcb8432bcf. A demonstração remota registrou a variante após consenso e encerramento sem consenso em uma rodada; versões 1.0/1.1 e respostas foram preservadas na importação. [Evidências](evidence/LIMITES_DSR_VALIDACAO.json). O pré-teste com potenciais respondentes e a revisão metodológica continuam anteriores à coleta científica; não são substituídos por esses testes sintéticos.

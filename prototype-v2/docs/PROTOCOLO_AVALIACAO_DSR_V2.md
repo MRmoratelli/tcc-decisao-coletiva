@@ -171,6 +171,10 @@ Fontes: Hevner et al. (2004); Peffers et al. (2007); Venable, Pries-Heje e Baske
 
 Referências adicionais da adaptação: VENABLE, J.; PRIES-HEJE, J.; BASKERVILLE, R. FEDS: a Framework for Evaluation in Design Science Research. European Journal of Information Systems, v. 25, p. 77–89, 2016. DOI: 10.1057/ejis.2014.36. AAPOR. Best Practices for Survey Research. Disponível em: https://aapor.org/standards-and-ethics/best-practices/. U.S. CENSUS BUREAU. Statistical Quality Standards: A2, Developing Data Collection Instruments and Supporting Materials, especialmente A2-3.3 e A2-4. Revisão consultada de 29 set. 2026. Disponível em: https://www2.census.gov/about/policies/quality/quality-standards.pdf. Acesso às fontes em: 19 nov. 2026.
 
+## 7 EVIDÊNCIA TÉCNICA DA VERSÃO DE APLICAÇÃO
+
+Código 98781dca1a4ca58a548c8d4b6f4be8bcb8432bcf, 74 testes e CI aprovados; variante demonstrada em sessão sintética encerrada na rodada 1 com consenso e sem consenso. Exportação e importação preservaram respostas e versões. Resultados exclusivamente técnicos em evidence/LIMITES_DSR_VALIDACAO.json, separados do pré-teste com respondentes e da avaliação científica.
+
 # ANEXO A QUESTIONÁRIO ORIGINAL DO ORIENTADOR
 
 Questionário de Avaliação de Artefato. Design Science Research (DSR) | Sistema de Decisão por Consenso Assistido por IA. Versão 1.0. Instrumento preliminar para avaliação com usuários. 16/11/2026.
