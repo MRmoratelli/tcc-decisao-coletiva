@@ -1,6 +1,7 @@
 import { randomUUID, createHash } from 'node:crypto';
 import { z } from 'zod';
 import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, EvaluationSchema, ChoiceSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult, type EvaluationInput, type Choice } from '../shared/contracts.js';
+import { FactualCheckSchema,FactualReportSchema,soundEvidence,type FactualReport } from '../shared/factual.js';
 import { dimensions } from '../shared/instrument.js';
 
 export class DomainError extends Error { constructor(message:string, public status=400){super(message);} }
@@ -10,9 +11,9 @@ const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.null
 const Round=z.object({id,number:z.number().int().positive(),proposalId:id,status:z.enum(['OPEN','CLOSED']),openedAt:date,closedAt:date.nullable()});
 const Vote=z.object({id,participantId:id,roundId:id,proposalId:id,choice:ChoiceSchema,justification:z.string().max(5000),createdAt:date});
 const Contribution=z.object({id,participantId:id,roundId:id,proposalId:id,originalText:z.string().min(1).max(5000),text:z.string().min(1).max(5000),review:ReviewRecord,contest:z.string().max(2000),createdAt:date});
-const Analysis=z.object({id,proposalId:id,roundId:id,sourceFingerprint:z.string(),result:AssessmentSchema,promptVersion:z.string(),model:z.string(),createdAt:date});
+const Analysis=z.object({id,proposalId:id,roundId:id,sourceFingerprint:z.string(),factualCheckIds:z.array(id).default([]),result:AssessmentSchema,promptVersion:z.string(),model:z.string(),createdAt:date});
 export const CoverageSchema=z.array(z.object({voteId:id,status:z.enum(['ATENDIDA','PARCIAL','NAO_ATENDIDA']),faithful:z.boolean().nullable(),note:z.string().max(2000)})).max(30);
-const Synthesis=z.object({id,proposalId:id,roundId:id,analysisId:id,result:SynthesisSchema,promptVersion:z.string(),model:z.string(),createdAt:date,publishedProposalId:id.nullable(),humanCoverage:CoverageSchema});
+const Synthesis=z.object({id,proposalId:id,roundId:id,analysisId:id,factualCheckIds:z.array(id).default([]),result:SynthesisSchema,promptVersion:z.string(),model:z.string(),createdAt:date,publishedProposalId:id.nullable(),humanCoverage:CoverageSchema});
 const Event=z.object({id,at:date,actor:z.string(),type:z.string(),detail:z.string().max(5000)});
 const Evaluation=z.object({id,participantId:id,at:date,input:EvaluationSchema});
 const Contest=z.object({id,participantId:id,targetId:id,text:z.string().min(1).max(2000),at:date});
@@ -20,7 +21,7 @@ export const StateSchema=z.object({
  schemaVersion:z.literal(2),initialDraft:ProposalSchema,decision:z.object({id,originId:id,title:z.string(),status:z.enum(['OPEN','CONSENSUS','CLOSED_WITHOUT_CONSENSUS']),createdAt:date,closedAt:date.nullable(),closureReason:z.string()}),
  participants:z.array(z.object({id,alias:z.string().regex(/^P\d{2}$/)})).min(2).max(30),
  proposals:z.array(Proposal).min(1),rounds:z.array(Round).min(1),
- votes:z.array(Vote),contributions:z.array(Contribution),analyses:z.array(Analysis),syntheses:z.array(Synthesis),contests:z.array(Contest),events:z.array(Event),evaluations:z.array(Evaluation),
+ factualChecks:z.array(FactualCheckSchema).max(40).default([]),votes:z.array(Vote),contributions:z.array(Contribution),analyses:z.array(Analysis),syntheses:z.array(Synthesis),contests:z.array(Contest),events:z.array(Event),evaluations:z.array(Evaluation),
 });
 export type State=z.infer<typeof StateSchema>;
 export type ReviewRecordType=z.infer<typeof ReviewRecord>;
@@ -40,7 +41,7 @@ export function createState(roomId:string,proposal:ProposalContent,participants:
  schemaVersion:2,initialDraft,decision:{id:roomId,originId:roomId,title:proposal.title,status:'OPEN',createdAt:at,closedAt:null,closureReason:''},participants,
  proposals:[{id:pid,version:1,parentId:null,content:proposal,createdAt:at,approvedBy:'moderator',review}],
  rounds:[{id:randomUUID(),number:1,proposalId:pid,status:'OPEN',openedAt:at,closedAt:null}],
- votes:[],contributions:[],analyses:[],syntheses:[],contests:[],events:[],evaluations:[]};
+ factualChecks:[],votes:[],contributions:[],analyses:[],syntheses:[],contests:[],events:[],evaluations:[]};
  event(s,'moderator','ROOM_CREATED','Proposta inicial confirmada por pessoa responsável.');return s;
 }
 function open(s:State){if(s.decision.status!=='OPEN')throw new DomainError('Processo encerrado.',409);}
@@ -65,9 +66,9 @@ export function assertAssessment(s:State,result:Assessment){
  if(ids.length!==objections.length||new Set(ids).size!==ids.length||objections.some(v=>!ids.includes(v.id)))throw new DomainError('Serviço de IA omitiu ou inventou objeções.',502);
  for(const a of result.individualAssessments){const v=objections.find(v=>v.id===a.voteId)!;if(!a.quotedExcerpt.trim()||!v.justification.includes(a.quotedExcerpt))throw new DomainError('Serviço de IA retornou citação não presente na objeção.',502);}
 }
-export function sourceFingerprint(s:State){const roundId=currentRound(s).id;return createHash('sha256').update(JSON.stringify({votes:latestVotes(s),contributions:s.contributions.filter(c=>c.roundId===roundId)})).digest('hex');}
+export function sourceFingerprint(s:State){const roundId=currentRound(s).id;return createHash('sha256').update(JSON.stringify({votes:latestVotes(s),contributions:s.contributions.filter(c=>c.roundId===roundId),factualChecks:s.factualChecks.filter(c=>c.roundId===roundId).map(c=>c.id)})).digest('hex');}
 export function addAnalysis(s:State,result:Assessment,model:string,promptVersion:string){
- open(s);assertAssessment(s,result);const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
+ open(s);assertAssessment(s,result);const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),factualCheckIds:factualContext(s).map(f=>f.id),result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
 }
 export function assertSynthesis(s:State,result:SynthesisResult){
  const ids=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
@@ -80,7 +81,7 @@ export function addSynthesis(s:State,analysisId:string,result:SynthesisResult,mo
  // Análises anteriores a um novo voto não podem fundamentar uma síntese.
  if(a.sourceFingerprint!==sourceFingerprint(s))throw new DomainError('Novas manifestações após a análise. Analise novamente.',409);
  assertAssessment(s,a.result);assertSynthesis(s,result);
- const entry={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,analysisId,result,model,promptVersion,createdAt:now(),publishedProposalId:null,humanCoverage:[]};
+ const entry={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,analysisId,factualCheckIds:a.factualCheckIds,result,model,promptVersion,createdAt:now(),publishedProposalId:null,humanCoverage:[]};
  s.syntheses.push(entry);event(s,'moderator','SYNTHESIS_DRAFTED');return entry;
 }
 export function publish(s:State,content:ProposalContent,sourceId:string,reason:string,synthesisId?:string,coverage:z.infer<typeof CoverageSchema>=[]){
@@ -101,7 +102,7 @@ export function closeWithoutConsensus(s:State,reason:string){open(s);if(!reason.
 export function contest(s:State,pid:string,targetId:string,text:string){
  participant(s,pid);
  const own=s.contributions.some(c=>c.id===targetId&&c.participantId===pid);
- const accessible=s.analyses.some(a=>a.id===targetId)||s.syntheses.some(a=>a.id===targetId);
+ const accessible=s.analyses.some(a=>a.id===targetId)||s.syntheses.some(a=>a.id===targetId)||s.factualChecks.some(f=>f.id===targetId&&(f.participantId===pid||s.votes.some(v=>v.roundId===f.roundId&&v.participantId===pid)||s.contributions.some(c=>c.roundId===f.roundId&&c.participantId===pid)));
  if(!own&&!accessible)throw new DomainError('Parecer não acessível.',403);
  s.contests.push({id:randomUUID(),participantId:pid,targetId,text,at:now()});event(s,pid,'AI_CONTESTED',text);
 }
@@ -134,7 +135,7 @@ export function statistics(s:State){
 export function validateState(input:unknown):State{
  const s=StateSchema.parse(input);
  const unique=(xs:string[])=>new Set(xs).size===xs.length;
- const allIds=[...s.proposals,...s.rounds,...s.votes,...s.contributions,...s.analyses,...s.syntheses,...s.contests,...s.events,...s.evaluations].map(x=>x.id);
+ const allIds=[...s.proposals,...s.rounds,...s.votes,...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks,...s.contests,...s.events,...s.evaluations].map(x=>x.id);
  if(!unique(allIds)||!unique(s.participants.map(p=>p.id))||!unique(s.participants.map(p=>p.alias))||!unique(s.evaluations.map(e=>e.participantId)))throw new DomainError('Identificadores duplicados no arquivo.');
  const pids=new Set(s.participants.map(p=>p.id));
  for(let i=0;i<s.proposals.length;i++){const p=s.proposals[i];if(p.version!==i+1||p.parentId!==(i?s.proposals[i-1].id:null))throw new DomainError('Cadeia de propostas inválida.');}
@@ -144,7 +145,9 @@ export function validateState(input:unknown):State{
  if(s.votes.some(v=>v.choice==='REJEITO'&&!v.justification.trim()))throw new DomainError('Rejeição sem justificativa.');
  for(const a of s.analyses){const r=s.rounds.find(r=>r.id===a.roundId&&r.proposalId===a.proposalId);if(!r||a.result.individualAssessments.some(x=>!s.votes.some(v=>v.id===x.voteId&&v.roundId===r.id&&v.choice==='REJEITO')))throw new DomainError('Análise com vínculo inválido.');}
  for(const x of s.syntheses){if(!s.analyses.some(a=>a.id===x.analysisId&&a.roundId===x.roundId&&a.proposalId===x.proposalId)||x.publishedProposalId&&!s.proposals.some(p=>p.id===x.publishedProposalId&&p.parentId===x.proposalId))throw new DomainError('Síntese com vínculo inválido.');const ids=[...x.result.addressedObjections,...x.result.partiallyAddressedObjections,...x.result.unresolvedObjections,...x.result.changeLog.flatMap(c=>c.voteIds),...x.humanCoverage.map(c=>c.voteId)];if(ids.some(id=>!s.votes.some(v=>v.id===id&&v.roundId===x.roundId&&v.choice==='REJEITO')))throw new DomainError('Vínculo de cobertura inválido.');}
- for(const c of s.contests){if(!pids.has(c.participantId)||![...s.contributions,...s.analyses,...s.syntheses].some(x=>x.id===c.targetId))throw new DomainError('Contestação inválida.');}
+ for(const f of s.factualChecks){if(f.participantId!==null&&!pids.has(f.participantId)||!s.rounds.some(r=>r.id===f.roundId&&r.proposalId===f.proposalId)||!soundEvidence(f))throw new DomainError('Evidência factual ou vínculo inválido.');}
+ for(const a of [...s.analyses,...s.syntheses])if(a.factualCheckIds.some(id=>!s.factualChecks.some(f=>f.id===id&&f.proposalId===a.proposalId)))throw new DomainError('Referência factual inválida.');
+ for(const c of s.contests){if(!pids.has(c.participantId)||![...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks].some(x=>x.id===c.targetId))throw new DomainError('Contestação inválida.');}
  if(s.evaluations.some(e=>!pids.has(e.participantId))||s.evaluations.length&&(s.decision.status==='OPEN'||s.rounds.length<2))throw new DomainError('Avaliação incompatível com o processo.');
  if(s.decision.status==='CONSENSUS'&&!unanimous(s)||s.decision.status!=='CONSENSUS'&&unanimous(s))throw new DomainError('Resultado de consenso incompatível com os votos.');
  if((s.decision.status==='OPEN')!==(s.decision.closedAt===null)||s.decision.status!=='OPEN'&&!s.decision.closureReason.trim())throw new DomainError('Encerramento inválido.');
@@ -152,3 +155,14 @@ export function validateState(input:unknown):State{
 }
 export function exportState(s:State){return {format:'dc2-consensus',version:2,exportedAt:now(),state:s,metrics:metrics(s),evaluation:statistics(s),provenance:'Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa.'};}
 export const ImportSchema=z.object({format:z.literal('dc2-consensus'),version:z.literal(2),state:StateSchema});
+
+export function addFactualCheck(s:State,report:FactualReport,participantId:string|null){
+ open(s);if(participantId)participant(s,participantId);
+ if(s.factualChecks.length>=40)throw new DomainError('Limite de verificações desta sala atingido.',429);
+ FactualReportSchema.parse(report);if(!soundEvidence(report))throw new DomainError('Evidências sem suporte rastreável.',502);
+ const entry={...report,id:randomUUID(),participantId,proposalId:currentProposal(s).id,roundId:currentRound(s).id};
+ s.factualChecks.push(entry);event(s,participantId??'moderator','FACTUAL_CHECK_RECORDED',entry.id+'; '+report.version+'; '+report.model);return entry;
+}
+export function factualContext(s:State){
+ return s.factualChecks.filter(f=>f.proposalId===currentProposal(s).id&&f.provenance!=='IMPORTED_UNAUTHENTICATED').slice(-12).map(f=>({id:f.id,version:f.version,queriedAt:f.createdAt,contested:s.contests.some(c=>c.targetId===f.id),contests:s.contests.filter(c=>c.targetId===f.id).map(c=>({text:c.text,at:c.at})),claims:f.claims.map(c=>({claim:c.claim.text,status:c.status,interpretation:c.explanation,sources:c.sources,supports:c.supports,limitations:c.limitations}))}));
+}

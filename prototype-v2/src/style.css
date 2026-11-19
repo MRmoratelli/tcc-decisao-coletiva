@@ -33,3 +33,12 @@ details{margin:18px 0}summary{cursor:pointer;font-weight:650}fieldset{border:1px
 dt{font-weight:700}dd{margin:6px 0 15px;white-space:pre-wrap}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
 .preserve{white-space:pre-wrap}button:focus-visible,summary:focus-visible{outline:3px solid #138572;outline-offset:3px}
 .workspace section{margin-top:24px}.workspace label{margin:16px 0}.workspace hr{margin:28px 0}.evaluation{padding-top:25px;border-top:1px solid #d7e9df}
+
+.factual-panel,.factual-result,.factual-claim{min-width:0;overflow-wrap:anywhere}
+.factual-panel details{margin-top:1rem;border-top:1px solid #cdd7d9;padding-top:.7rem}
+.factual-panel summary{cursor:pointer;font-weight:600;overflow-wrap:anywhere}
+.factual-claim{border-left:3px solid #a5bdb8;padding-left:1rem;margin:1.2rem 0}
+.factual-claim h5{font-size:1rem;margin:1rem 0 .4rem}
+.source-url{overflow-wrap:anywhere;font-size:.85rem;margin:.2rem 0}
+.search-suggestions{display:block;width:100%;box-sizing:border-box;border:0;height:230px;background:transparent;margin:.8rem 0}
+@media(max-width:600px){.search-suggestions{height:300px}.factual-claim{padding-left:.6rem}.factual-panel{padding:.8rem}}

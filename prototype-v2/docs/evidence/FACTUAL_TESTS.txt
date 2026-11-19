@@ -1,0 +1,76 @@
+TESTE TÉCNICO SINTÉTICO — nenhuma chamada externa nesta suíte.
+2026-11-19T03:22:56.983Z
+✔ 02 parecer de proposta validado e consultivo, sem alegar fonte externa (8.201ms)
+✔ 06 analyzeContribution identifica alegação sem checagem factual (1.7109ms)
+✔ 17 adaptador rejeita JSON inválido, campos ausentes, fatos falsamente confirmados e erro de transporte (19.4598ms)
+✔ 12-13 contratos de análise e síntese passam por schema (10.6611ms)
+✔ integração: códigos HTTP são categorizados com falhas simuladas sem expor mensagem privada (5.2239ms)
+✔ Gramática simplificada preserva limites completos do contrato após geração (2.2499ms)
+▶ Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três participantes
+  ✔ 03 criação com análise inicial e autenticação; recibo adulterado recusado (379.5633ms)
+  ✔ 04-05 credenciais, permissões, origem e isolamento entre salas (152.4947ms)
+  ✔ 06-08 parecer consultivo e contestação; rejeição exige justificativa (335.1038ms)
+  ✔ 09 abstenção e ausência mantêm processo aberto (213.1057ms)
+  ✔ 12 análise de objeções e contestação posterior preservadas (135.5237ms)
+  ✔ 13 síntese conciliadora é rascunho e mantém impasse (95.9467ms)
+  ✔ 14 revisão humana obrigatória antes de publicar V2 (104.9354ms)
+  ✔ 10-11 novas manifestações por versão; recibo antigo e revisão concorrente recusados (149.3711ms)
+  ✔ 15 consenso somente com os três aceites explícitos na V2 (159.4599ms)
+  ✔ 20 DSR individual pós-sessão; ausência e N/A distintos; exportação restrita (93.8442ms)
+  ✔ 18 exportação JSON não inclui segredos e preserva o histórico (17.875ms)
+  ✔ 19 importação recupera dados em sala nova, sem sobrescrever origem; formato inválido rejeitado (107.6973ms)
+AI failure {"code":"TRANSPORT","status":null,"model":"synthetic-test-only","promptVersion":"consensus-consultive-v2.1-factual-context"}
+AI failure {"code":"TRANSPORT","status":null,"model":"synthetic-test-only","promptVersion":"consensus-consultive-v2.1-factual-context"}
+  ✔ 17 falhas Gemini são auditadas e não bloqueiam manifestações ou revisões humanas (398.8919ms)
+  ✔ 16 encerramento sem consenso independente da IA e sem alterar outra sala (1248.6594ms)
+  ✔ persistência append-only, migração idempotente e nenhuma alteração de dados históricos (108.8354ms)
+✔ Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três participantes (3711.4214ms)
+✔ indicadores de coorte usam apenas processos concluídos e deduplicam restaurações (15.149ms)
+✔ deploy: porta da plataforma, bind público e origem HTTPS de mesma origem (16.0674ms)
+✔ deploy: frontend e SPA são servidos; API ausente continua JSON 404 (181.0889ms)
+✔ 01 proposta genérica e campos opcionais; sem orçamento nem taxonomia (1.6661ms)
+✔ 08-09 rejeição fundamentada; abstenção e silêncio não são aceite (2.9723ms)
+✔ 10-11 histórico de versões; nova versão exige novas posições (0.6163ms)
+✔ 15 aceitação explícita unânime na mesma versão encerra; IA não declara (0.3631ms)
+✔ 16 encerramento sem consenso requer razão e não força aceite (0.6562ms)
+✔ 12-14 análise e síntese cobrem todas objeções; revisão humana explícita (2.8061ms)
+✔ 07 contribuições originais e contestações são preservadas (0.8227ms)
+✔ 18-19 JSON versionado valida encadeamento, participantes e consenso (12.3527ms)
+✔ 20 instrumento integral, ausências e N/A; aplicação após duas rodadas (5.8458ms)
+✔ rascunho original, repetições e alteração após análise permanecem rastreáveis (0.9983ms)
+✔ Factual 10–14: dez identidades simultâneas, autorização, contestação, persistência, importação e consenso (5926.6961ms)
+✔ Factual 01/02: suporte favorável e contrário exige vínculos reais de metadados (fixtures) (48.9092ms)
+✔ Factual 03/07: fonte escrita pelo modelo, sem metadados, não confirma alegação (0.6353ms)
+✔ Factual 04: preferência e restrição pessoal não disparam rede nem classificação (11.8248ms)
+✔ Factual 05: evento, preço efetivo e nexo causal são resultados independentes (5.2137ms)
+✔ Factual 06: data antiga ou ausente não comprova atualidade; data não é inventada (1.0143ms)
+✔ Factual 08/09: falha, quota e desativação não viram sucesso (6.0617ms)
+✔ Factual: cache deduplica consultas simultâneas sem cruzar salas (131.9056ms)
+✔ Factual: recusas de URL interna, identificação privada e omissão das sugestões obrigatórias (8.9072ms)
+✔ Factual: plano com trecho inventado não é enviado ao mecanismo de pesquisa (2.3367ms)
+✔ Factual: preferência longa respeita os limites de armazenamento sem pesquisa (17.3818ms)
+✔ comprovante exige texto original sem modificação (5.9402ms)
+✔ comprovante recusa assinatura adulterada (0.607ms)
+✔ comprovante expirado não pode ser reutilizado (1.3877ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: proposta estruturada mantém campos opcionais e texto ao editar (44.462ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: questionário conserva 22 itens, quatro abertas e separa N/A de ausência (65.0857ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: parecer mostra incertezas e limitação factual, sem editar o texto (5.0886ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React: sala permite abstenção, parecer opcional e impede funções de moderador a participante (100.1643ms)
+✔ React: entrada preservada com fluxo de criação e login por credenciais (5.4374ms)
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+✔ React factual: fontes, incertezas e sugestões originais em iframe isolado (59.7528ms)
+✔ React factual: pesquisa exige alegação mínima e concordância, sem alterar manifestação (8.2696ms)
+ℹ tests 56
+ℹ suites 0
+ℹ pass 56
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12881.0568
