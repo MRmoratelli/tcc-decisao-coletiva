@@ -23,7 +23,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  async function analyze(){await act(async()=>{if(!consent)throw new Error('Confirme o envio do texto ao Gemini.');setReview(await post('/contribution-review',{...binding,text,consent:true}) as ReviewResult);});}
  async function send(kind:'vote'|'contribution'){
   await act(async()=>{
-   if(staleDraft)throw new Error('Confirme a reutilização do rascunho na nova rodada.');
+   if(staleDraft||draftRound.current!==p.id)throw new Error('Confirme a reutilização do rascunho na nova rodada.');
    if(text&&!review&&!bypass)throw new Error('Solicite parecer ou marque continuar sem parecer.');
    if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!text.trim()&&kind==='vote')throw new Error('Rejeição e aceite com ressalvas exigem justificativa.');
    const payload={...binding,receipt:review?.receipt,bypassReason:!review?'Autor optou por continuar sem parecer consultivo.':undefined,contest:contestText,originalText:original||text};
