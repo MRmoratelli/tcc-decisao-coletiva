@@ -124,3 +124,45 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
  });
 });
 
+
+test('Aceitação de reformulação IA preserva parecer, autoria do envio e texto original em um único voto',async()=>{
+ const room=(await post('/rooms',{proposal,participantCount:2,bypassReason:'Sala sintética para verificar reformulação.'})).data;
+ const credential=room.participants[0].credential;
+ const current=await view(room,credential),r=current.state.rounds.at(-1);
+ const input='O prazo é curto e precisamos discutir.';
+ const reviewed=await action(room,'/contribution-review',{roundId:r.id,proposalId:r.proposalId,text:input,consent:true},credential);
+ assert.equal(reviewed.status,200);assert.ok(reviewed.data.rewriteReceipt);
+ const invalid=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'ACEITO_COM_RESSALVAS',justification:reviewed.data.review.suggestedRewrite,originalText:input,receipt:reviewed.data.receipt,appliedRewrite:true},credential);
+ assert.equal(invalid.status,400);
+ const send=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'ACEITO_COM_RESSALVAS',justification:reviewed.data.review.suggestedRewrite,originalText:input,receipt:reviewed.data.rewriteReceipt,appliedRewrite:true},credential);
+ assert.equal(send.status,201,JSON.stringify(send.data));
+ const saved=await view(room);
+ assert.equal(saved.state.votes.length,1);
+ assert.equal(saved.state.contributions.length,1); // dual technical representations of ONE action
+ assert.equal(saved.state.contributions[0].originalText,input);
+ assert.equal(saved.state.contributions[0].text,reviewed.data.review.suggestedRewrite);
+ assert.equal(saved.state.contributions[0].review.status,'OK');
+ assert.equal(saved.state.contributions[0].review.appliedRewrite,true);
+});
+test('Síntese do API com vínculos errados preserva ressalvas e registra ajuste sem fabricar rejeições',async()=>{
+ const room=(await post('/rooms',{proposal,participantCount:3,bypassReason:'Sala sintética de vínculos.'})).data;
+ assert.equal((await cast(room,0,'REJEITO','Local inacessível')).status,201);
+ assert.equal((await cast(room,1,'ACEITO_COM_RESSALVAS','Alterar as bebidas')).status,201);
+ assert.equal((await cast(room,2,'ACEITO')).status,201);
+ assert.equal((await action(room,'/analyze-objections',{consent:true})).status,200);
+ const before=await view(room),analysis=before.state.analyses.at(-1);
+ const original=ai.synthesizeProposal.bind(ai);
+ ai.synthesizeProposal=async(...args)=>{const result=await original(...args);return {...result,
+  partiallyAddressedObjections:[before.state.votes[1].id],
+  changeLog:result.changeLog.map(c=>({...c,voteIds:[before.state.votes[1].id]}))};};
+ try{
+  const synth=await action(room,'/synthesize',{consent:true,analysisId:analysis.id});
+  assert.equal(synth.status,200,JSON.stringify(synth.data));
+ }finally{ai.synthesizeProposal=original;}
+ const saved=await view(room),result=saved.state.syntheses.at(-1).result;
+ assert.deepEqual(result.unresolvedObjections,[before.state.votes[0].id]);
+ assert.deepEqual(result.partiallyAddressedObjections,[]);
+ assert.ok(result.feasibilityWarnings.some((x:string)=>x.includes('AJUSTE DE VÍNCULOS')));
+ assert.ok(saved.state.events.some((x:any)=>x.type==='SYNTHESIS_LINKS_RECONCILED'));
+ assert.equal(saved.state.votes.length,3);
+});
