@@ -42,12 +42,14 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const r=currentRound(s),p=currentProposal(s),pid=identity.participantId;
   const visible=identity.role==='moderator'||s.votes.some(v=>v.roundId===r.id&&v.participantId===pid)||s.contributions.some(c=>c.roundId===r.id&&c.participantId===pid);
   const filtered:State={...s,
+   // Role projection only: persisted initial review and moderator exports stay complete.
+   proposals:s.proposals.map((p,index)=>identity.role!=='moderator'&&index===0?{...p,review:{...p.review,result:null,reason:''}}:p),
    factualChecks:s.factualChecks.filter(f=>visible||f.participantId===pid),
    votes:s.votes.filter(v=>visible||v.participantId===pid),contributions:s.contributions.filter(c=>visible||c.participantId===pid),
    analyses:visible?s.analyses:[],syntheses:visible?s.syntheses:[],contests:s.contests.filter(c=>visible||c.participantId===pid),
    events:identity.role==='moderator'?s.events:s.events.filter(e=>e.actor===pid||['PROPOSAL_PUBLISHED','CONSENSUS_RECORDED','CLOSED_WITHOUT_CONSENSUS'].includes(e.type)),
    evaluations:identity.role==='moderator'?[]:s.evaluations.filter(e=>e.participantId===pid)};
-  return {revision,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:s.proposals[0].review.result},
+  return {revision,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:identity.role==='moderator'?s.proposals[0].review.result:null},
    role:identity.role,alias:identity.alias??null,participantId:pid??null,canViewGroup:visible,state:filtered,
    positions:visible?positions(s):positions(s).filter(p=>p.id===pid),
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),

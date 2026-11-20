@@ -123,7 +123,7 @@ export default function App(){
       {session&&<section className="card room">
         <div className="row-between"><div><span className="eyebrow">Sala {session.code} · {session.view.role==='moderator'?'Moderador':session.view.alias}</span><h2>{session.view.room.topic}</h2></div><button className="secondary" onClick={refreshRoom} disabled={busy}>Atualizar</button></div>
         <div className="proposal"><h3>Proposta atual</h3><p>{session.view.room.proposal}</p></div>
-        {session.view.room.proposal_review&&<ReviewCard review={session.view.room.proposal_review} label="Parecer inicial"/>}
+        {session.view.role==='moderator'&&session.view.room.proposal_review&&<ReviewCard review={session.view.room.proposal_review} label="Parecer inicial"/>}
         <RoomWorkspace session={session} busy={busy} act={act} onRefresh={refreshRoom}/>
         <button className="text-button" onClick={()=>{setSession(null);setNotice('');}}>Sair desta sala</button>
       </section>}

@@ -31,6 +31,9 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   const created=await post('/rooms',{proposal,participantCount:3,receipt:review.data.receipt});assert.equal(created.status,201);room=created.data;assert.equal(room.participants.length,3);
   const fallback=await post('/rooms',{proposal,participantCount:2,bypassReason:'Criação deliberada sem análise.'});assert.equal(fallback.status,201);other=fallback.data;
   const state=await view(room);originalRound=state.state.rounds[0];assert.equal(state.state.proposals[0].review.status,'OK');
+  assert.deepEqual(state.room.proposal_review,review.data.review);assert.deepEqual(state.state.proposals[0].review.result,review.data.review);
+  const participant=await view(room,room.participants[0].credential);assert.equal(participant.room.proposal_review,null);assert.equal(participant.state.proposals[0].review.result,null);assert.equal(participant.state.proposals[0].review.reason,'');
+  const exported=await action(room,'/export');assert.deepEqual(exported.data.state.proposals[0].review.result,review.data.review);assert.deepEqual((await view(room)).state.proposals[0].review.result,review.data.review);
  });
  await t.test('04-05 credenciais, permissões, origem e isolamento entre salas',async()=>{
   assert.equal((await post('/rooms/'+room.code+'/view',{credential:other.participants[0].credential})).status,401);
@@ -49,6 +52,7 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   const reviewed=await action(room,'/contribution-review',{text:'O prazo precisa de revisão.',roundId:r.id,proposalId:r.proposalId,consent:true},room.participants[0].credential);assert.equal(reviewed.status,200);
   const send=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:'O prazo precisa de revisão.',originalText:'Prazo muito curto.',receipt:reviewed.data.receipt,contest:'Discordo do grau de certeza.'},room.participants[0].credential);assert.equal(send.status,201);
   const saved=await view(room);assert.equal(saved.state.contributions[0].originalText,'Prazo muito curto.');assert.equal(saved.state.contributions[0].contest,'Discordo do grau de certeza.');
+  const participating=await view(room,room.participants[0].credential);assert.equal(participating.canViewGroup,true);assert.equal(participating.state.proposals[0].review.result,null);assert.equal(participating.room.proposal_review,null);
   const hidden=await view(room,room.participants[1].credential);assert.equal(hidden.state.contributions.length,0);assert.equal(hidden.state.votes.length,0);
  });
  await t.test('09 abstenção e ausência mantêm processo aberto',async()=>{

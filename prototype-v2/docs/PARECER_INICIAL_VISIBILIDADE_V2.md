@@ -1,0 +1,9 @@
+# Parecer inicial: visibilidade por papel — 20/11/2026
+
+A revisão preliminar da proposta destina-se ao moderador. A projeção HTTP de participantes retorna null em room.proposal_review e state.proposals[0].review.result, retirando também a razão preliminar desse registro na projeção. O estado persistido não é modificado. O moderador continua recebendo a revisão integral e a exportação permanece completa e autorizada.
+
+O App também exige papel moderator para renderizar o parecer inicial, inclusive se receber payload antigo. Aprovação inicial simples não produz painel nem comparação adicional para o participante. Edições efetivas e adoção de reformulação IA permanecem identificáveis; a adoção sem edição da sugestão continua identificada como origem IA. Histórico de versões e intervenções relevantes permanece disponível. Análises e sínteses deliberativas não tiveram seus filtros alterados.
+
+Não há alteração de domínio, voto, consenso, Tavily, polling, contratos Gemini, questionário, schema ou migração. Arquivos: server/app.ts, src/App.tsx, src/components/RoomWorkspace.tsx, server/api.test.ts, src/pretest-components.test.tsx. Regressões exercitam autorização, redaction antes e depois de manifestação, exportação íntegra e retenção da revisão do moderador; React testa papel mesmo com payload legado, aprovação discreta, edição e reformulação rastreáveis. Oito testes focados locais passaram, além de TypeScript frontend/backend e build. O CI é a evidência da execução HTTP completa.
+
+A verificação funcional publicada deve usar leituras autorizadas de sala sintética existente, sem novas consultas Gemini/Tavily ou alteração de registros anteriores. A indisponibilidade 503 previamente observada na análise e síntese reais é uma limitação anterior, não solucionada nem reavaliada por esta correção de apresentação.
