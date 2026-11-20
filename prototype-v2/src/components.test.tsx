@@ -7,7 +7,7 @@ import { EvaluationForm } from './components/EvaluationForm';
 import { ReviewCard } from './components/ReviewCard';
 import { RoomWorkspace } from './components/RoomWorkspace';
 import App from './App';
-import { createState } from '../server/domain';
+import { createState,contribute,vote,currentRound } from '../server/domain';
 import { randomUUID } from 'node:crypto';
 import { proposal,review } from '../server/fixtures';
 import type { RoomView } from './api';
@@ -39,4 +39,21 @@ test('React: sala permite abstenção, parecer opcional e impede funções de mo
 });
 test('React: entrada preservada com fluxo de criação e login por credenciais',async()=>{
  let rendered!:ReactTestRenderer;await act(async()=>{rendered=create(<App/>);});const text=JSON.stringify(rendered.toJSON());assert.ok(text.includes('Criar nova sala'));assert.ok(text.includes('Entrar com código'));assert.ok(text.includes('Restaurar processo'));assert.ok(!text.includes('Svelte'));await act(async()=>rendered.unmount());
+});
+
+test('React: não exibe voto justificado e sua contribuição técnica como duas manifestações',async()=>{
+ const people=[{id:randomUUID(),alias:'P01'},{id:randomUUID(),alias:'P02'}];
+ const record={result:review,status:'OK' as const,promptVersion:'test',model:'synthetic',reason:'',appliedRewrite:true};
+ const state=createState(randomUUID(),proposal,people,record);
+ const r=currentRound(state),phrase='Manifestação única vinculada ao voto';
+ contribute(state,people[0].id,r.id,r.proposalId,phrase,'Texto original do participante',record,'');
+ vote(state,people[0].id,r.id,r.proposalId,'ACEITO_COM_RESSALVAS',phrase);
+ const view:RoomView={revision:3,room:{id:state.decision.id,code:'A123456789',topic:proposal.title,proposal:proposal.text,proposal_review:null},role:'moderator',alias:null,participantId:null,canViewGroup:true,state,positions:[{...people[0],choice:'ACEITO_COM_RESSALVAS'},{...people[1],choice:'PENDENTE'}],metrics:null,contributions:[]};
+ let rendered!:ReactTestRenderer;
+ await act(async()=>{rendered=create(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
+ const output=JSON.stringify(rendered.toJSON());
+ assert.equal((output.match(/Manifestação única vinculada ao voto/g)??[]).length,1);
+ assert.ok(output.includes('Reformulação sugerida pela IA aceita'));
+ assert.ok(output.includes('Texto original do participante'));
+ await act(async()=>rendered.unmount());
 });
