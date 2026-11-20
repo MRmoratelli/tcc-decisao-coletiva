@@ -68,7 +68,11 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   // Import is a new process with new access credentials; it never targets an existing room.
   res.status(201).json(await repo.create(currentProposal(state).content,state.participants.length,state.proposals[0].review,state));
  });
- app.post('/api/rooms/:code/view',async(req,res)=>{const i=await auth(req);const x=await repo.read(i);res.json(view(x.state,i,x.revision));});
+ app.post('/api/rooms/:code/view',async(req,res)=>{
+  const i=await auth(req),known=z.number().int().positive().optional().parse(req.body.knownRevision);
+  if(known!==undefined){const current=await repo.latestRevision(i);if(current===known){res.json({revision:current,unchanged:true});return;}}
+  const x=await repo.read(i);res.json(view(x.state,i,x.revision));
+ });
  app.post('/api/rooms/:code/fact-check',factualLimit,async(req,res)=>{
   const i=await auth(req),b=z.object({mode:ResearchModeSchema.default('VERIFY'),text:z.string().trim().min(4).max(1200),proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body);
   if(privateData(b.text))throw new DomainError('Remova dados pessoais, informações privadas e URLs. Envie somente a alegação pública mínima.');

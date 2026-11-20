@@ -25,7 +25,7 @@ function LegacyFactualResult({check}:{check:LegacyFactualCheck}){
 export function FactualResult({check}:{check:FactualCheck}){
  if(!isTavilyCheck(check))return <LegacyFactualResult check={check}/>;
  return <article className="factual-result">
-  <h4>O que foi afirmado</h4><blockquote>{check.originalText}</blockquote>
+  <h4>Consulta original deste registro</h4><blockquote>{check.originalText}</blockquote>
   <p>Modalidade: {check.modality==='RESEARCH'?'Pesquisar informações para a decisão':'Verificar afirmação'}</p>
   {check.classificationSourceCheckId&&<p className="muted">Classificação reutilizada do registro {check.classificationSourceCheckId.slice(0,8)}; não houve nova classificação nesta tentativa.</p>}
   {check.provenance==='SYNTHETIC_TEST'&&<p className="alert">Teste técnico sintético. Não representa pesquisa real nem resultado científico.</p>}
@@ -51,7 +51,7 @@ export function FactualPanel({checks,busy,isOpen,onVerify}:{checks:FactualCheck[
  const [claim,setClaim]=useState(''),[consent,setConsent]=useState(false);
  return <section className="review factual-panel" aria-label="Parecer consultivo de verificação factual">
   <h3>Pesquisa externa consultiva</h3>
-  <p>Separe um fato público de preferências e restrições pessoais. Somente a alegação abaixo será enviada ao Gemini e, quando cabível, à Tavily Search. Não inclua nomes, contatos, endereços privados ou URLs. O resultado não altera sua manifestação.</p>
+  <p>Separe um fato público de preferências e restrições pessoais. Somente o texto público abaixo será enviado ao Gemini e, quando cabível, à Tavily Search. Não inclua nomes, contatos, endereços privados ou URLs. O resultado não altera sua manifestação.</p>
   {isOpen&&<><label>Modalidade<select value={mode} onChange={e=>setMode(e.target.value as ResearchMode)}><option value="VERIFY">Verificar afirmação</option><option value="RESEARCH">Pesquisar informações para a decisão</option></select></label><label>{mode==='RESEARCH'?'Pergunta pública para pesquisar':'Alegação pública para verificar'}<textarea rows={3} maxLength={1200} value={claim} onChange={e=>setClaim(e.target.value)}/></label>
    <label className="check"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/> Concordo com o envio desta alegação mínima ao Gemini e à Tavily Search, se necessária.</label>
    <button className="secondary" disabled={busy||!consent||claim.trim().length<4} onClick={()=>void onVerify(claim,mode)}>{mode==='RESEARCH'?'Pesquisar informações para a decisão':'Verificar afirmação'}</button>

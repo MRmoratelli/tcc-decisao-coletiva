@@ -1,8 +1,38 @@
 # Verificação factual consultiva — Tavily + Gemini 3.5
 
-Versão: `factual-tavily-gemini-v2.0`. Data-base: 19/11/2026. Exclusivamente implementação e validação técnicas; não constitui avaliação científica com participantes.
+Versão vigente: `factual-tavily-gemini-v2.1`. Data-base: 20/11/2026. Exclusivamente implementação e validação técnicas; não constitui avaliação científica com participantes.
 
-## Estado de validação
+## Atualização vigente — correções do pré-teste de 20/11/2026
+
+Versão factual `factual-tavily-gemini-v2.1`; mediação `consensus-consultive-v2.4-all-manifestations`. Os registros de 19/11 abaixo são históricos. Esta seção descreve a implementação atual.
+
+Há duas modalidades: **Verificar afirmação** (VERIFY) e **Pesquisar informações para a decisão** (RESEARCH). Solicitações públicas de pesquisa são categoria própria, distinta de fato afirmado, preferência, restrição, opinião, hipótese ou necessidade de esclarecimento. Uma pergunta pública adequada pode acionar Search básica; perguntas de viagem sem ano exigem esclarecimento, sem supor o parâmetro. Preferências e informações privadas não são pesquisadas.
+
+A tela distingue o texto ainda digitado da consulta original de cada registro histórico. Mostra modalidade, horário, busca realizada ou dispensada, termos enviados, URLs, trechos, metadados de data efetivamente recebidos, interpretação e limitações. Ausência de pesquisa não é apresentada como pesquisa sem resultados. Falhas são identificadas por etapa (classificação, recuperação ou interpretação), incluindo quota; evidências já recuperadas podem ser reutilizadas sem nova Search.
+
+Uma pergunta causal sobre dólar e viagem nacional não comprova causalidade por plausibilidade: a instrução exige separar variação cambial, custos em moeda estrangeira, custos locais e evidências do nexo. Testes simulados examinam essa separação; não foi realizada pesquisa causal real nesta execução.
+
+### Validação externa observada
+
+Foram executadas **duas Search básicas reais, com um crédito informado em cada resposta** (dois créditos observados). Alegação: “A Lua é um satélite natural da Terra.” A Tavily devolveu três fontes e o Gemini interpretou evidência favorável, com citações literais conferidas nos trechos recebidos. Pesquisa: “Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?” Duas fontes foram recuperadas; a primeira interpretação falhou com 503 e a retomada reutilizou a mesma recuperação, sem nova Search. O resultado final foi evidência insuficiente: fontes genéricas, baixa relevância e ausência de preços e disponibilidade comparáveis nas datas solicitadas. A aplicação não declarou alternativa mais barata.
+
+Metadados reais, IDs de requisição, modelos, URLs, trechos e uso informado estão em [PRETESTE_FACTUAL_REAL.json](evidence/PRETESTE_FACTUAL_REAL.json). Datas não fornecidas permaneceram ausentes. As URLs provêm de resultados Tavily preservados, não de referências inventadas na prosa do Gemini. Isso demonstra recuperação e associação estrutural, sem certificar verdade absoluta ou qualidade integral das páginas.
+
+Os tetos persistentes PostgreSQL continuam **100 Search/dia UTC, 15/minuto e 1.000 reservas/mês; Gemini factual 250/dia UTC e 12/minuto; dez operações externas simultâneas**. Não são franquia garantida pelo provedor. A classificação e a interpretação consomem chamadas separadas; mediação compartilha recursos Gemini e não integra esse contador factual. O ledger observado passou de 1 para 3 reservas Search no dia e de 2 para 4 no mês; Gemini factual de 10 para 15 chamadas reservadas no dia. Falhas não são reembolsadas no contador. Não foram habilitados pagamentos, planos ou novas credenciais.
+
+### Integração, testes e limitações
+
+Análise e síntese agora recebem as manifestações canônicas de todas as posições, contestações e contexto factual rastreável da versão vigente. Os quatro nomes de operações Gemini foram mantidos; os contratos de análise e síntese ganharam campos de cobertura e proveniência, sem alterar os schemas de revisão de proposta e contribuição. Campos novos são opcionais na leitura histórica, mas obrigatórios e validados em resultados novos.
+
+A suíte completa registrada nas execuções CI das correções contém 81 testes aprovados (74 anteriores e sete novos). São testes técnicos sintéticos, incluindo causalidade, ausência de fontes, preferência sem busca, ano ausente, cache, falhas Tavily/Gemini, quota, quatro posições, fontes, revisão humana, sincronização e DSR inalterado. O fechamento da execução e seu CI ficam no relatório de correções.
+
+**Limitação externa remanescente:** os contratos reais de análise abrangente e síntese não foram revalidados com êxito. As tentativas de análise receberam HTTP 503 do Gemini, inclusive em diagnóstico de duas manifestações. A síntese dependente não foi chamada com resultado real inexistente. O fluxo completo de IA é demonstrado separadamente com FakeAI e marcado como simulado; a sala remota de dez identidades usou revisão manual de contingência explicitamente registrada. As revisões reais de proposta e contribuição e as duas modalidades factuais produziram respostas rastreáveis. Nenhum desses testes constitui avaliação científica com o grupo real.
+
+Relatório: [correções do pré-teste](RELATORIO_PRE_TESTE_CORRECOES_V2_2026-11-20.md). O questionário DSR-1.1 não foi alterado.
+
+---
+
+## Estado de validação histórica — 19/11/2026
 
 A implementação local passou em **64 testes sintéticos**, TypeScript frontend/backend e build Vite. Os testes utilizam respostas simuladas identificadas e PostgreSQL embarcado; não comprovam acesso externo real. Evidências: `evidence/TAVILY_TESTS.txt` e `evidence/TAVILY_BUILD.json`.
 
@@ -126,3 +156,4 @@ Código implantado `98781dca1a4ca58a548c8d4b6f4be8bcb8432bcf`, deploy `dep-dbvj4
 Na demonstração remota sintética, dez identidades acessaram a sala: nove aceitações mantiveram OPEN, a décima encerrou a rodada 1 em CONSENSUS. O formulário abriu na interface e registrou uma resposta técnica com N/A em 05, demais itens fechados ausentes e A4 explicitamente sintética. Também foram registrados questionário após encerramento sem consenso na rodada 1, sessão de duas rodadas com versões 1.0 e 1.1 discriminadas e importação em nova sala com as respostas preservadas. Os campos em branco não receberam nota neutra. Esses dados são exclusivamente de testes; não são amostra científica nem pré-teste de compreensão.
 
 [Relatório verificável](evidence/LIMITES_DSR_VALIDACAO.json), [migração](evidence/LIMITES_DSR_MIGRACAO.json), [formulário](evidence/DSR_UMA_RODADA_FORMULARIO.jpg), [N/A](evidence/DSR_UMA_RODADA_NA.jpg), [encerramento](evidence/DSR_UMA_RODADA_ENCERRADA.jpg). Exportações sintéticas: [caso A](evidence/DSR_SINTETICO_CASO_A.json), [caso B](evidence/DSR_SINTETICO_CASO_B.json) e [caso C](evidence/DSR_SINTETICO_CASO_C.json). Não importar essas salas como avaliação real do churrasco.
+

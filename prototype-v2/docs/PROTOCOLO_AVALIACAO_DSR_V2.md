@@ -1,6 +1,6 @@
 # PROTOCOLO AVALIAÇÃO DSR V2
 
-Versão 0.3 pré-avaliação. Data-base 19/11/2026. Situação: documento atualizado para apreciação do orientador, sem ratificação formal presumida.
+Versão 0.4 pré-avaliação. Data-base 20/11/2026. Situação: documento atualizado para apreciação do orientador, sem ratificação formal presumida.
 
 Projeto Processo de decisao. TCC Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Engenharia da Computação, Universidade Veiga de Almeida. Orientador Carlos Alvaro de Macedo Soares Quintella.
 
@@ -12,15 +12,15 @@ A avaliação principal compreende um grupo preexistente de aproximadamente dez 
 
 A proposta metodológica é avaliação exploratória naturalística estruturada como estudo de caso único, sujeita à ratificação acadêmica. Uma unidade coletiva de decisão não equivale a dez processos independentes por haver cerca de dez questionários. Fases temáticas não são necessariamente rodadas: o software abre nova rodada ao publicar versão revisada e recolher posições sobre ela.
 
-Consenso exige ACEITO explícito de todos os habilitados na mesma versão; abstenção e silêncio não contam como aceitação. Encerrar sem consenso é legítimo. Não serão fabricadas divergências ou novas rodadas.
+Consenso exige ACEITO explícito de todos os habilitados na mesma versão; ACEITO COM RESSALVAS é apoio condicionado, exige descrição e não conta como aceitação incondicional; abstenção e silêncio também não contam. Encerrar sem consenso é legítimo. Não serão fabricadas divergências ou novas rodadas.
 
 Conforme orientação comunicada pelo orientador, não é necessária submissão do procedimento planejado ao Comitê de Ética da UVA. Isso não constitui parecer formal informado de aprovação ou dispensa. A submissão não é pendência deste protocolo.
 
 ## 2 ARTEFATO E CONTROLE DE VERSÃO
 
-React, TypeScript e Vite no frontend; Node.js e TypeScript no backend; PostgreSQL Neon; Gemini no backend; HTTPS no Render. Base desta atualização: branch feat/vite-typescript-decisao-generica, HEAD ef8c588d206c201dcacd9fe53a71a6e94a280088 antes das alterações. Gemini 3.5 Flash-Lite e prompt consensus-consultive-v2.0 preservados. Registrar SHA implantado, versão factual e disponibilidade efetiva na sessão, sem expor credenciais.
+React, TypeScript e Vite no frontend; Node.js e TypeScript no backend; PostgreSQL Neon; Gemini no backend; HTTPS no Render. Base desta atualização: branch feat/vite-typescript-decisao-generica, HEAD 4d73f06750dc1ea68abdfe9e2bb308b9b21a0762 antes das correções funcionais de 20/11. Código das correções: 912c9c04ac422c9d38eb1355d3551f368078f146; restauração da geração estruturada original após diagnóstico sem sucesso: a8f376073c1e0ca04b1a540eccfdf5c36f643482. Gemini 3.5 Flash-Lite mantido; prompt de mediação consensus-consultive-v2.4-all-manifestations e versão factual factual-tavily-gemini-v2.1. Registrar SHA implantado, versão factual e disponibilidade efetiva na sessão, sem expor credenciais.
 
-A verificação factual consultiva usa Tavily Search básica para recuperação e Gemini 3.5 Flash-Lite para classificação e interpretação. Uma consulta pública real, com três fontes e um crédito, foi validada tecnicamente em 19/11/2026; isso não demonstra acurácia geral. Fontes, trechos, datas disponíveis, horários, incertezas e contestações são exportáveis. Os novos tetos internos são 100 buscas/dia UTC e 15/minuto, com orçamento mensal conservador de 1.000 reservas e controle compartilhado persistente no PostgreSQL V2. Não são franquia diária do provedor nem garantia de 100 verificações completas. Gemini factual: 250 chamadas/dia UTC e 12/minuto; quota gratuita observada no projeto: 500/dia, 15/minuto e 250 mil tokens de entrada/minuto, compartilhada com mediação. A quota diária do provedor usa meia-noite do Pacífico. Falhas e limites serão relatados, sem ativar faturamento.
+A consulta externa distingue verificação de afirmações factuais e pesquisa de informações públicas para apoio à decisão. Perguntas públicas adequadas podem acionar Tavily Search básica, com classificação e interpretação pelo Gemini 3.5 Flash-Lite. Informação indispensável ausente, como o ano de uma viagem datada, requer esclarecimento; preferências e restrições privadas não são pesquisadas. O retorno de hospedagens não comprova disponibilidade ou menor preço. Uma consulta pública real, com três fontes e um crédito, foi validada tecnicamente em 19/11/2026; isso não demonstra acurácia geral. Fontes, trechos, datas disponíveis, horários, incertezas e contestações são exportáveis. Os novos tetos internos são 100 buscas/dia UTC e 15/minuto, com orçamento mensal conservador de 1.000 reservas e controle compartilhado persistente no PostgreSQL V2. Não são franquia diária do provedor nem garantia de 100 verificações completas. Gemini factual: 250 chamadas/dia UTC e 12/minuto; quota gratuita observada no projeto: 500/dia, 15/minuto e 250 mil tokens de entrada/minuto, compartilhada com mediação. A quota diária do provedor usa meia-noite do Pacífico. Falhas e limites serão relatados, sem ativar faturamento.
 
 ## 3 PROCEDIMENTO OPERACIONAL E ANÁLISE
 
@@ -55,12 +55,12 @@ O procedimento abaixo organiza a aplicação sem prescrever a posição dos inte
 3. Solicitar ao próprio grupo que apresente sua necessidade e os aspectos que deseja resolver, conservando esse registro.
 4. Formular a proposta inicial com os participantes; solicitar parecer consultivo quando autorizado e registrar a decisão humana de manter, editar ou reformular.
 5. Criar uma sala com composição definida e distribuir individualmente os acessos, identificando participantes por pseudônimos.
-6. Receber manifestações individuais sobre a versão vigente, com justificativa obrigatória para rejeição e possibilidade de abstenção.
+6. Receber manifestações individuais sobre a versão vigente, com quatro posições: ACEITO, ACEITO COM RESSALVAS, REJEITO e ABSTENHO. Rejeição e aceite com ressalvas exigem justificativa; nenhuma dessas posições é convertida em outra pelo moderador.
 7. Disponibilizar pareceres consultivos sobre contribuições, permitindo edição e contestação sem eliminação automática do conteúdo.
-8. Examinar as objeções registradas, premissas, evidências apresentadas, interesses comuns, conflitos e incertezas.
+8. Examinar todas as manifestações pertinentes à rodada: apoios, ressalvas, objeções, abstenções justificadas, contribuições independentes, contestações e evidências disponíveis. A análise deve preservar identificadores e trechos literais, distinguir categoria original e interpretação, e evitar dupla contagem de justificativa registrada como voto e contribuição vinculada.
 9. Quando necessário, solicitar síntese conciliadora e realizar revisão humana, preservando a saída original e as mudanças propostas.
-10. Publicar nova versão somente por ação do moderador, com razão registrada e preservação do encadeamento.
-11. Receber novas manifestações sobre a versão publicada, sem reaproveitar votos anteriores como aceitação. Prosseguir apenas enquanto houver necessidade deliberativa legítima.
+10. Publicar nova versão somente por ação do moderador, com razão registrada, original e publicado separados, diferenças por campo, horário e responsável funcional. Distinguir aprovação sem alteração de edição humana sobre sugestão da IA ou proposta anterior. Registros antigos sem essa informação não receberão diferenças retrospectivas inventadas.
+11. Receber novas manifestações sobre a versão publicada, sem reaproveitar votos anteriores como aceitação. A interface consulta o estado periodicamente, sem recarregar a página; a atualização manual permanece alternativa. Um rascunho anterior será preservado e bloqueado para envio até confirmação humana de reutilização ou descarte, com conferência de proposta, rodada e revisão no servidor. Prosseguir apenas enquanto houver necessidade deliberativa legítima.
 12. Registrar consenso explícito ou encerramento sem consenso, com razão, incidentes e eventuais interrupções.
 13. Oferecer individualmente a variante DSR-1.1-NATURALISTICO após encerramento legítimo, com consenso ou sem consenso, independentemente do número de rodadas. Antes da coleta científica, concluir revisão metodológica e pré-teste da variante.
 14. Exportar e conferir os registros, separar dados científicos de ensaios sintéticos e executar o plano de análise.
@@ -143,6 +143,16 @@ A dependência do Gemini envolve variação de respostas, configuração, dispon
 
 O consenso formal informa apenas que todos os habilitados registraram aceitação sobre uma mesma versão. Não demonstra convicção, justiça, correção factual, qualidade substantiva ou execução do churrasco. Uma sessão sem consenso permanece informativa. A ausência de experiência em certas funcionalidades será apresentada por N/A e pelos registros; a disponibilidade da verificação factual não garante sua correção. Falhas de provedores e fontes desatualizadas serão explicitadas, evitando seleção de evidências que favoreça uma conclusão.
 
+### 3.10 CORREÇÕES FUNCIONAIS E INTERPRETAÇÃO DOS REGISTROS
+
+Os cinco achados relatados no pré-teste inicial de 20/11/2026 orientaram correções de manifestação condicionada, cobertura das manifestações, pesquisa pública, identificação da revisão humana e atualização de rodadas. São ocorrências de preparação e desenvolvimento do artefato, não validação científica de eficácia. Sua descrição e os ensaios exclusivamente sintéticos ficam no relatório técnico de correções.
+
+Nos registros novos, examinar a separação entre texto participante, interpretação da IA, original da sugestão, revisão humana e conteúdo publicado. Identificadores válidos e trechos literais reduzem omissões estruturais detectáveis, mas não garantem completude semântica, neutralidade ou fidelidade absoluta. A interpretação permanece consultiva e contestável.
+
+A consulta externa registra modalidade, consulta original, pesquisa efetivamente tentada, resposta recebida ou reutilizada, termos, metadados Tavily, interpretação Gemini e falhas por etapa. Distinguir dispensa, esclarecimento, falta de fontes, indisponibilidade e evidência insuficiente. Reutilização de trechos não será contada como nova busca. Uma indisponibilidade do provedor não será apresentada como prova da falsidade de uma manifestação.
+
+Não houve alteração do DSR-1.1-NATURALISTICO, de seus 22 itens, quatro questões abertas ou instruções. O Anexo A original também permanece integralmente preservado.
+
 ## 4 PREPARAÇÃO E REGISTRO DA APLICAÇÃO
 
 Antes da aplicação, completar: data, modalidade, intervalo disponível, forma de recrutamento sem cadastro adicional, identidade funcional do moderador integrante do TCC, papéis dos pesquisadores, informação e concordância, guarda, prazo de retenção e contato responsável. Conferir acessos individualizados, conectividade, versão do instrumento e exportação disponível. Não executar testes sintéticos dentro da sala científica nem importar o ensaio fictício como caso real.
@@ -170,6 +180,8 @@ Fontes: Hevner et al. (2004); Peffers et al. (2007); Venable, Pries-Heje e Baske
 
 
 Referências adicionais da adaptação: VENABLE, J.; PRIES-HEJE, J.; BASKERVILLE, R. FEDS: a Framework for Evaluation in Design Science Research. European Journal of Information Systems, v. 25, p. 77–89, 2016. DOI: 10.1057/ejis.2014.36. AAPOR. Best Practices for Survey Research. Disponível em: https://aapor.org/standards-and-ethics/best-practices/. U.S. CENSUS BUREAU. Statistical Quality Standards: A2, Developing Data Collection Instruments and Supporting Materials, especialmente A2-3.3 e A2-4. Revisão consultada de 29 set. 2026. Disponível em: https://www2.census.gov/about/policies/quality/quality-standards.pdf. Acesso às fontes em: 19 nov. 2026.
+
+Versão 0.4 de 20/11/2026: incorpora as cinco correções funcionais do pré-teste, sem alterar o delineamento, a regra de unanimidade ou os instrumentos. A versão 0.3 continua acessível no commit 4d73f06750dc1ea68abdfe9e2bb308b9b21a0762 e no espelho estático anterior do Drive. Os estados e evidências efetivamente validados serão discriminados no relatório técnico, sem presumir disponibilidade contínua dos provedores.
 
 ## 7 EVIDÊNCIA TÉCNICA DA VERSÃO DE APLICAÇÃO
 

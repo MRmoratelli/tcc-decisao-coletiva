@@ -38,6 +38,8 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   assert.equal((await action(room,'/close',{reason:'Sem permissão'},room.participants[0].credential)).status,403);
   assert.equal((await action(room,'/export',{},room.participants[0].credential)).status,403);
   const v=await view(room,room.participants[0].credential);assert.equal(v.canViewGroup,false);assert.equal(v.positions.length,1);
+  const unchanged=await post('/rooms/'+room.code+'/view',{credential:room.participants[0].credential,knownRevision:v.revision});assert.equal(unchanged.status,200);assert.deepEqual(unchanged.data,{revision:v.revision,unchanged:true});
+  const changed=await post('/rooms/'+room.code+'/view',{credential:room.participants[0].credential,knownRevision:v.revision+1});assert.equal(changed.status,200);assert.equal(changed.data.revision,v.revision);assert.ok(changed.data.state);assert.equal(changed.data.canViewGroup,false);
   const serialized=JSON.stringify(v);for(const p of room.participants)assert.ok(!serialized.includes(p.credential));assert.ok(!serialized.includes(room.moderatorCredential));assert.ok(!serialized.includes('secret_hash'));
   const csrf=await fetch(base+'/rooms/'+room.code+'/view',{method:'POST',headers:{'content-type':'application/json',origin:'https://unexpected.invalid'},body:JSON.stringify({credential:room.moderatorCredential})});assert.equal(csrf.status,403);
  });

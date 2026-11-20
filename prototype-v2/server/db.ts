@@ -38,6 +38,7 @@ export class Repository {
   return p?{roomId:r.id,code,role:'participant',participantId:p.id,alias:p.alias}:null;
  }
  async read(identity:Identity){const row=(await this.pool.query('SELECT revision,state FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];if(!row)throw new DomainError('Sala anterior à migração. Exporte-a pela versão original; não foi alterada.',409);return {revision:row.revision as number,state:validateState(row.state)};}
+ async latestRevision(identity:Identity){const row=(await this.pool.query('SELECT revision FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];if(!row)throw new DomainError('Estado da sala indisponível.',409);return row.revision as number;}
  async mutate(identity:Identity,expectedRevision:number,fn:(s:State)=>void){
   const c=await this.pool.connect();try{
    await c.query('BEGIN');
@@ -51,3 +52,4 @@ export class Repository {
  }
 }
 export function postgresRepository(pool:pg.Pool,pepper:string){return new Repository(pool as unknown as SQLPool,pepper);}
+

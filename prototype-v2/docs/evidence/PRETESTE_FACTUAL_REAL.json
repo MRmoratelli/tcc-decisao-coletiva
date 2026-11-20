@@ -1,0 +1,317 @@
+{
+  "syntheticOnly": true,
+  "realExternalProviders": true,
+  "checks": [
+    {
+      "originalText": "A Lua é um satélite natural da Terra.",
+      "createdAt": "2026-11-20T16:31:47.430Z",
+      "provenance": "LIVE_PROVIDER",
+      "model": "gemini-3.5-flash-lite",
+      "version": "factual-tavily-gemini-v2.1",
+      "modality": "VERIFY",
+      "retrievalProvider": "TAVILY",
+      "classificationSourceCheckId": null,
+      "classificationModel": "gemini-3.5-flash-lite",
+      "claims": [
+        {
+          "claim": {
+            "text": "A Lua é o satélite natural da Terra.",
+            "originalExcerpt": "A Lua é um satélite natural da Terra.",
+            "kind": "FATO_VERIFICAVEL",
+            "query": "A Lua é um satélite natural da Terra",
+            "timeSensitive": false,
+            "reason": "Trata-se de um fato astronômico público e verificável sobre a órbita e natureza da Lua em relação à Terra."
+          },
+          "status": "EVIDENCIA_FAVORAVEL",
+          "explanation": "As evidências recuperadas confirmam diretamente a alegação de que a Lua é o satélite natural da Terra.",
+          "providerText": "{\n  \"status\": \"EVIDENCIA_FAVORAVEL\",\n  \"explanation\": \"As evidências recuperadas confirmam diretamente a alegação de que a Lua é o satélite natural da Terra.\",\n  \"scopeMatches\": true,\n  \"evidenceLinks\": [\n    {\n      \"sourceId\": \"S1\",\n      \"quote\": \"Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Afirma claramente que a Lua é o satélite natural da Terra.\"\n    },\n    {\n      \"sourceId\": \"S2\",\n      \"quote\": \"A Lua é o único satélite natural do planeta Terra.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Confirma que a Lua é o satélite natural da Terra.\"\n    },\n    {\n      \"sourceId\": \"S3\",\n      \"quote\": \"A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Confirma a condição da Lua como satélite natural da Terra.\"\n    }\n  ],\n  \"uncertainties\": []\n}",
+          "responseModel": "gemini-3.5-flash-lite",
+          "queriedAt": "2026-11-20T16:31:57.132Z",
+          "limitations": [
+            "Recuperar um resultado não comprova a alegação. A interpretação do Gemini é consultiva e falível.",
+            "O trecho é o conteúdo retornado pela Tavily; a aplicação não realizou leitura independente da página.",
+            "Data não fornecida ou não reconhecida nos metadados; nenhuma data foi criada pelo Gemini.",
+            "A data Tavily é uma estimativa de publicação ou atualização; pode divergir da publicação original."
+          ],
+          "failureCode": null,
+          "searchAttempted": true,
+          "attemptedQuery": "A Lua é um satélite natural da Terra",
+          "sources": [
+            {
+              "id": "S1",
+              "title": "Lua – Wikipédia, a enciclopédia livre",
+              "url": "https://pt.wikipedia.org/wiki/Lua",
+              "publishedAt": "2025-10-19T00:00:00.000Z",
+              "provider": "TAVILY",
+              "providerId": "dae877-00",
+              "excerpt": "Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar. É o maior satélite natural de um planeta no sistema solar em relação ao tamanho do seu corpo primário \"Primário (astronomia)\"), tendo 27% do dimetro e 60% da densidade da Terra, o que representa 1⁄81 da sua massa. Entre os satélites cuja densidade é conhecida, a Lua é o segundo mais denso, atrás de Io \"Io (satélite)\"). Estima-se que a formação da Lua tenha ocorrido há cerca de 4,51 mil milhões\\ de anos, relativamente",
+              "excerptTruncated": false,
+              "contentSha256": "6aacf76c6dc4f895967954c6e1fe3ed3c490283376f7a66643bf47d9b7e8f6b8",
+              "score": 0.8824279,
+              "publishedAtRaw": "Sun, 19 Oct 2025 00:00:00 GMT",
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            },
+            {
+              "id": "S2",
+              "title": "Lua: características, fases, origem, formação - Brasil Escola",
+              "url": "https://brasilescola.uol.com.br/geografia/lua.htm",
+              "publishedAt": null,
+              "provider": "TAVILY",
+              "providerId": "b2b663-01",
+              "excerpt": "A Lua é o único satélite natural do planeta Terra. Esse corpo celeste possui um raio de aproximadamente 1740 km, o que o torna a quinta maior lua de todo o Sistema Solar. A massa da Lua é de 7,35 x 1019 toneladas, valor que corresponde a apenas 1,23% da massa terrestre. Ela está posicionada a uma distncia de 384.400 km do nosso planeta, intervalo, pelo menos, 18 vezes maior do que quando ela se formou, há 4,5 bilhões de anos. O processo de distanciamento não cessou, e a cada ano ele aumenta em [...] A Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar. Ela se formou, há aproximadamente 4,5 bilhões de anos, do impacto de um grande corpo celeste com o planeta, e desde então realiza a sua órbita ao redor dele e também do Sol. A forma como a luz solar incide sobre a sua superfície e como a enxergamos da Terra produz as diferentes fases da Lua. Além disso, ela interage com o nosso planeta e dá origem às marés e aos eclipses. [...] A Lua é o único satélite natural da Terra.\n Está a 384.400 km do planeta, e a cada ano se afasta 3,78 centímetros.\n Apresenta uma exosfera fina e frágil, e sua estrutura é composta por crosta, manto e núcleo.\n Sua superfície está repleta de crateras de impacto, fragmentos de rocha e poeira.\n Crateras preenchidas com lava no passado deram origem a pequenas elevações (marias) nela.\n Formou-se, há 4,5 bilhões de anos, do impacto de um enorme meteorito na Terra.",
+              "excerptTruncated": false,
+              "contentSha256": "757a9cab34bc1bd2ac83b717ec987156f8df447a73eba75dc301a85613a4f696",
+              "score": 0.8750414,
+              "publishedAtRaw": null,
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            },
+            {
+              "id": "S3",
+              "title": "A Lua – satélite natural da Terra",
+              "url": "https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf",
+              "publishedAt": null,
+              "provider": "TAVILY",
+              "providerId": "f7cd4d-02",
+              "excerpt": "A Lua – satélite natural da Terra A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km. A nossa Lua é o único corpo celeste a receber seres humanos. O seu diâmetro é de aproximadamente 3.500 km, por essa razão seu tamanho é 80 vezes inferior ao do planeta Terra. A imagem abaixo mostra a diferença entre o tamanho da Terra e a Lua: Imagem: Comparação de diâmetros da Terra e da Lua. Arquivo criado pela NASA no domínio público. Esse corpo celeste é visto da Terra [...] é visto da Terra e exibe várias fases, mesmo assim expõe sempre a mesma face. O tempo gasto para realização do movimento de rotação é o mesmo para o de translação. Apesar de ser o segundo corpo mais brilhante no céu, atrás somente do Sol, a Lua não possui brilho próprio, sendo iluminada pela luz solar. À medida que a Lua viaja ao redor da Terra ao longo do mês, ela passa por um ciclo de fases, durante o qual sua forma parece variar gradualmente. O ciclo completo dura aproximadamente 29,5 dias. [...] é marcada por pouca luminosidade, pois sua face voltada para a Terra não está sendo iluminada pelo Sol.  Lua crescente: considerada a fase de transição da Lua nova para a Lua cheia, a Lua crescente é caracterizada por receber luminosidade em apenas uma face (no lado oposto da minguante). Responda as questões colocando a resposta em seu caderno: 1) Qual é o satélite natural da Terra? 2) Complete: “A Lua é ____________ menor que a Terra.” 3) A Lua tem brilho próprio? 4) Explique cada movimento",
+              "excerptTruncated": false,
+              "contentSha256": "4ccc28bf5eb31bb214f7468739499692331f039944468beb098869c8719a8af8",
+              "score": 0.86350673,
+              "publishedAtRaw": null,
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            }
+          ],
+          "retrieval": {
+            "provider": "TAVILY",
+            "endpoint": "SEARCH",
+            "searchDepth": "basic",
+            "query": "A Lua é um satélite natural da Terra",
+            "requestId": "9d3efa37-cb22-485a-96ee-50d81e55f8f5",
+            "queriedAt": "2026-11-20T16:31:55.310Z",
+            "creditsUsed": 1,
+            "responseTimeSeconds": 1.19,
+            "resultsReceived": 3,
+            "resultsRetained": 3,
+            "rawResponseSha256": "671ffcc0e402ca3c29a7e69c0e2d5e4ccdef4931672a324530d44c8959564c13"
+          },
+          "scopeMatches": true,
+          "evidenceLinks": [
+            {
+              "sourceId": "S1",
+              "quote": "Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar.",
+              "relation": "SUPPORTS",
+              "explanation": "Afirma claramente que a Lua é o satélite natural da Terra."
+            },
+            {
+              "sourceId": "S2",
+              "quote": "A Lua é o único satélite natural do planeta Terra.",
+              "relation": "SUPPORTS",
+              "explanation": "Confirma que a Lua é o satélite natural da Terra."
+            },
+            {
+              "sourceId": "S3",
+              "quote": "A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km.",
+              "relation": "SUPPORTS",
+              "explanation": "Confirma a condição da Lua como satélite natural da Terra."
+            }
+          ]
+        }
+      ],
+      "id": "5fa8f865-69c7-460c-9325-161e33e09ce5",
+      "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+      "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+      "participantId": null
+    },
+    {
+      "originalText": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+      "createdAt": "2026-11-20T16:32:34.128Z",
+      "provenance": "LIVE_PROVIDER",
+      "model": "gemini-3.5-flash-lite",
+      "version": "factual-tavily-gemini-v2.1",
+      "modality": "RESEARCH",
+      "retrievalProvider": "TAVILY",
+      "classificationSourceCheckId": null,
+      "classificationModel": "gemini-3.5-flash-lite",
+      "claims": [
+        {
+          "claim": {
+            "text": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+            "originalExcerpt": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+            "kind": "SOLICITACAO_PESQUISA",
+            "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+            "timeSensitive": true,
+            "reason": "Pergunta pública sobre disponibilidade de hospedagem em datas futuras específicas, exigindo busca atualizada."
+          },
+          "status": "VERIFICACAO_INDISPONIVEL",
+          "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+          "providerText": "",
+          "responseModel": null,
+          "queriedAt": "2026-11-20T16:32:46.722Z",
+          "limitations": [
+            "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+          ],
+          "failureCode": "GEMINI_TEMPORARILY_UNAVAILABLE",
+          "searchAttempted": true,
+          "attemptedQuery": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+          "failureStage": "INTERPRETATION",
+          "sources": [
+            {
+              "id": "S1",
+              "title": "AS FÉRIAS ESTÃO CHEGANDO… E SUA ROTINA PODE SER ...",
+              "url": "https://www.instagram.com/reel/DfsNChSthnm",
+              "publishedAt": null,
+              "provider": "TAVILY",
+              "providerId": "5c2840-00",
+              "excerpt": "Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios. ☀️",
+              "excerptTruncated": false,
+              "contentSha256": "b7174de67def8e5272cde3fb067fe13cc5aa27727f49bee136aeca84b44bd44a",
+              "score": 0.2726051,
+              "publishedAtRaw": null,
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            },
+            {
+              "id": "S2",
+              "title": "ᐉ BONITO PARAISO ILHA GRANDE ( BRASIL ) FOTOS REAIS E ...",
+              "url": "https://bonito-paraiso-ilha-grande.allriodejaneirohotels.com/pt",
+              "publishedAt": null,
+              "provider": "TAVILY",
+              "providerId": "edbc3d-01",
+              "excerpt": "Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande. Este hotel de 9 quartos disponibiliza",
+              "excerptTruncated": false,
+              "contentSha256": "b3e5bd7d7881c9fe265372d17804cff602563a0169eeb92d3286410e43953164",
+              "score": 0.26038948,
+              "publishedAtRaw": null,
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            }
+          ],
+          "retrieval": {
+            "provider": "TAVILY",
+            "endpoint": "SEARCH",
+            "searchDepth": "basic",
+            "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+            "requestId": "0bf6e393-7463-49db-afc1-59d0b4fac9aa",
+            "queriedAt": "2026-11-20T16:32:43.369Z",
+            "creditsUsed": 1,
+            "responseTimeSeconds": 1.01,
+            "resultsReceived": 2,
+            "resultsRetained": 2,
+            "rawResponseSha256": "21eeb6462139941a7ffe1e3b83c6e2184d935b5fb03ae4b4bb3a3b855181c4e1"
+          },
+          "scopeMatches": false,
+          "evidenceLinks": []
+        }
+      ],
+      "id": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05",
+      "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+      "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+      "participantId": null
+    },
+    {
+      "originalText": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+      "createdAt": "2026-11-20T16:33:27.391Z",
+      "provenance": "LIVE_PROVIDER",
+      "model": "gemini-3.5-flash-lite",
+      "version": "factual-tavily-gemini-v2.1",
+      "modality": "RESEARCH",
+      "retrievalProvider": "TAVILY",
+      "classificationSourceCheckId": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05",
+      "classificationModel": "gemini-3.5-flash-lite",
+      "claims": [
+        {
+          "claim": {
+            "text": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+            "originalExcerpt": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+            "kind": "SOLICITACAO_PESQUISA",
+            "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+            "timeSensitive": true,
+            "reason": "Pergunta pública sobre disponibilidade de hospedagem em datas futuras específicas, exigindo busca atualizada."
+          },
+          "status": "EVIDENCIA_INSUFICIENTE",
+          "explanation": "A solicitação de pesquisa exige listar hospedagens específicas em Búzios e Ilha Grande para o período de 25 a 31 de dezembro de 2026. As fontes recuperadas contêm apenas menções genéricas ou nomes de locais ('Casa Recanto Ilha de Búzios' e 'Bonito Paraiso Ilha Grande'), sem apresentar disponibilidade, valores, confirmações de funcionamento ou dados para o período exato solicitado (dezembro de 2026). Portanto, a evidência é insuficiente para responder de forma abrangente.",
+          "providerText": "{\n  \"status\": \"EVIDENCIA_INSUFICIENTE\",\n  \"explanation\": \"A solicitação de pesquisa exige listar hospedagens específicas em Búzios e Ilha Grande para o período de 25 a 31 de dezembro de 2026. As fontes recuperadas contêm apenas menções genéricas ou nomes de locais ('Casa Recanto Ilha de Búzios' e 'Bonito Paraiso Ilha Grande'), sem apresentar disponibilidade, valores, confirmações de funcionamento ou dados para o período exato solicitado (dezembro de 2026). Portanto, a evidência é insuficiente para responder de forma abrangente.\",\n  \"scopeMatches\": false,\n  \"evidenceLinks\": [\n    {\n      \"sourceId\": \"S1\",\n      \"quote\": \"Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios.\",\n      \"relation\": \"CONTEXT\",\n      \"explanation\": \"A citação menciona Búzios e uma hospedagem genérica, mas não traz informações sobre o período de 25 a 31 de dezembro de 2026.\"\n    },\n    {\n      \"sourceId\": \"S2\",\n      \"quote\": \"Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande.\",\n      \"relation\": \"CONTEXT\",\n      \"explanation\": \"A citação cita uma hospedagem em Ilha Grande, mas não confirma disponibilidade nem dados referentes a dezembro de 2026.\"\n    }\n  ],\n  \"uncertainties\": [\n    \"Falta de dados específicos de disponibilidade para o período de 25 a 31 de dezembro de 2026.\",\n    \"Ausência de uma listagem completa e comparável de hospedagens ativas em ambas as localidades para as datas da solicitação.\"\n  ]\n}",
+          "responseModel": "gemini-3.5-flash-lite",
+          "queriedAt": "2026-11-20T16:33:41.140Z",
+          "limitations": [
+            "Recuperar um resultado não comprova a alegação. A interpretação do Gemini é consultiva e falível.",
+            "O trecho é o conteúdo retornado pela Tavily; a aplicação não realizou leitura independente da página.",
+            "Falta de dados específicos de disponibilidade para o período de 25 a 31 de dezembro de 2026.",
+            "Ausência de uma listagem completa e comparável de hospedagens ativas em ambas as localidades para as datas da solicitação.",
+            "Data não fornecida ou não reconhecida nos metadados; nenhuma data foi criada pelo Gemini.",
+            "Atualidade necessária não comprovada por data fornecida pela Tavily dentro das últimas 72 horas."
+          ],
+          "failureCode": "FRESHNESS_NOT_ESTABLISHED",
+          "searchAttempted": false,
+          "attemptedQuery": "",
+          "sources": [
+            {
+              "id": "S1",
+              "title": "AS FÉRIAS ESTÃO CHEGANDO… E SUA ROTINA PODE SER ...",
+              "url": "https://www.instagram.com/reel/DfsNChSthnm",
+              "publishedAt": null,
+              "provider": "TAVILY",
+              "providerId": "5c2840-00",
+              "excerpt": "Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios. ☀️",
+              "excerptTruncated": false,
+              "contentSha256": "b7174de67def8e5272cde3fb067fe13cc5aa27727f49bee136aeca84b44bd44a",
+              "score": 0.2726051,
+              "publishedAtRaw": null,
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            },
+            {
+              "id": "S2",
+              "title": "ᐉ BONITO PARAISO ILHA GRANDE ( BRASIL ) FOTOS REAIS E ...",
+              "url": "https://bonito-paraiso-ilha-grande.allriodejaneirohotels.com/pt",
+              "publishedAt": null,
+              "provider": "TAVILY",
+              "providerId": "edbc3d-01",
+              "excerpt": "Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande. Este hotel de 9 quartos disponibiliza",
+              "excerptTruncated": false,
+              "contentSha256": "b3e5bd7d7881c9fe265372d17804cff602563a0169eeb92d3286410e43953164",
+              "score": 0.26038948,
+              "publishedAtRaw": null,
+              "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+            }
+          ],
+          "retrieval": {
+            "provider": "TAVILY",
+            "endpoint": "SEARCH",
+            "searchDepth": "basic",
+            "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+            "reusedFromCheckId": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05",
+            "requestId": "0bf6e393-7463-49db-afc1-59d0b4fac9aa",
+            "queriedAt": "2026-11-20T16:32:43.369Z",
+            "creditsUsed": 1,
+            "responseTimeSeconds": 1.01,
+            "resultsReceived": 2,
+            "resultsRetained": 2,
+            "rawResponseSha256": "21eeb6462139941a7ffe1e3b83c6e2184d935b5fb03ae4b4bb3a3b855181c4e1"
+          },
+          "scopeMatches": false,
+          "evidenceLinks": [
+            {
+              "sourceId": "S1",
+              "quote": "Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios.",
+              "relation": "CONTEXT",
+              "explanation": "A citação menciona Búzios e uma hospedagem genérica, mas não traz informações sobre o período de 25 a 31 de dezembro de 2026."
+            },
+            {
+              "sourceId": "S2",
+              "quote": "Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande.",
+              "relation": "CONTEXT",
+              "explanation": "A citação cita uma hospedagem em Ilha Grande, mas não confirma disponibilidade nem dados referentes a dezembro de 2026."
+            }
+          ]
+        }
+      ],
+      "id": "7aeb32f7-6f2b-4bb5-b53e-11537b014527",
+      "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+      "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+      "participantId": null
+    }
+  ],
+  "uniqueRequests": [
+    "9d3efa37-cb22-485a-96ee-50d81e55f8f5",
+    "0bf6e393-7463-49db-afc1-59d0b4fac9aa"
+  ],
+  "observedUniqueSearchCredits": 2,
+  "limitation": "Pesquisa de hospedagens concluída com evidência insuficiente; não comprova disponibilidade ou menor preço."
+}

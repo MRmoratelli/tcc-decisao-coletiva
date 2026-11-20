@@ -1,0 +1,81 @@
+{
+  "syntheticOnly": true,
+  "room": "BF8C404889",
+  "staleVoteStatus": 409,
+  "concurrentVotes": [
+    {
+      "alias": "P02",
+      "status": 201,
+      "attempts": 3
+    },
+    {
+      "alias": "P03",
+      "status": 201,
+      "attempts": 1
+    },
+    {
+      "alias": "P04",
+      "status": 201,
+      "attempts": 6
+    },
+    {
+      "alias": "P05",
+      "status": 201,
+      "attempts": 4
+    },
+    {
+      "alias": "P06",
+      "status": 201,
+      "attempts": 4
+    },
+    {
+      "alias": "P07",
+      "status": 201,
+      "attempts": 5
+    },
+    {
+      "alias": "P08",
+      "status": 201,
+      "attempts": 6
+    },
+    {
+      "alias": "P09",
+      "status": 201,
+      "attempts": 1
+    }
+  ],
+  "nineAcceptedStatus": "OPEN",
+  "finalVote": {
+    "alias": "P10",
+    "status": 201,
+    "attempts": 1
+  },
+  "finalStatus": "CONSENSUS",
+  "rounds": 2,
+  "firstRoundChoices": [
+    "ACEITO_COM_RESSALVAS",
+    "ACEITO",
+    "REJEITO",
+    "ABSTENHO",
+    "ACEITO",
+    "ACEITO_COM_RESSALVAS",
+    "ACEITO",
+    "ABSTENHO",
+    "REJEITO",
+    "ACEITO"
+  ],
+  "secondRoundChoices": [
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO",
+    "ACEITO"
+  ],
+  "externalAnalysisStatus": "BLOCKED_GEMINI_503",
+  "humanRevisionSource": "PROPOSTA_ANTERIOR"
+}

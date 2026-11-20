@@ -9,6 +9,7 @@ export type RoomView={
  positions:Array<{id:string;alias:string;choice:string}>;
  metrics:unknown;contributions:Array<{id:string;alias:string;text:string;review:Review|null;user_choice:string;created_at:string}>;
 };
+export type RoomSyncResponse=RoomView|{revision:number;unchanged:true};
 export async function request<T>(path:string,body?:unknown):Promise<T>{
  const response=await fetch('/api'+path,{...(path.endsWith('/view')?{signal:AbortSignal.timeout(15000)}:{}),method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
  let result:unknown;try{result=await response.json();}catch{throw new Error('Servidor não retornou resposta JSON.');}

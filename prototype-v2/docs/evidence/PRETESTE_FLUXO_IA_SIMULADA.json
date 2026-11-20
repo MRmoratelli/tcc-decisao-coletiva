@@ -1,0 +1,1760 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-20T16:53:14.591Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+      "problem": "Há tarefas concorrentes e capacidade limitada.",
+      "decision": "Definir a ordem de execução do projeto.",
+      "goals": "Entregar com acesso amplo.",
+      "alternatives": "",
+      "constraints": "",
+      "successCriteria": "",
+      "context": "",
+      "text": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida."
+    },
+    "decision": {
+      "id": "91f7ec2b-e57f-4016-9b48-37aee24e5e03",
+      "originId": "91f7ec2b-e57f-4016-9b48-37aee24e5e03",
+      "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-20T16:53:14.527Z",
+      "closedAt": "2026-11-20T16:53:14.551Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "alias": "P01"
+      },
+      {
+        "id": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "alias": "P02"
+      },
+      {
+        "id": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "alias": "P03"
+      },
+      {
+        "id": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "alias": "P04"
+      },
+      {
+        "id": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "alias": "P05"
+      },
+      {
+        "id": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "alias": "P06"
+      },
+      {
+        "id": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "alias": "P07"
+      },
+      {
+        "id": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "alias": "P08"
+      },
+      {
+        "id": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "alias": "P09"
+      },
+      {
+        "id": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "alias": "P10"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "19f66516-3337-4789-b346-62c3284332c2",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+          "problem": "Há tarefas concorrentes e capacidade limitada.",
+          "decision": "Definir a ordem de execução do projeto.",
+          "goals": "Entregar com acesso amplo.",
+          "alternatives": "",
+          "constraints": "",
+          "successCriteria": "",
+          "context": "",
+          "text": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida."
+        },
+        "createdAt": "2026-11-20T16:53:14.527Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        }
+      },
+      {
+        "id": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "version": 2,
+        "parentId": "19f66516-3337-4789-b346-62c3284332c2",
+        "content": {
+          "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+          "problem": "Há tarefas concorrentes e capacidade limitada.",
+          "decision": "Definir a ordem de execução do projeto.",
+          "goals": "Entregar com acesso amplo.",
+          "alternatives": "",
+          "constraints": "",
+          "successCriteria": "",
+          "context": "",
+          "text": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida. Revisar o prazo após avaliar capacidade. EDIÇÃO HUMANA SINTÉTICA: explicitar incertezas na nota."
+        },
+        "createdAt": "2026-11-20T16:53:14.551Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1",
+          "model": "human",
+          "reason": "Ensaio exclusivamente sintético: moderador alterou uma saída de IA SIMULADA por fixture; não é uma resposta Gemini real."
+        },
+        "intervention": {
+          "kind": "EDICAO_HUMANA",
+          "source": "SINTESE_IA",
+          "sourceId": "99dce480-9abb-4cf6-b1b8-ba1c3150f2c6",
+          "original": {
+            "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+            "problem": "Há tarefas concorrentes e capacidade limitada.",
+            "decision": "Definir a ordem de execução do projeto.",
+            "goals": "Entregar com acesso amplo.",
+            "alternatives": "",
+            "constraints": "",
+            "successCriteria": "",
+            "context": "",
+            "text": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida. Revisar o prazo após avaliar capacidade."
+          },
+          "published": {
+            "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+            "problem": "Há tarefas concorrentes e capacidade limitada.",
+            "decision": "Definir a ordem de execução do projeto.",
+            "goals": "Entregar com acesso amplo.",
+            "alternatives": "",
+            "constraints": "",
+            "successCriteria": "",
+            "context": "",
+            "text": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida. Revisar o prazo após avaliar capacidade. EDIÇÃO HUMANA SINTÉTICA: explicitar incertezas na nota."
+          },
+          "changes": [
+            {
+              "field": "text",
+              "before": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida. Revisar o prazo após avaliar capacidade.",
+              "after": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida. Revisar o prazo após avaliar capacidade. EDIÇÃO HUMANA SINTÉTICA: explicitar incertezas na nota."
+            }
+          ],
+          "reason": "Ensaio exclusivamente sintético: moderador alterou uma saída de IA SIMULADA por fixture; não é uma resposta Gemini real.",
+          "at": "2026-11-20T16:53:14.551Z",
+          "actor": "moderator"
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "number": 1,
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "status": "CLOSED",
+        "openedAt": "2026-11-20T16:53:14.527Z",
+        "closedAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "number": 2,
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "status": "CLOSED",
+        "openedAt": "2026-11-20T16:53:14.551Z",
+        "closedAt": "2026-11-20T16:53:14.551Z"
+      }
+    ],
+    "factualChecks": [],
+    "votes": [
+      {
+        "id": "1b1c0563-e2f9-401a-99a3-dabf97307fd2",
+        "participantId": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ACEITO",
+        "justification": "Manifestação fictícia 0: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.542Z"
+      },
+      {
+        "id": "b10d484e-0a82-4210-b626-545794225fbc",
+        "participantId": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ACEITO_COM_RESSALVAS",
+        "justification": "Manifestação fictícia 1: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.542Z"
+      },
+      {
+        "id": "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2",
+        "participantId": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "REJEITO",
+        "justification": "Manifestação fictícia 2: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.542Z"
+      },
+      {
+        "id": "d455f0cf-7bcc-44a1-a62a-32c79a164c9f",
+        "participantId": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ABSTENHO",
+        "justification": "Manifestação fictícia 3: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "848711a4-4895-445f-850f-3849d454a31c",
+        "participantId": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ACEITO",
+        "justification": "Manifestação fictícia 4: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "c4275714-ee91-4695-8501-74091dec40a6",
+        "participantId": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ACEITO_COM_RESSALVAS",
+        "justification": "Manifestação fictícia 5: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "0d586acc-a895-429f-932f-c8cb889fdba0",
+        "participantId": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "REJEITO",
+        "justification": "Manifestação fictícia 6: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "c8018e91-e962-46eb-b9d6-fac0de1063d8",
+        "participantId": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ABSTENHO",
+        "justification": "Manifestação fictícia 7: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "b60019cc-d7db-4fa5-afa0-ef7fc2d328ef",
+        "participantId": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ACEITO",
+        "justification": "Manifestação fictícia 8: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "6fb28e4a-7e5b-44c7-95cb-6474413c1640",
+        "participantId": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "choice": "ACEITO_COM_RESSALVAS",
+        "justification": "Manifestação fictícia 9: preservar fontes, condições e limites.",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "7a4f3b61-3254-4492-9311-dd10769078b0",
+        "participantId": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "ca35c1c6-943f-456b-8dc1-1bf4bccc9b72",
+        "participantId": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "4abdc2a7-6080-471b-a66f-da73e4b1dbe2",
+        "participantId": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "ef181ef3-b92b-4655-a3c9-2434b11fc1a3",
+        "participantId": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "d6a55178-69be-4b3e-9e46-4ed5fe05aa10",
+        "participantId": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "654471a6-34a6-4165-8c75-3013315fe6df",
+        "participantId": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "30c58c10-11ac-49c7-805c-f30096a08208",
+        "participantId": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "938e679b-b3e0-4169-bb4e-e405d71dfbc7",
+        "participantId": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "41132154-2a33-4c9b-9772-5cd4cb8fbddd",
+        "participantId": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      },
+      {
+        "id": "3444f8c6-91b3-424d-9e35-4d265c0b02f2",
+        "participantId": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "roundId": "139d571c-f7c7-4384-9fe1-47ad8b0a8097",
+        "proposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "choice": "ACEITO",
+        "justification": "Aceitação sintética explícita da V2.",
+        "createdAt": "2026-11-20T16:53:14.551Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "51c3e7d9-a19a-45f1-b3eb-99edaa158ba8",
+        "participantId": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 0: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 0: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.542Z"
+      },
+      {
+        "id": "805964b8-c558-43b1-ac4a-cfd3f9e79760",
+        "participantId": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 1: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 1: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.542Z"
+      },
+      {
+        "id": "071ce7fc-4970-43de-906f-158a3b4ff29e",
+        "participantId": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 2: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 2: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "27e39d10-153d-4d08-a714-5c2d1db6d8dc",
+        "participantId": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 3: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 3: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "9fd3a5fe-a6a6-4b3e-b228-5ed380fa1a4c",
+        "participantId": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 4: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 4: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "30b9e7c5-55d4-4b27-b812-836c104e7c2e",
+        "participantId": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 5: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 5: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "c1e3ae24-7a8d-4954-9a6e-d917a70ff8d4",
+        "participantId": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 6: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 6: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "2d9ee65f-25b7-4cd5-87c8-c21a7d6479c4",
+        "participantId": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 7: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 7: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "9fae8aa6-40fd-4735-a469-f01593808f90",
+        "participantId": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 8: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 8: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "ec8a34e5-4e2d-4e0d-875e-8ba7722a934c",
+        "participantId": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Manifestação fictícia 9: preservar fontes, condições e limites.",
+        "originalText": "Manifestação fictícia 9: preservar fontes, condições e limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      },
+      {
+        "id": "001b8535-6f63-44fe-8c51-f8237874ecbb",
+        "participantId": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "text": "Sugestão independente: apresentar limites.",
+        "originalText": "Sugestão independente: apresentar limites.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Parecer sintético de teste; não é resultado Gemini.",
+            "recommendations": [
+              "Esclareça o prazo."
+            ],
+            "assertions": [
+              {
+                "text": "A capacidade é limitada.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Somente o contexto informado."
+              }
+            ],
+            "limitations": [
+              "Sem consulta a fontes externas."
+            ],
+            "clarity": "Objetivo compreensível.",
+            "biasFlags": [],
+            "assumptions": [],
+            "missingInfo": [],
+            "questions": [
+              "Qual o prazo?"
+            ],
+            "uncertainties": [],
+            "suggestedRewrite": "Priorizar acessibilidade e revisar o prazo com a equipe."
+          },
+          "status": "OK",
+          "model": "synthetic-test-only",
+          "promptVersion": "synthetic-only",
+          "reason": "Fixture técnica sem participantes ou provedor real."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:53:14.543Z"
+      }
+    ],
+    "analyses": [
+      {
+        "id": "d0f1afe6-23ae-49ee-928b-13e5a542dd3f",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "sourceFingerprint": "07d729f07554c84535e18a531567e3f15b08b88c5c81f6fc869978df77494a3a",
+        "factualCheckIds": [],
+        "result": {
+          "manifestationAssessments": [
+            {
+              "sourceId": "1b1c0563-e2f9-401a-99a3-dabf97307fd2",
+              "kind": "APOIO",
+              "quotedExcerpt": "Manifestação fictícia 0: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "b10d484e-0a82-4210-b626-545794225fbc",
+              "kind": "RESSALVA",
+              "quotedExcerpt": "Manifestação fictícia 1: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2",
+              "kind": "OBJECAO",
+              "quotedExcerpt": "Manifestação fictícia 2: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "d455f0cf-7bcc-44a1-a62a-32c79a164c9f",
+              "kind": "ABSTENCAO",
+              "quotedExcerpt": "Manifestação fictícia 3: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "848711a4-4895-445f-850f-3849d454a31c",
+              "kind": "APOIO",
+              "quotedExcerpt": "Manifestação fictícia 4: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "c4275714-ee91-4695-8501-74091dec40a6",
+              "kind": "RESSALVA",
+              "quotedExcerpt": "Manifestação fictícia 5: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "0d586acc-a895-429f-932f-c8cb889fdba0",
+              "kind": "OBJECAO",
+              "quotedExcerpt": "Manifestação fictícia 6: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "c8018e91-e962-46eb-b9d6-fac0de1063d8",
+              "kind": "ABSTENCAO",
+              "quotedExcerpt": "Manifestação fictícia 7: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "b60019cc-d7db-4fa5-afa0-ef7fc2d328ef",
+              "kind": "APOIO",
+              "quotedExcerpt": "Manifestação fictícia 8: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "6fb28e4a-7e5b-44c7-95cb-6474413c1640",
+              "kind": "RESSALVA",
+              "quotedExcerpt": "Manifestação fictícia 9: preservar fontes, condições e limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "001b8535-6f63-44fe-8c51-f8237874ecbb",
+              "kind": "CONTRIBUICAO",
+              "quotedExcerpt": "Sugestão independente: apresentar limites.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            },
+            {
+              "sourceId": "23c39bc5-be3b-4c66-858a-08c3dacc2966",
+              "kind": "CONTESTACAO",
+              "quotedExcerpt": "Contestação sintética: preservar o sentido da condição.",
+              "interpretation": "Interpretação sintética do registro.",
+              "suggestedPath": "Revisar com o grupo."
+            }
+          ],
+          "individualAssessments": [
+            {
+              "voteId": "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2",
+              "relevance": "Pertinente",
+              "explanation": "Discordância preservada.",
+              "quotedExcerpt": "Manifestação fictícia 2: preservar fontes, condições e limites.",
+              "premises": [],
+              "evidence": [],
+              "risks": [],
+              "uncertainty": "Não verificada."
+            },
+            {
+              "voteId": "0d586acc-a895-429f-932f-c8cb889fdba0",
+              "relevance": "Pertinente",
+              "explanation": "Discordância preservada.",
+              "quotedExcerpt": "Manifestação fictícia 6: preservar fontes, condições e limites.",
+              "premises": [],
+              "evidence": [],
+              "risks": [],
+              "uncertainty": "Não verificada."
+            }
+          ],
+          "sharedInterests": [
+            "Entregar o projeto"
+          ],
+          "convergences": [],
+          "conflicts": [
+            "Prazo"
+          ],
+          "incompatibleObjections": [],
+          "nonNegotiableConditions": [],
+          "uncertainties": [
+            "Capacidade não comprovada"
+          ]
+        },
+        "model": "synthetic-test-only",
+        "promptVersion": "synthetic-only",
+        "createdAt": "2026-11-20T16:53:14.545Z"
+      }
+    ],
+    "syntheses": [
+      {
+        "id": "99dce480-9abb-4cf6-b1b8-ba1c3150f2c6",
+        "proposalId": "19f66516-3337-4789-b346-62c3284332c2",
+        "roundId": "b2d93e7b-f258-4b1b-a987-cec583d3c417",
+        "analysisId": "d0f1afe6-23ae-49ee-928b-13e5a542dd3f",
+        "factualCheckIds": [],
+        "result": {
+          "consideredSourceIds": [
+            "1b1c0563-e2f9-401a-99a3-dabf97307fd2",
+            "b10d484e-0a82-4210-b626-545794225fbc",
+            "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2",
+            "d455f0cf-7bcc-44a1-a62a-32c79a164c9f",
+            "848711a4-4895-445f-850f-3849d454a31c",
+            "c4275714-ee91-4695-8501-74091dec40a6",
+            "0d586acc-a895-429f-932f-c8cb889fdba0",
+            "c8018e91-e962-46eb-b9d6-fac0de1063d8",
+            "b60019cc-d7db-4fa5-afa0-ef7fc2d328ef",
+            "6fb28e4a-7e5b-44c7-95cb-6474413c1640",
+            "001b8535-6f63-44fe-8c51-f8237874ecbb",
+            "23c39bc5-be3b-4c66-858a-08c3dacc2966"
+          ],
+          "revisedProposal": {
+            "title": "[SINTÉTICO — IA SIMULADA] Revisão humana rastreável",
+            "problem": "Há tarefas concorrentes e capacidade limitada.",
+            "decision": "Definir a ordem de execução do projeto.",
+            "goals": "Entregar com acesso amplo.",
+            "alternatives": "",
+            "constraints": "",
+            "successCriteria": "",
+            "context": "",
+            "text": "SIMULAÇÃO TÉCNICA: preparar nota com fontes e limitações, sem eficácia científica presumida. Revisar o prazo após avaliar capacidade."
+          },
+          "changeLog": [
+            {
+              "change": "Revisar prazo",
+              "reason": "Preocupação apresentada",
+              "voteIds": [
+                "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2"
+              ],
+              "sourceIds": [
+                "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2"
+              ]
+            },
+            {
+              "change": "Revisar prazo",
+              "reason": "Preocupação apresentada",
+              "voteIds": [
+                "0d586acc-a895-429f-932f-c8cb889fdba0"
+              ],
+              "sourceIds": [
+                "0d586acc-a895-429f-932f-c8cb889fdba0"
+              ]
+            }
+          ],
+          "addressedObjections": [],
+          "partiallyAddressedObjections": [
+            "bf26a9d7-54b9-44a1-94d9-9515d4c1d2e2",
+            "0d586acc-a895-429f-932f-c8cb889fdba0"
+          ],
+          "unresolvedObjections": [],
+          "remainingImpasses": [
+            "Prazo ainda requer confirmação"
+          ],
+          "feasibilityWarnings": [
+            "Validar capacidade"
+          ]
+        },
+        "model": "synthetic-test-only",
+        "promptVersion": "synthetic-only",
+        "createdAt": "2026-11-20T16:53:14.547Z",
+        "publishedProposalId": "94a0473c-9660-41f5-b274-b87b2c257db2",
+        "humanCoverage": []
+      }
+    ],
+    "contests": [
+      {
+        "id": "23c39bc5-be3b-4c66-858a-08c3dacc2966",
+        "participantId": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "targetId": "001b8535-6f63-44fe-8c51-f8237874ecbb",
+        "text": "Contestação sintética: preservar o sentido da condição.",
+        "at": "2026-11-20T16:53:14.543Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "c360eb98-00a5-4142-8dfd-17bef5eea5f0",
+        "at": "2026-11-20T16:53:14.542Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "68a66ddd-c627-4235-80b6-9f5a5f092456",
+        "at": "2026-11-20T16:53:14.542Z",
+        "actor": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "25768460-d05a-46b2-ab8a-ccc162f751fa",
+        "at": "2026-11-20T16:53:14.542Z",
+        "actor": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "ddfbdd51-e56d-4cf1-91ea-5bde4d0762f7",
+        "at": "2026-11-20T16:53:14.542Z",
+        "actor": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO_COM_RESSALVAS"
+      },
+      {
+        "id": "2ba606c8-cb0a-4ebe-b5a0-8cbabb1259cb",
+        "at": "2026-11-20T16:53:14.542Z",
+        "actor": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "88e24d82-5ec8-4984-9a9f-6f6401b28f6a",
+        "at": "2026-11-20T16:53:14.542Z",
+        "actor": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "831e102d-3bf9-4901-a153-deab802d1486",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "28e6aa14-c2d1-43b5-be60-dff1dd4677f0",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "461932cb-47ba-48da-9809-804c12b8a2f2",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "2a58c737-38a6-46af-86d2-587535ad1c57",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "31283bbf-0d1a-4fed-9e94-d3bf36da4e0b",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "991b2e9e-8748-435d-9e03-df05a21e1cb0",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO_COM_RESSALVAS"
+      },
+      {
+        "id": "fb694523-0009-4479-b5ec-c063a6222416",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "d74c3208-906b-4f9c-9bd2-07f5687dd8b6",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "bd1e8261-9810-4a92-b4d8-9d9923c7b41c",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "cf10dd19-857b-4256-b35f-159b49217a20",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "71cdd340-0c71-4569-8f73-4d5dc6c63ffb",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "51b4e740-239c-45b4-abca-cf00a6cfc88b",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "16deb803-20d6-42bd-8848-301f71f9c497",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "6a701cf9-6862-443e-a4f7-e94c1837d862",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO_COM_RESSALVAS"
+      },
+      {
+        "id": "beda3c3a-09a5-47f9-aeef-f36b7a1f0bbe",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "cc3caf11-aca9-42b8-8521-a3a3603e003d",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "b933dc97-0b30-41df-9404-b0abad13070a",
+        "at": "2026-11-20T16:53:14.543Z",
+        "actor": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "type": "AI_CONTESTED",
+        "detail": "Contestação sintética: preservar o sentido da condição."
+      },
+      {
+        "id": "5b2d649a-5e7d-4374-8eaf-1317a6ad5b9d",
+        "at": "2026-11-20T16:53:14.545Z",
+        "actor": "moderator",
+        "type": "OBJECTIONS_ANALYZED",
+        "detail": ""
+      },
+      {
+        "id": "3b58f047-cf86-4915-8442-4aa4e4607016",
+        "at": "2026-11-20T16:53:14.547Z",
+        "actor": "moderator",
+        "type": "SYNTHESIS_DRAFTED",
+        "detail": ""
+      },
+      {
+        "id": "5d3252a2-189a-4e3a-b0c2-d8e159ff5f33",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "moderator",
+        "type": "PROPOSAL_PUBLISHED",
+        "detail": "Ensaio exclusivamente sintético: moderador alterou uma saída de IA SIMULADA por fixture; não é uma resposta Gemini real."
+      },
+      {
+        "id": "88e5f5ba-2bd3-4da2-8de6-78ba1b6f1ce8",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "5a015f55-0392-460f-9e8e-0d2289af2df9",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "a24e2a1c-2e8f-4b51-801b-159c8d983a06",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "ec2ad808-06ce-46dd-a141-5bce22f5bc69",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "5dcd1eb5-c3a9-4022-991f-a3b374b75f1f",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "d8d8e34f-e114-4553-a2f3-bc279b6c072e",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "bc1f08e2-3ca9-4c5f-bd3c-743f9e96f3dd",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "0dcfa110-08b1-43c0-9211-614de9676d9d",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "39c5f5ed-fea8-4305-ad4f-4932b967d7a9",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "952b8da5-0396-468c-b21b-629a8c355e4f",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "ba4ce5f3-1e0a-46b8-abf6-3729963c9b47",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "ab423c54-a0ed-4f3c-b856-6bfe99227f59",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3897afb6-9005-4fbc-9a3f-ff3dd067ee30",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "e9819fe7-b7d7-4831-8831-45e0a25c7317",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "0bba3a81-2c49-4818-a9cd-98762ca64472",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "c216698c-6ebd-4921-8b86-2f176460647b",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "c6ae122e-93c7-4015-95da-571db3b45c59",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "0d589743-ebc6-4a60-86e1-df4efcecd833",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "439495d3-2912-4e64-ad19-0d645c31da63",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "111d9b66-a741-4623-86ef-86a2a1254fe8",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "b4dc1628-38b5-43e0-a3e7-6242ad16f306",
+        "at": "2026-11-20T16:53:14.551Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      }
+    ],
+    "evaluations": []
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 2,
+      "deliberationMs": 24,
+      "repeatedObjections": [],
+      "votes": 20,
+      "conditionalAcceptances": 3,
+      "objections": 2,
+      "distinctObjectionsByRound": 2
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 10,
+    "received": 0,
+    "nonrespondents": 10,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "groups": [],
+    "mixedVersions": false,
+    "pooledSummary": "UMA_VERSAO",
+    "denominator": "Frequências e médias usam somente respostas individuais enviadas; n inclui apenas notas 1–5. N/A, itens ausentes e participantes não respondentes são separados. Dimensões agrupam respostas a itens, não um escore validado.",
+    "openResponses": [],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

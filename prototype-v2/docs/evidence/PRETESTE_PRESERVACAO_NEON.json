@@ -1,0 +1,42 @@
+{
+  "observedAt": "2026-11-20T17:05:22.727Z",
+  "scope": "Somente V2; consultas de integridade e contadores sem dados pessoais",
+  "baselineCutoff": "2026-11-20T16:28:55.081Z",
+  "before": {
+    "old_snapshots": 147,
+    "aggregate_md5": "5e0a42c4ce18d7d60d224182ce20a930"
+  },
+  "after": {
+    "old_snapshots": 147,
+    "aggregate_md5": "5e0a42c4ce18d7d60d224182ce20a930"
+  },
+  "unchanged": true,
+  "readOnlyInspection": true,
+  "newDestructiveMigration": false,
+  "backupNote": "Snapshots append-only anteriores preservados; conferência de integridade não equivale a pg_dump.",
+  "providerBudget": {
+    "search": {
+      "day": "2026-11-20",
+      "calls": 3,
+      "month": "2026-11",
+      "minute": [
+        1795192314064.829,
+        1795192362306.338
+      ],
+      "monthly": 4
+    },
+    "gemini": {
+      "day": "2026-11-20",
+      "calls": 15,
+      "month": "2026-11",
+      "minute": [
+        1795192354130.212,
+        1795192363375.998,
+        1795192407393.559
+      ],
+      "monthly": 15
+    }
+  },
+  "uniqueTavilyRequestsInThisTask": 2,
+  "observedTavilyCreditsInThisTask": 2
+}

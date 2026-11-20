@@ -1,0 +1,25 @@
+{
+  "syntheticOnly": true,
+  "before": {
+    "at": "2026-11-20T16:50:45.944Z",
+    "status": [
+      "Rodada 1 · Proposta V1Deliberação aberta"
+    ],
+    "draft": "RASCUNHO SINTÉTICO NÃO ENVIADO DA RODADA 1: preservar o texto quando chegar a nova proposta."
+  },
+  "after": {
+    "at": "2026-11-20T16:51:27.691Z",
+    "status": [
+      "Nova rodada publicada. Confira a proposta antes de se manifestar.",
+      "Rodada 2 · Proposta V2Deliberação aberta"
+    ],
+    "draft": "RASCUNHO SINTÉTICO NÃO ENVIADO DA RODADA 1: preservar o texto quando chegar a nova proposta.",
+    "blocked": true,
+    "refreshClicked": false,
+    "pageReloaded": false,
+    "independentBrowsers": [
+      "Chrome",
+      "IAB"
+    ]
+  }
+}

@@ -15,7 +15,7 @@ const view=(s:ReturnType<typeof state>,revision:number):RoomView=>({revision,sta
 
 test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exige confirmação e recupera conexão',async t=>{
  const s=state();let remote=view(s,1),fail=false;let rendered!:ReactTestRenderer;
- const fetchMock=t.mock.method(globalThis,'fetch',async()=>{if(fail)throw Error('synthetic network failure');return {ok:true,json:async()=>structuredClone(remote)} as Response;});
+ const fetchMock=t.mock.method(globalThis,'fetch',async(_url:RequestInfo|URL,init?:RequestInit)=>{if(fail)throw Error('synthetic network failure');const body=JSON.parse(String(init?.body));return {ok:true,json:async()=>body.knownRevision===remote.revision?{revision:remote.revision,unchanged:true}:structuredClone(remote)} as Response;});
  t.mock.timers.enable({apis:['setTimeout']});
  try{
   await act(async()=>{rendered=create(<App/>);});
@@ -25,6 +25,7 @@ test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exi
   await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
   const manifest=()=>rendered.root.findAllByType('textarea').find(x=>x.props.rows===5)!;
   await act(async()=>manifest().props.onChange({target:{value:'Rascunho humano ainda não enviado.'}}));
+  await act(async()=>{t.mock.timers.tick(4000);});assert.equal(manifest().props.value,'Rascunho humano ainda não enviado.');
   publish(s,{...proposal,text:'Segunda proposta sintética publicada.'},currentProposal(s).id,'Revisão humana sintética');remote=view(s,2);
   await act(async()=>{t.mock.timers.tick(4000);});
   assert.equal(manifest().props.value,'Rascunho humano ainda não enviado.');
@@ -35,7 +36,7 @@ test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exi
   await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Confirmar reutilização do meu texto na rodada atual'))!.props.onClick());assert.equal(register().props.disabled,false);assert.equal(manifest().props.value,'Rascunho humano ainda não enviado.');
   fail=true;await act(async()=>{t.mock.timers.tick(4000);});assert.ok(JSON.stringify(rendered.toJSON()).includes('temporariamente indisponível'));assert.equal(manifest().props.value,'Rascunho humano ainda não enviado.');
   fail=false;closeWithoutConsensus(s,'Encerramento sintético legítimo');remote=view(s,3);await act(async()=>{t.mock.timers.tick(4000);});
-  const html=JSON.stringify(rendered.toJSON());assert.ok(html.includes('Encerrado sem consenso'));assert.ok(html.includes('Rascunho humano ainda não enviado.'));assert.ok(!html.includes('temporariamente indisponível'));assert.equal(fetchMock.mock.callCount(),4);
+  const html=JSON.stringify(rendered.toJSON());assert.ok(html.includes('Encerrado sem consenso'));assert.ok(html.includes('Rascunho humano ainda não enviado.'));assert.ok(!html.includes('temporariamente indisponível'));assert.equal(fetchMock.mock.callCount(),5);
  }finally{if(rendered)await act(async()=>rendered.unmount());t.mock.timers.reset();}
 });
 

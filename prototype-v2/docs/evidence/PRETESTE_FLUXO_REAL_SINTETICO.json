@@ -1,0 +1,1699 @@
+{
+  "format": "dc2-consensus",
+  "version": 2,
+  "exportedAt": "2026-11-20T16:52:13.278Z",
+  "state": {
+    "schemaVersion": 2,
+    "initialDraft": {
+      "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+      "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+      "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+      "goals": "",
+      "alternatives": "",
+      "constraints": "",
+      "successCriteria": "",
+      "context": "",
+      "text": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026 sem presumir preços, disponibilidade ou opção mais barata. Discutir condições e publicar revisão humana quando necessária."
+    },
+    "decision": {
+      "id": "2f5b1573-ac85-4c3b-a1ac-a76fe24ddb32",
+      "originId": "2f5b1573-ac85-4c3b-a1ac-a76fe24ddb32",
+      "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+      "status": "CONSENSUS",
+      "createdAt": "2026-11-20T16:31:13.853Z",
+      "closedAt": "2026-11-20T16:52:12.933Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "participants": [
+      {
+        "id": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "alias": "P01"
+      },
+      {
+        "id": "adec2996-c1eb-4552-8656-c3178a547250",
+        "alias": "P02"
+      },
+      {
+        "id": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "alias": "P03"
+      },
+      {
+        "id": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "alias": "P04"
+      },
+      {
+        "id": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "alias": "P05"
+      },
+      {
+        "id": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "alias": "P06"
+      },
+      {
+        "id": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "alias": "P07"
+      },
+      {
+        "id": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "alias": "P08"
+      },
+      {
+        "id": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "alias": "P09"
+      },
+      {
+        "id": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "alias": "P10"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "version": 1,
+        "parentId": null,
+        "content": {
+          "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+          "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+          "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+          "goals": "",
+          "alternatives": "",
+          "constraints": "",
+          "successCriteria": "",
+          "context": "",
+          "text": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026 sem presumir preços, disponibilidade ou opção mais barata. Discutir condições e publicar revisão humana quando necessária."
+        },
+        "createdAt": "2026-11-20T16:31:13.853Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "Proposta de definição de plano fictício para comparação de hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026, com foco em consulta sem presunção de preços e necessidade de revisão humana.",
+            "recommendations": [
+              "Manter clareza sobre o caráter estritamente fictício do teste.",
+              "Garantir a necessidade de revisão humana em qualquer alteração futura."
+            ],
+            "assertions": [
+              {
+                "text": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "Consta explicitamente no texto da proposta."
+              }
+            ],
+            "limitations": [
+              "O grupo é exclusivamente fictício e não representa coleta científica."
+            ],
+            "clarity": "O texto da proposta é direto e define claramente o escopo do pré-teste.",
+            "biasFlags": [
+              "Viés de enquadramento voltado a cenários estritamente hipotéticos."
+            ],
+            "assumptions": [
+              "Assume-se que os dados consultados possuem apenas finalidade de simulação."
+            ],
+            "missingInfo": [
+              "Detalhes sobre critérios específicos de seleção das hospedagens."
+            ],
+            "questions": [
+              "Quais métricas adicionais poderiam ser incluídas na revisão humana?"
+            ],
+            "uncertainties": [
+              "Incerteza sobre a aplicabilidade prática das condições simuladas."
+            ],
+            "suggestedRewrite": "Definir condições de um plano fictício para consulta de hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026, sem presumir preços ou disponibilidade, exigindo revisão humana quando necessário."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "gemini-3.5-flash-lite",
+          "reason": "Moderador confirmou a versão publicada após parecer sobre o rascunho preservado."
+        }
+      },
+      {
+        "id": "701164af-fb79-4a47-b586-988125a84d1c",
+        "version": 2,
+        "parentId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "content": {
+          "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+          "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+          "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+          "goals": "",
+          "alternatives": "",
+          "constraints": "",
+          "successCriteria": "",
+          "context": "",
+          "text": "ENSAIO SINTÉTICO: comparar destinos com o mesmo período, teto de orçamento definido pelo grupo, transporte e condições de cancelamento. Confirmar preços e disponibilidade antes de reservar; nenhuma escolha é automática."
+        },
+        "createdAt": "2026-11-20T16:50:59.111Z",
+        "approvedBy": "moderator",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1",
+          "model": "human",
+          "reason": "Revisão manual de contingência em teste técnico sintético após erros 503 do Gemini; não representa síntese Gemini validada."
+        },
+        "intervention": {
+          "kind": "EDICAO_HUMANA",
+          "source": "PROPOSTA_ANTERIOR",
+          "sourceId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+          "original": {
+            "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+            "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+            "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+            "goals": "",
+            "alternatives": "",
+            "constraints": "",
+            "successCriteria": "",
+            "context": "",
+            "text": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026 sem presumir preços, disponibilidade ou opção mais barata. Discutir condições e publicar revisão humana quando necessária."
+          },
+          "published": {
+            "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+            "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+            "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+            "goals": "",
+            "alternatives": "",
+            "constraints": "",
+            "successCriteria": "",
+            "context": "",
+            "text": "ENSAIO SINTÉTICO: comparar destinos com o mesmo período, teto de orçamento definido pelo grupo, transporte e condições de cancelamento. Confirmar preços e disponibilidade antes de reservar; nenhuma escolha é automática."
+          },
+          "changes": [
+            {
+              "field": "text",
+              "before": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026 sem presumir preços, disponibilidade ou opção mais barata. Discutir condições e publicar revisão humana quando necessária.",
+              "after": "ENSAIO SINTÉTICO: comparar destinos com o mesmo período, teto de orçamento definido pelo grupo, transporte e condições de cancelamento. Confirmar preços e disponibilidade antes de reservar; nenhuma escolha é automática."
+            }
+          ],
+          "reason": "Revisão manual de contingência em teste técnico sintético após erros 503 do Gemini; não representa síntese Gemini validada.",
+          "at": "2026-11-20T16:50:59.111Z",
+          "actor": "moderator"
+        }
+      }
+    ],
+    "rounds": [
+      {
+        "id": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "number": 1,
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "status": "CLOSED",
+        "openedAt": "2026-11-20T16:31:13.853Z",
+        "closedAt": "2026-11-20T16:50:59.111Z"
+      },
+      {
+        "id": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "number": 2,
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "status": "CLOSED",
+        "openedAt": "2026-11-20T16:50:59.111Z",
+        "closedAt": "2026-11-20T16:52:12.933Z"
+      }
+    ],
+    "factualChecks": [
+      {
+        "originalText": "A Lua é um satélite natural da Terra.",
+        "createdAt": "2026-11-20T16:31:47.430Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.1",
+        "modality": "VERIFY",
+        "retrievalProvider": "TAVILY",
+        "classificationSourceCheckId": null,
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "A Lua é o satélite natural da Terra.",
+              "originalExcerpt": "A Lua é um satélite natural da Terra.",
+              "kind": "FATO_VERIFICAVEL",
+              "query": "A Lua é um satélite natural da Terra",
+              "timeSensitive": false,
+              "reason": "Trata-se de um fato astronômico público e verificável sobre a órbita e natureza da Lua em relação à Terra."
+            },
+            "status": "EVIDENCIA_FAVORAVEL",
+            "explanation": "As evidências recuperadas confirmam diretamente a alegação de que a Lua é o satélite natural da Terra.",
+            "providerText": "{\n  \"status\": \"EVIDENCIA_FAVORAVEL\",\n  \"explanation\": \"As evidências recuperadas confirmam diretamente a alegação de que a Lua é o satélite natural da Terra.\",\n  \"scopeMatches\": true,\n  \"evidenceLinks\": [\n    {\n      \"sourceId\": \"S1\",\n      \"quote\": \"Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Afirma claramente que a Lua é o satélite natural da Terra.\"\n    },\n    {\n      \"sourceId\": \"S2\",\n      \"quote\": \"A Lua é o único satélite natural do planeta Terra.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Confirma que a Lua é o satélite natural da Terra.\"\n    },\n    {\n      \"sourceId\": \"S3\",\n      \"quote\": \"A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km.\",\n      \"relation\": \"SUPPORTS\",\n      \"explanation\": \"Confirma a condição da Lua como satélite natural da Terra.\"\n    }\n  ],\n  \"uncertainties\": []\n}",
+            "responseModel": "gemini-3.5-flash-lite",
+            "queriedAt": "2026-11-20T16:31:57.132Z",
+            "limitations": [
+              "Recuperar um resultado não comprova a alegação. A interpretação do Gemini é consultiva e falível.",
+              "O trecho é o conteúdo retornado pela Tavily; a aplicação não realizou leitura independente da página.",
+              "Data não fornecida ou não reconhecida nos metadados; nenhuma data foi criada pelo Gemini.",
+              "A data Tavily é uma estimativa de publicação ou atualização; pode divergir da publicação original."
+            ],
+            "failureCode": null,
+            "searchAttempted": true,
+            "attemptedQuery": "A Lua é um satélite natural da Terra",
+            "sources": [
+              {
+                "id": "S1",
+                "title": "Lua – Wikipédia, a enciclopédia livre",
+                "url": "https://pt.wikipedia.org/wiki/Lua",
+                "publishedAt": "2025-10-19T00:00:00.000Z",
+                "provider": "TAVILY",
+                "providerId": "dae877-00",
+                "excerpt": "Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar. É o maior satélite natural de um planeta no sistema solar em relação ao tamanho do seu corpo primário \"Primário (astronomia)\"), tendo 27% do dimetro e 60% da densidade da Terra, o que representa 1⁄81 da sua massa. Entre os satélites cuja densidade é conhecida, a Lua é o segundo mais denso, atrás de Io \"Io (satélite)\"). Estima-se que a formação da Lua tenha ocorrido há cerca de 4,51 mil milhões\\ de anos, relativamente",
+                "excerptTruncated": false,
+                "contentSha256": "6aacf76c6dc4f895967954c6e1fe3ed3c490283376f7a66643bf47d9b7e8f6b8",
+                "score": 0.8824279,
+                "publishedAtRaw": "Sun, 19 Oct 2025 00:00:00 GMT",
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S2",
+                "title": "Lua: características, fases, origem, formação - Brasil Escola",
+                "url": "https://brasilescola.uol.com.br/geografia/lua.htm",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "b2b663-01",
+                "excerpt": "A Lua é o único satélite natural do planeta Terra. Esse corpo celeste possui um raio de aproximadamente 1740 km, o que o torna a quinta maior lua de todo o Sistema Solar. A massa da Lua é de 7,35 x 1019 toneladas, valor que corresponde a apenas 1,23% da massa terrestre. Ela está posicionada a uma distncia de 384.400 km do nosso planeta, intervalo, pelo menos, 18 vezes maior do que quando ela se formou, há 4,5 bilhões de anos. O processo de distanciamento não cessou, e a cada ano ele aumenta em [...] A Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar. Ela se formou, há aproximadamente 4,5 bilhões de anos, do impacto de um grande corpo celeste com o planeta, e desde então realiza a sua órbita ao redor dele e também do Sol. A forma como a luz solar incide sobre a sua superfície e como a enxergamos da Terra produz as diferentes fases da Lua. Além disso, ela interage com o nosso planeta e dá origem às marés e aos eclipses. [...] A Lua é o único satélite natural da Terra.\n Está a 384.400 km do planeta, e a cada ano se afasta 3,78 centímetros.\n Apresenta uma exosfera fina e frágil, e sua estrutura é composta por crosta, manto e núcleo.\n Sua superfície está repleta de crateras de impacto, fragmentos de rocha e poeira.\n Crateras preenchidas com lava no passado deram origem a pequenas elevações (marias) nela.\n Formou-se, há 4,5 bilhões de anos, do impacto de um enorme meteorito na Terra.",
+                "excerptTruncated": false,
+                "contentSha256": "757a9cab34bc1bd2ac83b717ec987156f8df447a73eba75dc301a85613a4f696",
+                "score": 0.8750414,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S3",
+                "title": "A Lua – satélite natural da Terra",
+                "url": "https://dpid.cidadaopg.sp.gov.br/pde/arquivos/1620150381790~5%C2%BAano%20-%20Ci%C3%AAncias%20v.02%20-%20Semanas%207%20e%208.pdf",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "f7cd4d-02",
+                "excerpt": "A Lua – satélite natural da Terra A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km. A nossa Lua é o único corpo celeste a receber seres humanos. O seu diâmetro é de aproximadamente 3.500 km, por essa razão seu tamanho é 80 vezes inferior ao do planeta Terra. A imagem abaixo mostra a diferença entre o tamanho da Terra e a Lua: Imagem: Comparação de diâmetros da Terra e da Lua. Arquivo criado pela NASA no domínio público. Esse corpo celeste é visto da Terra [...] é visto da Terra e exibe várias fases, mesmo assim expõe sempre a mesma face. O tempo gasto para realização do movimento de rotação é o mesmo para o de translação. Apesar de ser o segundo corpo mais brilhante no céu, atrás somente do Sol, a Lua não possui brilho próprio, sendo iluminada pela luz solar. À medida que a Lua viaja ao redor da Terra ao longo do mês, ela passa por um ciclo de fases, durante o qual sua forma parece variar gradualmente. O ciclo completo dura aproximadamente 29,5 dias. [...] é marcada por pouca luminosidade, pois sua face voltada para a Terra não está sendo iluminada pelo Sol.  Lua crescente: considerada a fase de transição da Lua nova para a Lua cheia, a Lua crescente é caracterizada por receber luminosidade em apenas uma face (no lado oposto da minguante). Responda as questões colocando a resposta em seu caderno: 1) Qual é o satélite natural da Terra? 2) Complete: “A Lua é ____________ menor que a Terra.” 3) A Lua tem brilho próprio? 4) Explique cada movimento",
+                "excerptTruncated": false,
+                "contentSha256": "4ccc28bf5eb31bb214f7468739499692331f039944468beb098869c8719a8af8",
+                "score": 0.86350673,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              }
+            ],
+            "retrieval": {
+              "provider": "TAVILY",
+              "endpoint": "SEARCH",
+              "searchDepth": "basic",
+              "query": "A Lua é um satélite natural da Terra",
+              "requestId": "9d3efa37-cb22-485a-96ee-50d81e55f8f5",
+              "queriedAt": "2026-11-20T16:31:55.310Z",
+              "creditsUsed": 1,
+              "responseTimeSeconds": 1.19,
+              "resultsReceived": 3,
+              "resultsRetained": 3,
+              "rawResponseSha256": "671ffcc0e402ca3c29a7e69c0e2d5e4ccdef4931672a324530d44c8959564c13"
+            },
+            "scopeMatches": true,
+            "evidenceLinks": [
+              {
+                "sourceId": "S1",
+                "quote": "Lua é o único satélite natural da Terra e o quinto maior do Sistema Solar.",
+                "relation": "SUPPORTS",
+                "explanation": "Afirma claramente que a Lua é o satélite natural da Terra."
+              },
+              {
+                "sourceId": "S2",
+                "quote": "A Lua é o único satélite natural do planeta Terra.",
+                "relation": "SUPPORTS",
+                "explanation": "Confirma que a Lua é o satélite natural da Terra."
+              },
+              {
+                "sourceId": "S3",
+                "quote": "A Lua é o satélite natural do planeta Terra, distanciados por aproximadamente 384.405 km.",
+                "relation": "SUPPORTS",
+                "explanation": "Confirma a condição da Lua como satélite natural da Terra."
+              }
+            ]
+          }
+        ],
+        "id": "5fa8f865-69c7-460c-9325-161e33e09ce5",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "participantId": null
+      },
+      {
+        "originalText": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+        "createdAt": "2026-11-20T16:32:34.128Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.1",
+        "modality": "RESEARCH",
+        "retrievalProvider": "TAVILY",
+        "classificationSourceCheckId": null,
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+              "originalExcerpt": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+              "kind": "SOLICITACAO_PESQUISA",
+              "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+              "timeSensitive": true,
+              "reason": "Pergunta pública sobre disponibilidade de hospedagem em datas futuras específicas, exigindo busca atualizada."
+            },
+            "status": "VERIFICACAO_INDISPONIVEL",
+            "explanation": "A consulta não foi concluída. Sua manifestação pode ser mantida e contestada normalmente.",
+            "providerText": "",
+            "responseModel": null,
+            "queriedAt": "2026-11-20T16:32:46.722Z",
+            "limitations": [
+              "Não há confirmação factual. Nenhuma mudança de posição é exigida."
+            ],
+            "failureCode": "GEMINI_TEMPORARILY_UNAVAILABLE",
+            "searchAttempted": true,
+            "attemptedQuery": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+            "failureStage": "INTERPRETATION",
+            "sources": [
+              {
+                "id": "S1",
+                "title": "AS FÉRIAS ESTÃO CHEGANDO… E SUA ROTINA PODE SER ...",
+                "url": "https://www.instagram.com/reel/DfsNChSthnm",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "5c2840-00",
+                "excerpt": "Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios. ☀️",
+                "excerptTruncated": false,
+                "contentSha256": "b7174de67def8e5272cde3fb067fe13cc5aa27727f49bee136aeca84b44bd44a",
+                "score": 0.2726051,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S2",
+                "title": "ᐉ BONITO PARAISO ILHA GRANDE ( BRASIL ) FOTOS REAIS E ...",
+                "url": "https://bonito-paraiso-ilha-grande.allriodejaneirohotels.com/pt",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "edbc3d-01",
+                "excerpt": "Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande. Este hotel de 9 quartos disponibiliza",
+                "excerptTruncated": false,
+                "contentSha256": "b3e5bd7d7881c9fe265372d17804cff602563a0169eeb92d3286410e43953164",
+                "score": 0.26038948,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              }
+            ],
+            "retrieval": {
+              "provider": "TAVILY",
+              "endpoint": "SEARCH",
+              "searchDepth": "basic",
+              "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+              "requestId": "0bf6e393-7463-49db-afc1-59d0b4fac9aa",
+              "queriedAt": "2026-11-20T16:32:43.369Z",
+              "creditsUsed": 1,
+              "responseTimeSeconds": 1.01,
+              "resultsReceived": 2,
+              "resultsRetained": 2,
+              "rawResponseSha256": "21eeb6462139941a7ffe1e3b83c6e2184d935b5fb03ae4b4bb3a3b855181c4e1"
+            },
+            "scopeMatches": false,
+            "evidenceLinks": []
+          }
+        ],
+        "id": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "participantId": null
+      },
+      {
+        "originalText": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+        "createdAt": "2026-11-20T16:33:27.391Z",
+        "provenance": "LIVE_PROVIDER",
+        "model": "gemini-3.5-flash-lite",
+        "version": "factual-tavily-gemini-v2.1",
+        "modality": "RESEARCH",
+        "retrievalProvider": "TAVILY",
+        "classificationSourceCheckId": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05",
+        "classificationModel": "gemini-3.5-flash-lite",
+        "claims": [
+          {
+            "claim": {
+              "text": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+              "originalExcerpt": "Quais hospedagens existem em Búzios e Ilha Grande de 25 a 31 de dezembro de 2026?",
+              "kind": "SOLICITACAO_PESQUISA",
+              "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+              "timeSensitive": true,
+              "reason": "Pergunta pública sobre disponibilidade de hospedagem em datas futuras específicas, exigindo busca atualizada."
+            },
+            "status": "EVIDENCIA_INSUFICIENTE",
+            "explanation": "A solicitação de pesquisa exige listar hospedagens específicas em Búzios e Ilha Grande para o período de 25 a 31 de dezembro de 2026. As fontes recuperadas contêm apenas menções genéricas ou nomes de locais ('Casa Recanto Ilha de Búzios' e 'Bonito Paraiso Ilha Grande'), sem apresentar disponibilidade, valores, confirmações de funcionamento ou dados para o período exato solicitado (dezembro de 2026). Portanto, a evidência é insuficiente para responder de forma abrangente.",
+            "providerText": "{\n  \"status\": \"EVIDENCIA_INSUFICIENTE\",\n  \"explanation\": \"A solicitação de pesquisa exige listar hospedagens específicas em Búzios e Ilha Grande para o período de 25 a 31 de dezembro de 2026. As fontes recuperadas contêm apenas menções genéricas ou nomes de locais ('Casa Recanto Ilha de Búzios' e 'Bonito Paraiso Ilha Grande'), sem apresentar disponibilidade, valores, confirmações de funcionamento ou dados para o período exato solicitado (dezembro de 2026). Portanto, a evidência é insuficiente para responder de forma abrangente.\",\n  \"scopeMatches\": false,\n  \"evidenceLinks\": [\n    {\n      \"sourceId\": \"S1\",\n      \"quote\": \"Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios.\",\n      \"relation\": \"CONTEXT\",\n      \"explanation\": \"A citação menciona Búzios e uma hospedagem genérica, mas não traz informações sobre o período de 25 a 31 de dezembro de 2026.\"\n    },\n    {\n      \"sourceId\": \"S2\",\n      \"quote\": \"Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande.\",\n      \"relation\": \"CONTEXT\",\n      \"explanation\": \"A citação cita uma hospedagem em Ilha Grande, mas não confirma disponibilidade nem dados referentes a dezembro de 2026.\"\n    }\n  ],\n  \"uncertainties\": [\n    \"Falta de dados específicos de disponibilidade para o período de 25 a 31 de dezembro de 2026.\",\n    \"Ausência de uma listagem completa e comparável de hospedagens ativas em ambas as localidades para as datas da solicitação.\"\n  ]\n}",
+            "responseModel": "gemini-3.5-flash-lite",
+            "queriedAt": "2026-11-20T16:33:41.140Z",
+            "limitations": [
+              "Recuperar um resultado não comprova a alegação. A interpretação do Gemini é consultiva e falível.",
+              "O trecho é o conteúdo retornado pela Tavily; a aplicação não realizou leitura independente da página.",
+              "Falta de dados específicos de disponibilidade para o período de 25 a 31 de dezembro de 2026.",
+              "Ausência de uma listagem completa e comparável de hospedagens ativas em ambas as localidades para as datas da solicitação.",
+              "Data não fornecida ou não reconhecida nos metadados; nenhuma data foi criada pelo Gemini.",
+              "Atualidade necessária não comprovada por data fornecida pela Tavily dentro das últimas 72 horas."
+            ],
+            "failureCode": "FRESHNESS_NOT_ESTABLISHED",
+            "searchAttempted": false,
+            "attemptedQuery": "",
+            "sources": [
+              {
+                "id": "S1",
+                "title": "AS FÉRIAS ESTÃO CHEGANDO… E SUA ROTINA PODE SER ...",
+                "url": "https://www.instagram.com/reel/DfsNChSthnm",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "5c2840-00",
+                "excerpt": "Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios. ☀️",
+                "excerptTruncated": false,
+                "contentSha256": "b7174de67def8e5272cde3fb067fe13cc5aa27727f49bee136aeca84b44bd44a",
+                "score": 0.2726051,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              },
+              {
+                "id": "S2",
+                "title": "ᐉ BONITO PARAISO ILHA GRANDE ( BRASIL ) FOTOS REAIS E ...",
+                "url": "https://bonito-paraiso-ilha-grande.allriodejaneirohotels.com/pt",
+                "publishedAt": null,
+                "provider": "TAVILY",
+                "providerId": "edbc3d-01",
+                "excerpt": "Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande. Este hotel de 9 quartos disponibiliza",
+                "excerptTruncated": false,
+                "contentSha256": "b3e5bd7d7881c9fe265372d17804cff602563a0169eeb92d3286410e43953164",
+                "score": 0.26038948,
+                "publishedAtRaw": null,
+                "dateOrigin": "TAVILY_ESTIMATED_METADATA"
+              }
+            ],
+            "retrieval": {
+              "provider": "TAVILY",
+              "endpoint": "SEARCH",
+              "searchDepth": "basic",
+              "query": "hospedagens em Búzios e Ilha Grande 25 a 31 de dezembro de 2026",
+              "reusedFromCheckId": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05",
+              "requestId": "0bf6e393-7463-49db-afc1-59d0b4fac9aa",
+              "queriedAt": "2026-11-20T16:32:43.369Z",
+              "creditsUsed": 1,
+              "responseTimeSeconds": 1.01,
+              "resultsReceived": 2,
+              "resultsRetained": 2,
+              "rawResponseSha256": "21eeb6462139941a7ffe1e3b83c6e2184d935b5fb03ae4b4bb3a3b855181c4e1"
+            },
+            "scopeMatches": false,
+            "evidenceLinks": [
+              {
+                "sourceId": "S1",
+                "quote": "Venha curtir suas férias nesse paraíso, aproveitar o verão em Búzios e viver dias inesquecíveis na Casa Recanto Ilha de Búzios.",
+                "relation": "CONTEXT",
+                "explanation": "A citação menciona Búzios e uma hospedagem genérica, mas não traz informações sobre o período de 25 a 31 de dezembro de 2026."
+              },
+              {
+                "sourceId": "S2",
+                "quote": "Com vista para o mar, hotel Bonito Paraiso Ilha Grande fica a 2.5 km do Parque Estadual da Ilha Grande em Ilha Grande.",
+                "relation": "CONTEXT",
+                "explanation": "A citação cita uma hospedagem em Ilha Grande, mas não confirma disponibilidade nem dados referentes a dezembro de 2026."
+              }
+            ]
+          }
+        ],
+        "id": "7aeb32f7-6f2b-4bb5-b53e-11537b014527",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "participantId": null
+      }
+    ],
+    "votes": [
+      {
+        "id": "4731dcfc-7eb0-4a45-a4bf-200701100a48",
+        "participantId": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ACEITO_COM_RESSALVAS",
+        "justification": "Apoio o plano fictício, com a condição de confirmar os preços e a disponibilidade nas datas antes de qualquer reserva.",
+        "createdAt": "2026-11-20T16:33:14.343Z"
+      },
+      {
+        "id": "68ca70cd-ecf2-4e75-9343-a084319a6891",
+        "participantId": "adec2996-c1eb-4552-8656-c3178a547250",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ACEITO",
+        "justification": "Apoio o levantamento de informações sem compromisso de reserva.",
+        "createdAt": "2026-11-20T16:33:59.097Z"
+      },
+      {
+        "id": "73e4dfbf-7186-48f0-9b49-a19cb0586f72",
+        "participantId": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "REJEITO",
+        "justification": "Rejeito assumir custos antes de definir um teto de orçamento.",
+        "createdAt": "2026-11-20T16:34:03.108Z"
+      },
+      {
+        "id": "21d11dd2-916c-45ad-90d0-f337b8ae95ff",
+        "participantId": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ABSTENHO",
+        "justification": "Preciso conhecer as alternativas de transporte antes de definir minha posição.",
+        "createdAt": "2026-11-20T16:34:07.101Z"
+      },
+      {
+        "id": "4ce11a82-3d89-4906-bf39-2e53c7bcab62",
+        "participantId": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ACEITO",
+        "justification": "Concordo em comparar as duas localidades com critérios comuns.",
+        "createdAt": "2026-11-20T16:34:11.132Z"
+      },
+      {
+        "id": "3282d99e-56e3-496c-afec-b2282bf72929",
+        "participantId": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ACEITO_COM_RESSALVAS",
+        "justification": "Apoio desde que as opções tenham condições de cancelamento explícitas.",
+        "createdAt": "2026-11-20T16:34:15.097Z"
+      },
+      {
+        "id": "d6b0d8ae-4de8-4f7a-8b4a-6c23f7b3fa20",
+        "participantId": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ACEITO",
+        "justification": "Apoio registrar as fontes e suas limitações.",
+        "createdAt": "2026-11-20T16:34:19.101Z"
+      },
+      {
+        "id": "761477b1-2254-4000-bb8e-d446f0e799b6",
+        "participantId": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ABSTENHO",
+        "justification": "Aguardo esclarecimento sobre a divisão de responsabilidades.",
+        "createdAt": "2026-11-20T16:34:23.094Z"
+      },
+      {
+        "id": "0c372825-6157-495b-8932-76d0624a9d6d",
+        "participantId": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "REJEITO",
+        "justification": "Não concordo com uma escolha definitiva sem comparação dos custos de transporte.",
+        "createdAt": "2026-11-20T16:34:27.107Z"
+      },
+      {
+        "id": "e2f38e42-b8c9-44f3-891b-c8590a0c13ac",
+        "participantId": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "choice": "ACEITO",
+        "justification": "Apoio tratar os preços como indicativos, sujeitos a confirmação.",
+        "createdAt": "2026-11-20T16:34:31.113Z"
+      },
+      {
+        "id": "ab8788b7-5b60-461d-ac36-0f0a433553f2",
+        "participantId": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "Aceito explicitamente a proposta V2 deste ensaio exclusivamente sintético.",
+        "createdAt": "2026-11-20T16:51:49.226Z"
+      },
+      {
+        "id": "9ee3d927-03c0-4f6a-a7b5-ccb1f825bc28",
+        "participantId": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:09.408Z"
+      },
+      {
+        "id": "38d1f8a5-765b-4843-920f-30e4fbd8dc01",
+        "participantId": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:09.902Z"
+      },
+      {
+        "id": "4362745d-4fb3-4dc1-b526-748d1bfa323b",
+        "participantId": "adec2996-c1eb-4552-8656-c3178a547250",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:10.415Z"
+      },
+      {
+        "id": "5d6e6ca5-c176-46ae-8cac-8932fad79407",
+        "participantId": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:11.001Z"
+      },
+      {
+        "id": "141a8bda-4cde-4434-a773-8fe81949c6f2",
+        "participantId": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:11.263Z"
+      },
+      {
+        "id": "3b61e2c5-dc30-48fc-abda-e5b8aed5572d",
+        "participantId": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:11.518Z"
+      },
+      {
+        "id": "1d64baf2-1f5b-491d-abee-7b8fe0fcd860",
+        "participantId": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:11.906Z"
+      },
+      {
+        "id": "551e8595-a89d-4805-b431-f4770e68838f",
+        "participantId": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:12.260Z"
+      },
+      {
+        "id": "d62e0212-139b-4547-93f9-2a38d3f322c8",
+        "participantId": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "choice": "ACEITO",
+        "justification": "",
+        "createdAt": "2026-11-20T16:52:12.933Z"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "5e571e22-1603-4888-bb47-1c1ebcfb3cbd",
+        "participantId": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Apoio o plano fictício, com a condição de confirmar os preços e a disponibilidade nas datas antes de qualquer reserva.",
+        "text": "Apoio o plano fictício, com a condição de confirmar os preços e a disponibilidade nas datas antes de qualquer reserva.",
+        "review": {
+          "result": {
+            "relevance": "RELACIONADA",
+            "summary": "A contribuição manifesta apoio ao plano fictício, impondo como condição a confirmação prévia de preços e disponibilidade nas datas estipuladas antes de qualquer reserva.",
+            "recommendations": [
+              "Incorporar a condição de validação de preços e disponibilidade reais nas datas selecionadas antes de proceder a qualquer reserva definitiva."
+            ],
+            "assertions": [
+              {
+                "text": "Apoio o plano fictício, com a condição de confirmar os preços e a disponibilidade nas datas antes de qualquer reserva.",
+                "status": "COMPATIVEL_COM_CONTEXTO",
+                "note": "A declaração está alinhada com o contexto de planejamento e discussão de condições de viagem fictícia."
+              }
+            ],
+            "limitations": [
+              "O cenário apresentado é exclusivamente fictício e voltado para pré-teste, sem validade para operação real."
+            ],
+            "clarity": "A contribuição é direta e compreensível, estabelecendo claramente uma condição para o apoio ao plano.",
+            "biasFlags": [
+              "Viés de cautela operacional ao exigir checagem de dados antes de compromissos financeiros."
+            ],
+            "assumptions": [
+              "Assume-se que a consulta de preços e disponibilidade é viável para o escopo proposto."
+            ],
+            "missingInfo": [
+              "Detalhes específicos sobre quais canais ou plataformas serão utilizados para consultar as hospedagens."
+            ],
+            "questions": [
+              "Quais critérios específicos serão adotados para a verificação de disponibilidade e preços em Búzios e Ilha Grande?"
+            ],
+            "uncertainties": [
+              "Incerteza sobre a exatidão futura dos dados consultados para o período de final de ano de 2026."
+            ],
+            "suggestedRewrite": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026, confirmando obrigatoriamente preços e disponibilidade nas datas antes de qualquer reserva, e publicar revisão humana quando necessária."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "gemini-3.5-flash-lite",
+          "reason": ""
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:33:14.343Z"
+      },
+      {
+        "id": "e0914490-7ffe-48d0-922f-b11320ab6be8",
+        "participantId": "adec2996-c1eb-4552-8656-c3178a547250",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Apoio o levantamento de informações sem compromisso de reserva.",
+        "text": "Apoio o levantamento de informações sem compromisso de reserva.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:33:59.097Z"
+      },
+      {
+        "id": "86587d58-0cfb-4069-9b6a-3daf10a367f2",
+        "participantId": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Rejeito assumir custos antes de definir um teto de orçamento.",
+        "text": "Rejeito assumir custos antes de definir um teto de orçamento.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:03.108Z"
+      },
+      {
+        "id": "3ea702d6-cab8-419e-a104-871c820efaf9",
+        "participantId": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Preciso conhecer as alternativas de transporte antes de definir minha posição.",
+        "text": "Preciso conhecer as alternativas de transporte antes de definir minha posição.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:07.101Z"
+      },
+      {
+        "id": "b3c46098-f38b-42e6-aeeb-2fa940ad7338",
+        "participantId": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Concordo em comparar as duas localidades com critérios comuns.",
+        "text": "Concordo em comparar as duas localidades com critérios comuns.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:11.132Z"
+      },
+      {
+        "id": "053bf0ec-b0ee-4255-a239-38a8c0432892",
+        "participantId": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Apoio desde que as opções tenham condições de cancelamento explícitas.",
+        "text": "Apoio desde que as opções tenham condições de cancelamento explícitas.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:15.097Z"
+      },
+      {
+        "id": "92da71e0-cdda-4ba1-9603-6115f084d594",
+        "participantId": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Apoio registrar as fontes e suas limitações.",
+        "text": "Apoio registrar as fontes e suas limitações.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:19.101Z"
+      },
+      {
+        "id": "079fa703-f50d-4189-ace2-2a93da9dd7e2",
+        "participantId": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Aguardo esclarecimento sobre a divisão de responsabilidades.",
+        "text": "Aguardo esclarecimento sobre a divisão de responsabilidades.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:23.094Z"
+      },
+      {
+        "id": "b874a6df-0dcf-4ce8-8441-f88dd6b8a4fa",
+        "participantId": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Não concordo com uma escolha definitiva sem comparação dos custos de transporte.",
+        "text": "Não concordo com uma escolha definitiva sem comparação dos custos de transporte.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:27.107Z"
+      },
+      {
+        "id": "c530c5ee-c3ed-43df-9f70-fea3721a359a",
+        "participantId": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Apoio tratar os preços como indicativos, sujeitos a confirmação.",
+        "text": "Apoio tratar os preços como indicativos, sujeitos a confirmação.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:31.113Z"
+      },
+      {
+        "id": "07e52a80-a3da-4088-95fa-eef1d95c996e",
+        "participantId": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "roundId": "0e30c4f8-4ac8-444d-b5e1-25375f7aee43",
+        "proposalId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+        "originalText": "Sugiro uma tabela com destino, preço indicativo, transporte e política de cancelamento, sem decidir automaticamente.",
+        "text": "Sugiro uma tabela com destino, preço indicativo, transporte e política de cancelamento, sem decidir automaticamente.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.2-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:34:45.531Z"
+      },
+      {
+        "id": "264f4f58-a75d-4502-8ba6-53d12fc06e5a",
+        "participantId": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "roundId": "3627576b-5f59-4b7e-abc0-90cc0f54b92f",
+        "proposalId": "701164af-fb79-4a47-b586-988125a84d1c",
+        "originalText": "Aceito explicitamente a proposta V2 deste ensaio exclusivamente sintético.",
+        "text": "Aceito explicitamente a proposta V2 deste ensaio exclusivamente sintético.",
+        "review": {
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.3-all-manifestations",
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo."
+        },
+        "contest": "",
+        "createdAt": "2026-11-20T16:51:49.225Z"
+      }
+    ],
+    "analyses": [],
+    "syntheses": [],
+    "contests": [
+      {
+        "id": "3f84c851-75c3-419c-a119-38c2090bc284",
+        "participantId": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "targetId": "7aeb32f7-6f2b-4bb5-b53e-11537b014527",
+        "text": "As fontes são genéricas; mantenho minha ressalva e não autorizo concluir que uma hospedagem seja a mais barata.",
+        "at": "2026-11-20T16:35:16.672Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "0dbfbe45-6e9f-4732-a237-05344e93e3a4",
+        "at": "2026-11-20T16:31:13.853Z",
+        "actor": "moderator",
+        "type": "ROOM_CREATED",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "id": "fcda4472-b7d4-464c-9546-8fafd6fa6fa6",
+        "at": "2026-11-20T16:31:57.210Z",
+        "actor": "moderator",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "5fa8f865-69c7-460c-9325-161e33e09ce5; factual-tavily-gemini-v2.1; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "2c764f02-21eb-47f3-8320-96f9c2da692d",
+        "at": "2026-11-20T16:32:46.729Z",
+        "actor": "moderator",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "3223ec86-d3d4-4a4e-bd8d-f06ea516ac05; factual-tavily-gemini-v2.1; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "d67d68f3-bae7-4a49-90f7-8425aea26ffb",
+        "at": "2026-11-20T16:33:14.343Z",
+        "actor": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "869cf8d7-f314-4ba1-afcd-21b1110002e3",
+        "at": "2026-11-20T16:33:14.343Z",
+        "actor": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO_COM_RESSALVAS"
+      },
+      {
+        "id": "0886bba1-36bc-49a1-b583-f500cc7a38b3",
+        "at": "2026-11-20T16:33:41.148Z",
+        "actor": "moderator",
+        "type": "FACTUAL_CHECK_RECORDED",
+        "detail": "7aeb32f7-6f2b-4bb5-b53e-11537b014527; factual-tavily-gemini-v2.1; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "747c6b14-5466-41cd-9070-895b0c76dc87",
+        "at": "2026-11-20T16:33:59.097Z",
+        "actor": "adec2996-c1eb-4552-8656-c3178a547250",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "7eb3b1f6-956d-4cc3-a202-57d340ae5f5c",
+        "at": "2026-11-20T16:33:59.097Z",
+        "actor": "adec2996-c1eb-4552-8656-c3178a547250",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "d3ae9c7e-e0c6-405f-95e2-8988f4367aa1",
+        "at": "2026-11-20T16:34:03.108Z",
+        "actor": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "713b7fdc-7a2b-4c1b-8d5b-23c2c8097ab7",
+        "at": "2026-11-20T16:34:03.108Z",
+        "actor": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "bbe7b406-57ed-4c14-a437-176db403416d",
+        "at": "2026-11-20T16:34:07.101Z",
+        "actor": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "bddb0cf2-3c57-46b7-857a-f5d9a37a8213",
+        "at": "2026-11-20T16:34:07.101Z",
+        "actor": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "70492724-7684-4512-8fcf-3f117538ec46",
+        "at": "2026-11-20T16:34:11.132Z",
+        "actor": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "03d1a6c2-43b4-4ea5-85fa-995e654c324f",
+        "at": "2026-11-20T16:34:11.132Z",
+        "actor": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "42260c2f-0ea9-466e-8f50-0a226d1724c0",
+        "at": "2026-11-20T16:34:15.097Z",
+        "actor": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "f86bfdaf-b30a-411a-8b9a-a141d62ecad2",
+        "at": "2026-11-20T16:34:15.097Z",
+        "actor": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO_COM_RESSALVAS"
+      },
+      {
+        "id": "365bf852-e836-4ca8-a3ab-c1ea30d8ba36",
+        "at": "2026-11-20T16:34:19.101Z",
+        "actor": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "064ac68e-f85c-4b88-b42f-d62a9d48a2fa",
+        "at": "2026-11-20T16:34:19.101Z",
+        "actor": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "93013a14-fb01-4a1d-afb5-f9b6fb2bfb50",
+        "at": "2026-11-20T16:34:23.094Z",
+        "actor": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "73b7db0a-c898-4405-93fd-6524c3fb130d",
+        "at": "2026-11-20T16:34:23.094Z",
+        "actor": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "type": "VOTE_RECORDED",
+        "detail": "ABSTENHO"
+      },
+      {
+        "id": "b0d6bc4f-717e-460f-a0de-7da756839d71",
+        "at": "2026-11-20T16:34:27.107Z",
+        "actor": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "00df0e59-a19f-4111-b5ab-418c7ff9691c",
+        "at": "2026-11-20T16:34:27.107Z",
+        "actor": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "type": "VOTE_RECORDED",
+        "detail": "REJEITO"
+      },
+      {
+        "id": "3c353288-3a5e-4684-ac06-f82a9e7c36c3",
+        "at": "2026-11-20T16:34:31.113Z",
+        "actor": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "62fd92b6-6c05-4c3f-a70b-bff7ee2af290",
+        "at": "2026-11-20T16:34:31.113Z",
+        "actor": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "8ec3a3bd-7f26-4d98-a9a2-7e01670cf837",
+        "at": "2026-11-20T16:34:45.532Z",
+        "actor": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "8dcd9b71-fb31-46cf-924c-88231c21ff70",
+        "at": "2026-11-20T16:35:16.672Z",
+        "actor": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "type": "AI_CONTESTED",
+        "detail": "As fontes são genéricas; mantenho minha ressalva e não autorizo concluir que uma hospedagem seja a mais barata."
+      },
+      {
+        "id": "fe8f9e96-7b6d-4772-baac-34accc5a2ccb",
+        "at": "2026-11-20T16:35:27.961Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.2-all-manifestations; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "762d8e75-1fc5-4c38-9ae0-f32ec108aab9",
+        "at": "2026-11-20T16:36:28.767Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.2-all-manifestations; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "3c2d407a-d8f5-49a8-8c26-67987541fe22",
+        "at": "2026-11-20T16:38:22.021Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.2-all-manifestations; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "30f5f30a-9cae-4d7b-a1f6-4cfd15b2363b",
+        "at": "2026-11-20T16:40:38.196Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.2-all-manifestations; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "a95ac0b7-a8cd-4ed3-9f03-303863e2e716",
+        "at": "2026-11-20T16:43:43.371Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.2-all-manifestations; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "c0c9b97a-5b85-4aad-897c-c1dae275d607",
+        "at": "2026-11-20T16:49:20.422Z",
+        "actor": "moderator",
+        "type": "AI_FAILURE",
+        "detail": "analysis: TRANSPORT; consensus-consultive-v2.3-all-manifestations; gemini-3.5-flash-lite"
+      },
+      {
+        "id": "b71e5e8a-4670-4042-a3b4-a1c187c10695",
+        "at": "2026-11-20T16:50:59.111Z",
+        "actor": "moderator",
+        "type": "PROPOSAL_PUBLISHED",
+        "detail": "Revisão manual de contingência em teste técnico sintético após erros 503 do Gemini; não representa síntese Gemini validada."
+      },
+      {
+        "id": "8a93a328-addc-453d-81bd-2b2873d08102",
+        "at": "2026-11-20T16:51:49.225Z",
+        "actor": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "type": "CONTRIBUTION_RECORDED",
+        "detail": "Texto preservado."
+      },
+      {
+        "id": "8a1ba2c7-8349-4afe-b9da-32ee47521516",
+        "at": "2026-11-20T16:51:49.226Z",
+        "actor": "fd0ac314-3717-495f-8919-a81b43fac77f",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "49567b5b-1af8-4240-986a-0549df482165",
+        "at": "2026-11-20T16:52:09.408Z",
+        "actor": "34684852-17be-4475-8f2b-0dc49f96bd53",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "85e2483a-4bc2-4813-a025-8cbbed2ce376",
+        "at": "2026-11-20T16:52:09.902Z",
+        "actor": "db7a0c43-488a-4139-8bfb-8df4f69335e2",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "c7917ba3-0270-4337-bc97-24398fcf4ccd",
+        "at": "2026-11-20T16:52:10.415Z",
+        "actor": "adec2996-c1eb-4552-8656-c3178a547250",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "fec4c581-154f-4256-ad91-9c85c870569b",
+        "at": "2026-11-20T16:52:11.001Z",
+        "actor": "6e6c15b9-2f54-46fd-a122-f19f4b620818",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "b2503f3f-7b74-48d2-a359-800407c3bb61",
+        "at": "2026-11-20T16:52:11.263Z",
+        "actor": "ebab301f-312e-4866-89b9-b1b9628a5252",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "849035d5-06df-403f-8b5a-8334bfb2644f",
+        "at": "2026-11-20T16:52:11.518Z",
+        "actor": "b2b9ec4b-cc22-454f-8d87-7eb5914a3446",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "947f0cec-b0e0-40ec-a935-ff77a27401b3",
+        "at": "2026-11-20T16:52:11.906Z",
+        "actor": "725305d5-b6bd-480b-83f5-96c9363339cc",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "3469d8b9-cf7e-4d6b-bb1c-1823de8363cf",
+        "at": "2026-11-20T16:52:12.260Z",
+        "actor": "85f0d9eb-1186-4af3-898a-640e834fbbb6",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "7a386e6f-208b-4e9f-bcb8-15daa8758d90",
+        "at": "2026-11-20T16:52:12.933Z",
+        "actor": "18109d78-2551-420c-a6ef-7756b1142ae4",
+        "type": "VOTE_RECORDED",
+        "detail": "ACEITO"
+      },
+      {
+        "id": "5b65d654-efac-4784-b2c8-57e9aa2e87d6",
+        "at": "2026-11-20T16:52:12.933Z",
+        "actor": "system",
+        "type": "CONSENSUS_RECORDED",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      }
+    ],
+    "evaluations": []
+  },
+  "metrics": {
+    "automatic": {
+      "consensus": true,
+      "rounds": 2,
+      "deliberationMs": 1259080,
+      "repeatedObjections": [],
+      "votes": 20,
+      "conditionalAcceptances": 2,
+      "objections": 2,
+      "distinctObjectionsByRound": 2
+    },
+    "human": {
+      "addressed": 0,
+      "partial": 0,
+      "unresolved": 0,
+      "assessed": 0,
+      "faithful": 0,
+      "fidelityAssessed": 0,
+      "argumentQuality": null
+    },
+    "limitation": "Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos."
+  },
+  "evaluation": {
+    "expected": 10,
+    "received": 0,
+    "nonrespondents": 10,
+    "items": [
+      {
+        "item": 1,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 2,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 3,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 4,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 5,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 6,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 7,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 8,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 9,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 10,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 11,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 12,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 13,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 14,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 15,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 16,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 17,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 18,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 19,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 20,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 21,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "item": 22,
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Utilidade percebida",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Eficácia na construção de consenso",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Qualidade da IA",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Transparência e confiança",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Usabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      },
+      {
+        "name": "Adoção e aplicabilidade",
+        "n": 0,
+        "na": 0,
+        "missing": 0,
+        "frequencies": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0
+        },
+        "mean": null
+      }
+    ],
+    "groups": [],
+    "mixedVersions": false,
+    "pooledSummary": "UMA_VERSAO",
+    "denominator": "Frequências e médias usam somente respostas individuais enviadas; n inclui apenas notas 1–5. N/A, itens ausentes e participantes não respondentes são separados. Dimensões agrupam respostas a itens, não um escore validado.",
+    "openResponses": [],
+    "thematicCoding": "Codificação temática humana pendente. Não há síntese científica automática.",
+    "psychometricValidation": false
+  },
+  "provenance": "Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa."
+}

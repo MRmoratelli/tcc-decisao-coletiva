@@ -1,5 +1,5 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { request, type CreatedRoom, type ReviewResult, type RoomView } from './api';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { request, type CreatedRoom, type ReviewResult, type RoomView, type RoomSyncResponse } from './api';
 import { ProposalEditor,emptyProposal } from './components/ProposalEditor';
 import { ReviewCard } from './components/ReviewCard';
 import { RoomWorkspace } from './components/RoomWorkspace';
@@ -19,6 +19,7 @@ export default function App(){
   const [code,setCode]=useState('');
   const [credential,setCredential]=useState('');
   const [session,setSession]=useState<{code:string;credential:string;view:RoomView}|null>(null);
+  const sessionRef=useRef(session);sessionRef.current=session;
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState('');
   const [notice,setNotice]=useState('');
@@ -28,8 +29,8 @@ export default function App(){
     const {code,credential}=session;let cancelled=false;let timer:ReturnType<typeof setTimeout>;
     const poll=async()=>{try{
       if(typeof document==='undefined'||document.visibilityState!=='hidden'){
-       const view=await request<RoomView>('/rooms/'+code+'/view',{credential});
-       if(!cancelled){setSession(previous=>previous?.code===code&&previous.credential===credential&&view.revision>previous.view.revision?{...previous,view}:previous);setSyncError('');}
+       const view=await request<RoomSyncResponse>('/rooms/'+code+'/view',{credential,knownRevision:sessionRef.current?.view.revision});
+       if(!cancelled){if(!('unchanged' in view))setSession(previous=>previous?.code===code&&previous.credential===credential&&view.revision>previous.view.revision?{...previous,view}:previous);setSyncError('');}
       }
     }catch{if(!cancelled)setSyncError('Atualização automática temporariamente indisponível. Seus rascunhos foram mantidos; use Atualizar ou aguarde a reconexão.');}
     finally{if(!cancelled)timer=setTimeout(poll,4000);}};

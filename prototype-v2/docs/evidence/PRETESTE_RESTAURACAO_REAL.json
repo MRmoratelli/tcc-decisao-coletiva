@@ -1,0 +1,53 @@
+{
+  "syntheticOnly": true,
+  "status": 201,
+  "newRoom": true,
+  "originalPreserved": true,
+  "rounds": 2,
+  "votes": 20,
+  "result": "CONSENSUS",
+  "conditionalVotesPreserved": 2,
+  "factualEvidence": 3,
+  "provenance": [
+    "IMPORTED_UNAUTHENTICATED",
+    "IMPORTED_UNAUTHENTICATED",
+    "IMPORTED_UNAUTHENTICATED"
+  ],
+  "intervention": {
+    "kind": "EDICAO_HUMANA",
+    "source": "PROPOSTA_ANTERIOR",
+    "sourceId": "0443c12c-d232-4c44-9a5d-8305c356a09d",
+    "original": {
+      "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+      "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+      "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+      "goals": "",
+      "alternatives": "",
+      "constraints": "",
+      "successCriteria": "",
+      "context": "",
+      "text": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026 sem presumir preços, disponibilidade ou opção mais barata. Discutir condições e publicar revisão humana quando necessária."
+    },
+    "published": {
+      "title": "[SINTÉTICO] Correções do pré-teste V2 20/11",
+      "problem": "Grupo exclusivamente fictício precisa comparar informações públicas e condições de uma viagem de teste. Não representa coleta científica.",
+      "decision": "Definir condições de um plano fictício com manifestação humana explícita.",
+      "goals": "",
+      "alternatives": "",
+      "constraints": "",
+      "successCriteria": "",
+      "context": "",
+      "text": "ENSAIO SINTÉTICO: comparar destinos com o mesmo período, teto de orçamento definido pelo grupo, transporte e condições de cancelamento. Confirmar preços e disponibilidade antes de reservar; nenhuma escolha é automática."
+    },
+    "changes": [
+      {
+        "field": "text",
+        "before": "Consultar hospedagens em Búzios e Ilha Grande entre 25 e 31 de dezembro de 2026 sem presumir preços, disponibilidade ou opção mais barata. Discutir condições e publicar revisão humana quando necessária.",
+        "after": "ENSAIO SINTÉTICO: comparar destinos com o mesmo período, teto de orçamento definido pelo grupo, transporte e condições de cancelamento. Confirmar preços e disponibilidade antes de reservar; nenhuma escolha é automática."
+      }
+    ],
+    "reason": "Revisão manual de contingência em teste técnico sintético após erros 503 do Gemini; não representa síntese Gemini validada.",
+    "at": "2026-11-20T16:50:59.111Z",
+    "actor": "moderator"
+  }
+}
