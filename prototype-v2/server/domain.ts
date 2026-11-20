@@ -97,6 +97,32 @@ export function assertSynthesis(s:State,result:SynthesisResult){
  const classified=[...result.addressedObjections,...result.partiallyAddressedObjections,...result.unresolvedObjections];
  if(classified.length!==ids.length||new Set(classified).size!==classified.length||ids.some(id=>!classified.includes(id))||result.changeLog.some(c=>c.voteIds.some(id=>!ids.includes(id))))throw new DomainError('Serviço de IA omitiu ou inventou vínculos de objeções.',502);
 }
+// Reconcile only mechanical ID mistakes from a fallible AI output. A missing
+// formal rejection is conservatively UNRESOLVED, never silently considered met.
+// Keep the authoritative domain validation strict for imported or other data.
+export function reconcileSynthesisLinks(s:State,result:SynthesisResult):SynthesisResult{
+ const formalIds=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
+ const allowed=new Set(formalIds);
+ const original=[...result.addressedObjections,...result.partiallyAddressedObjections,...result.unresolvedObjections];
+ const classified=new Set(original.filter(id=>allowed.has(id)));
+ const addressed=formalIds.filter(id=>result.addressedObjections.includes(id)&&!result.partiallyAddressedObjections.includes(id)&&!result.unresolvedObjections.includes(id));
+ const partial=formalIds.filter(id=>result.partiallyAddressedObjections.includes(id)&&!result.unresolvedObjections.includes(id));
+ const unresolved=formalIds.filter(id=>result.unresolvedObjections.includes(id)||!classified.has(id));
+ const changeLog=result.changeLog.map(c=>({...c,voteIds:[...new Set(c.voteIds.filter(id=>allowed.has(id)))]}));
+ const changed=original.length!==formalIds.length||new Set(original).size!==original.length||
+  original.some(id=>!allowed.has(id))||
+  addressed.length!==result.addressedObjections.length||
+  partial.length!==result.partiallyAddressedObjections.length||
+  unresolved.length!==result.unresolvedObjections.length||
+  changeLog.some((c,i)=>JSON.stringify(c.voteIds)!==JSON.stringify(result.changeLog[i].voteIds));
+ if(!changed)return result;
+ const discarded=original.filter(id=>!allowed.has(id)).length+
+  result.changeLog.reduce((n,c)=>n+c.voteIds.filter(id=>!allowed.has(id)).length,0);
+ const missing=formalIds.filter(id=>!classified.has(id)).length;
+ const warning='AJUSTE DE VÍNCULOS (verificação automática, não avaliação de mérito): IDs estranhos às rejeições formais removidos ('+discarded+'); rejeições não classificadas marcadas como não atendidas ('+missing+'). Ressalvas e contribuições continuam rastreadas em sourceIds. A síntese exige revisão humana.';
+ return {...result,addressedObjections:addressed,partiallyAddressedObjections:partial,unresolvedObjections:unresolved,changeLog,
+  feasibilityWarnings:[...result.feasibilityWarnings.slice(0,49),warning]};
+}
 export function addSynthesis(s:State,analysisId:string,result:SynthesisResult,model:string,promptVersion:string){
  open(s);const a=s.analyses.find(a=>a.id===analysisId&&a.proposalId===currentProposal(s).id);
  if(!a)throw new DomainError('Analise as objeções da versão atual primeiro.');
