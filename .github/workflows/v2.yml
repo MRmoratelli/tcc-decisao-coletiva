@@ -1,7 +1,7 @@
 name: V2 React and consensus API
 on:
   push:
-    branches: [feat/vite-typescript-decisao-generica]
+    branches: [feat/vite-typescript-decisao-generica, fix/v2-sintese-e-manifestacoes-20261120]
     paths: ['prototype-v2/**', '.github/workflows/v2.yml']
   workflow_dispatch:
 permissions:
