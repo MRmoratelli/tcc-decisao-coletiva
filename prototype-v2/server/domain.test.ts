@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { createState,vote,currentRound,currentProposal,unanimous,publish,closeWithoutConsensus,validateState,exportState,metrics,evaluate,statistics,addAnalysis,addSynthesis,contest,contribute } from './domain.js';
+import { createState,vote,currentRound,currentProposal,unanimous,publish,closeWithoutConsensus,validateState,exportState,metrics,evaluate,statistics,addAnalysis,addSynthesis,reconcileSynthesisLinks,manifestations,contest,contribute } from './domain.js';
 import { proposal,review,FakeAI } from './fixtures.js';
 import { ProposalSchema,EvaluationSchema,INSTRUMENT_VERSION } from '../shared/contracts.js';
 import { items,openItems,dimensions } from '../shared/instrument.js';
@@ -26,3 +26,26 @@ test('rascunho original, repetições e alteração após análise permanecem ra
  const r=currentRound(s);contribute(s,s.participants[0].id,r.id,r.proposalId,'Nova sugestão','Nova sugestão',reviewRecord,'');
  const draft=await ai.synthesizeProposal(proposal,result);assert.throws(()=>addSynthesis(s,analysis.id,draft,'fake','test'));
 });
+
+test('Síntese: ressalvas não são rejeições; correção conserva classificação cautelosa e vínculo real',async()=>{
+ const s=fresh(),ai=new FakeAI(),r=currentRound(s),pid0=s.participants[0].id,pid1=s.participants[1].id;
+ vote(s,pid0,r.id,r.proposalId,'REJEITO','Local de difícil acesso');
+ vote(s,pid1,r.id,r.proposalId,'ACEITO_COM_RESSALVAS','Prefiro levar bebidas separadamente');
+ const assessment=await ai.analyzeObjections(proposal,latestForTest(s),[],manifestations(s));
+ const a=addAnalysis(s,assessment,'synthetic','test');
+ const valid=await ai.synthesizeProposal(proposal,assessment);
+ const malformed={...valid,partiallyAddressedObjections:[pid1],changeLog:valid.changeLog.map(c=>({...c,voteIds:[pid1]}))};
+ const fixed=reconcileSynthesisLinks(s,malformed);
+ assert.deepEqual(fixed.addressedObjections,[]);
+ assert.deepEqual(fixed.partiallyAddressedObjections,[]);
+ assert.deepEqual(fixed.unresolvedObjections,[s.votes[0].id]);
+ assert.deepEqual(fixed.changeLog[0].voteIds,[]);
+ assert.ok(fixed.feasibilityWarnings.some(w=>w.includes('AJUSTE DE VÍNCULOS')));
+ assert.ok(fixed.consideredSourceIds?.includes(s.votes[1].id));
+ assert.throws(()=>addSynthesis(s,a.id,malformed,'synthetic','test'));
+ const saved=addSynthesis(s,a.id,fixed,'synthetic','test');
+ assert.equal(saved.result.unresolvedObjections.length,1);
+ const tampered={...fixed,consideredSourceIds:['não-existente']};
+ assert.throws(()=>addSynthesis(s,a.id,tampered,'synthetic','test'));
+});
+function latestForTest(s:ReturnType<typeof fresh>){return s.votes.map(v=>({id:v.id,choice:v.choice,justification:v.justification}));}
