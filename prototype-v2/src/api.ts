@@ -1,7 +1,7 @@
 import type { State } from '../server/domain';
 import type { Review } from '../shared/contracts';
 export type { Review };
-export type ReviewResult={review:Review;receipt:string};
+export type ReviewResult={review:Review;receipt:string;rewriteReceipt?:string|null};
 export type CreatedRoom={code:string;moderatorCredential:string;participants:Array<{alias:string;credential:string}>};
 export type RoomView={
  revision:number;room:{id:string;code:string;topic:string;proposal:string;proposal_review:Review|null};
