@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult } from '../shared/contracts.js';
 export { ReviewSchema };
 export type { Review };
-export const PROMPT_VERSION='consensus-consultive-v2.4-all-manifestations';
+export const PROMPT_VERSION='consensus-consultive-v2.5-formal-rejections';
 export interface AIAdapter {
  model:string;
  analyzeProposal(proposal:ProposalContent):Promise<Review>;
@@ -21,7 +21,7 @@ Separe coerência com contexto de alegações que precisam de fonte ou não são
 Explicite premissas, contradições, vieses de enquadramento, limitações, riscos e incertezas.
 Nenhuma objeção é eliminada por sua avaliação. Cite somente trechos exatos das justificativas.
 Na análise, manifestationAssessments deve cobrir exatamente uma vez cada fonte de manifestations recebida, preservando sourceId, kind e trecho literal (vazio somente se a posição não tiver texto). Distingua APOIO, RESSALVA, OBJECAO, ABSTENCAO, CONTRIBUICAO e CONTESTACAO. Não invente objeções em apoios. Identifique acordos, condições, alternativas, esclarecimentos, riscos e caminhos de conciliação. Completude semântica exige revisão humana.
-Na síntese, consideredSourceIds deve cobrir todas as manifestações recebidas; cada changeLog deve conter sourceIds válidos das manifestações que motivaram a mudança. Preserve os interesses já compartilhados. Não invente intenções, concessões ou declarações.
+Na síntese, consideredSourceIds deve cobrir todas as manifestações recebidas; cada changeLog deve conter sourceIds válidos das manifestações que motivaram a mudança. Somente os IDs em formalRejectionIds são rejeições formais: use EXCLUSIVAMENTE esses IDs em changeLog.voteIds, addressedObjections, partiallyAddressedObjections e unresolvedObjections. ACEITO_COM_RESSALVAS, apoios e contribuições são manifestações a considerar por sourceIds, nunca classificações de rejeições formais. Preserve os interesses já compartilhados. Não invente intenções, concessões ou declarações.
 Na análise, individualAssessments deve conter todas as rejeições (voteId), uma vez cada.
 Na síntese, classifique cada rejeição uma vez: addressedObjections, partiallyAddressedObjections ou unresolvedObjections.
 Use somente IDs recebidos, explique cada mudança e suas objeções de origem, sem inventar concessões.
@@ -58,6 +58,6 @@ export class GeminiAdapter implements AIAdapter{
  analyzeProposal(proposal:ProposalContent){return this.call('analyzeProposal',{proposal},ReviewSchema);}
  analyzeContribution(proposal:ProposalContent,contribution:string){return this.call('analyzeContribution',{proposal,contribution},ReviewSchema);}
  analyzeObjections(proposal:ProposalContent,votes:unknown[],contributions:unknown[]=[],manifestations:unknown[]=[]){return this.call('analyzeObjections',{proposal,votes,contributions,manifestations},AssessmentSchema);}
- synthesizeProposal(proposal:ProposalContent,assessments:Assessment,manifestations:unknown[]=[]){return this.call('synthesizeProposal',{proposal,assessments,manifestations},SynthesisSchema);}
+ synthesizeProposal(proposal:ProposalContent,assessments:Assessment,manifestations:unknown[]=[]){return this.call('synthesizeProposal',{proposal,assessments,manifestations,formalRejectionIds:assessments.individualAssessments.map(a=>a.voteId)},SynthesisSchema);}
 }
 

@@ -6,7 +6,7 @@ import { Repository, type Identity } from './db.js';
 import { FactualService,privateData,retryableFactual,type FactualAdapter } from './factual.js';
 import { FACTUAL_MODEL,FACTUAL_VERSION,isTavilyCheck,ResearchModeSchema } from '../shared/factual.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
-import { DomainError,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema,addFactualCheck,factualContext, type State, type ReviewRecordType } from './domain.js';
+import { DomainError,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema,addFactualCheck,factualContext, type State, type ReviewRecordType } from './domain.js';
 export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean;factual?:FactualAdapter}={}){
  if(signingKey.length<32)throw new Error('REVIEW_SIGNING_KEY forte obrigatório.');
  const factual=options.factual??new FactualService();
@@ -24,9 +24,13 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  const factualLimit=rateLimit(60);
  const credential=z.string().min(20).max(128),revision=z.number().int().positive();
  const text=z.string().trim().min(1).max(5000);
- const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional()});
+ const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional(),appliedRewrite:z.boolean().optional()});
  const reviewRecord=(body:z.infer<typeof reviewInput>,kind:'proposal'|'contribution',binding:unknown):ReviewRecordType=>{
-  if(body.receipt)return {result:ReviewSchema.parse(verifyReceipt(signingKey,body.receipt,kind,binding)),status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:''};
+  if(body.receipt){const result=ReviewSchema.parse(verifyReceipt(signingKey,body.receipt,kind,binding));
+   if(kind==='contribution'&&body.appliedRewrite&&result.suggestedRewrite!==(binding as {text?:string}).text)throw new DomainError('Reformulação não corresponde ao parecer assinado. Analise novamente.');
+   return {result,status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:'',...(kind==='contribution'&&body.appliedRewrite?{appliedRewrite:true}:{})} as ReviewRecordType;
+  }
+  if(body.appliedRewrite)throw new DomainError('Reformulação exige parecer de IA válido.');
   if(!body.bypassReason)throw new DomainError('Solicite parecer ou registre por que decidiu continuar sem ele.');
   return {result:null,status:'IGNORADA',model:'none',promptVersion:PROMPT_VERSION,reason:body.bypassReason};
  };
@@ -97,7 +101,10 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.post('/api/rooms/:code/contribution-review',aiLimit,async(req,res)=>{
   const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
   if(b.proposalId!==currentProposal(state).id||b.roundId!==currentRound(state).id)throw new DomainError('Versão desatualizada.',409);
-  try{const review=await ai.analyzeContribution(currentProposal(state).content,b.text);res.json({review,receipt:makeReceipt(signingKey,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text},review)});}
+  try{const review=await ai.analyzeContribution(currentProposal(state).content,b.text);
+   const binding={roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text};
+   res.json({review,receipt:makeReceipt(signingKey,'contribution',binding,review),
+    rewriteReceipt:review.suggestedRewrite?makeReceipt(signingKey,'contribution',{...binding,text:review.suggestedRewrite},review):null});}
   catch(e){await repo.mutate(i,(await repo.read(i)).revision,s=>event(s,i.participantId!,'AI_FAILURE','analyzeContribution: '+(e instanceof AIUnavailable?e.code:'UNKNOWN')+'; '+PROMPT_VERSION+'; '+ai.model));throw e;}
  });
  const contributionBody=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),text,originalText:text,contest:z.string().trim().max(2000).default('')});
@@ -126,7 +133,11 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    }
    const a=state.analyses.find(a=>a.id===b.analysisId&&a.proposalId===currentProposal(state).id);if(!a)throw new DomainError('Análise atual não encontrada.');
    const result=await ai.synthesizeProposal(currentProposal(state).content,{...a.result,uncertainties:[...a.result.uncertainties,...factualContext(state).map(f=>'EVIDÊNCIA EXTERNA CONSULTIVA, NÃO DECISÓRIA: '+JSON.stringify(f))]},manifestations(state));
-   return await repo.mutate(i,b.revision,s=>addSynthesis(s,a.id,result,ai.model,PROMPT_VERSION));
+   const verified=reconcileSynthesisLinks(state,result);
+   return await repo.mutate(i,b.revision,s=>{
+    if(verified!==result)event(s,'moderator','SYNTHESIS_LINKS_RECONCILED','IDs verificados; classificação ausente conservadoramente não atendida. Ver aviso no rascunho.');
+    addSynthesis(s,a.id,verified,ai.model,PROMPT_VERSION);
+   });
   }catch(e){
    if(e instanceof AIUnavailable||e instanceof DomainError&&e.status===502){
     const x=await repo.read(i);await repo.mutate(i,x.revision,s=>event(s,'moderator','AI_FAILURE',mode+': '+(e instanceof AIUnavailable?e.code:'INVALID_LINKS')+'; '+PROMPT_VERSION+'; '+ai.model));

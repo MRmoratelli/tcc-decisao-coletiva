@@ -3,6 +3,9 @@ on:
   push:
     branches: [feat/vite-typescript-decisao-generica]
     paths: ['prototype-v2/**', '.github/workflows/v2.yml']
+  pull_request:
+    branches: [feat/vite-typescript-decisao-generica]
+    paths: ['prototype-v2/**', '.github/workflows/v2.yml']
   workflow_dispatch:
 permissions:
   contents: read
