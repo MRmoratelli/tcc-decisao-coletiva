@@ -10,7 +10,7 @@ export type RoomView={
  metrics:unknown;contributions:Array<{id:string;alias:string;text:string;review:Review|null;user_choice:string;created_at:string}>;
 };
 export async function request<T>(path:string,body?:unknown):Promise<T>{
- const response=await fetch('/api'+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
+ const response=await fetch('/api'+path,{...(path.endsWith('/view')?{signal:AbortSignal.timeout(15000)}:{}),method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
  let result:unknown;try{result=await response.json();}catch{throw new Error('Servidor não retornou resposta JSON.');}
  if(!response.ok)throw new Error((result as {error?:string}).error||'Falha na comunicação com o servidor.');
  return result as T;
@@ -19,3 +19,4 @@ export function downloadJSON(value:unknown,name:string){
  const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+

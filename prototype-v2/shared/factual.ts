@@ -1,8 +1,11 @@
 import { z } from 'zod';
-export const FACTUAL_VERSION='factual-tavily-gemini-v2.0';
+export const FACTUAL_VERSION='factual-tavily-gemini-v2.1';
+export const PREVIOUS_TAVILY_VERSION='factual-tavily-gemini-v2.0';
+export const ResearchModeSchema=z.enum(['VERIFY','RESEARCH']);
+export type ResearchMode=z.infer<typeof ResearchModeSchema>;
 export const FACTUAL_MODEL='gemini-3.5-flash-lite';
 export const LEGACY_FACTUAL_VERSION='factual-grounding-v1.0';
-export const ClaimKind=z.enum(['FATO_VERIFICAVEL','PREFERENCIA','RESTRICAO_INDIVIDUAL','OPINIAO','HIPOTESE','INFORMACAO_INSUFICIENTE']);
+export const ClaimKind=z.enum(['FATO_VERIFICAVEL','SOLICITACAO_PESQUISA','PREFERENCIA','RESTRICAO_INDIVIDUAL','OPINIAO','HIPOTESE','INFORMACAO_INSUFICIENTE']);
 export const EvidenceStatus=z.enum(['EVIDENCIA_FAVORAVEL','EVIDENCIA_CONTRARIA','EVIDENCIA_INSUFICIENTE','NAO_VERIFICAVEL','VERIFICACAO_INDISPONIVEL']);
 export const AtomicClaimSchema=z.object({text:z.string().min(1).max(700),originalExcerpt:z.string().min(1).max(1200),kind:ClaimKind,query:z.string().max(250),timeSensitive:z.boolean(),reason:z.string().max(800)});
 export const ClaimPlanSchema=z.object({claims:z.array(AtomicClaimSchema).min(1).max(3)});
@@ -25,8 +28,8 @@ export const EvidenceSourceSchema=z.object({...SourceBase,provider:z.literal('TA
 export const EvidenceLinkSchema=z.object({sourceId:z.string().regex(/^S\d+$/),quote:z.string().min(12).max(1000),relation:z.enum(['SUPPORTS','CONTRADICTS','CONTEXT']),explanation:z.string().min(1).max(700)});
 export const InterpretationSchema=z.object({status:z.enum(['EVIDENCIA_FAVORAVEL','EVIDENCIA_CONTRARIA','EVIDENCIA_INSUFICIENTE','NAO_VERIFICAVEL']),explanation:z.string().min(1).max(3000),scopeMatches:z.boolean(),evidenceLinks:z.array(EvidenceLinkSchema).max(6),uncertainties:z.array(z.string().max(700)).max(6)});
 export const RetrievalSchema=z.object({provider:z.literal('TAVILY'),endpoint:z.literal('SEARCH'),searchDepth:z.literal('basic'),query:z.string().max(250),reusedFromCheckId:z.string().uuid().nullable().optional(),requestId:z.string().max(200).nullable(),queriedAt:z.string().datetime(),creditsUsed:z.number().nonnegative().nullable(),responseTimeSeconds:z.number().nonnegative().nullable(),resultsReceived:z.number().int().nonnegative(),resultsRetained:z.number().int().min(0).max(3),rawResponseSha256:z.string().regex(/^[a-f0-9]{64}$/)});
-export const ClaimEvidenceSchema=z.object({...CommonClaim,sources:z.array(EvidenceSourceSchema).max(3),retrieval:RetrievalSchema.nullable(),scopeMatches:z.boolean(),evidenceLinks:z.array(EvidenceLinkSchema).max(6)});
-export const TavilyReportSchema=z.object({...CommonReport,model:z.literal(FACTUAL_MODEL),version:z.literal(FACTUAL_VERSION),retrievalProvider:z.literal('TAVILY'),classificationSourceCheckId:z.string().uuid().nullable().optional(),classificationModel:z.string().max(120).nullable(),claims:z.array(ClaimEvidenceSchema).min(1).max(3)});
+export const ClaimEvidenceSchema=z.object({...CommonClaim,searchAttempted:z.boolean().optional(),attemptedQuery:z.string().max(250).optional(),failureStage:z.enum(['CLASSIFICATION','SEARCH','INTERPRETATION']).nullable().optional(),sources:z.array(EvidenceSourceSchema).max(3),retrieval:RetrievalSchema.nullable(),scopeMatches:z.boolean(),evidenceLinks:z.array(EvidenceLinkSchema).max(6)});
+export const TavilyReportSchema=z.object({...CommonReport,model:z.literal(FACTUAL_MODEL),version:z.enum([FACTUAL_VERSION,PREVIOUS_TAVILY_VERSION]),modality:ResearchModeSchema.optional(),retrievalProvider:z.literal('TAVILY'),classificationSourceCheckId:z.string().uuid().nullable().optional(),classificationModel:z.string().max(120).nullable(),claims:z.array(ClaimEvidenceSchema).min(1).max(3)});
 export const TavilyCheckSchema=TavilyReportSchema.extend(Binding);
 export const FactualReportSchema=z.union([TavilyReportSchema,LegacyFactualReportSchema]);
 export const FactualCheckSchema=z.union([TavilyCheckSchema,LegacyFactualCheckSchema]);
@@ -38,7 +41,7 @@ export type TavilyReport=z.infer<typeof TavilyReportSchema>;
 export type FactualReport=z.infer<typeof FactualReportSchema>;
 export type FactualCheck=z.infer<typeof FactualCheckSchema>;
 export type TavilyCheck=z.infer<typeof TavilyCheckSchema>;
-export const isTavilyCheck=(f:FactualCheck):f is TavilyCheck=>f.version===FACTUAL_VERSION;
+export const isTavilyCheck=(f:FactualCheck):f is TavilyCheck=>f.version!==LEGACY_FACTUAL_VERSION;
 // A retrieved result is not confirmation. Model links must quote the actual snippet.
 export function soundEvidence(report:FactualReport):boolean{
  if(report.version===LEGACY_FACTUAL_VERSION)return report.claims.every(c=>{
@@ -51,6 +54,7 @@ export function soundEvidence(report:FactualReport):boolean{
   if(ids.size!==c.sources.length||c.evidenceLinks.some(link=>!c.sources.some(s=>s.id===link.sourceId&&s.excerpt.includes(link.quote))))return false;
   if(!['EVIDENCIA_FAVORAVEL','EVIDENCIA_CONTRARIA'].includes(c.status))return true;
   const expected=c.status==='EVIDENCIA_FAVORAVEL'?'SUPPORTS':'CONTRADICTS',opposite=expected==='SUPPORTS'?'CONTRADICTS':'SUPPORTS';
-  return c.claim.kind==='FATO_VERIFICAVEL'&&c.retrieval?.provider==='TAVILY'&&c.scopeMatches&&c.evidenceLinks.some(l=>l.relation===expected)&&!c.evidenceLinks.some(l=>l.relation===opposite);
+  return ['FATO_VERIFICAVEL','SOLICITACAO_PESQUISA'].includes(c.claim.kind)&&c.retrieval?.provider==='TAVILY'&&c.scopeMatches&&c.evidenceLinks.some(l=>l.relation===expected)&&!c.evidenceLinks.some(l=>l.relation===opposite);
  });
 }
+

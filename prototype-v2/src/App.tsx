@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { request, type CreatedRoom, type ReviewResult, type RoomView } from './api';
 import { ProposalEditor,emptyProposal } from './components/ProposalEditor';
 import { ReviewCard } from './components/ReviewCard';
@@ -11,6 +11,7 @@ export default function App(){
   const [aiConsent,setAiConsent]=useState(false);
   const [bypass,setBypass]=useState(false);
   const [reviewedProposal,setReviewedProposal]=useState<typeof emptyProposal|null>(null);
+  const [appliedRewrite,setAppliedRewrite]=useState(false);
   const [initialReceipt,setInitialReceipt]=useState<string|undefined>();
   const [count,setCount]=useState(5);
   const [proposalReview,setProposalReview]=useState<ReviewResult|null>(null);
@@ -21,6 +22,19 @@ export default function App(){
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState('');
   const [notice,setNotice]=useState('');
+  const [syncError,setSyncError]=useState('');
+  useEffect(()=>{
+    if(!session||busy)return;
+    const {code,credential}=session;let cancelled=false;let timer:ReturnType<typeof setTimeout>;
+    const poll=async()=>{try{
+      if(typeof document==='undefined'||document.visibilityState!=='hidden'){
+       const view=await request<RoomView>('/rooms/'+code+'/view',{credential});
+       if(!cancelled){setSession(previous=>previous?.code===code&&previous.credential===credential&&view.revision>previous.view.revision?{...previous,view}:previous);setSyncError('');}
+      }
+    }catch{if(!cancelled)setSyncError('Atualização automática temporariamente indisponível. Seus rascunhos foram mantidos; use Atualizar ou aguarde a reconexão.');}
+    finally{if(!cancelled)timer=setTimeout(poll,4000);}};
+    timer=setTimeout(poll,4000);return()=>{cancelled=true;clearTimeout(timer);};
+  },[session?.code,session?.credential,busy]);
   const message=(e:unknown)=>setError(e instanceof Error?e.message:'Erro inesperado.');
 
   async function previewProposal(e:FormEvent){
@@ -32,7 +46,7 @@ export default function App(){
     if(!proposalReview&&!bypass)return;
     setError('');setBusy(true);
     try{
-      const result=await request<CreatedRoom>('/rooms',{proposal:ProposalSchema.parse(proposal),participantCount:count,receipt:proposalReview?.receipt??(bypass?undefined:initialReceipt),reviewedProposal:proposalReview?proposal:reviewedProposal??undefined,bypassReason:!proposalReview?'Moderador optou por criar a sala sem parecer consultivo.':undefined});
+      const result=await request<CreatedRoom>('/rooms',{proposal:ProposalSchema.parse(proposal),participantCount:count,appliedRewrite,receipt:proposalReview?.receipt??initialReceipt,reviewedProposal:proposalReview?proposal:reviewedProposal??undefined,bypassReason:!proposalReview?'Moderador optou por criar a sala sem parecer consultivo.':undefined});
       setCreated(result);setCode(result.code);setTab('join');
       setNotice('Sala criada. Guarde e distribua as credenciais individualmente; elas só aparecem nesta tela.');
     }catch(e){message(e);}finally{setBusy(false);}
@@ -68,6 +82,7 @@ export default function App(){
         <h1>Decisões melhores começam com ideias bem discutidas.</h1>
         <p>Crie uma discussão sobre qualquer tema, receba observações construtivas da IA e mantenha a palavra final com as pessoas.</p>
       </section>
+      {session&&syncError&&<p className="alert" role="status">{syncError}</p>}
       {error&&<div className="alert error" role="alert">{error}</div>}
       {notice&&<div className="alert" role="status">{notice}</div>}
       {!session&&<>
@@ -82,7 +97,7 @@ export default function App(){
           </form>
           {proposalReview&&<div className="review-follow">
             <ReviewCard review={proposalReview.review} label="Parecer da proposta"/>
-            {proposalReview.review.suggestedRewrite&&<button className="secondary" onClick={()=>{setProposal({...proposal,text:proposalReview.review.suggestedRewrite});setProposalReview(null);setBypass(true);}}>Aceitar reformulação para editar e confirmar</button>}
+            {proposalReview.review.suggestedRewrite&&<button className="secondary" onClick={()=>{setAppliedRewrite(true);setProposal({...proposal,text:proposalReview.review.suggestedRewrite});setProposalReview(null);setBypass(true);}}>Aceitar reformulação para editar e confirmar</button>}
             <button className="primary" disabled={busy} onClick={createRoom}>{busy?'Criando sala...':'2. Criar sala com esta proposta'}</button>
             <p className="muted">O responsável pode seguir com a proposta mesmo que o parecer identifique dúvidas ou pontos de atenção.</p>
           </div>}
@@ -115,3 +130,4 @@ export default function App(){
     <footer>Versão 2 em desenvolvimento · A IA auxilia, mas não decide · Não utilize dados pessoais ou sensíveis.</footer>
   </div>;
 }
+

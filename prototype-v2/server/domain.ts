@@ -6,8 +6,8 @@ import { dimensions,NATURALISTIC_VERSION,APPLICATION_VARIANT,displayedOpenItems 
 
 export class DomainError extends Error { constructor(message:string, public status=400){super(message);} }
 const id=z.string().uuid(), date=z.string().datetime();
-const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string()});
-const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.nullable(),content:ProposalSchema,createdAt:date,approvedBy:z.string(),review:ReviewRecord});
+const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional()});
+const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.nullable(),content:ProposalSchema,createdAt:date,approvedBy:z.string(),review:ReviewRecord,intervention:z.object({kind:z.enum(['APROVACAO_HUMANA','EDICAO_HUMANA']),source:z.enum(['PROPOSTA_ANTERIOR','SINTESE_IA','RASCUNHO_INICIAL','PARECER_INICIAL_IA']),sourceId:id,original:ProposalSchema,published:ProposalSchema,changes:z.array(z.object({field:z.string(),before:z.string(),after:z.string()})),reason:z.string(),at:date,actor:z.literal('moderator')}).optional()});
 const Round=z.object({id,number:z.number().int().positive(),proposalId:id,status:z.enum(['OPEN','CLOSED']),openedAt:date,closedAt:date.nullable()});
 const Vote=z.object({id,participantId:id,roundId:id,proposalId:id,choice:ChoiceSchema,justification:z.string().max(5000),createdAt:date});
 const Contribution=z.object({id,participantId:id,roundId:id,proposalId:id,originalText:z.string().min(1).max(5000),text:z.string().min(1).max(5000),review:ReviewRecord,contest:z.string().max(2000),createdAt:date});
@@ -43,6 +43,11 @@ export function createState(roomId:string,proposal:ProposalContent,participants:
  proposals:[{id:pid,version:1,parentId:null,content:proposal,createdAt:at,approvedBy:'moderator',review}],
  rounds:[{id:randomUUID(),number:1,proposalId:pid,status:'OPEN',openedAt:at,closedAt:null}],
  factualChecks:[],votes:[],contributions:[],analyses:[],syntheses:[],contests:[],events:[],evaluations:[]};
+ if(review.appliedRewrite||JSON.stringify(initialDraft)!==JSON.stringify(proposal)){
+  const original=review.appliedRewrite&&review.result?.suggestedRewrite?{...initialDraft,text:review.result.suggestedRewrite}:initialDraft;
+  const changes=Object.keys(proposal).filter(k=>proposal[k as keyof ProposalContent]!==original[k as keyof ProposalContent]).map(k=>({field:k,before:original[k as keyof ProposalContent],after:proposal[k as keyof ProposalContent]}));
+  s.proposals[0].intervention={kind:changes.length?'EDICAO_HUMANA':'APROVACAO_HUMANA',source:review.appliedRewrite?'PARECER_INICIAL_IA':'RASCUNHO_INICIAL',sourceId:pid,original,published:structuredClone(proposal),changes,reason:review.reason||'Confirmação humana da proposta inicial.',at,actor:'moderator'};
+ }
  event(s,'moderator','ROOM_CREATED','Proposta inicial confirmada por pessoa responsável.');return s;
 }
 function open(s:State){if(s.decision.status!=='OPEN')throw new DomainError('Processo encerrado.',409);}
@@ -50,7 +55,7 @@ function participant(s:State,pid:string){if(!s.participants.some(p=>p.id===pid))
 export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:Choice,justification:string){
  open(s);participant(s,pid);const r=currentRound(s);
  if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Versão ou rodada desatualizada. Atualize a sala.',409);
- if(choice==='REJEITO'&&!justification.trim())throw new DomainError('A rejeição exige justificativa.');
+ if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!justification.trim())throw new DomainError('Rejeição e aceite com ressalvas exigem justificativa.');
  s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:now()});
  event(s,pid,'VOTE_RECORDED',choice);
  if(unanimous(s)){s.decision.status='CONSENSUS';s.decision.closedAt=now();s.decision.closureReason='Aceitação explícita de todos na mesma versão.';r.status='CLOSED';r.closedAt=s.decision.closedAt;event(s,'system','CONSENSUS_RECORDED',s.decision.closureReason);}
@@ -61,17 +66,33 @@ export function contribute(s:State,pid:string,roundId:string,proposalId:string,t
  const entry={id:randomUUID(),participantId:pid,roundId,proposalId,text,originalText,review,contest,createdAt:now()};
  s.contributions.push(entry);event(s,pid,'CONTRIBUTION_RECORDED',contest?'Parecer contestado.':'Texto preservado.');return entry;
 }
+export function manifestations(s:State){
+ const roundId=currentRound(s).id,votes=latestVotes(s);
+ const kind=(choice:string)=>choice==='REJEITO'?'OBJECAO' as const:choice==='ACEITO_COM_RESSALVAS'?'RESSALVA' as const:choice==='ABSTENHO'?'ABSTENCAO' as const:'APOIO' as const;
+ const contributions=s.contributions.filter(c=>c.roundId===roundId);
+ const rows=[...votes.map(v=>({linkedOriginals:contributions.filter(c=>c.participantId===v.participantId&&c.text===v.justification).map(c=>({id:c.id,originalText:c.originalText,contest:c.contest})),id:v.id,kind:kind(v.choice),text:v.justification,participantId:v.participantId,choice:v.choice,linkedContributionIds:contributions.filter(c=>c.participantId===v.participantId&&c.text===v.justification).map(c=>c.id)})),...contributions.filter(c=>!votes.some(v=>v.participantId===c.participantId&&v.justification===c.text)).map(c=>({id:c.id,kind:'CONTRIBUICAO' as const,text:c.text,participantId:c.participantId,originalText:c.originalText,contest:c.contest}))];
+ const relevant=new Set([...votes,...contributions,...s.analyses.filter(a=>a.roundId===roundId),...s.syntheses.filter(a=>a.roundId===roundId),...s.factualChecks.filter(a=>a.roundId===roundId)].map(a=>a.id));
+ return [...rows,...s.contests.filter(c=>relevant.has(c.targetId)).map(c=>({id:c.id,kind:'CONTESTACAO' as const,text:c.text,participantId:c.participantId,targetId:c.targetId}))];
+}
+export function assertManifestations(s:State,result:Assessment){
+ const sources=manifestations(s),rows=result.manifestationAssessments??[];
+ if(rows.length!==sources.length||new Set(rows.map(x=>x.sourceId)).size!==rows.length)throw new DomainError('IA omitiu ou duplicou manifestações.',502);
+ for(const row of rows){const source=sources.find(x=>x.id===row.sourceId);if(!source||row.kind!==source.kind||(source.text?(!row.quotedExcerpt.trim()||!source.text.includes(row.quotedExcerpt)):row.quotedExcerpt!==''))throw new DomainError('Proveniência de manifestação inválida.',502);}
+}
 export function assertAssessment(s:State,result:Assessment){
+ assertManifestations(s,result);
  const objections=latestVotes(s).filter(v=>v.choice==='REJEITO');
  const ids=result.individualAssessments.map(a=>a.voteId);
  if(ids.length!==objections.length||new Set(ids).size!==ids.length||objections.some(v=>!ids.includes(v.id)))throw new DomainError('Serviço de IA omitiu ou inventou objeções.',502);
  for(const a of result.individualAssessments){const v=objections.find(v=>v.id===a.voteId)!;if(!a.quotedExcerpt.trim()||!v.justification.includes(a.quotedExcerpt))throw new DomainError('Serviço de IA retornou citação não presente na objeção.',502);}
 }
-export function sourceFingerprint(s:State){const roundId=currentRound(s).id;return createHash('sha256').update(JSON.stringify({votes:latestVotes(s),contributions:s.contributions.filter(c=>c.roundId===roundId),factualChecks:s.factualChecks.filter(c=>c.roundId===roundId).map(c=>c.id)})).digest('hex');}
+export function sourceFingerprint(s:State){const roundId=currentRound(s).id;return createHash('sha256').update(JSON.stringify({manifestations:manifestations(s),votes:latestVotes(s),contributions:s.contributions.filter(c=>c.roundId===roundId),factualChecks:s.factualChecks.filter(c=>c.roundId===roundId).map(c=>c.id)})).digest('hex');}
 export function addAnalysis(s:State,result:Assessment,model:string,promptVersion:string){
  open(s);assertAssessment(s,result);const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),factualCheckIds:factualContext(s).map(f=>f.id),result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
 }
 export function assertSynthesis(s:State,result:SynthesisResult){
+ const sourceIds=manifestations(s).map(x=>x.id),considered=result.consideredSourceIds??[];
+ if(considered.length!==sourceIds.length||new Set(considered).size!==considered.length||sourceIds.some(id=>!considered.includes(id))||result.changeLog.some(c=>!c.sourceIds?.length||c.sourceIds.some(id=>!sourceIds.includes(id))))throw new DomainError('Síntese sem cobertura ou proveniência das manifestações.',502);
  const ids=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
  const classified=[...result.addressedObjections,...result.partiallyAddressedObjections,...result.unresolvedObjections];
  if(classified.length!==ids.length||new Set(classified).size!==classified.length||ids.some(id=>!classified.includes(id))||result.changeLog.some(c=>c.voteIds.some(id=>!ids.includes(id))))throw new DomainError('Serviço de IA omitiu ou inventou vínculos de objeções.',502);
@@ -90,12 +111,15 @@ export function publish(s:State,content:ProposalContent,sourceId:string,reason:s
  if(!reason.trim())throw new DomainError('Registre a justificativa da revisão humana.');
  const synthesis=synthesisId?s.syntheses.find(x=>x.id===synthesisId&&x.proposalId===sourceId&&!x.publishedProposalId):undefined;
  if(synthesisId&&!synthesis)throw new DomainError('Síntese inválida.');
- if(synthesis)assertSynthesis(s,synthesis.result);
+ if(synthesis){assertSynthesis(s,synthesis.result);const a=s.analyses.find(a=>a.id===synthesis.analysisId);if(a?.sourceFingerprint!==sourceFingerprint(s))throw new DomainError('Novas manifestações: analise e sintetize novamente.',409);}
  const ids=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
  if(coverage.some(c=>!ids.includes(c.voteId))||new Set(coverage.map(c=>c.voteId)).size!==coverage.length)throw new DomainError('Cobertura humana inválida.');
  const r=currentRound(s);r.status='CLOSED';r.closedAt=now();
  const proposal={id:randomUUID(),version:s.proposals.length+1,parentId:sourceId,content,createdAt:now(),approvedBy:'moderator',review:{result:null,status:'IGNORADA' as const,promptVersion:'human-review-v1',model:'human',reason}};
- s.proposals.push(proposal);s.rounds.push({id:randomUUID(),number:s.rounds.length+1,proposalId:proposal.id,status:'OPEN',openedAt:now(),closedAt:null});
+ const original=synthesis?.result.revisedProposal??currentProposal(s).content;
+ const changes=Object.keys(content).filter(k=>content[k as keyof ProposalContent]!==original[k as keyof ProposalContent]).map(k=>({field:k,before:original[k as keyof ProposalContent],after:content[k as keyof ProposalContent]}));
+ const intervention={kind:changes.length?'EDICAO_HUMANA' as const:'APROVACAO_HUMANA' as const,source:synthesis?'SINTESE_IA' as const:'PROPOSTA_ANTERIOR' as const,sourceId:synthesis?.id??sourceId,original:structuredClone(original),published:structuredClone(content),changes,reason,at:proposal.createdAt,actor:'moderator' as const};
+ s.proposals.push({...proposal,intervention});s.rounds.push({id:randomUUID(),number:s.rounds.length+1,proposalId:proposal.id,status:'OPEN',openedAt:now(),closedAt:null});
  if(synthesis){synthesis.publishedProposalId=proposal.id;synthesis.humanCoverage=coverage;}
  event(s,'moderator','PROPOSAL_PUBLISHED',reason);
 }
@@ -120,7 +144,7 @@ export function metrics(s:State){
  const coverage=s.syntheses.flatMap(x=>x.humanCoverage);
  const counted=(status:string)=>coverage.filter(x=>x.status===status).length;
  return {automatic:{consensus:s.decision.status==='CONSENSUS',rounds:s.rounds.length,deliberationMs:s.decision.closedAt?Date.parse(s.decision.closedAt)-Date.parse(s.decision.createdAt):null,
- repeatedObjections:repeatedObjections(s),votes:s.votes.length,objections:s.votes.filter(v=>v.choice==='REJEITO').length,distinctObjectionsByRound:s.rounds.reduce((n,r)=>n+latestVotes(s,r.id).filter(v=>v.choice==='REJEITO').length,0)},
+ repeatedObjections:repeatedObjections(s),votes:s.votes.length,conditionalAcceptances:s.votes.filter(v=>v.choice==='ACEITO_COM_RESSALVAS').length,objections:s.votes.filter(v=>v.choice==='REJEITO').length,distinctObjectionsByRound:s.rounds.reduce((n,r)=>n+latestVotes(s,r.id).filter(v=>v.choice==='REJEITO').length,0)},
  human:{addressed:counted('ATENDIDA'),partial:counted('PARCIAL'),unresolved:counted('NAO_ATENDIDA'),assessed:coverage.length,faithful:coverage.filter(c=>c.faithful===true).length,fidelityAssessed:coverage.filter(c=>c.faithful!==null).length,argumentQuality:null},
  limitation:'Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos.'};
 }
@@ -147,9 +171,15 @@ export function validateState(input:unknown):State{
  if(s.rounds.length!==s.proposals.length)throw new DomainError('Rodadas incompatíveis.');
  for(let i=0;i<s.rounds.length;i++){const r=s.rounds[i];if(r.number!==i+1||r.proposalId!==s.proposals[i].id||r.status!==(i===s.rounds.length-1&&s.decision.status==='OPEN'?'OPEN':'CLOSED'))throw new DomainError('Sequência de rodadas inválida.');}
  for(const v of [...s.votes,...s.contributions]){if(!pids.has(v.participantId)||!s.rounds.some(r=>r.id===v.roundId&&r.proposalId===v.proposalId))throw new DomainError('Manifestação com vínculo inválido.');}
- if(s.votes.some(v=>v.choice==='REJEITO'&&!v.justification.trim()))throw new DomainError('Rejeição sem justificativa.');
+ if(s.votes.some(v=>['REJEITO','ACEITO_COM_RESSALVAS'].includes(v.choice)&&!v.justification.trim()))throw new DomainError('Rejeição sem justificativa.');
  for(const a of s.analyses){const r=s.rounds.find(r=>r.id===a.roundId&&r.proposalId===a.proposalId);if(!r||a.result.individualAssessments.some(x=>!s.votes.some(v=>v.id===x.voteId&&v.roundId===r.id&&v.choice==='REJEITO')))throw new DomainError('Análise com vínculo inválido.');}
  for(const x of s.syntheses){if(!s.analyses.some(a=>a.id===x.analysisId&&a.roundId===x.roundId&&a.proposalId===x.proposalId)||x.publishedProposalId&&!s.proposals.some(p=>p.id===x.publishedProposalId&&p.parentId===x.proposalId))throw new DomainError('Síntese com vínculo inválido.');const ids=[...x.result.addressedObjections,...x.result.partiallyAddressedObjections,...x.result.unresolvedObjections,...x.result.changeLog.flatMap(c=>c.voteIds),...x.humanCoverage.map(c=>c.voteId)];if(ids.some(id=>!s.votes.some(v=>v.id===id&&v.roundId===x.roundId&&v.choice==='REJEITO')))throw new DomainError('Vínculo de cobertura inválido.');}
+ for(const p of s.proposals){if(p.intervention){const i=p.intervention,source=i.source==='RASCUNHO_INICIAL'?s.initialDraft:i.source==='PARECER_INICIAL_IA'?(s.proposals[0].review.result?.suggestedRewrite?{...s.initialDraft,text:s.proposals[0].review.result.suggestedRewrite}:undefined):i.source==='SINTESE_IA'?s.syntheses.find(x=>x.id===i.sourceId)?.result.revisedProposal:s.proposals.find(x=>x.id===i.sourceId)?.content;
+ const changes=Object.keys(p.content).filter(k=>p.content[k as keyof ProposalContent]!==i.original[k as keyof ProposalContent]).map(k=>({field:k,before:i.original[k as keyof ProposalContent],after:p.content[k as keyof ProposalContent]}));
+ if(!source||JSON.stringify(source)!==JSON.stringify(i.original)||JSON.stringify(i.published)!==JSON.stringify(p.content)||JSON.stringify(changes)!==JSON.stringify(i.changes)||i.kind!==(changes.length?'EDICAO_HUMANA':'APROVACAO_HUMANA')||!i.reason.trim()||i.at!==p.createdAt)throw new DomainError('Intervenção humana incompatível com a proveniência.');}}
+ const recorded=[...s.votes.map(v=>({id:v.id,roundId:v.roundId,text:v.justification,kind:v.choice==='REJEITO'?'OBJECAO':v.choice==='ACEITO_COM_RESSALVAS'?'RESSALVA':v.choice==='ABSTENHO'?'ABSTENCAO':'APOIO'})),...s.contributions.map(c=>({id:c.id,roundId:c.roundId,text:c.text,kind:'CONTRIBUICAO'})),...s.contests.map(c=>({id:c.id,roundId:[...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks].find(x=>x.id===c.targetId)?.roundId,text:c.text,kind:'CONTESTACAO'}))];
+ for(const a of s.analyses)if(a.result.manifestationAssessments){const rows=a.result.manifestationAssessments;if(new Set(rows.map(x=>x.sourceId)).size!==rows.length||rows.some(row=>{const src=recorded.find(x=>x.id===row.sourceId&&x.roundId===a.roundId);return !src||src.kind!==row.kind||(src.text?(!row.quotedExcerpt.trim()||!src.text.includes(row.quotedExcerpt)):row.quotedExcerpt!=='');}))throw new DomainError('Análise com proveniência de manifestação inválida.');}
+ for(const x of s.syntheses)if(x.result.consideredSourceIds){const ids=x.result.consideredSourceIds;if(new Set(ids).size!==ids.length||ids.some(id=>!recorded.some(r=>r.id===id&&r.roundId===x.roundId))||x.result.changeLog.some(c=>!c.sourceIds?.length||c.sourceIds.some(id=>!ids.includes(id))))throw new DomainError('Síntese com proveniência de manifestação inválida.');}
  for(const f of s.factualChecks){if(f.participantId!==null&&!pids.has(f.participantId)||!s.rounds.some(r=>r.id===f.roundId&&r.proposalId===f.proposalId)||!soundEvidence(f))throw new DomainError('Evidência factual ou vínculo inválido.');}
  for(const a of [...s.analyses,...s.syntheses])if(a.factualCheckIds.some(id=>!s.factualChecks.some(f=>f.id===id&&f.proposalId===a.proposalId)))throw new DomainError('Referência factual inválida.');
  for(const c of s.contests){if(!pids.has(c.participantId)||![...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks].some(x=>x.id===c.targetId))throw new DomainError('Contestação inválida.');}
@@ -175,3 +205,4 @@ export function addFactualCheck(s:State,report:FactualReport,participantId:strin
 export function factualContext(s:State){
  return s.factualChecks.filter(isTavilyCheck).filter(f=>f.proposalId===currentProposal(s).id&&f.provenance!=='IMPORTED_UNAUTHENTICATED').slice(-12).map(f=>({id:f.id,provider:'TAVILY',version:f.version,queriedAt:f.createdAt,contested:s.contests.some(c=>c.targetId===f.id),contests:s.contests.filter(c=>c.targetId===f.id).map(c=>({text:c.text,at:c.at})),claims:f.claims.map(c=>({claim:c.claim.text,status:c.status,interpretation:c.explanation,sources:c.sources,evidenceLinks:c.evidenceLinks,retrieval:c.retrieval,limitations:c.limitations}))}));
 }
+

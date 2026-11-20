@@ -58,6 +58,9 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   assert.equal((await action(room,'/contest',{targetId:analysis.id,text:'A incerteza merece mais destaque.'},room.participants[0].credential)).status,201);
  });
  await t.test('13 síntese conciliadora é rascunho e mantém impasse',async()=>{
+  assert.equal((await action(room,'/synthesize',{analysisId:analysis.id,consent:true})).status,409);
+  assert.equal((await action(room,'/analyze-objections',{consent:true})).status,200);
+  analysis=(await view(room)).state.analyses.at(-1);
   assert.equal((await action(room,'/synthesize',{analysisId:analysis.id,consent:true})).status,200);
   const v=await view(room);synthesis=v.state.syntheses.at(-1);assert.equal(v.state.proposals.length,1);assert.equal(synthesis.publishedProposalId,null);assert.ok(synthesis.result.remainingImpasses.length);
  });
@@ -114,3 +117,4 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   const migrations=await query('SELECT version FROM dc2_migrations');assert.equal(migrations.rows.length,3);
  });
 });
+

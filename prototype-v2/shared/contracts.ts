@@ -21,19 +21,22 @@ export const ReviewSchema=z.object({
 });
 export type Review=z.infer<typeof ReviewSchema>;
 const list=z.array(z.string().max(2000)).max(50);
+export const ManifestationAssessmentSchema=z.object({sourceId:z.string(),kind:z.enum(['APOIO','RESSALVA','OBJECAO','ABSTENCAO','CONTRIBUICAO','CONTESTACAO']),quotedExcerpt:field,interpretation:field,suggestedPath:field});
 export const AssessmentSchema=z.object({
+ manifestationAssessments:z.array(ManifestationAssessmentSchema).max(200).optional(),
  individualAssessments:z.array(z.object({voteId:z.string(),relevance:field,explanation:field,quotedExcerpt:field,premises:list,evidence:list,risks:list,uncertainty:field})).max(30),
  sharedInterests:list,convergences:list,conflicts:list,incompatibleObjections:list,nonNegotiableConditions:list,uncertainties:list,
 });
 export type Assessment=z.infer<typeof AssessmentSchema>;
 export const SynthesisSchema=z.object({
  revisedProposal:ProposalSchema,
- changeLog:z.array(z.object({change:field,reason:field,voteIds:z.array(z.string()).max(30)})).max(30),
+ consideredSourceIds:z.array(z.string()).max(200).optional(),
+ changeLog:z.array(z.object({change:field,reason:field,voteIds:z.array(z.string()).max(30),sourceIds:z.array(z.string()).max(200).optional()})).max(30),
  addressedObjections:z.array(z.string()).max(30),partiallyAddressedObjections:z.array(z.string()).max(30),
  unresolvedObjections:z.array(z.string()).max(30),remainingImpasses:list,feasibilityWarnings:list,
 });
 export type SynthesisResult=z.infer<typeof SynthesisSchema>;
-export const ChoiceSchema=z.enum(['ACEITO','REJEITO','ABSTENHO']);
+export const ChoiceSchema=z.enum(['ACEITO','ACEITO_COM_RESSALVAS','REJEITO','ABSTENHO']);
 export type Choice=z.infer<typeof ChoiceSchema>;
 const LegacyEvaluationSchema=z.object({
  instrumentVersion:z.literal('DSR-1.0-2026-11-16'),
@@ -46,3 +49,4 @@ export const EvaluationSchema=z.discriminatedUnion('instrumentVersion',[
 ]);
 export type EvaluationInput=z.infer<typeof EvaluationSchema>;
 export const INSTRUMENT_VERSION='DSR-1.0-2026-11-16' as const;
+
