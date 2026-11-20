@@ -49,3 +49,20 @@ test('Síntese: ressalvas não são rejeições; correção conserva classifica�
  assert.throws(()=>addSynthesis(s,a.id,tampered,'synthetic','test'));
 });
 function latestForTest(s:ReturnType<typeof fresh>){return s.votes.map(v=>({id:v.id,choice:v.choice,justification:v.justification}));}
+
+test('Voto único por rodada: repetir ou alterar posição é recusado; histórico antigo continua legível',()=>{
+ const s=fresh(),pid=s.participants[0].id,r1=currentRound(s);
+ vote(s,pid,r1.id,r1.proposalId,'ACEITO_COM_RESSALVAS','Exijo acesso por rampa.');
+ const before=JSON.stringify(s);
+ for(const choice of ['ACEITO','ACEITO_COM_RESSALVAS','REJEITO','ABSTENHO'] as const){
+  assert.throws(()=>vote(s,pid,r1.id,r1.proposalId,choice,'Tentativa de substituir posição.'),(e:unknown)=>e instanceof Error&&'status' in e&&e.status===409);
+  assert.equal(JSON.stringify(s),before);
+ }
+ const legacy=structuredClone(s);
+ legacy.votes.push({...legacy.votes[0],id:randomUUID(),choice:'REJEITO',justification:'Atualização histórica anterior à regra de voto único.'});
+ assert.equal(validateState(legacy).votes.length,2);
+ publish(s,{...proposal,text:'Proposta nova com acesso por rampa.'},currentProposal(s).id,'Revisão humana para nova votação.');
+ const r2=currentRound(s);vote(s,pid,r2.id,r2.proposalId,'ACEITO','');
+ assert.equal(s.votes.length,2);assert.equal(s.votes[0].choice,'ACEITO_COM_RESSALVAS');assert.equal(s.decision.status,'OPEN');
+ assert.throws(()=>vote(s,pid,r2.id,r2.proposalId,'ABSTENHO',''),/já foi registrado/);
+});

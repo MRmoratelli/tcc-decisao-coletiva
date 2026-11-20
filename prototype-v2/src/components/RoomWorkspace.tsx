@@ -24,13 +24,20 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  const [staleDraft,setStaleDraft]=useState(false),[roundNotice,setRoundNotice]=useState('');
  const draftRound=useRef(p.id);
  const [target,setTarget]=useState(''),[contestLater,setContestLater]=useState('');
- useEffect(()=>{if(draftRound.current!==p.id){setRoundNotice('Nova rodada publicada. Confira a proposta antes de se manifestar.');setStaleDraft(true);setReview(null);setRewriteApplied(false);setSynthesis(undefined);setCoverage({});} },[p.id]);
+ useEffect(()=>{if(draftRound.current!==p.id){
+  const needsDraftReview=view.role==='moderator'||Boolean(text.trim()||original.trim()||contestText.trim());
+  setRoundNotice('Nova rodada publicada. Confira a proposta antes de se manifestar.');
+  setStaleDraft(needsDraftReview);if(!needsDraftReview)draftRound.current=p.id;
+  setReview(null);setRewriteApplied(false);setSynthesis(undefined);setCoverage({});
+  setChoice('ACEITO');setConsent(false);setBypass(false);
+ }},[p.id]);
  const base={credential,revision:view.revision},binding={roundId:r.id,proposalId:p.id};
  const post=(suffix:string,data:object)=>request('/rooms/'+code+suffix,{...base,...data});
  const mutate=async(suffix:string,data:object)=>{await post(suffix,data);await onRefresh();};
  async function analyze(){await act(async()=>{if(!consent)throw new Error('Confirme o envio do texto ao Gemini.');setReview(await post('/contribution-review',{...binding,text,consent:true}) as ReviewResult);setRewriteApplied(false);setBypass(false);});}
  async function send(kind:'vote'|'contribution'){
   await act(async()=>{
+   if(kind==='vote'&&ownVotes.length)throw new Error('Seu voto nesta rodada já foi registrado. Aguarde uma nova rodada.');
    if(staleDraft||draftRound.current!==p.id)throw new Error('Confirme a reutilização do rascunho na nova rodada.');
    if(text&&!review&&!bypass)throw new Error('Solicite parecer ou marque continuar sem parecer.');
    if(rewriteApplied&&!review?.rewriteReceipt)throw new Error('Comprovante de reformulação indisponível. Analise novamente.');
@@ -64,8 +71,9 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  {s.decision.closureReason&&<p className="alert">{s.decision.closureReason}</p>}
  <details><summary>Problema e contexto da versão atual</summary><dl>{Object.entries(p.content).filter(([key,value])=>!['title','text'].includes(key)&&value).map(([key,value])=><div key={key}><dt>{{problem:'Problema',decision:'Decisão pretendida',goals:'Objetivos',alternatives:'Alternativas',constraints:'Restrições',successCriteria:'Critérios de sucesso',context:'Contexto'}[key]}</dt><dd>{value}</dd></div>)}</dl></details>
  <ul className="positions">{view.positions.map(pos=><li key={pos.id}><b>{pos.alias}</b> {pos.choice.replaceAll('_',' ')}</li>)}</ul>
- {view.role==='participant'&&isOpen&&<section className="entry"><h3>Sua manifestação sobre V{p.version}</h3>
- <p>{ownVotes.length?'Você já se manifestou nesta versão. Uma nova manifestação preserva a anterior e passa a ser sua posição vigente.':'Registre sua posição explicitamente.'}</p>
+ {view.role==='participant'&&isOpen&&ownVotes.length>0&&<section className="entry" role="status"><h3>Voto registrado nesta rodada</h3><p>Sua posição foi registrada. Aguarde o moderador publicar uma nova rodada para votar novamente. A tela será atualizada automaticamente.</p></section>}
+ {view.role==='participant'&&isOpen&&ownVotes.length===0&&<section className="entry"><h3>Sua manifestação sobre V{p.version}</h3>
+ <p>Registre sua posição explicitamente. Cada participante pode votar uma única vez por rodada.</p>
  <label>Posição<select value={choice} onChange={e=>setChoice(e.target.value as Choice)}><option>ACEITO</option><option value="ACEITO_COM_RESSALVAS">ACEITO COM RESSALVAS</option><option>REJEITO</option><option>ABSTENHO</option></select></label>
  <label>Justificativa, objeção ou sugestão {['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)?'(obrigatória)':'(opcional)'}<textarea rows={5} maxLength={5000} value={text} onChange={e=>{setText(e.target.value);setReview(null);setRewriteApplied(false);}}/></label>
  <label className="check"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/> Autorizo enviar este texto e o contexto da proposta ao Gemini. Evite dados pessoais ou sensíveis.</label>

@@ -29,7 +29,7 @@ test('Pré-teste 1/2/4: dez identidades, quatro posições, síntese rastreável
  const p=currentProposal(s);assert.equal(p.intervention?.kind,'EDICAO_HUMANA');assert.equal(p.intervention?.source,'SINTESE_IA');assert.equal(p.intervention?.original.text,result.revisedProposal.text);assert.equal(p.intervention?.published.text,p.content.text);assert.equal(p.intervention?.actor,'moderator');assert.ok(p.intervention?.at);assert.equal(p.intervention?.changes.length,1);assert.equal(JSON.stringify(syn.result),original);assert.equal(s.votes.length,10);assert.equal(unanimous(s),false);
  assert.throws(()=>vote(s,s.participants[0].id,r.id,r.proposalId,'ACEITO',''));
  const r2=currentRound(s);for(let i=0;i<9;i++)vote(s,s.participants[i].id,r2.id,r2.proposalId,'ACEITO','');
- vote(s,s.participants[9].id,r2.id,r2.proposalId,'ACEITO_COM_RESSALVAS','Ainda condiciono ao prazo.');assert.equal(s.decision.status,'OPEN');
+ assert.throws(()=>vote(s,s.participants[9].id,r2.id,r2.proposalId,'ACEITO_COM_RESSALVAS','  '));assert.equal(s.decision.status,'OPEN');
  vote(s,s.participants[9].id,r2.id,r2.proposalId,'ACEITO','');assert.equal(s.decision.status,'CONSENSUS');
  const archive=exportState(s);assert.deepEqual(validateState(JSON.parse(JSON.stringify(archive.state))),s);
  const tampered=structuredClone(s);tampered.proposals[1].intervention!.original.text='Origem inventada';assert.throws(()=>validateState(tampered));
