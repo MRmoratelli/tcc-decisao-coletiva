@@ -1,0 +1,188 @@
+{
+  "nature": "TECHNICAL_SYNTHETIC_NON_SCIENTIFIC",
+  "roomCode": "8DAEC1E5E5",
+  "validatedApplicationCommit": "d8294b95033fdb3b7002151184588c47a0f59a3c",
+  "capturedAt": "2026-11-20T23:43:54.101Z",
+  "proof": {
+    "revision": 10,
+    "decision": "CONSENSUS",
+    "counts": {
+      "participants": 3,
+      "proposals": 2,
+      "rounds": 2,
+      "votes": 6,
+      "contributions": 2,
+      "analyses": 1,
+      "syntheses": 1,
+      "events": 13,
+      "evaluations": 0
+    },
+    "historicalRounds": [
+      {
+        "number": 1,
+        "status": "CLOSED",
+        "positions": [
+          {
+            "participantId": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b",
+            "choice": "ACEITO"
+          },
+          {
+            "participantId": "e7229cc3-3f87-4458-8c21-175c4a71ccca",
+            "choice": "ACEITO_COM_RESSALVAS"
+          },
+          {
+            "participantId": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd",
+            "choice": "REJEITO"
+          }
+        ],
+        "proposalMatches": true
+      },
+      {
+        "number": 2,
+        "status": "CLOSED",
+        "positions": [
+          {
+            "participantId": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b",
+            "choice": "ACEITO"
+          },
+          {
+            "participantId": "e7229cc3-3f87-4458-8c21-175c4a71ccca",
+            "choice": "ACEITO"
+          },
+          {
+            "participantId": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd",
+            "choice": "ACEITO"
+          }
+        ],
+        "proposalMatches": true
+      }
+    ],
+    "providers": {
+      "contribution": "gemini-3.5-flash-lite",
+      "analysis": "gemini-3.5-flash-lite",
+      "synthesis": "gemini-3.5-flash-lite",
+      "promptVersion": "consensus-consultive-v2.5-formal-rejections"
+    },
+    "consideredSourcesComplete": true,
+    "sourceIdsValid": true,
+    "formalRejectionCoverageExact": true,
+    "quotesLiteral": true,
+    "rewriteSaved": true,
+    "humanIntervention": {
+      "at": "2026-11-20T23:31:42.535Z",
+      "kind": "APROVACAO_HUMANA",
+      "actor": "moderator",
+      "reason": "Revisão humana técnica sintética: explicitar acessibilidade no térreo e a divisão R$ 20/R$ 70, preservando a sugestão original da IA.",
+      "source": "SINTESE_IA",
+      "changes": [],
+      "original": {
+        "text": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo, acessível por rampa, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+        "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+        "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+        "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+        "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+        "decision": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo (acessível por rampa), com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+        "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+        "alternatives": "Sala A no segundo andar (não acessível). Alternativa fictícia para comparação.",
+        "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+      },
+      "sourceId": "e190ecb6-d5f0-4f63-a659-4a255822f891",
+      "published": {
+        "text": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo, acessível por rampa, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+        "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+        "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+        "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+        "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+        "decision": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo (acessível por rampa), com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+        "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+        "alternatives": "Sala A no segundo andar (não acessível). Alternativa fictícia para comparação.",
+        "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+      }
+    },
+    "consensusEvents": [
+      {
+        "at": "2026-11-20T23:37:25.805Z",
+        "id": "ca1da4d2-8c3f-40cf-b235-5063c67f2461",
+        "type": "CONSENSUS_RECORDED",
+        "actor": "system",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      }
+    ],
+    "failureEvents": [],
+    "synthesisWarning": [
+      "A disponibilidade efetiva da sala alternativa no térreo para a data e horário estipulados deve ser verificada antes da realização."
+    ]
+  },
+  "consensusProgression": [
+    {
+      "revision": 1,
+      "status": "OPEN",
+      "historical_votes": 0,
+      "rounds": 1,
+      "current_acceptances": "0"
+    },
+    {
+      "revision": 2,
+      "status": "OPEN",
+      "historical_votes": 1,
+      "rounds": 1,
+      "current_acceptances": "1"
+    },
+    {
+      "revision": 3,
+      "status": "OPEN",
+      "historical_votes": 2,
+      "rounds": 1,
+      "current_acceptances": "1"
+    },
+    {
+      "revision": 4,
+      "status": "OPEN",
+      "historical_votes": 3,
+      "rounds": 1,
+      "current_acceptances": "1"
+    },
+    {
+      "revision": 5,
+      "status": "OPEN",
+      "historical_votes": 3,
+      "rounds": 1,
+      "current_acceptances": "1"
+    },
+    {
+      "revision": 6,
+      "status": "OPEN",
+      "historical_votes": 3,
+      "rounds": 1,
+      "current_acceptances": "1"
+    },
+    {
+      "revision": 7,
+      "status": "OPEN",
+      "historical_votes": 3,
+      "rounds": 2,
+      "current_acceptances": "0"
+    },
+    {
+      "revision": 8,
+      "status": "OPEN",
+      "historical_votes": 4,
+      "rounds": 2,
+      "current_acceptances": "1"
+    },
+    {
+      "revision": 9,
+      "status": "OPEN",
+      "historical_votes": 5,
+      "rounds": 2,
+      "current_acceptances": "2"
+    },
+    {
+      "revision": 10,
+      "status": "CONSENSUS",
+      "historical_votes": 6,
+      "rounds": 2,
+      "current_acceptances": "3"
+    }
+  ]
+}

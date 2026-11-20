@@ -1,0 +1,515 @@
+{
+  "nature": "TECHNICAL_SYNTHETIC_NON_SCIENTIFIC",
+  "roomCode": "8DAEC1E5E5",
+  "validatedApplicationCommit": "d8294b95033fdb3b7002151184588c47a0f59a3c",
+  "capturedAt": "2026-11-20T23:43:54.101Z",
+  "evidenceType": "READ_ONLY_POSTGRESQL_SNAPSHOT",
+  "notApplicationExport": true,
+  "explanation": "Estado real da sala obtido por SELECT no PostgreSQL. Este arquivo não é o download JSON da aplicação e não comprova seu mecanismo de exportação.",
+  "revision": 10,
+  "state": {
+    "votes": [
+      {
+        "id": "f2cd5aea-80a1-4f64-ae4f-3b8d1a5990a1",
+        "choice": "ACEITO",
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:28:50.933Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "justification": "",
+        "participantId": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b"
+      },
+      {
+        "id": "a2b67f07-cc8c-4c4e-ab84-8070092e2fdd",
+        "choice": "ACEITO_COM_RESSALVAS",
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:29:48.573Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "justification": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+        "participantId": "e7229cc3-3f87-4458-8c21-175c4a71ccca"
+      },
+      {
+        "id": "6cdfffec-ea40-496d-b0e6-e6f0362eaac4",
+        "choice": "REJEITO",
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:30:37.885Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "justification": "Rejeito o encontro na sala A porque fica no segundo andar sem elevador. Para este cenário fictício, preciso de uma sala no térreo acessível por rampa.",
+        "participantId": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd"
+      },
+      {
+        "id": "64befd7e-34a0-4aef-b2b5-0e52e6517ced",
+        "choice": "ACEITO",
+        "roundId": "0298b21a-bb60-425c-9c4e-92ded0540092",
+        "createdAt": "2026-11-20T23:36:43.320Z",
+        "proposalId": "3e773d3c-4246-4d19-a216-f89b13d4b5c5",
+        "justification": "",
+        "participantId": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b"
+      },
+      {
+        "id": "826b73cd-75bb-410f-8d39-f0593c4e8154",
+        "choice": "ACEITO",
+        "roundId": "0298b21a-bb60-425c-9c4e-92ded0540092",
+        "createdAt": "2026-11-20T23:37:09.399Z",
+        "proposalId": "3e773d3c-4246-4d19-a216-f89b13d4b5c5",
+        "justification": "",
+        "participantId": "e7229cc3-3f87-4458-8c21-175c4a71ccca"
+      },
+      {
+        "id": "b18787e7-8cb8-441c-b7ee-2cacc2f39b56",
+        "choice": "ACEITO",
+        "roundId": "0298b21a-bb60-425c-9c4e-92ded0540092",
+        "createdAt": "2026-11-20T23:37:25.805Z",
+        "proposalId": "3e773d3c-4246-4d19-a216-f89b13d4b5c5",
+        "justification": "",
+        "participantId": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd"
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-20T23:27:32.499Z",
+        "id": "39b1fd90-1dba-45c5-a98f-991b2fed9eed",
+        "type": "ROOM_CREATED",
+        "actor": "moderator",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "at": "2026-11-20T23:28:50.933Z",
+        "id": "6bddb003-a320-4ff4-a2a8-3ce0d8ca2368",
+        "type": "VOTE_RECORDED",
+        "actor": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b",
+        "detail": "ACEITO"
+      },
+      {
+        "at": "2026-11-20T23:29:48.573Z",
+        "id": "187fb1a2-930d-4e18-b10a-51796e92c91c",
+        "type": "CONTRIBUTION_RECORDED",
+        "actor": "e7229cc3-3f87-4458-8c21-175c4a71ccca",
+        "detail": "Texto preservado."
+      },
+      {
+        "at": "2026-11-20T23:29:48.573Z",
+        "id": "2f21e27f-0d31-4732-8319-43a9d6c84a9e",
+        "type": "VOTE_RECORDED",
+        "actor": "e7229cc3-3f87-4458-8c21-175c4a71ccca",
+        "detail": "ACEITO_COM_RESSALVAS"
+      },
+      {
+        "at": "2026-11-20T23:30:37.885Z",
+        "id": "a7cd00a6-93ca-4465-bd47-7e72ad914c4b",
+        "type": "CONTRIBUTION_RECORDED",
+        "actor": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd",
+        "detail": "Texto preservado."
+      },
+      {
+        "at": "2026-11-20T23:30:37.885Z",
+        "id": "5bff9e46-bde7-4381-9a4c-9bc84a4ec9dc",
+        "type": "VOTE_RECORDED",
+        "actor": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd",
+        "detail": "REJEITO"
+      },
+      {
+        "at": "2026-11-20T23:31:01.707Z",
+        "id": "d2ec3147-5cce-4bc2-8fdd-5d9d9d2b984a",
+        "type": "OBJECTIONS_ANALYZED",
+        "actor": "moderator",
+        "detail": ""
+      },
+      {
+        "at": "2026-11-20T23:31:08.079Z",
+        "id": "6ec71594-cd93-4905-94d0-2bb73acd7f28",
+        "type": "SYNTHESIS_DRAFTED",
+        "actor": "moderator",
+        "detail": ""
+      },
+      {
+        "at": "2026-11-20T23:31:42.535Z",
+        "id": "86aaf536-2db5-49c0-bcfb-f4d74b2a487d",
+        "type": "PROPOSAL_PUBLISHED",
+        "actor": "moderator",
+        "detail": "Revisão humana técnica sintética: explicitar acessibilidade no térreo e a divisão R$ 20/R$ 70, preservando a sugestão original da IA."
+      },
+      {
+        "at": "2026-11-20T23:36:43.320Z",
+        "id": "5c41271e-82b9-492a-b1fa-eada88ef6bbd",
+        "type": "VOTE_RECORDED",
+        "actor": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b",
+        "detail": "ACEITO"
+      },
+      {
+        "at": "2026-11-20T23:37:09.399Z",
+        "id": "6c278612-d418-4292-8c75-cf3e8a9a2f47",
+        "type": "VOTE_RECORDED",
+        "actor": "e7229cc3-3f87-4458-8c21-175c4a71ccca",
+        "detail": "ACEITO"
+      },
+      {
+        "at": "2026-11-20T23:37:25.805Z",
+        "id": "fdd9b8d3-77f7-4a41-8aa9-80296f14a406",
+        "type": "VOTE_RECORDED",
+        "actor": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd",
+        "detail": "ACEITO"
+      },
+      {
+        "at": "2026-11-20T23:37:25.805Z",
+        "id": "ca1da4d2-8c3f-40cf-b235-5063c67f2461",
+        "type": "CONSENSUS_RECORDED",
+        "actor": "system",
+        "detail": "Aceitação explícita de todos na mesma versão."
+      }
+    ],
+    "rounds": [
+      {
+        "id": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "number": 1,
+        "status": "CLOSED",
+        "closedAt": "2026-11-20T23:31:42.535Z",
+        "openedAt": "2026-11-20T23:27:32.499Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324"
+      },
+      {
+        "id": "0298b21a-bb60-425c-9c4e-92ded0540092",
+        "number": 2,
+        "status": "CLOSED",
+        "closedAt": "2026-11-20T23:37:25.805Z",
+        "openedAt": "2026-11-20T23:31:42.535Z",
+        "proposalId": "3e773d3c-4246-4d19-a216-f89b13d4b5c5"
+      }
+    ],
+    "analyses": [
+      {
+        "id": "1e864794-eee4-4ef7-847b-a2626af7fd6d",
+        "model": "gemini-3.5-flash-lite",
+        "result": {
+          "conflicts": [
+            "Conflito entre a escolha original da sala A (segundo andar sem elevador) e a exigência de acessibilidade no térreo."
+          ],
+          "convergences": [
+            "Concordância quanto à data, horário e montante orçamentário geral da proposta.",
+            "Aceitação da destinação de parte do orçamento para bebidas e lanches."
+          ],
+          "uncertainties": [
+            "A disponibilidade efetiva da sala alternativa no térreo para a data e horário estipulados."
+          ],
+          "sharedInterests": [
+            "Realizar o encontro em 21/11/2026, às 14h.",
+            "Utilizar o orçamento total de R$ 90 para lanches e bebidas."
+          ],
+          "individualAssessments": [
+            {
+              "risks": [
+                "Exclusão de participantes com restrições de mobilidade caso a sala A seja mantida."
+              ],
+              "voteId": "6cdfffec-ea40-496d-b0e6-e6f0362eaac4",
+              "evidence": [
+                "Localização informada na proposta original (sala A, segundo andar sem elevador)."
+              ],
+              "premises": [
+                "Acessibilidade é um requisito obrigatório para a participação plena.",
+                "O segundo andar sem elevador impede o acesso adequado."
+              ],
+              "relevance": "Impeditiva para o consenso integral, pois aponta uma barreira física excludente (falta de elevador).",
+              "explanation": "A objeção fundamenta-se na necessidade de acessibilidade física, tornando a sala A inadequada.",
+              "uncertainty": "Não há ambiguidade na exigência de uma sala no térreo com rampa.",
+              "quotedExcerpt": "Rejeito o encontro na sala A porque fica no segundo andar sem elevador. Para este cenário fictício, preciso de uma sala no térreo acessível por rampa."
+            }
+          ],
+          "incompatibleObjections": [
+            "A manutenção da sala A é incompatível com a condição de acessibilidade exigida pelo voto de rejeição."
+          ],
+          "nonNegotiableConditions": [
+            "Disponibilização de uma sala no térreo acessível por rampa."
+          ],
+          "manifestationAssessments": [
+            {
+              "kind": "APOIO",
+              "sourceId": "f2cd5aea-80a1-4f64-ae4f-3b8d1a5990a1",
+              "quotedExcerpt": "",
+              "suggestedPath": "Manter os termos originais da proposta que contam com este apoio.",
+              "interpretation": "O participante apoia integralmente a proposta sem ressalvas ou exigências adicionais."
+            },
+            {
+              "kind": "RESSALVA",
+              "sourceId": "a2b67f07-cc8c-4c4e-ab84-8070092e2fdd",
+              "quotedExcerpt": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+              "suggestedPath": "Acolher a subdivisão do orçamento para contemplar a ressalva sem alterar os parâmetros fundamentais.",
+              "interpretation": "O participante aceita a proposta básica, mas condiciona parte da execução à alocação específica de R$ 20 para bebidas sem açúcar."
+            },
+            {
+              "kind": "OBJECAO",
+              "sourceId": "6cdfffec-ea40-496d-b0e6-e6f0362eaac4",
+              "quotedExcerpt": "Rejeito o encontro na sala A porque fica no segundo andar sem elevador. Para este cenário fictício, preciso de uma sala no térreo acessível por rampa.",
+              "suggestedPath": "Migrar a realização do encontro para a sala alternativa no térreo mencionada nas diretrizes para satisfazer a exigência de acessibilidade.",
+              "interpretation": "O participante rejeita explicitamente a escolha da sala A devido à falta de acessibilidade (segundo andar sem elevador) e exige uma sala no térreo acessível por rampa."
+            }
+          ]
+        },
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:31:01.707Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "promptVersion": "consensus-consultive-v2.5-formal-rejections",
+        "factualCheckIds": [],
+        "sourceFingerprint": "f742f2a9b2f0d7e0fcda8adf5af4f609203f70901b22873445a98060ce6225b1"
+      }
+    ],
+    "contests": [],
+    "decision": {
+      "id": "7e218072-fc12-4794-a6bd-2100a585e4cf",
+      "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+      "status": "CONSENSUS",
+      "closedAt": "2026-11-20T23:37:25.805Z",
+      "originId": "7e218072-fc12-4794-a6bd-2100a585e4cf",
+      "createdAt": "2026-11-20T23:27:32.499Z",
+      "closureReason": "Aceitação explícita de todos na mesma versão."
+    },
+    "proposals": [
+      {
+        "id": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "review": {
+          "model": "none",
+          "reason": "Moderador optou por criar a sala sem parecer consultivo.",
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.5-formal-rejections"
+        },
+        "content": {
+          "text": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90 para lanche e bebidas.",
+          "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+          "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+          "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+          "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+          "decision": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90 para lanche e bebidas.",
+          "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+          "alternatives": "Sala B no térreo (acessível). Alternativa fictícia para comparação.",
+          "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+        },
+        "version": 1,
+        "parentId": null,
+        "createdAt": "2026-11-20T23:27:32.499Z",
+        "approvedBy": "moderator"
+      },
+      {
+        "id": "3e773d3c-4246-4d19-a216-f89b13d4b5c5",
+        "review": {
+          "model": "human",
+          "reason": "Revisão humana técnica sintética: explicitar acessibilidade no térreo e a divisão R$ 20/R$ 70, preservando a sugestão original da IA.",
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1"
+        },
+        "content": {
+          "text": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo, acessível por rampa, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+          "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+          "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+          "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+          "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+          "decision": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo (acessível por rampa), com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+          "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+          "alternatives": "Sala A no segundo andar (não acessível). Alternativa fictícia para comparação.",
+          "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+        },
+        "version": 2,
+        "parentId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "createdAt": "2026-11-20T23:31:42.535Z",
+        "approvedBy": "moderator",
+        "intervention": {
+          "at": "2026-11-20T23:31:42.535Z",
+          "kind": "APROVACAO_HUMANA",
+          "actor": "moderator",
+          "reason": "Revisão humana técnica sintética: explicitar acessibilidade no térreo e a divisão R$ 20/R$ 70, preservando a sugestão original da IA.",
+          "source": "SINTESE_IA",
+          "changes": [],
+          "original": {
+            "text": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo, acessível por rampa, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+            "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+            "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+            "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+            "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+            "decision": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo (acessível por rampa), com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+            "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+            "alternatives": "Sala A no segundo andar (não acessível). Alternativa fictícia para comparação.",
+            "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+          },
+          "sourceId": "e190ecb6-d5f0-4f63-a659-4a255822f891",
+          "published": {
+            "text": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo, acessível por rampa, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+            "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+            "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+            "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+            "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+            "decision": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo (acessível por rampa), com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+            "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+            "alternatives": "Sala A no segundo andar (não acessível). Alternativa fictícia para comparação.",
+            "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+          }
+        }
+      }
+    ],
+    "syntheses": [
+      {
+        "id": "e190ecb6-d5f0-4f63-a659-4a255822f891",
+        "model": "gemini-3.5-flash-lite",
+        "result": {
+          "changeLog": [
+            {
+              "change": "Alteração do local do encontro da sala A para a sala B no térreo, acessível por rampa.",
+              "reason": "Atendimento à objeção formal sobre a falta de acessibilidade na sala A.",
+              "voteIds": [
+                "6cdfffec-ea40-496d-b0e6-e6f0362eaac4"
+              ],
+              "sourceIds": [
+                "6cdfffec-ea40-496d-b0e6-e6f0362eaac4"
+              ]
+            },
+            {
+              "change": "Especificação da divisão do orçamento para incluir R$ 20 destinados a bebidas sem açúcar e o restante para o lanche.",
+              "reason": "Acolhimento da ressalva apresentada pelo participante.",
+              "voteIds": [],
+              "sourceIds": [
+                "a2b67f07-cc8c-4c4e-ab84-8070092e2fdd"
+              ]
+            }
+          ],
+          "revisedProposal": {
+            "text": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo, acessível por rampa, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+            "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+            "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+            "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+            "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+            "decision": "Encontro fictício em 21/11/2026, às 14h, na sala B no térreo (acessível por rampa), com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+            "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+            "alternatives": "Sala A no segundo andar (não acessível). Alternativa fictícia para comparação.",
+            "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+          },
+          "remainingImpasses": [],
+          "addressedObjections": [
+            "6cdfffec-ea40-496d-b0e6-e6f0362eaac4"
+          ],
+          "consideredSourceIds": [
+            "f2cd5aea-80a1-4f64-ae4f-3b8d1a5990a1",
+            "a2b67f07-cc8c-4c4e-ab84-8070092e2fdd",
+            "6cdfffec-ea40-496d-b0e6-e6f0362eaac4"
+          ],
+          "feasibilityWarnings": [
+            "A disponibilidade efetiva da sala alternativa no térreo para a data e horário estipulados deve ser verificada antes da realização."
+          ],
+          "unresolvedObjections": [],
+          "partiallyAddressedObjections": []
+        },
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:31:08.079Z",
+        "analysisId": "1e864794-eee4-4ef7-847b-a2626af7fd6d",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "humanCoverage": [
+          {
+            "note": "",
+            "status": "ATENDIDA",
+            "voteId": "6cdfffec-ea40-496d-b0e6-e6f0362eaac4",
+            "faithful": null
+          }
+        ],
+        "promptVersion": "consensus-consultive-v2.5-formal-rejections",
+        "factualCheckIds": [],
+        "publishedProposalId": "3e773d3c-4246-4d19-a216-f89b13d4b5c5"
+      }
+    ],
+    "evaluations": [],
+    "initialDraft": {
+      "text": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90 para lanche e bebidas.",
+      "goals": "Validar o fluxo de criação de sala, participações e síntese conciliadora na V2.",
+      "title": "TESTE TÉCNICO V2 — ESTABILIZAÇÃO 20/11 — NÃO CIENTÍFICO",
+      "context": "Cenário fictício para teste técnico V2 — sem dados reais.",
+      "problem": "Ensaio técnico sintético, sem participantes reais: decidir um encontro fictício de três pessoas para validar o fluxo da aplicação.",
+      "decision": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90 para lanche e bebidas.",
+      "constraints": "Somente dados sintéticos. Não constitui coleta científica. Revisão humana obrigatória.",
+      "alternatives": "Sala B no térreo (acessível). Alternativa fictícia para comparação.",
+      "successCriteria": "Sala criada, 3 participantes votam, síntese gerada, export JSON funcional."
+    },
+    "participants": [
+      {
+        "id": "c3d8a7f4-b6f9-48f6-94fb-e48bf8bbb33b",
+        "alias": "P01"
+      },
+      {
+        "id": "e7229cc3-3f87-4458-8c21-175c4a71ccca",
+        "alias": "P02"
+      },
+      {
+        "id": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd",
+        "alias": "P03"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "302cb052-c8c5-4b4d-a4e7-e99577bc26b9",
+        "text": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche.",
+        "review": {
+          "model": "gemini-3.5-flash-lite",
+          "reason": "",
+          "result": {
+            "clarity": "A contribuição é clara e objetiva ao especificar a divisão do orçamento para o item de bebidas sem açúcar.",
+            "summary": "A contribuição aceita com ressalvas aponta a necessidade de destinar R$ 20 dos R$ 90 do orçamento total para bebidas sem açúcar, permitindo que o restante seja utilizado no lanche.",
+            "biasFlags": [
+              "Viés de enquadramento restrito ao teste técnico sintético."
+            ],
+            "questions": [
+              "O fornecedor escolhido para o lanche atende à demanda de bebidas sem açúcar dentro do valor estipulado?"
+            ],
+            "relevance": "RELACIONADA",
+            "assertions": [
+              {
+                "note": "A alegação complementa diretamente o orçamento estabelecido na proposta inicial.",
+                "text": "Precisamos reservar R$ 20 dos R$ 90 para bebidas sem açúcar; o restante pode ser usado no lanche.",
+                "status": "COMPATIVEL_COM_CONTEXTO"
+              }
+            ],
+            "assumptions": [
+              "Assume-se que a divisão proposta de R$ 20 para bebidas e o restante para lanche é viável dentro do fornecedor escolhido."
+            ],
+            "limitations": [
+              "O cenário é estritamente sintético e voltado para teste técnico, sem participantes reais."
+            ],
+            "missingInfo": [
+              "Detalhes sobre os tipos específicos de lanche ou fornecedor das bebidas."
+            ],
+            "uncertainties": [
+              "Incerteza sobre a aceitação unânime da divisão orçamentária por todos os participantes do teste."
+            ],
+            "recommendations": [
+              "Ajustar a alocação do orçamento para contemplar a reserva de R$ 20 para bebidas sem açúcar.",
+              "Manter o restante do orçamento direcionado ao lanche conforme proposto."
+            ],
+            "suggestedRewrite": "Encontro fictício em 21/11/2026, às 14h, na sala A, no segundo andar sem elevador, com orçamento total de R$ 90, sendo R$ 20 reservados para bebidas sem açúcar e o restante destinado ao lanche."
+          },
+          "status": "OK",
+          "promptVersion": "consensus-consultive-v2.5-formal-rejections",
+          "appliedRewrite": true
+        },
+        "contest": "",
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:29:48.573Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "originalText": "Aceito com ressalvas: precisamos reservar R$ 20 dos R$ 90 para bebidas sem açúcar; o restante pode ser usado no lanche.",
+        "participantId": "e7229cc3-3f87-4458-8c21-175c4a71ccca"
+      },
+      {
+        "id": "ca9e91f3-537b-4785-89ea-8ca0cb6c88ef",
+        "text": "Rejeito o encontro na sala A porque fica no segundo andar sem elevador. Para este cenário fictício, preciso de uma sala no térreo acessível por rampa.",
+        "review": {
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo.",
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.5-formal-rejections"
+        },
+        "contest": "",
+        "roundId": "f4ec3f52-14f0-45b1-8788-60fb61457e36",
+        "createdAt": "2026-11-20T23:30:37.885Z",
+        "proposalId": "f4a73e01-9e71-4b31-82bd-9b88dfa8d324",
+        "originalText": "Rejeito o encontro na sala A porque fica no segundo andar sem elevador. Para este cenário fictício, preciso de uma sala no térreo acessível por rampa.",
+        "participantId": "b5f6dfed-23c8-499f-8cfd-fd4a534093dd"
+      }
+    ],
+    "factualChecks": [],
+    "schemaVersion": 2
+  }
+}
