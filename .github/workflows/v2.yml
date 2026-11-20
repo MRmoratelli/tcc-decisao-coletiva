@@ -3,6 +3,9 @@ on:
   push:
     branches: [feat/vite-typescript-decisao-generica, fix/v2-sintese-e-manifestacoes-20261120]
     paths: ['prototype-v2/**', '.github/workflows/v2.yml']
+  pull_request:
+    branches: [feat/vite-typescript-decisao-generica]
+    paths: ['prototype-v2/**', '.github/workflows/v2.yml']
   workflow_dispatch:
 permissions:
   contents: read
