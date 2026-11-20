@@ -55,6 +55,7 @@ function participant(s:State,pid:string){if(!s.participants.some(p=>p.id===pid))
 export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:Choice,justification:string){
  open(s);participant(s,pid);const r=currentRound(s);
  if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Versão ou rodada desatualizada. Atualize a sala.',409);
+ if(s.votes.some(v=>v.participantId===pid&&v.roundId===roundId))throw new DomainError('Seu voto nesta rodada já foi registrado. Aguarde o moderador publicar uma nova rodada.',409);
  if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!justification.trim())throw new DomainError('Rejeição e aceite com ressalvas exigem justificativa.');
  s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:now()});
  event(s,pid,'VOTE_RECORDED',choice);

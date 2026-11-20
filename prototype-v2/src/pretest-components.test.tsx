@@ -6,7 +6,7 @@ import {create,act,type ReactTestRenderer} from 'react-test-renderer';
 import {randomUUID} from 'node:crypto';
 import App from './App';
 import {RoomWorkspace} from './components/RoomWorkspace';
-import {createState,publish,currentProposal,closeWithoutConsensus} from '../server/domain';
+import {createState,publish,currentProposal,currentRound,vote,closeWithoutConsensus} from '../server/domain';
 import {proposal} from '../server/fixtures';
 import type {RoomView} from './api';
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
@@ -79,4 +79,37 @@ test('Parecer inicial: somente moderador; aprovação simples discreta; edição
    if(expected)assert.ok(output.includes(expected));
   }finally{if(rendered)await act(async()=>rendered.unmount());}
  }
+});
+
+test('React polling: quem já votou aguarda; nova rodada chega automaticamente e libera voto sem rascunho vazio',async t=>{
+ const s=state(),r1=currentRound(s),credential='synthetic-vote-lock-access-not-a-real-secret';
+ vote(s,s.participants[0].id,r1.id,r1.proposalId,'REJEITO','Precisamos rever o acesso.');
+ let remote=view(s,2),rendered!:ReactTestRenderer;const sent:any[]=[];
+ t.mock.method(globalThis,'fetch',async(url:RequestInfo|URL,init?:RequestInit)=>{
+  const body=JSON.parse(String(init?.body));
+  if(String(url).endsWith('/votes')){
+   sent.push(body);const r=currentRound(s);assert.equal(body.roundId,r.id);assert.equal(body.proposalId,r.proposalId);
+   vote(s,s.participants[0].id,r.id,r.proposalId,body.choice,body.justification);remote=view(s,4);
+   return {ok:true,json:async()=>({saved:true})} as Response;
+  }
+  return {ok:true,json:async()=>body.knownRevision===remote.revision?{revision:remote.revision,unchanged:true}:structuredClone(remote)} as Response;
+ });
+ t.mock.timers.enable({apis:['setTimeout']});
+ try{
+  await act(async()=>{rendered=create(<App/>);});
+  await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Entrar com código'))!.props.onClick());
+  const inputs=rendered.root.findAllByType('input');
+  await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[1].props.onChange({target:{value:credential}});});
+  await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
+  const register=()=>rendered.root.findAllByType('button').find(b=>b.children.join('').startsWith('Registrar '));
+  assert.equal(register(),undefined);assert.ok(JSON.stringify(rendered.toJSON()).includes('Voto registrado nesta rodada'));
+  await act(async()=>{t.mock.timers.tick(4000);});assert.equal(register(),undefined);
+  publish(s,{...proposal,text:'Nova versão com acesso por rampa.'},currentProposal(s).id,'Revisão sintética do moderador.');remote=view(s,3);
+  await act(async()=>{t.mock.timers.tick(4000);});
+  const output=JSON.stringify(rendered.toJSON());assert.ok(output.includes('Nova rodada publicada'));assert.ok(output.includes('Nova versão com acesso por rampa.'));
+  assert.ok(!output.includes('Confirmar reutilização do meu texto'));assert.ok(!output.includes('Voto registrado nesta rodada'));
+  assert.equal(register()!.props.disabled,false);assert.equal(sent.length,0);
+  await act(async()=>register()!.props.onClick());
+  assert.equal(sent.length,1);assert.equal(s.votes.length,2);assert.equal(register(),undefined);
+ }finally{if(rendered)await act(async()=>rendered.unmount());t.mock.timers.reset();}
 });

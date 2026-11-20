@@ -166,3 +166,23 @@ test('Síntese do API com vínculos errados preserva ressalvas e registra ajuste
  assert.ok(saved.state.events.some((x:any)=>x.type==='SYNTHESIS_LINKS_RECONCILED'));
  assert.equal(saved.state.votes.length,3);
 });
+
+test('HTTP: voto único, concorrência e repetição não criam votos ou contribuições; nova rodada libera novo voto',async()=>{
+ const room=(await post('/rooms',{proposal,participantCount:3,bypassReason:'Teste sintético isolado de voto único.'})).data;
+ const credential=room.participants[0].credential,initial=await view(room,credential),r=initial.state.rounds.at(-1);
+ const payload={credential,revision:initial.revision,roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:'O acesso precisa ser revisto.',bypassReason:'Texto humano sintético sem parecer.'};
+ const concurrent=await Promise.all([post('/rooms/'+room.code+'/votes',payload),post('/rooms/'+room.code+'/votes',payload)]);
+ assert.deepEqual(concurrent.map(x=>x.status).sort(),[201,409]);
+ const saved=await view(room);
+ assert.equal(saved.state.votes.length,1);assert.equal(saved.state.contributions.length,1);
+ const baseline=JSON.stringify(saved.state);
+ assert.equal((await cast(room,0,'ACEITO')).status,409);
+ assert.equal((await cast(room,0,'REJEITO','Outra justificativa não pode substituir o voto.')).status,409);
+ const unchanged=await view(room);
+ assert.equal(unchanged.revision,saved.revision);assert.equal(JSON.stringify(unchanged.state),baseline);
+ const published=await action(room,'/publish',{proposal:{...proposal,text:'Nova versão sintética com acesso revisto.'},sourceId:r.proposalId,reason:'Moderador publica nova rodada sintética.',confirm:true});
+ assert.equal(published.status,200);
+ const next=await view(room,credential);assert.ok(next.positions.every((x:any)=>x.choice==='PENDENTE'));
+ assert.equal((await cast(room,0,'ACEITO')).status,201);
+ const final=await view(room);assert.equal(final.state.votes.length,2);assert.equal(final.state.votes[0].choice,'REJEITO');assert.equal(final.state.decision.status,'OPEN');
+});
