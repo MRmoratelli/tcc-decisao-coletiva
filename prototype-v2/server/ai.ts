@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult } from '../shared/contracts.js';
 export { ReviewSchema };
 export type { Review };
-export const PROMPT_VERSION='consensus-consultive-v2.3-all-manifestations';
+export const PROMPT_VERSION='consensus-consultive-v2.4-all-manifestations';
 export interface AIAdapter {
  model:string;
  analyzeProposal(proposal:ProposalContent):Promise<Review>;
@@ -46,12 +46,8 @@ export class GeminiAdapter implements AIAdapter{
    else {
     const key=process.env.GEMINI_API_KEY;if(!key)throw new AIUnavailable('NOT_CONFIGURED');
     const client=new GoogleGenAI({apiKey:key,httpOptions:{timeout:30000}});
-    // The expanded group contracts have many nested lists. Generate plain JSON
-    // against an explicit textual contract instead of multiplying decoder states.
-    // Full Zod and provenance validation below remain mandatory and fail closed.
-    const groupContract=mode==='analyzeObjections'||mode==='synthesizeProposal';
-    const response=await client.models.generateContent({model:this.model,contents:JSON.stringify({mode,promptVersion:PROMPT_VERSION,data:input,...(groupContract?{outputContract:jsonSchema}:{})}),
-      config:{systemInstruction:instructions+' O campo outputContract, quando fornecido pelo servidor, define integralmente o formato obrigatório da resposta.',responseMimeType:'application/json',...(groupContract?{}:{responseJsonSchema:jsonSchema})}});
+    const response=await client.models.generateContent({model:this.model,contents:JSON.stringify({mode,promptVersion:PROMPT_VERSION,data:input}),
+      config:{systemInstruction:instructions,responseMimeType:'application/json',responseJsonSchema:jsonSchema}});
     text=response.text;
    }
    if(!text)throw new AIUnavailable('EMPTY_RESPONSE');
