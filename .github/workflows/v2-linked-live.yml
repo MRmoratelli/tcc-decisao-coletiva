@@ -1,0 +1,28 @@
+name: V2 accepted-rewrite live regression gate
+on:
+  push:
+    branches: [validation/v2-linkedquotes-20261121]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: prototype-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: node --import tsx server/linked-live.ts
+        env:
+          FROZEN_COMMIT: 640aa8626b6a9c8080cb4af2ce86fca1d7e776ac
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v2-linked-rewrites-synthetic-evidence
+          path: prototype-v2/linked-evidence
+          retention-days: 30
