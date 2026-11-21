@@ -1,0 +1,364 @@
+{
+  "nature": "TECHNICAL_SYNTHETIC_NON_SCIENTIFIC",
+  "roomCode": "E59662052A",
+  "applicationCommit": "da17ed77d4237191474bb4d7438bef982e8c0509",
+  "capturedAt": "2026-11-21T00:07:38.672Z",
+  "source": "Read-only PostgreSQL SELECT scoped to the isolated synthetic room; observations from two independent cloud browser sessions.",
+  "databaseRevision": 4,
+  "state": {
+    "votes": [
+      {
+        "id": "018a4bda-ed8b-4494-aa41-6c9d86a419be",
+        "choice": "REJEITO",
+        "roundId": "4275ae7d-d200-4dff-a556-74a0eb934918",
+        "createdAt": "2026-11-21T00:03:38.411Z",
+        "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+        "justification": "Objeção sintética: revisar o horário para 15h.",
+        "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5"
+      },
+      {
+        "id": "6446f90c-1f8f-44c5-8ad6-1eb1856c0b32",
+        "choice": "ACEITO",
+        "roundId": "885493fc-c2ab-4f99-a1df-eb3382d83ece",
+        "createdAt": "2026-11-21T00:05:40.163Z",
+        "proposalId": "588f5277-84ee-4f0e-8581-898d086c81f1",
+        "justification": "",
+        "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5"
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-21T00:01:32.687Z",
+        "id": "d2b9efa9-5c05-45b6-9fdd-c141b1326738",
+        "type": "ROOM_CREATED",
+        "actor": "moderator",
+        "detail": "Proposta inicial confirmada por pessoa responsável."
+      },
+      {
+        "at": "2026-11-21T00:03:38.411Z",
+        "id": "ab96dd9b-aade-4fdc-abdd-7d085f364c8e",
+        "type": "CONTRIBUTION_RECORDED",
+        "actor": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+        "detail": "Texto preservado."
+      },
+      {
+        "at": "2026-11-21T00:03:38.411Z",
+        "id": "43cc0a8d-9093-4be0-a27a-29f70326a218",
+        "type": "VOTE_RECORDED",
+        "actor": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+        "detail": "REJEITO"
+      },
+      {
+        "at": "2026-11-21T00:05:19.379Z",
+        "id": "9a0df6c1-cfc2-49ab-965d-31d18b8fa059",
+        "type": "PROPOSAL_PUBLISHED",
+        "actor": "moderator",
+        "detail": "Ensaio técnico sintético: alterar o horário para 15h e verificar liberação automática de novo voto; sem coleta científica."
+      },
+      {
+        "at": "2026-11-21T00:05:40.163Z",
+        "id": "a143b12b-0db2-46c2-ab8f-1382715f8b87",
+        "type": "VOTE_RECORDED",
+        "actor": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+        "detail": "ACEITO"
+      }
+    ],
+    "rounds": [
+      {
+        "id": "4275ae7d-d200-4dff-a556-74a0eb934918",
+        "number": 1,
+        "status": "CLOSED",
+        "closedAt": "2026-11-21T00:05:19.379Z",
+        "openedAt": "2026-11-21T00:01:32.687Z",
+        "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46"
+      },
+      {
+        "id": "885493fc-c2ab-4f99-a1df-eb3382d83ece",
+        "number": 2,
+        "status": "OPEN",
+        "closedAt": null,
+        "openedAt": "2026-11-21T00:05:19.379Z",
+        "proposalId": "588f5277-84ee-4f0e-8581-898d086c81f1"
+      }
+    ],
+    "analyses": [],
+    "contests": [],
+    "decision": {
+      "id": "e7e37c7b-61aa-45ce-ae67-9bdd514da57f",
+      "title": "TESTE TÉCNICO V2 — VOTO ÚNICO E SINCRONIZAÇÃO — NÃO CIENTÍFICO",
+      "status": "OPEN",
+      "closedAt": null,
+      "originId": "e7e37c7b-61aa-45ce-ae67-9bdd514da57f",
+      "createdAt": "2026-11-21T00:01:32.687Z",
+      "closureReason": ""
+    },
+    "proposals": [
+      {
+        "id": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+        "review": {
+          "model": "none",
+          "reason": "Moderador optou por criar a sala sem parecer consultivo.",
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.5-formal-rejections"
+        },
+        "content": {
+          "text": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica.",
+          "goals": "",
+          "title": "TESTE TÉCNICO V2 — VOTO ÚNICO E SINCRONIZAÇÃO — NÃO CIENTÍFICO",
+          "context": "",
+          "problem": "Ensaio técnico sintético para validar um voto por rodada e atualização automática entre sessões.",
+          "decision": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica.",
+          "constraints": "Somente dados sintéticos, teste de software, sem coleta científica.",
+          "alternatives": "",
+          "successCriteria": ""
+        },
+        "version": 1,
+        "parentId": null,
+        "createdAt": "2026-11-21T00:01:32.687Z",
+        "approvedBy": "moderator"
+      },
+      {
+        "id": "588f5277-84ee-4f0e-8581-898d086c81f1",
+        "review": {
+          "model": "human",
+          "reason": "Ensaio técnico sintético: alterar o horário para 15h e verificar liberação automática de novo voto; sem coleta científica.",
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "human-review-v1"
+        },
+        "content": {
+          "text": "SINCRONIZAÇÃO CONFIRMADA — 15h. Encontro fictício de teste na sala A às 15h, após revisão do moderador.",
+          "goals": "",
+          "title": "TESTE TÉCNICO V2 — VOTO ÚNICO E SINCRONIZAÇÃO — NÃO CIENTÍFICO",
+          "context": "",
+          "problem": "Ensaio técnico sintético para validar um voto por rodada e atualização automática entre sessões.",
+          "decision": "SINCRONIZAÇÃO CONFIRMADA — 15h. Encontro fictício de teste na sala A às 15h, após revisão do moderador.",
+          "constraints": "Somente dados sintéticos, teste de software, sem coleta científica.",
+          "alternatives": "",
+          "successCriteria": ""
+        },
+        "version": 2,
+        "parentId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+        "createdAt": "2026-11-21T00:05:19.379Z",
+        "approvedBy": "moderator",
+        "intervention": {
+          "at": "2026-11-21T00:05:19.379Z",
+          "kind": "EDICAO_HUMANA",
+          "actor": "moderator",
+          "reason": "Ensaio técnico sintético: alterar o horário para 15h e verificar liberação automática de novo voto; sem coleta científica.",
+          "source": "PROPOSTA_ANTERIOR",
+          "changes": [
+            {
+              "after": "SINCRONIZAÇÃO CONFIRMADA — 15h. Encontro fictício de teste na sala A às 15h, após revisão do moderador.",
+              "field": "decision",
+              "before": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica."
+            },
+            {
+              "after": "SINCRONIZAÇÃO CONFIRMADA — 15h. Encontro fictício de teste na sala A às 15h, após revisão do moderador.",
+              "field": "text",
+              "before": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica."
+            }
+          ],
+          "original": {
+            "text": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica.",
+            "goals": "",
+            "title": "TESTE TÉCNICO V2 — VOTO ÚNICO E SINCRONIZAÇÃO — NÃO CIENTÍFICO",
+            "context": "",
+            "problem": "Ensaio técnico sintético para validar um voto por rodada e atualização automática entre sessões.",
+            "decision": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica.",
+            "constraints": "Somente dados sintéticos, teste de software, sem coleta científica.",
+            "alternatives": "",
+            "successCriteria": ""
+          },
+          "sourceId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+          "published": {
+            "text": "SINCRONIZAÇÃO CONFIRMADA — 15h. Encontro fictício de teste na sala A às 15h, após revisão do moderador.",
+            "goals": "",
+            "title": "TESTE TÉCNICO V2 — VOTO ÚNICO E SINCRONIZAÇÃO — NÃO CIENTÍFICO",
+            "context": "",
+            "problem": "Ensaio técnico sintético para validar um voto por rodada e atualização automática entre sessões.",
+            "decision": "SINCRONIZAÇÃO CONFIRMADA — 15h. Encontro fictício de teste na sala A às 15h, após revisão do moderador.",
+            "constraints": "Somente dados sintéticos, teste de software, sem coleta científica.",
+            "alternatives": "",
+            "successCriteria": ""
+          }
+        }
+      }
+    ],
+    "syntheses": [],
+    "evaluations": [],
+    "initialDraft": {
+      "text": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica.",
+      "goals": "",
+      "title": "TESTE TÉCNICO V2 — VOTO ÚNICO E SINCRONIZAÇÃO — NÃO CIENTÍFICO",
+      "context": "",
+      "problem": "Ensaio técnico sintético para validar um voto por rodada e atualização automática entre sessões.",
+      "decision": "Encontro fictício de teste na sala A às 14h. Nenhuma participação científica.",
+      "constraints": "Somente dados sintéticos, teste de software, sem coleta científica.",
+      "alternatives": "",
+      "successCriteria": ""
+    },
+    "participants": [
+      {
+        "id": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+        "alias": "P01"
+      },
+      {
+        "id": "b0c16e4f-3a2e-405a-a463-8256046dc896",
+        "alias": "P02"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "cb3c3001-5dba-4fb4-93c7-49265951bb93",
+        "text": "Objeção sintética: revisar o horário para 15h.",
+        "review": {
+          "model": "none",
+          "reason": "Autor optou por continuar sem parecer consultivo.",
+          "result": null,
+          "status": "IGNORADA",
+          "promptVersion": "consensus-consultive-v2.5-formal-rejections"
+        },
+        "contest": "",
+        "roundId": "4275ae7d-d200-4dff-a556-74a0eb934918",
+        "createdAt": "2026-11-21T00:03:38.411Z",
+        "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+        "originalText": "Objeção sintética: revisar o horário para 15h.",
+        "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5"
+      }
+    ],
+    "factualChecks": [],
+    "schemaVersion": 2
+  },
+  "progression": [
+    {
+      "revision": 1,
+      "status": "OPEN",
+      "rounds": [
+        {
+          "id": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "number": 1,
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46"
+        }
+      ],
+      "votes": []
+    },
+    {
+      "revision": 2,
+      "status": "OPEN",
+      "rounds": [
+        {
+          "id": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "number": 1,
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46"
+        }
+      ],
+      "votes": [
+        {
+          "id": "018a4bda-ed8b-4494-aa41-6c9d86a419be",
+          "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+          "roundId": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+          "choice": "REJEITO",
+          "createdAt": "2026-11-21T00:03:38.411Z"
+        }
+      ]
+    },
+    {
+      "revision": 3,
+      "status": "OPEN",
+      "rounds": [
+        {
+          "id": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "number": 1,
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46"
+        },
+        {
+          "id": "885493fc-c2ab-4f99-a1df-eb3382d83ece",
+          "number": 2,
+          "proposalId": "588f5277-84ee-4f0e-8581-898d086c81f1"
+        }
+      ],
+      "votes": [
+        {
+          "id": "018a4bda-ed8b-4494-aa41-6c9d86a419be",
+          "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+          "roundId": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+          "choice": "REJEITO",
+          "createdAt": "2026-11-21T00:03:38.411Z"
+        }
+      ]
+    },
+    {
+      "revision": 4,
+      "status": "OPEN",
+      "rounds": [
+        {
+          "id": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "number": 1,
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46"
+        },
+        {
+          "id": "885493fc-c2ab-4f99-a1df-eb3382d83ece",
+          "number": 2,
+          "proposalId": "588f5277-84ee-4f0e-8581-898d086c81f1"
+        }
+      ],
+      "votes": [
+        {
+          "id": "018a4bda-ed8b-4494-aa41-6c9d86a419be",
+          "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+          "roundId": "4275ae7d-d200-4dff-a556-74a0eb934918",
+          "proposalId": "a384f528-5274-4aa9-86e7-e6325aad8c46",
+          "choice": "REJEITO",
+          "createdAt": "2026-11-21T00:03:38.411Z"
+        },
+        {
+          "id": "6446f90c-1f8f-44c5-8ad6-1eb1856c0b32",
+          "participantId": "b4528e3a-c10b-4876-a843-49b78f4810d5",
+          "roundId": "885493fc-c2ab-4f99-a1df-eb3382d83ece",
+          "proposalId": "588f5277-84ee-4f0e-8581-898d086c81f1",
+          "choice": "ACEITO",
+          "createdAt": "2026-11-21T00:05:40.163Z"
+        }
+      ]
+    }
+  ],
+  "browserChecks": {
+    "waitingAfterFirstVote": true,
+    "voteFormAbsentAfterFirstVote": true,
+    "independentModeratorPublication": true,
+    "participantAutomaticUpdateWithoutRefresh": true,
+    "emptyDraftConfirmationAbsent": true,
+    "newVoteSentExplicitlyInRound2": true,
+    "waitingAfterSecondVote": true,
+    "preciseLatencyMeasured": false
+  },
+  "automatedChecks": {
+    "tests": 89,
+    "pass": 89,
+    "fail": 0,
+    "typescriptFrontend": true,
+    "typescriptBackend": true,
+    "viteBuild": true,
+    "concurrentDuplicateVotesRejected": true,
+    "freshRevisionRepeatRejected": true,
+    "legacyHistoryReadable": true,
+    "unsentDraftPreserved": true
+  },
+  "runs": {
+    "setup": "https://agent.tinyfish.ai/runs/ea2fe643-226e-450b-991a-ce49d1c28962",
+    "observer": "https://agent.tinyfish.ai/runs/addbc07b-edf1-4d8a-88aa-68d0233dfc07",
+    "moderator": "https://agent.tinyfish.ai/runs/b6a154bc-03f2-40f2-a42c-ea5e63ba7fa5"
+  },
+  "notes": [
+    "Initial setup browser stalled after showing credentials. Another cloud run resumed the same room, without creating a replacement.",
+    "The automatic browser reports mislabeled V2 as round 1; PostgreSQL and application source confirm round 2.",
+    "P01 ACEITO was explicitly submitted in the observer run. Polling does not create votes.",
+    "Nominal polling interval is 4 seconds while the page is active; exact delivery latency was not measured.",
+    "No new Gemini calls were needed for this focused regression; earlier real Gemini validation is separate.",
+    "No credentials are included in this evidence file."
+  ]
+}
