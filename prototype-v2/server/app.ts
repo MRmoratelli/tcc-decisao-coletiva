@@ -186,7 +186,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.post('/api/rooms/:code/analyze-objections',aiLimit,async(req,res)=>{await aiAction(req,'analysis');res.json({saved:true});});
  app.post('/api/rooms/:code/synthesize',aiLimit,async(req,res)=>{await aiAction(req,'synthesis');res.json({saved:true});});
  app.post('/api/rooms/:code/publish',async(req,res)=>{
-  const i=await auth(req,'moderator'),b=z.object({revision,proposal:ProposalSchema,sourceId:z.string().uuid(),synthesisId:z.string().uuid().optional(),reason:text,coverage:CoverageSchema.default([]),confirm:z.literal(true)}).parse(req.body);
+  const i=await auth(req,'moderator'),b=z.object({revision,proposal:ProposalSchema,sourceId:z.string().uuid(),synthesisId:z.string().uuid().optional(),reason:z.string().trim().max(5000).default(''),coverage:CoverageSchema.default([]),confirm:z.literal(true)}).parse(req.body);
   await repo.mutate(i,b.revision,s=>publish(s,b.proposal,b.sourceId,b.reason,b.synthesisId,b.coverage));res.json({saved:true});
  });
  app.post('/api/rooms/:code/close',async(req,res)=>{const i=await auth(req,'moderator'),b=z.object({revision,reason:text}).parse(req.body);await repo.mutate(i,b.revision,s=>closeWithoutConsensus(s,b.reason));res.json({saved:true});});

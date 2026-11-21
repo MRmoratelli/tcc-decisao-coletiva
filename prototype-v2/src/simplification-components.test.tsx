@@ -25,6 +25,19 @@ test('Ready synthesis opens publication fields only after the moderator enters r
  assert.equal(ui.root.findAllByType('textarea').filter(x=>x.props.value===v.state.syntheses[0].result.revisedProposal.text).length,0);
  await act(async()=>ui.root.findAllByType('button').find(x=>x.children.includes('Revisar nova proposta'))!.props.onClick());
  assert.ok(ui.root.findAllByType('textarea').some(x=>x.props.value===v.state.syntheses[0].result.revisedProposal.text));
+ assert.equal(ui.root.findAllByType('button').filter(x=>x.children.includes('Carregar rascunho para revisão humana')).length,0);
+ const publishButton=()=>ui.root.findAllByType('button').find(x=>x.props.className==='primary'&&x.children.some(c=>typeof c==='string'&&c.includes('publicar nova rodada')))!;
+ assert.equal(publishButton().props.disabled,false);
+ assert.ok(!ui.root.findAllByType('textarea').some(x=>x.props.name==='publicationReason'));
+ const proposed=v.state.syntheses[0].result.revisedProposal.text;
+ const editor=()=>ui.root.findAllByType('textarea').find(x=>x.props.rows===6)!;
+ await act(async()=>editor().props.onChange({target:{value:proposed+' Moderator adjustment.'}}));
+ assert.equal(publishButton().props.disabled,true);
+ const justification=ui.root.findAllByType('textarea').find(x=>x.props.name==='publicationReason')!;
+ await act(async()=>justification.props.onChange({target:{value:'Explained adjustment.'}}));
+ assert.equal(publishButton().props.disabled,false);
+ await act(async()=>editor().props.onChange({target:{value:proposed}}));
+ assert.equal(publishButton().props.disabled,false);assert.ok(!ui.root.findAllByType('textarea').some(x=>x.props.name==='publicationReason'));
  await act(async()=>ui.unmount());
 });
 test('Moderator stages hide future publication until a synthesis is ready and allow explicit manual intervention',async()=>{

@@ -162,16 +162,17 @@ export function addSynthesis(s:State,analysisId:string,result:SynthesisResult,mo
 }
 export function publish(s:State,content:ProposalContent,sourceId:string,reason:string,synthesisId?:string,coverage:z.infer<typeof CoverageSchema>=[]){
  open(s);if(sourceId!==currentProposal(s).id)throw new DomainError('Proposta desatualizada.',409);
- if(!reason.trim())throw new DomainError('Registre a justificativa da revisão humana.');
  const synthesis=synthesisId?s.syntheses.find(x=>x.id===synthesisId&&x.proposalId===sourceId&&!x.publishedProposalId):undefined;
  if(synthesisId&&!synthesis)throw new DomainError('Síntese inválida.');
  if(synthesis){assertSynthesis(s,synthesis.result);const a=s.analyses.find(a=>a.id===synthesis.analysisId);if(a?.sourceFingerprint!==sourceFingerprint(s))throw new DomainError('Novas manifestações: analise e sintetize novamente.',409);}
  const ids=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
  if(coverage.some(c=>!ids.includes(c.voteId))||new Set(coverage.map(c=>c.voteId)).size!==coverage.length)throw new DomainError('Cobertura humana inválida.');
- const r=currentRound(s);r.status='CLOSED';r.closedAt=now();
- const proposal={id:randomUUID(),version:s.proposals.length+1,parentId:sourceId,content,createdAt:now(),approvedBy:'moderator',review:{result:null,status:'IGNORADA' as const,promptVersion:'human-review-v1',model:'human',reason}};
  const original=synthesis?.result.revisedProposal??currentProposal(s).content;
  const changes=Object.keys(content).filter(k=>content[k as keyof ProposalContent]!==original[k as keyof ProposalContent]).map(k=>({field:k,before:original[k as keyof ProposalContent],after:content[k as keyof ProposalContent]}));
+ if((changes.length||!synthesis)&&!reason.trim())throw new DomainError('Justifique as alterações feitas pelo moderador antes de publicar.');
+ reason=reason.trim()||'Sugestão da IA aprovada pelo moderador sem alterações (registro automático).';
+ const r=currentRound(s);r.status='CLOSED';r.closedAt=now();
+ const proposal={id:randomUUID(),version:s.proposals.length+1,parentId:sourceId,content,createdAt:now(),approvedBy:'moderator',review:{result:null,status:'IGNORADA' as const,promptVersion:'human-review-v1',model:'human',reason}};
  const intervention={kind:changes.length?'EDICAO_HUMANA' as const:'APROVACAO_HUMANA' as const,source:synthesis?'SINTESE_IA' as const:'PROPOSTA_ANTERIOR' as const,sourceId:synthesis?.id??sourceId,original:structuredClone(original),published:structuredClone(content),changes,reason,at:proposal.createdAt,actor:'moderator' as const};
  s.proposals.push({...proposal,intervention});s.rounds.push({id:randomUUID(),number:s.rounds.length+1,proposalId:proposal.id,status:'OPEN',openedAt:now(),closedAt:null});
  if(synthesis){synthesis.publishedProposalId=proposal.id;synthesis.humanCoverage=coverage;}
