@@ -1,9 +1,8 @@
 import { useState,useEffect,useRef,type FormEvent } from 'react';
 import { request,type CreatedRoom,type RoomView,type RoomSyncResponse } from './api';
-import { emptyProposal } from './components/ProposalEditor';
+import {InitialProposalForm,type InitialProposalInput} from './components/InitialProposalForm';
 import { ReviewCard } from './components/ReviewCard';
 import { RoomWorkspace } from './components/RoomWorkspace';
-import { ProposalSchema } from '../shared/contracts';
 
 type Session={code:string;credential:string;view:RoomView};
 type Invitation={research:{version:string;text:string;source:string};participantCount:number;open:boolean};
@@ -21,7 +20,6 @@ function initialCode(){if(typeof window==='undefined')return '';return new URLSe
 export default function App(){
  const inviteCode=initialCode();
  const [tab,setTab]=useState<'create'|'join'>(inviteCode?'join':'create');
- const [proposal,setProposal]=useState(emptyProposal),[count,setCount]=useState(5);
  const [created,setCreated]=useState<CreatedRoom|null>(null);
  const [code,setCode]=useState(inviteCode),[credential,setCredential]=useState('');
  const [invitation,setInvitation]=useState<Invitation|null>(null),[accepted,setAccepted]=useState(false);
@@ -62,10 +60,10 @@ export default function App(){
   finally{if(!cancelled)timer=setTimeout(poll,4000);}};
   timer=setTimeout(poll,4000);return()=>{cancelled=true;clearTimeout(timer);};
  },[session?.code,session?.credential,busy]);
- async function createRoom(e:FormEvent){
-  e.preventDefault();setError('');setBusy(true);
+ async function createRoom(input:InitialProposalInput){
+  setError('');setBusy(true);
   try{
-   const result=await request<CreatedRoom>('/rooms',{proposal:ProposalSchema.parse(proposal),participantCount:count,simple:true,aiConsent:true});
+   const result=await request<CreatedRoom>('/rooms',input);
    setCreated(result);setCode(result.code);setTab('join');persist(result.code,result.moderatorCredential);
    setNotice('Sala criada. Compartilhe o link único com o grupo e guarde seu acesso de moderador.');
   }catch(e){message(e);}finally{setBusy(false);}
@@ -104,15 +102,7 @@ export default function App(){
  {!inviteCode&&<nav className="tabs" aria-label="Acesso"><button className={tab==='create'?'active':''} onClick={()=>{setTab('create');setInvitation(null);}}>Criar nova sala</button><button className={tab==='join'?'active':''} onClick={()=>setTab('join')}>Participar de uma sala</button></nav>}
  {tab==='create'?<section className="card">
  <h2>Apresente o desafio ao grupo</h2>
- <form onSubmit={createRoom}>
- <label>Título da discussão<input required minLength={3} maxLength={180} value={proposal.title} onChange={e=>setProposal({...proposal,title:e.target.value})}/></label>
- <label>Quantidade de participantes<input required type="number" min={2} max={15} value={count} onChange={e=>setCount(Number(e.target.value))}/></label>
- <p className="muted">De 2 a 15 pessoas que votarão. O consenso exige ACEITO de todas elas na mesma rodada.</p>
- <label>Proposta inicial<textarea required minLength={4} maxLength={5000} rows={5} value={proposal.text} onChange={e=>setProposal({...proposal,text:e.target.value})}/></label>
- <label>Contexto ou complemento (opcional)<textarea maxLength={5000} rows={3} value={proposal.context} onChange={e=>setProposal({...proposal,context:e.target.value})}/></label>
- <p className="muted">Ao criar a sala, você autoriza o envio da proposta e das manifestações pseudonimizadas ao Gemini para apoio consultivo. A análise e a síntese serão preparadas automaticamente após as respostas do grupo, quando houver divergência. Revise e publique a próxima proposta. Evite dados pessoais ou sensíveis.</p>
- <button className="primary" disabled={busy}>{busy?'Criando sala…':'Criar sala'}</button>
- </form>
+ <InitialProposalForm busy={busy} onCreate={createRoom}/>
  <details><summary>Restaurar processo de arquivo JSON</summary><label>Arquivo exportado da V2<input type="file" accept=".json,application/json" onChange={e=>{const f=e.target.files?.[0];if(f)void importFile(f);}}/></label><p>Cria uma cópia em outra sala e preserva a sala original.</p></details>
  </section>:!created&&<section className="card">
  <h2>{invitation?'Informação e concordância para a pesquisa':'Entrar em uma discussão'}</h2>

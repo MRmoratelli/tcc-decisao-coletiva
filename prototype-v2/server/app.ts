@@ -75,11 +75,17 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});
  });
  app.post('/api/rooms',creationLimit,async(req,res)=>{
-  const b=reviewInput.extend({proposal:ProposalSchema,reviewedProposal:ProposalSchema.optional(),appliedRewrite:z.boolean().optional(),participantCount:z.number().int().min(2).max(15),simple:z.boolean().default(false),aiConsent:z.boolean().optional()}).parse(req.body);
+  const b=reviewInput.extend({proposal:ProposalSchema,reviewedProposal:ProposalSchema.optional(),appliedRewrite:z.boolean().optional(),participantCount:z.number().int().min(2).max(15),simple:z.boolean().default(false),aiConsent:z.boolean().optional(),initialReviewMode:z.enum(['REVIEWED','BYPASSED']).optional()}).parse(req.body);
   let review:ReviewRecordType;
   if(b.simple){
    if(b.aiConsent!==true)throw new DomainError('Autorize o apoio consultivo da IA na criação da sala.');
-   try{review={result:await ai.analyzeProposal(b.proposal),status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:'Parecer inicial automático, destinado ao moderador.'};}
+   if(b.initialReviewMode==='REVIEWED'){
+    if(!b.reviewedProposal||!b.receipt)throw new DomainError('Solicite a revisão inicial antes de confirmar a proposta.');
+    review=reviewRecord(b,'proposal',b.reviewedProposal);
+   }else if(b.initialReviewMode==='BYPASSED'){
+    if(b.receipt||b.appliedRewrite)throw new DomainError('Criação sem revisão não pode adotar um parecer.');
+    review=reviewRecord(b,'proposal',b.proposal);
+   }else try{review={result:await ai.analyzeProposal(b.proposal),status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:'Parecer inicial automático, destinado ao moderador.'};}
    catch{review={result:null,status:'INDISPONIVEL',model:ai.model,promptVersion:PROMPT_VERSION,reason:'Parecer inicial indisponível. Proposta confirmada pelo moderador.'};}
   }else review=reviewRecord(b,'proposal',b.reviewedProposal??b.proposal);if(b.appliedRewrite){if(!review.result?.suggestedRewrite)throw new DomainError('Sugestão original da IA indisponível.');review.appliedRewrite=true;}review.reason=b.reviewedProposal?'Moderador confirmou a versão publicada após parecer sobre o rascunho preservado.':review.reason;
   res.status(201).json(await repo.create(b.proposal,b.participantCount,review,undefined,b.reviewedProposal,b.simple));

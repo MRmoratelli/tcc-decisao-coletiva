@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult } from '../shared/contracts.js';
 export { ReviewSchema };
 export type { Review };
-export const PROMPT_VERSION='consensus-consultive-v2.5-formal-rejections';
+export const PROMPT_VERSION='consensus-consultive-v2.6-initial-proposal';
 export interface AIAdapter {
  model:string;
  analyzeProposal(proposal:ProposalContent):Promise<Review>;
@@ -26,6 +26,7 @@ Na análise, individualAssessments deve conter todas as rejeições (voteId), um
 Na síntese, classifique cada rejeição uma vez: addressedObjections, partiallyAddressedObjections ou unresolvedObjections.
 Use somente IDs recebidos, explique cada mudança e suas objeções de origem, sem inventar concessões.
 Inclua interesses comuns, conflitos, incompatibilidades e condições inegociáveis. Não oculte impasses.
+Na revisão da proposta inicial (analyzeProposal), ofereça um parecer breve sobre clareza, ambiguidades e informações ausentes, com reformulação quando útil. Preserve a intenção do moderador e use somente o contexto informado. Não invente datas, custos, condições, restrições ou preferências para completar lacunas: destaque a incerteza e sugira uma pergunta ao grupo.
 Reformulação depende de aprovação humana. Retorne apenas JSON segundo o schema.
 `;
 export type Generate=(mode:string,input:unknown,schema:Record<string,unknown>)=>Promise<string>;
