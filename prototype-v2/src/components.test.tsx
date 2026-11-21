@@ -30,7 +30,7 @@ test('React: questionário conserva 22 itens, quatro abertas e separa N/A de aus
 test('React: parecer mostra incertezas e limitação factual, sem editar o texto',async()=>{
  let rendered!:ReactTestRenderer;await act(async()=>{rendered=create(<ReviewCard review={review} label="Parecer teste"/>);});const text=JSON.stringify(rendered.toJSON());assert.ok(text.includes('não é um julgamento definitivo'));assert.ok(text.includes('Sem consulta a fontes externas'));assert.ok(text.includes('Reformulação sugerida'));await act(async()=>rendered.unmount());
 });
-test('React: sala permite abstenção, parecer opcional e impede funções de moderador a participante',async()=>{
+test('React: sala oferece votos binários, parecer opcional e impede funções de moderador a participante',async()=>{
  const people=[{id:randomUUID(),alias:'P01'},{id:randomUUID(),alias:'P02'}];
  const state=createState(randomUUID(),proposal,people,{result:null,status:'IGNORADA',promptVersion:'test',model:'none',reason:'Teste'});
  const view:RoomView={revision:1,room:{id:state.decision.id,code:'A123456789',topic:proposal.title,proposal:proposal.text,proposal_review:null},role:'participant',alias:'P01',participantId:people[0].id,canViewGroup:false,state,positions:[{...people[0],choice:'PENDENTE'}],metrics:null,contributions:[]};

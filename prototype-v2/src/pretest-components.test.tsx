@@ -41,7 +41,7 @@ test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exi
  }finally{if(rendered)await act(async()=>rendered.unmount());t.mock.timers.reset();}
 });
 
-test('Pré-teste 1/4 React: opção com ressalvas e comparação humana aparecem ao participante',async()=>{
+test('React: votos binários e comparação humana aparecem ao participante',async()=>{
  const s=state();publish(s,{...proposal,text:'Texto efetivamente publicado pelo moderador.'},currentProposal(s).id,'Esclarecer o escopo.');let rendered!:ReactTestRenderer;
  await act(async()=>{rendered=create(<RoomWorkspace session={{code:'A123456789',credential:'synthetic-token',view:view(s,2)}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
  const output=JSON.stringify(rendered.toJSON());assert.ok(!output.includes('ACEITO COM RESSALVAS'));assert.ok(output.includes('Proposta revisada pelo moderador'));assert.ok(output.includes('Comparar versão original e publicada'));assert.ok(output.includes('Esclarecer o escopo.'));assert.ok(output.includes('Texto efetivamente publicado pelo moderador.'));

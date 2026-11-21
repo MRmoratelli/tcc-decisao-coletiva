@@ -49,7 +49,7 @@ test('Factual 07: nenhuma fonte encontrada não aciona interpretação nem gera 
 test('Factual 08/09: falha Tavily, créditos, limites locais e falha Gemini não simulam sucesso',async()=>{
  for(const code of ['TAVILY_API_FAILURE','TAVILY_CREDIT_LIMIT','TAVILY_RATE_LIMIT']){const s=service({search:{configured:true,async search(){throw new SearchFailure(code);}}});assert.equal((await s.check(fact.text,'r')).claims[0].failureCode,code);}
  assert.equal((await service({maxDailySearches:0}).check(fact.text,'r')).claims[0].failureCode,'LOCAL_SEARCH_LIMIT');
- const quota=await service({maxDailyGeminiCalls:1}).check(fact.text,'r');assert.equal(quota.claims[0].failureCode,'LOCAL_GEMINI_LIMIT');assert.equal(quota.claims[0].sources.length,1);assert.equal(quota.claims[0].retrieval?.creditsUsed,1);
+ const quota=await service({maxDailyGeminiCalls:1}).check(fact.text,'r');assert.equal(quota.claims[0].failureCode,'LOCAL_GEMINI_DAILY_LIMIT');assert.equal(quota.claims[0].sources.length,1);assert.equal(quota.claims[0].retrieval?.creditsUsed,1);
  const off=await service({freeTierConfirmed:false}).check(fact.text,'r');assert.equal(off.claims[0].failureCode,'FREE_TIER_NOT_CONFIRMED');
 });
 test('Factual: cache de dez consultas simultâneas usa uma busca e não cruza salas',async()=>{
