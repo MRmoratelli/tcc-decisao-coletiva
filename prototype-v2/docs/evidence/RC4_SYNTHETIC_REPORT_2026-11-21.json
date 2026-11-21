@@ -1,0 +1,33 @@
+{
+  "kind": "SYNTHETIC_TECHNICAL_TEST_NOT_SCIENTIFIC_DATA",
+  "expectedCommit": "0b1d2ec424d5fe454882670c0aba5026625391ed",
+  "startedAt": "2026-11-21T18:57:37.731Z",
+  "checks": [
+    {
+      "name": "exact-commit-and-existing-provider-limits",
+      "status": "PASS"
+    },
+    {
+      "name": "conditional-text-with-acceptance-is-rejected-without-writing",
+      "status": "PASS"
+    },
+    {
+      "name": "real-synthesis-keeps-missing-date-and-responsibilities-pending-with-questions-and-private-draft",
+      "status": "PASS"
+    },
+    {
+      "name": "moderator-edits-require-reason-and-new-round-restarts-voting",
+      "status": "PASS"
+    },
+    {
+      "name": "unconditional-unanimity-export-import-and-preserved-provenance",
+      "status": "PASS"
+    }
+  ],
+  "roomCode": "B6FEE76A90",
+  "sha256": "d5bc8087c5a842c64b1c2a28d570f926ed61ed8d6f6dbfa8c9668f06dfab6e03",
+  "votes": 6,
+  "rounds": 2,
+  "result": "PASS",
+  "finishedAt": "2026-11-21T18:57:54.135Z"
+}
