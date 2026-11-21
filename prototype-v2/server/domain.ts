@@ -4,7 +4,7 @@ import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, Evalua
 import { FactualCheckSchema,FactualReportSchema,soundEvidence,isTavilyCheck,type FactualReport } from '../shared/factual.js';
 import { dimensions,NATURALISTIC_VERSION,APPLICATION_VARIANT,displayedOpenItems } from '../shared/instrument.js';
 
-export class DomainError extends Error { constructor(message:string, public status=400){super(message);} }
+export class DomainError extends Error { constructor(message:string, public status=400, public code?:string){super(message);} }
 const id=z.string().uuid(), date=z.string().datetime();
 const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional(),choice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
 const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.nullable(),content:ProposalSchema,createdAt:date,approvedBy:z.string(),review:ReviewRecord,intervention:z.object({kind:z.enum(['APROVACAO_HUMANA','EDICAO_HUMANA']),source:z.enum(['PROPOSTA_ANTERIOR','SINTESE_IA','RASCUNHO_INICIAL','PARECER_INICIAL_IA']),sourceId:id,original:ProposalSchema,published:ProposalSchema,changes:z.array(z.object({field:z.string(),before:z.string(),after:z.string()})),reason:z.string(),at:date,actor:z.literal('moderator')}).optional()});
@@ -81,21 +81,42 @@ export function manifestations(s:State){
  const relevant=new Set([...votes,...contributions,...s.analyses.filter(a=>a.roundId===roundId),...s.syntheses.filter(a=>a.roundId===roundId),...s.factualChecks.filter(a=>a.roundId===roundId)].map(a=>a.id));
  return [...rows,...s.contests.filter(c=>relevant.has(c.targetId)).map(c=>({id:c.id,kind:'CONTESTACAO' as const,text:c.text,participantId:c.participantId,targetId:c.targetId}))];
 }
+// Resolve quotes only against texts authoritatively linked to this source and round.
+export function quoteOrigin(s:State,sourceId:string,roundId:string,quote:string):'SUBMITTED'|'ORIGINAL'|undefined{
+ const v=s.votes.find(x=>x.id===sourceId&&x.roundId===roundId);
+ const c=s.contributions.find(x=>x.id===sourceId&&x.roundId===roundId);
+ const contest=s.contests.find(x=>x.id===sourceId&&[...s.votes,...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks].some(t=>t.id===x.targetId&&t.roundId===roundId));
+ const source=v?{text:v.justification}:c??contest;if(!source)return;
+ if(source.text===''&&quote==='')return 'SUBMITTED';
+ if(!quote.trim())return;
+ if(source.text.includes(quote))return 'SUBMITTED';
+ const originals=v?s.contributions.filter(x=>x.participantId===v.participantId&&x.proposalId===v.proposalId&&x.roundId===v.roundId&&x.text===v.justification):c?[c]:[];
+ if(originals.some(x=>x.originalText.includes(quote)))return 'ORIGINAL';
+}
 export function assertManifestations(s:State,result:Assessment){
  const sources=manifestations(s),rows=result.manifestationAssessments??[];
- if(rows.length!==sources.length||new Set(rows.map(x=>x.sourceId)).size!==rows.length)throw new DomainError('IA omitiu ou duplicou manifestações.',502);
- for(const row of rows){const source=sources.find(x=>x.id===row.sourceId);if(!source||row.kind!==source.kind||(source.text?(!row.quotedExcerpt.trim()||!source.text.includes(row.quotedExcerpt)):row.quotedExcerpt!==''))throw new DomainError('Proveniência de manifestação inválida.',502);}
+ if(rows.length!==sources.length||new Set(rows.map(x=>x.sourceId)).size!==rows.length)throw new DomainError('IA omitiu ou duplicou manifestações.',502,'ANALYSIS_SOURCE_COVERAGE');
+ for(const row of rows){
+  const source=sources.find(x=>x.id===row.sourceId);
+  if(!source)throw new DomainError('Fonte desconhecida na análise.',502,'ANALYSIS_SOURCE_UNKNOWN');
+  if(row.kind!==source.kind)throw new DomainError('Tipo de manifestação incompatível.',502,'ANALYSIS_KIND_MISMATCH');
+  const origin=quoteOrigin(s,row.sourceId,currentRound(s).id,row.quotedExcerpt);
+  if(!origin||row.quoteOrigin&&row.quoteOrigin!==origin)throw new DomainError('Citação sem correspondência na fonte.',502,'ANALYSIS_QUOTE_MISMATCH');
+ }
 }
 export function assertAssessment(s:State,result:Assessment){
  assertManifestations(s,result);
  const objections=latestVotes(s).filter(v=>v.choice==='REJEITO');
  const ids=result.individualAssessments.map(a=>a.voteId);
- if(ids.length!==objections.length||new Set(ids).size!==ids.length||objections.some(v=>!ids.includes(v.id)))throw new DomainError('Serviço de IA omitiu ou inventou objeções.',502);
- for(const a of result.individualAssessments){const v=objections.find(v=>v.id===a.voteId)!;if(!a.quotedExcerpt.trim()||!v.justification.includes(a.quotedExcerpt))throw new DomainError('Serviço de IA retornou citação não presente na objeção.',502);}
+ if(ids.length!==objections.length||new Set(ids).size!==ids.length||objections.some(v=>!ids.includes(v.id)))throw new DomainError('IA omitiu ou inventou objeções.',502,'ANALYSIS_REJECTION_COVERAGE');
+ for(const a of result.individualAssessments){const origin=quoteOrigin(s,a.voteId,currentRound(s).id,a.quotedExcerpt);if(!a.quotedExcerpt.trim()||!origin||a.quoteOrigin&&a.quoteOrigin!==origin)throw new DomainError('Citação sem correspondência na objeção.',502,'ANALYSIS_REJECTION_QUOTE');}
 }
 export function sourceFingerprint(s:State){const roundId=currentRound(s).id;return createHash('sha256').update(JSON.stringify({manifestations:manifestations(s),votes:latestVotes(s),contributions:s.contributions.filter(c=>c.roundId===roundId),factualChecks:s.factualChecks.filter(c=>c.roundId===roundId).map(c=>c.id)})).digest('hex');}
 export function addAnalysis(s:State,result:Assessment,model:string,promptVersion:string){
- open(s);assertAssessment(s,result);const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),factualCheckIds:factualContext(s).map(f=>f.id),result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
+ open(s);assertAssessment(s,result);result=structuredClone(result);
+ for(const row of result.manifestationAssessments??[])row.quoteOrigin=quoteOrigin(s,row.sourceId,currentRound(s).id,row.quotedExcerpt);
+ for(const row of result.individualAssessments)row.quoteOrigin=quoteOrigin(s,row.voteId,currentRound(s).id,row.quotedExcerpt);
+ const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),factualCheckIds:factualContext(s).map(f=>f.id),result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
 }
 export function assertSynthesis(s:State,result:SynthesisResult){
  const sourceIds=manifestations(s).map(x=>x.id),considered=result.consideredSourceIds??[];
@@ -214,7 +235,7 @@ export function validateState(input:unknown):State{
  const changes=Object.keys(p.content).filter(k=>p.content[k as keyof ProposalContent]!==i.original[k as keyof ProposalContent]).map(k=>({field:k,before:i.original[k as keyof ProposalContent],after:p.content[k as keyof ProposalContent]}));
  if(!source||JSON.stringify(source)!==JSON.stringify(i.original)||JSON.stringify(i.published)!==JSON.stringify(p.content)||JSON.stringify(changes)!==JSON.stringify(i.changes)||i.kind!==(changes.length?'EDICAO_HUMANA':'APROVACAO_HUMANA')||!i.reason.trim()||i.at!==p.createdAt)throw new DomainError('Intervenção humana incompatível com a proveniência.');}}
  const recorded=[...s.votes.map(v=>({id:v.id,roundId:v.roundId,text:v.justification,kind:v.choice==='REJEITO'?'OBJECAO':v.choice==='ACEITO_COM_RESSALVAS'?'RESSALVA':v.choice==='ABSTENHO'?'ABSTENCAO':'APOIO'})),...s.contributions.map(c=>({id:c.id,roundId:c.roundId,text:c.text,kind:'CONTRIBUICAO'})),...s.contests.map(c=>({id:c.id,roundId:[...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks].find(x=>x.id===c.targetId)?.roundId,text:c.text,kind:'CONTESTACAO'}))];
- for(const a of s.analyses)if(a.result.manifestationAssessments){const rows=a.result.manifestationAssessments;if(new Set(rows.map(x=>x.sourceId)).size!==rows.length||rows.some(row=>{const src=recorded.find(x=>x.id===row.sourceId&&x.roundId===a.roundId);return !src||src.kind!==row.kind||(src.text?(!row.quotedExcerpt.trim()||!src.text.includes(row.quotedExcerpt)):row.quotedExcerpt!=='');}))throw new DomainError('Análise com proveniência de manifestação inválida.');}
+ for(const a of s.analyses)if(a.result.manifestationAssessments){const rows=a.result.manifestationAssessments;if(new Set(rows.map(x=>x.sourceId)).size!==rows.length||rows.some(row=>{const src=recorded.find(x=>x.id===row.sourceId&&x.roundId===a.roundId);return !src||src.kind!==row.kind||(!quoteOrigin(s,row.sourceId,a.roundId,row.quotedExcerpt)||row.quoteOrigin&&row.quoteOrigin!==quoteOrigin(s,row.sourceId,a.roundId,row.quotedExcerpt));}))throw new DomainError('Análise com proveniência de manifestação inválida.');}
  for(const x of s.syntheses)if(x.result.consideredSourceIds){const ids=x.result.consideredSourceIds;if(new Set(ids).size!==ids.length||ids.some(id=>!recorded.some(r=>r.id===id&&r.roundId===x.roundId))||x.result.changeLog.some(c=>!c.sourceIds?.length||c.sourceIds.some(id=>!ids.includes(id))))throw new DomainError('Síntese com proveniência de manifestação inválida.');}
  for(const f of s.factualChecks){if(f.participantId!==null&&!pids.has(f.participantId)||!s.rounds.some(r=>r.id===f.roundId&&r.proposalId===f.proposalId)||!soundEvidence(f))throw new DomainError('Evidência factual ou vínculo inválido.');}
  for(const a of [...s.analyses,...s.syntheses])if(a.factualCheckIds.some(id=>!s.factualChecks.some(f=>f.id===id&&f.proposalId===a.proposalId)))throw new DomainError('Referência factual inválida.');

@@ -14,6 +14,19 @@ function fixture(role:'moderator'|'participant'='moderator'):RoomView{
  return {state,revision:1,role,participantId:role==='participant'?state.participants[0].id:null,alias:role==='participant'?'P01':null,room:{id:state.decision.id,code:'ABCDEF1234',topic:proposal.title,proposal:proposal.text,proposal_review:null},canViewGroup:true,positions:[],metrics:null,contributions:[]};
 }
 const session=(view:RoomView)=>({code:view.room.code,credential:'synthetic-private-token',view});
+
+test('Ready synthesis opens publication fields only after the moderator enters review',async()=>{
+ const v=fixture(),r=currentRound(v.state),ai=new FakeAI();
+ vote(v.state,v.state.participants[0].id,r.id,r.proposalId,'REJEITO','Synthetic access objection');
+ const a=addAnalysis(v.state,await ai.analyzeObjections(proposal,v.state.votes),'synthetic','test');
+ addSynthesis(v.state,a.id,await ai.synthesizeProposal(proposal,a.result),'synthetic','test');
+ let ui!:ReactTestRenderer;
+ await act(async()=>{ui=create(<RoomWorkspace session={session(v)} busy={false} act={async f=>f()} onRefresh={async()=>{}}/>);});
+ assert.equal(ui.root.findAllByType('textarea').filter(x=>x.props.value===v.state.syntheses[0].result.revisedProposal.text).length,0);
+ await act(async()=>ui.root.findAllByType('button').find(x=>x.children.includes('Revisar nova proposta'))!.props.onClick());
+ assert.ok(ui.root.findAllByType('textarea').some(x=>x.props.value===v.state.syntheses[0].result.revisedProposal.text));
+ await act(async()=>ui.unmount());
+});
 test('Moderator stages hide future publication until a synthesis is ready and allow explicit manual intervention',async()=>{
  const v=fixture();let ui!:ReactTestRenderer;
  await act(async()=>{ui=create(<RoomWorkspace session={session(v)} busy={false} act={async f=>f()} onRefresh={async()=>{}}/>);});

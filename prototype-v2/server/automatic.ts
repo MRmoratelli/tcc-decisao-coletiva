@@ -50,7 +50,7 @@ export function automaticMediation(repo:Repository,ai:AIAdapter){
     event(state,'system','AUTO_MEDIATION_READY',roundId);
    });
   }catch(e){
-   const code=e instanceof AIUnavailable?e.code:e instanceof DomainError?(e.status===502?'INVALID_SOURCE_LINKS':e.status===409?'STATE_CHANGED':'DOMAIN_VALIDATION'):e instanceof Error&&e.name==='ZodError'?'INVALID_STATE':'INTERNAL_FAILURE';
+   const code=e instanceof AIUnavailable?e.code:e instanceof DomainError?(e.code??(e.status===502?'INVALID_SOURCE_LINKS':e.status===409?'STATE_CHANGED':'DOMAIN_VALIDATION')):e instanceof Error&&e.name==='ZodError'?'INVALID_STATE':'INTERNAL_FAILURE';
    const safe={event:'AUTO_MEDIATION_FAILURE',stage,code,status:e instanceof AIUnavailable?e.httpStatus??null:e instanceof DomainError?e.status:null,attempts:e instanceof AIUnavailable?e.attempts:0,model:ai.model,promptVersion:PROMPT_VERSION};
    console.warn(JSON.stringify(safe));
    if(fingerprint&&code!=='STATE_CHANGED')try{await change(state=>{

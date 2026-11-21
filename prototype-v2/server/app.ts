@@ -136,7 +136,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.post('/api/rooms/:code/contribution-review',aiLimit,async(req,res)=>{
   const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
   if(b.proposalId!==currentProposal(state).id||b.roundId!==currentRound(state).id)throw new DomainError('Versão desatualizada.',409);
-  const reserved=await reserveReview(repo,i,b.text);
+  const reserved=await reserveReview(repo,i,b.text,Date.now(),ai.model);
   try{const review=reserved.cached??await ai.analyzeContribution(currentProposal(state).content,b.text);
    if(!reserved.cached)await finishReview(repo,i,reserved.requestId,review);
    const latest=(await repo.read(i)).state;if(latest.decision.status!=='OPEN'||currentProposal(latest).id!==b.proposalId)throw new DomainError('A proposta mudou durante a consulta. Nenhum voto foi registrado.',409);

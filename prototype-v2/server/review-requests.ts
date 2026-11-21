@@ -1,4 +1,5 @@
 import {createHash,randomUUID} from 'node:crypto';
+import {PROMPT_VERSION} from './ai.js';
 import type {Review} from '../shared/contracts.js';
 import {DomainError,currentProposal,currentRound} from './domain.js';
 import type {Repository,Identity} from './db.js';
@@ -6,8 +7,8 @@ export const REVIEW_INTERVAL_MS=60000;
 export class ReviewWait extends DomainError{
  constructor(public code:string,public retryAfterSeconds:number){super(code==='REVIEW_IN_PROGRESS'?'Seu parecer anterior ainda está em andamento.':'Aguarde '+retryAfterSeconds+' segundos antes de pedir outro parecer.',429);}
 }
-export async function reserveReview(repo:Repository,i:Identity,text:string,now=Date.now()){
- const hash=createHash('sha256').update(text).digest('hex');
+export async function reserveReview(repo:Repository,i:Identity,text:string,now=Date.now(),model='unspecified'){
+ const hash=createHash('sha256').update(JSON.stringify({text,model,promptVersion:PROMPT_VERSION})).digest('hex');
  for(let attempt=0;attempt<12;attempt++){
   const x=await repo.read(i),s=x.state,p=currentProposal(s),r=currentRound(s);
   if(s.decision.status!=='OPEN'||s.votes.some(v=>v.participantId===i.participantId&&v.roundId===r.id))throw new DomainError('Você já votou ou a rodada foi encerrada.',409);

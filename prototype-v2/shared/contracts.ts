@@ -21,10 +21,10 @@ export const ReviewSchema=z.object({
 });
 export type Review=z.infer<typeof ReviewSchema>;
 const list=z.array(z.string().max(2000)).max(50);
-export const ManifestationAssessmentSchema=z.object({sourceId:z.string(),kind:z.enum(['APOIO','RESSALVA','OBJECAO','ABSTENCAO','CONTRIBUICAO','CONTESTACAO']),quotedExcerpt:field,interpretation:field,suggestedPath:field});
+export const ManifestationAssessmentSchema=z.object({sourceId:z.string(),kind:z.enum(['APOIO','RESSALVA','OBJECAO','ABSTENCAO','CONTRIBUICAO','CONTESTACAO']),quotedExcerpt:field,quoteOrigin:z.enum(['SUBMITTED','ORIGINAL']).optional(),interpretation:field,suggestedPath:field});
 export const AssessmentSchema=z.object({
  manifestationAssessments:z.array(ManifestationAssessmentSchema).max(200).optional(),
- individualAssessments:z.array(z.object({voteId:z.string(),relevance:field,explanation:field,quotedExcerpt:field,premises:list,evidence:list,risks:list,uncertainty:field})).max(30),
+ individualAssessments:z.array(z.object({voteId:z.string(),relevance:field,explanation:field,quotedExcerpt:field,quoteOrigin:z.enum(['SUBMITTED','ORIGINAL']).optional(),premises:list,evidence:list,risks:list,uncertainty:field})).max(30),
  sharedInterests:list,convergences:list,conflicts:list,incompatibleObjections:list,nonNegotiableConditions:list,uncertainties:list,
 });
 export type Assessment=z.infer<typeof AssessmentSchema>;
