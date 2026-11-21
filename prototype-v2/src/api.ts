@@ -10,10 +10,13 @@ export type RoomView={
  metrics:unknown;contributions:Array<{id:string;alias:string;text:string;review:Review|null;user_choice:string;created_at:string}>;
 };
 export type RoomSyncResponse=RoomView|{revision:number;unchanged:true};
+export class APIError extends Error {
+ constructor(message:string,public status:number,public code?:string,public attempts?:number){super(message);this.name='APIError';}
+}
 export async function request<T>(path:string,body?:unknown):Promise<T>{
  const response=await fetch('/api'+path,{...(path.endsWith('/view')?{signal:AbortSignal.timeout(15000)}:{}),method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
  let result:unknown;try{result=await response.json();}catch{throw new Error('Servidor não retornou resposta JSON.');}
- if(!response.ok)throw new Error((result as {error?:string}).error||'Falha na comunicação com o servidor.');
+ if(!response.ok)throw new APIError((result as {error?:string}).error||'Falha na comunicação com o servidor.',response.status,(result as {code?:string}).code,(result as {attempts?:number}).attempts);
  return result as T;
 }
 export function downloadJSON(value:unknown,name:string){

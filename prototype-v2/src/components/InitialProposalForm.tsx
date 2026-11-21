@@ -1,5 +1,5 @@
 import {useState,type FormEvent} from 'react';
-import {request,type ReviewResult} from '../api';
+import {request,APIError,type ReviewResult} from '../api';
 import {ProposalSchema,type ProposalContent} from '../../shared/contracts';
 import {emptyProposal} from './ProposalEditor';
 import {ReviewCard} from './ReviewCard';
@@ -22,7 +22,7 @@ export function InitialProposalForm({busy,onCreate}:{busy:boolean;onCreate:(inpu
    const draft=ProposalSchema.parse(proposal);
    const result=await request<ReviewResult>('/ai/proposal-review',{proposal:draft,consent:true});
    setReviewed(draft);setReview(result);
-  }catch{setFailure('Não foi possível revisar a proposta com a IA. Seu texto foi mantido. Tente novamente ou crie a sala sem essa revisão.');}
+  }catch(e){setFailure(e instanceof APIError&&e.code==='PROVIDER_UNAVAILABLE'?e.message:'Não foi possível revisar a proposta com a IA. Seu texto foi mantido. Tente novamente ou crie a sala sem essa revisão.');}
   finally{setReviewing(false);}
  }
  async function create(withoutReview=false){

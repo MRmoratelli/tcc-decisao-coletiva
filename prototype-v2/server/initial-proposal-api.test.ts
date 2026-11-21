@@ -4,6 +4,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { Repository,type SQLPool } from './db.js';
 import { migrate } from './migrate.js';
 import { createApp } from './app.js';
+import {GeminiAdapter} from './ai.js';
 import { FakeAI,proposal,review } from './fixtures.js';
 import { RESEARCH_VERSION } from '../shared/research.js';
 const db=new PGlite();
@@ -64,4 +65,17 @@ test('Revisão inicial: manter texto original e criação explícita sem revisã
   assert.equal(s.proposals[0].review.status,'IGNORADA');assert.equal(s.enrollment.mode,'SELF');assert.equal(s.enrollment.automaticMediation,true);
   assert.equal((await post('/rooms',{proposal,participantCount:2,simple:true,aiConsent:true,initialReviewMode:'BYPASSED'})).status,400);
  }finally{mock.mock.restore();}
+});
+
+test('HTTP 503: indisponibilidade persistente retorna código específico e não cria sala',async()=>{
+ const failed=new GeminiAdapter('synthetic',async()=>{throw {status:503,message:'PRIVATE_PROVIDER_DETAIL'};},{sleep:async()=>{},random:()=>0,log:()=>{}});
+ const api=createApp(repo,failed,'synthetic-usability-signing-not-real-credential').listen(0,'127.0.0.1');
+ await new Promise<void>(r=>api.once('listening',r));const address=api.address();if(!address||typeof address==='string')throw Error('server');
+ try{
+  const response=await fetch('http://127.0.0.1:'+address.port+'/api/ai/proposal-review',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({proposal,consent:true})});
+  const body=await response.json() as {code:string;attempts:number;retryable:boolean;error:string;receipt?:string};
+  assert.equal(response.status,503);assert.equal(body.code,'PROVIDER_UNAVAILABLE');assert.equal(body.attempts,3);assert.equal(body.retryable,true);
+  assert.ok(body.error.includes('temporariamente indisponível'));assert.ok(!JSON.stringify(body).includes('PRIVATE_PROVIDER_DETAIL'));
+  assert.equal(body.receipt,undefined);
+ }finally{await new Promise<void>((r,j)=>api.close(e=>e?j(e):r()));}
 });

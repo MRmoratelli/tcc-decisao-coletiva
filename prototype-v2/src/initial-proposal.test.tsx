@@ -60,3 +60,15 @@ test('Criação: processamento explícito, falha conserva texto e oferece contin
   assert.equal(created[0].initialReviewMode,'BYPASSED');assert.ok(created[0].bypassReason);assert.equal(created[0].receipt,undefined);
  }finally{await act(async()=>ui.unmount());}
 });
+
+test('Revisão inicial: informa indisponibilidade do Gemini após as tentativas e conserva o rascunho',async t=>{
+ t.mock.method(globalThis,'fetch',async()=>({ok:false,status:503,json:async()=>({error:'O serviço Gemini está temporariamente indisponível após as tentativas automáticas. Seu texto foi mantido.',code:'PROVIDER_UNAVAILABLE',attempts:3})}) as Response);
+ let rendered!:ReactTestRenderer;
+ try{
+  await act(async()=>{rendered=create(<InitialProposalForm busy={false} onCreate={async()=>{throw Error('Must not create');}}/>);});
+  await fill(rendered);await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
+  assert.ok(JSON.stringify(rendered.toJSON()).includes('temporariamente indisponível após as tentativas automáticas'));
+  assert.equal(rendered.root.findAllByType('textarea')[0].props.value,'Proposta original para revisão.');
+  assert.ok(button(rendered,'Criar sala sem revisão da IA'));
+ }finally{await act(async()=>rendered.unmount());}
+});
