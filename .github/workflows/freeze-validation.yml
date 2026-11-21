@@ -1,0 +1,33 @@
+name: V2 freeze validation
+on:
+  push:
+    branches: [validation/v2-freeze-20261121]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: prototype-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: prototype-v2/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Synthetic live validation of frozen candidate
+        run: node --import tsx server/freeze-live.ts
+        env:
+          FROZEN_COMMIT: a7b169edd5561bdf454e9bf302da3ca740dc19c5
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v2-freeze-synthetic-evidence
+          path: prototype-v2/freeze-evidence
+          retention-days: 30
