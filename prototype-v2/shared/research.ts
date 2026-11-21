@@ -1,4 +1,4 @@
-export const RESEARCH_VERSION='1.2-2026-11-21' as const;
+export const RESEARCH_VERSION='1.3-2026-11-21' as const;
 export const RESEARCH_SOURCE='https://docs.google.com/document/d/13A-q5WTqWHdNUCfRjpWaRXfpCQXLtGDQ7-CwBdUT1Oo';
 export const RESEARCH_SECTIONS=[
   {
@@ -6,7 +6,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "Versão 1.2 — 21/11/2026 — registro eletrônico de concordância",
+    "text": "Versão 1.3 — 21/11/2026 — registro eletrônico de concordância",
     "heading": true
   },
   {
@@ -111,7 +111,7 @@ export const RESEARCH_SECTIONS=[
   },
   {
     "heading": false,
-    "text": "Atualização 1.2: nas novas manifestações, apenas ACEITO e REJEITO. O silêncio não é aceitação. Pedidos de parecer possuem intervalo individual mínimo de 60 segundos e podem aguardar capacidade. A pesquisa externa é conduzida pelo moderador. Os registros históricos mantêm suas categorias originais. Atualização anterior 1.1: adaptação do registro de concordância ao fluxo eletrônico no software. As condições de participação, guarda, acesso e retirada da versão 1.0 foram preservadas."
+    "text": "Atualização 1.3: ACEITO significa aceitar a proposta como está, sem justificativa. Se houver condição ou ajuste, registre REJEITO e justifique. A classificação humana de cobertura/fidelidade não é solicitada ao moderador neste fluxo; registros antigos são preservados. Atualização 1.2: nas novas manifestações, apenas ACEITO e REJEITO. O silêncio não é aceitação. Pedidos de parecer possuem intervalo individual mínimo de 60 segundos e podem aguardar capacidade. A pesquisa externa é conduzida pelo moderador. Os registros históricos mantêm suas categorias originais. Atualização anterior 1.1: adaptação do registro de concordância ao fluxo eletrônico no software. As condições de participação, guarda, acesso e retirada da versão 1.0 foram preservadas."
   }
 ] as const;
 export const RESEARCH_TEXT=RESEARCH_SECTIONS.map(s=>s.text).join('\n\n');

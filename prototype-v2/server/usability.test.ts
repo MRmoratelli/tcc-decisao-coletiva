@@ -82,7 +82,7 @@ test('Escolhas da revisão: reformulação e descarte preservados, sem registrar
  const m=await view(c);assert.equal(m.state.votes.length,1);assert.equal(m.state.contributions.length,1);assert.equal(m.state.contributions[0].review.choice,'USED_REWRITE');assert.equal(m.state.contributions[0].originalText,original);
  const p2=await view(c,token(32));
  const res2=await post('/rooms/'+c.code+'/contribution-review',{credential:token(32),text:original,roundId:r.id,proposalId:r.proposalId,consent:true});
- const disc=await post('/rooms/'+c.code+'/votes',{credential:token(32),revision:(await view(c,token(32))).revision,roundId:r.id,proposalId:r.proposalId,choice:'ACEITO',justification:original,originalText:original,reviewChoice:'DISCARDED',receipt:res2.data.receipt});
+ const disc=await post('/rooms/'+c.code+'/votes',{credential:token(32),revision:(await view(c,token(32))).revision,roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:original,originalText:original,reviewChoice:'DISCARDED',receipt:res2.data.receipt});
  assert.equal(disc.status,201,JSON.stringify(disc.data));
  const after=await view(c);assert.equal(after.state.contributions[1].review.choice,'DISCARDED');assert.equal(after.state.contributions[1].review.result.suggestedRewrite,review.suggestedRewrite);
 });

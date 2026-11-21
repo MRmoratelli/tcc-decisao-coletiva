@@ -155,6 +155,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  });
  app.post('/api/rooms/:code/votes',async(req,res)=>{
   const i=await auth(req,'participant'),b=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),choice:ActiveChoiceSchema,justification:z.string().trim().max(5000).default(''),originalText:z.string().max(5000).optional(),contest:z.string().max(2000).default('')}).parse(req.body);
+  if(b.choice==='ACEITO'&&b.justification)throw new DomainError('ACEITO significa aceitar a proposta como está, sem justificativa. Se precisa de alteração, escolha REJEITO e explique.');
   const review=b.justification?reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.justification}):null;
   await repo.mutate(i,b.revision,s=>{
    if(review)contribute(s,i.participantId!,b.roundId,b.proposalId,b.justification,b.originalText??b.justification,review,b.contest);

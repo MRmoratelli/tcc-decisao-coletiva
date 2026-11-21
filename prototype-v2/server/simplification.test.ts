@@ -60,7 +60,7 @@ test('Binary sessions reject removed categories while historical JSON remains re
 test('Ten participants: failed synthesis exposes safe stage, analysis remains private and is reused on retry',async()=>{
  const f=fixture(),s=f.state,r=currentRound(s);s.enrollment={mode:'SELF',claims:s.participants.map(x=>x.id),automaticMediation:true};
  s.researchConsents=s.participants.map(p=>({participantId:p.id,response:'SIM' as const,at:new Date().toISOString(),version:'test',actor:'participant' as const}));
- for(let n=0;n<10;n++)vote(s,s.participants[n].id,r.id,r.proposalId,n%2?'REJEITO':'ACEITO','Synthetic concern '+n);
+ for(let n=0;n<10;n++)vote(s,s.participants[n].id,r.id,r.proposalId,n%2?'REJEITO':'ACEITO',n%2?'Synthetic concern '+n:'');
  f.state=s;
  const ai=new FakeAI();let analyses=0,syntheses=0;
  const originalAnalyze=ai.analyzeObjections.bind(ai),originalSynthesize=ai.synthesizeProposal.bind(ai);

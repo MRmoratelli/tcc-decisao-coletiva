@@ -46,7 +46,7 @@ test('Moderator stages hide future publication until a synthesis is ready and al
  assert.equal(ui.root.findAllByType('textarea').filter(x=>x.props.value===proposal.text).length,0);
  assert.ok(JSON.stringify(ui.toJSON()).includes('Aguardando 2'));
  await act(async()=>ui.root.findAllByType('button').find(x=>x.children.includes('Abrir revisão manual'))!.props.onClick());
- assert.ok(JSON.stringify(ui.toJSON()).includes('Publicar proposta e abrir próxima rodada'));
+ assert.ok(JSON.stringify(ui.toJSON()).includes('Revisão e publicação de V'));
  await act(async()=>ui.unmount());
 });
 test('Participant has only two vote options and an individual cooldown survives a fresh component',async()=>{
@@ -55,6 +55,7 @@ test('Participant has only two vote options and an individual cooldown survives 
  await act(async()=>{ui=create(<RoomWorkspace session={session(v)} busy={false} act={async f=>f()} onRefresh={async()=>{}}/>);});
  const options=ui.root.findAllByType('select')[0].findAllByType('option').map(x=>x.props.value);
  assert.deepEqual(options,['ACEITO','REJEITO']);
+ await act(async()=>ui.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
  assert.ok(JSON.stringify(ui.toJSON()).includes('Novo pedido de parecer disponível em'));
  assert.ok(!JSON.stringify(ui.toJSON()).includes('Pesquisa externa consultiva'));
  await act(async()=>ui.unmount());

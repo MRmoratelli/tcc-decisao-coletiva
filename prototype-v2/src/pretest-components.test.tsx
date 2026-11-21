@@ -24,6 +24,7 @@ test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exi
   const inputs=rendered.root.findAllByType('input');
   await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[inputs.length-1].props.onChange({target:{value:'synthetic-participant-access-not-a-real-secret'}});});
   await act(async()=>rendered.root.findAllByType('form').at(-1)!.props.onSubmit({preventDefault(){}}));
+  await act(async()=>rendered.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
   const manifest=()=>rendered.root.findAllByType('textarea').find(x=>x.props.rows===5)!;
   await act(async()=>manifest().props.onChange({target:{value:'Rascunho humano ainda não enviado.'}}));
   await act(async()=>{t.mock.timers.tick(4000);});assert.equal(manifest().props.value,'Rascunho humano ainda não enviado.');
@@ -44,7 +45,7 @@ test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exi
 test('React: votos binários e comparação humana aparecem ao participante',async()=>{
  const s=state();publish(s,{...proposal,text:'Texto efetivamente publicado pelo moderador.'},currentProposal(s).id,'Esclarecer o escopo.');let rendered!:ReactTestRenderer;
  await act(async()=>{rendered=create(<RoomWorkspace session={{code:'A123456789',credential:'synthetic-token',view:view(s,2)}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
- const output=JSON.stringify(rendered.toJSON());assert.ok(!output.includes('ACEITO COM RESSALVAS'));assert.ok(output.includes('Proposta revisada pelo moderador'));assert.ok(output.includes('Comparar versão original e publicada'));assert.ok(output.includes('Esclarecer o escopo.'));assert.ok(output.includes('Texto efetivamente publicado pelo moderador.'));
+ const output=JSON.stringify(rendered.toJSON());assert.ok(!output.includes('ACEITO COM RESSALVAS'));assert.ok(output.includes('Proposta alterada pelo moderador'));assert.ok(output.includes('Alterações do moderador nesta versão'));assert.ok(output.includes('Esclarecer o escopo.'));assert.ok(output.includes('Texto efetivamente publicado pelo moderador.'));
  const position=rendered.root.findAllByType('select')[0];await act(async()=>position.props.onChange({target:{value:'REJEITO'}}));assert.ok(JSON.stringify(rendered.toJSON()).includes('(obrigatória)'));
  await act(async()=>rendered.unmount());
 });
@@ -70,13 +71,13 @@ test('Parecer inicial: somente moderador; aprovação simples discreta; edição
  p.intervention={kind:'APROVACAO_HUMANA',source:'RASCUNHO_INICIAL',sourceId:p.id,original:p.content,published:p.content,changes:[],reason:'Aprovação inicial simples.',at:p.createdAt,actor:'moderator'};
  const edited=createState(randomUUID(),{...proposal,text:'Edição efetiva inicial.'},approved.participants,{result:initial,status:'OK',model:'synthetic',promptVersion:'test',reason:'Ajuste humano.'},proposal);
  const rewritten=createState(randomUUID(),{...proposal,text:initial.suggestedRewrite},approved.participants,{result:initial,status:'OK',model:'synthetic',promptVersion:'test',reason:'Reformulação adotada.',appliedRewrite:true},proposal);
- for(const [s,visible,expected] of [[approved,false,''],[edited,true,'Proposta revisada pelo moderador'],[rewritten,true,'Texto sugerido pela IA e aprovado sem alteração.']] as const){
+ for(const [s,visible,expected] of [[approved,false,''],[edited,true,'Proposta alterada pelo moderador'],[rewritten,true,'Sugestão aprovada sem alterações']] as const){
   let rendered!:ReactTestRenderer;
   try{
    await act(async()=>{rendered=create(<RoomWorkspace session={{code:'A123456789',credential:'synthetic-token',view:view(s,1)}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
    const output=JSON.stringify(rendered.toJSON());
-   assert.equal(output.includes('Comparar versão original e publicada'),visible);
-   assert.equal(output.includes('Comparar revisão humana desta versão'),visible);
+   assert.equal(output.includes('Alterações do moderador nesta versão'),visible);
+   assert.equal(output.includes('Alterações do moderador nesta versão'),visible);
    if(expected)assert.ok(output.includes(expected));
   }finally{if(rendered)await act(async()=>rendered.unmount());}
  }

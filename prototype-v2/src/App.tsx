@@ -116,7 +116,7 @@ export default function App(){
  {!invitation.open&&<p className="alert">Esta discussão foi encerrada. Participantes já inscritos podem retornar pelo mesmo navegador.</p>}
  <p className="muted">Se não concordar, não prossiga. Para dúvidas ou retirada, utilize o contato informado no termo. Volte pelo mesmo navegador para recuperar seu acesso.</p>
  </>}
- <details><summary>Acesso de moderador ou credencial já existente</summary><form onSubmit={e=>{e.preventDefault();void act(()=>openRoom(code,credential));}}><label>Código da sala<input required value={code} maxLength={10} onChange={e=>setCode(e.target.value.toUpperCase())}/></label><label>Credencial individual<input required type="password" value={credential} onChange={e=>setCredential(e.target.value)}/></label><button disabled={busy}>Entrar com credencial</button></form></details>
+ <details><summary>Usar uma credencial salva</summary><p>Para acessar em outro navegador ou quando o acesso automático não estiver disponível.</p><form onSubmit={e=>{e.preventDefault();void act(()=>openRoom(code,credential));}}><label>Código da sala<input required value={code} maxLength={10} onChange={e=>setCode(e.target.value.toUpperCase())}/></label><label>Credencial individual<input required type="password" value={credential} onChange={e=>setCredential(e.target.value)}/></label><button disabled={busy}>Entrar com credencial</button></form></details>
  </section>}
  {created&&<section className="card credentials">
  <h2>Sala {created.code} criada</h2>
@@ -129,8 +129,6 @@ export default function App(){
  {session&&<section className="card room">
  <div className="row-between"><div><span className="eyebrow">Sala {session.code} · {session.view.role==='moderator'?'Moderador':session.view.alias}</span><h2>{session.view.room.topic}</h2></div><button className="secondary" onClick={()=>void act(refreshRoom)} disabled={busy}>Atualizar</button></div>
  {session.view.role==='moderator'&&session.view.state.enrollment&&<details><summary>Link de acesso do grupo</summary><p><a href={link}>{link}</a></p><button onClick={()=>void navigator.clipboard.writeText(link)}>Copiar link único</button><p>{session.view.state.enrollment.claims.length} de {session.view.state.participants.length} participantes inscritos.</p></details>}
- <div className="proposal"><h3>Proposta atual</h3><p>{session.view.room.proposal}</p></div>
- {session.view.role==='moderator'&&session.view.room.proposal_review&&<details><summary>Parecer inicial de apoio ao moderador</summary><ReviewCard review={session.view.room.proposal_review} label="Parecer inicial"/></details>}
  <RoomWorkspace session={session} busy={busy} act={act} onRefresh={refreshRoom}/>
  <button className="text-button" onClick={()=>{setSession(null);setCreated(null);setTab('join');setNotice('Seu acesso foi mantido neste navegador.');}}>Sair desta sala</button>
  </section>}

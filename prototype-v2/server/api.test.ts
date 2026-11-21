@@ -148,7 +148,7 @@ test('Aceitação de reformulação IA preserva parecer, autoria do envio e text
 test('Síntese do API com vínculos errados preserva ressalvas e registra ajuste sem fabricar rejeições',async()=>{
  const room=(await post('/rooms',{proposal,participantCount:3,bypassReason:'Sala sintética de vínculos.'})).data;
  assert.equal((await cast(room,0,'REJEITO','Local inacessível')).status,201);
- assert.equal((await cast(room,1,'ACEITO','Manter as bebidas separadas')).status,201);
+ assert.equal((await cast(room,1,'ACEITO')).status,201);
  assert.equal((await cast(room,2,'ACEITO')).status,201);
  assert.equal((await action(room,'/analyze-objections',{consent:true})).status,200);
  const before=await view(room),analysis=before.state.analyses.at(-1);

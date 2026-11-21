@@ -28,7 +28,10 @@ export const AssessmentSchema=z.object({
  sharedInterests:list,convergences:list,conflicts:list,incompatibleObjections:list,nonNegotiableConditions:list,uncertainties:list,
 });
 export type Assessment=z.infer<typeof AssessmentSchema>;
+export const DecisionProgressSchema=z.object({defined:list,suggested:list,pending:list,questions:list});
+export const ResolutionCheckSchema=z.object({voteId:z.string(),satisfiedRequirements:list,remainingRequirements:list});
 export const SynthesisSchema=z.object({
+ decisionProgress:DecisionProgressSchema.optional(),resolutionChecks:z.array(ResolutionCheckSchema).max(30).optional(),
  revisedProposal:ProposalSchema,
  consideredSourceIds:z.array(z.string()).max(200).optional(),
  changeLog:z.array(z.object({change:field,reason:field,voteIds:z.array(z.string()).max(30),sourceIds:z.array(z.string()).max(200).optional()})).max(30),

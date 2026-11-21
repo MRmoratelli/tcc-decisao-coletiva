@@ -26,6 +26,9 @@ after(async()=>{await new Promise<void>((resolve,reject)=>server.close(e=>e?reje
 test('Publication without changes needs no typed reason; moderator edits require one and are visible to participants',async()=>{
  const created=await post('/rooms',{proposal,participantCount:2,bypassReason:'Synthetic publication regression'}),c=created.data;
  assert.equal(created.status,201);
+ const initial=await view(c),round=initial.state.rounds.at(-1);
+ const conditional=await action(c,'/votes',{roundId:round.id,proposalId:round.proposalId,choice:'ACEITO',justification:'I accept only with a fixed date.',bypassReason:'Synthetic conditional acceptance'},c.participants[0].credential);
+ assert.equal(conditional.status,400);assert.equal((await view(c)).state.votes.length,0);assert.equal((await view(c)).state.contributions.length,0);
  assert.equal((await cast(c,0,'REJEITO','Synthetic access concern')).status,201);
  assert.equal((await cast(c,1,'ACEITO')).status,201);
  assert.equal((await action(c,'/analyze-objections',{consent:true})).status,200);

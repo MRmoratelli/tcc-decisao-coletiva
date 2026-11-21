@@ -35,6 +35,7 @@ test('React: sala oferece votos binários, parecer opcional e impede funções d
  const state=createState(randomUUID(),proposal,people,{result:null,status:'IGNORADA',promptVersion:'test',model:'none',reason:'Teste'});
  const view:RoomView={revision:1,room:{id:state.decision.id,code:'A123456789',topic:proposal.title,proposal:proposal.text,proposal_review:null},role:'participant',alias:'P01',participantId:people[0].id,canViewGroup:false,state,positions:[{...people[0],choice:'PENDENTE'}],metrics:null,contributions:[]};
  let rendered!:ReactTestRenderer;await act(async()=>{rendered=create(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
+ await act(async()=>rendered.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
  assert.ok(!JSON.stringify(rendered.toJSON()).includes('ABSTENHO'));assert.ok(JSON.stringify(rendered.toJSON()).includes('Continuar com meu texto sem parecer'));assert.ok(!JSON.stringify(rendered.toJSON()).includes('Confirmar revisão e publicar'));
  await act(async()=>rendered.update(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={true} act={async f=>{await f();}} onRefresh={async()=>{}}/>));assert.ok(rendered.root.findAllByType('button').filter(b=>b.props.disabled===true).length>=3);await act(async()=>rendered.unmount());
 });
@@ -52,7 +53,7 @@ test('React: não exibe voto justificado e sua contribuição técnica como duas
  const view:RoomView={revision:3,room:{id:state.decision.id,code:'A123456789',topic:proposal.title,proposal:proposal.text,proposal_review:null},role:'moderator',alias:null,participantId:null,canViewGroup:true,state,positions:[{...people[0],choice:'ACEITO_COM_RESSALVAS'},{...people[1],choice:'PENDENTE'}],metrics:null,contributions:[]};
  let rendered!:ReactTestRenderer;
  await act(async()=>{rendered=create(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
- const output=JSON.stringify(rendered.toJSON());
+ const current=rendered.root.findByProps({'aria-label':'Manifestações da rodada atual'});const output=current.findAll(n=>typeof n.type==='string').map(n=>n.children.filter(c=>typeof c==='string').join('')).join(' ');
  assert.equal((output.match(/Manifestação única vinculada ao voto/g)??[]).length,1);
  assert.ok(output.includes('Reformulação sugerida pela IA aceita'));
  assert.ok(output.includes('Texto original do participante'));

@@ -53,6 +53,7 @@ test('Revisão: reformulação e descarte são escolhas anteriores ao único reg
  const button=(label:string)=>ui.root.findAllByType('button').find(b=>b.children.join('')===label)!;
  try{
   await act(async()=>{ui=create(<RoomWorkspace session={{code:v.room.code,credential:'synthetic',view:v}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
+  await act(async()=>ui.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
   const text=()=>ui.root.findAllByType('textarea').find(t=>t.props.rows===5)!;
   await act(async()=>text().props.onChange({target:{value:'Precisamos rever o prazo.'}}));
   await act(async()=>ui.root.findAllByType('input').find(i=>i.props.type==='checkbox')!.props.onChange({target:{checked:true}}));
@@ -61,7 +62,7 @@ test('Revisão: reformulação e descarte são escolhas anteriores ao único reg
   assert.equal(text().props.value,review.suggestedRewrite);assert.equal(requests.length,1);
   await act(async()=>button('Descartar parecer da IA').props.onClick());
   assert.equal(text().props.value,'Precisamos rever o prazo.');assert.equal(requests.length,1);
-  await act(async()=>button('Registrar ACEITO').props.onClick());
+  await act(async()=>button('Registrar REJEITO').props.onClick());
   assert.equal(requests.filter(r=>r.path.endsWith('/votes')).length,1);
   assert.equal(requests.at(-1).body.reviewChoice,'DISCARDED');assert.equal(requests.at(-1).body.justification,'Precisamos rever o prazo.');
  }finally{await act(async()=>ui.unmount());}
@@ -72,6 +73,7 @@ test('Revisão: editar argumento após o parecer exige nova análise e exibe ró
  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({review,receipt:'test',rewriteReceipt:'rewrite'})}) as Response);
  try{
   await act(async()=>{ui=create(<RoomWorkspace session={{code:v.room.code,credential:'synthetic',view:v}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
+  await act(async()=>ui.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
   const text=()=>ui.root.findAllByType('textarea').find(t=>t.props.rows===5)!;
   await act(async()=>text().props.onChange({target:{value:'Primeiro argumento.'}}));
   await act(async()=>ui.root.findAllByType('input').find(i=>i.props.type==='checkbox')!.props.onChange({target:{checked:true}}));

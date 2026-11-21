@@ -61,6 +61,7 @@ export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:
  open(s);participant(s,pid);const r=currentRound(s);
  if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Versão ou rodada desatualizada. Atualize a sala.',409);
  if(s.votes.some(v=>v.participantId===pid&&v.roundId===roundId))throw new DomainError('Seu voto nesta rodada já foi registrado. Aguarde o moderador publicar uma nova rodada.',409);
+ if(s.votingMode==='BINARY'&&choice==='ACEITO'&&justification.trim())throw new DomainError('ACEITO não recebe justificativa. Se há condição ou ajuste, escolha REJEITO e explique.');
  if(s.votingMode==='BINARY'&&!['ACEITO','REJEITO'].includes(choice))throw new DomainError('Escolha Aceito ou Rejeito.');
  if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!justification.trim())throw new DomainError('Rejeição e aceite com ressalvas exigem justificativa.');
  s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:now()});
@@ -122,6 +123,11 @@ export function assertSynthesis(s:State,result:SynthesisResult){
  const sourceIds=manifestations(s).map(x=>x.id),considered=result.consideredSourceIds??[];
  if(considered.length!==sourceIds.length||new Set(considered).size!==considered.length||sourceIds.some(id=>!considered.includes(id))||result.changeLog.some(c=>!c.sourceIds?.length||c.sourceIds.some(id=>!sourceIds.includes(id))))throw new DomainError('Síntese sem cobertura ou proveniência das manifestações.',502);
  const ids=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
+ if(result.resolutionChecks){
+  const checks=result.resolutionChecks;
+  if(checks.length!==ids.length||new Set(checks.map(x=>x.voteId)).size!==checks.length||checks.some(x=>!ids.includes(x.voteId)))throw new DomainError('Verificação de resolução sem cobertura das rejeições.',502,'SYNTHESIS_RESOLUTION_COVERAGE');
+  if(checks.some(x=>x.remainingRequirements.length&&result.addressedObjections.includes(x.voteId)))throw new DomainError('Objeção com requisito pendente não está integralmente atendida.',502,'SYNTHESIS_UNRESOLVED_REQUIREMENT');
+ }
  const classified=[...result.addressedObjections,...result.partiallyAddressedObjections,...result.unresolvedObjections];
  if(classified.length!==ids.length||new Set(classified).size!==classified.length||ids.some(id=>!classified.includes(id))||result.changeLog.some(c=>c.voteIds.some(id=>!ids.includes(id))))throw new DomainError('Serviço de IA omitiu ou inventou vínculos de objeções.',502);
 }
@@ -131,6 +137,10 @@ export function assertSynthesis(s:State,result:SynthesisResult){
 export function reconcileSynthesisLinks(s:State,result:SynthesisResult):SynthesisResult{
  const formalIds=latestVotes(s).filter(v=>v.choice==='REJEITO').map(v=>v.id);
  const allowed=new Set(formalIds);
+ const requirements=result.resolutionChecks??[];
+ const withGaps=new Set(requirements.filter(x=>x.remainingRequirements.length).map(x=>x.voteId));
+ const moved=result.addressedObjections.filter(id=>withGaps.has(id));
+ if(moved.length)result={...result,addressedObjections:result.addressedObjections.filter(id=>!withGaps.has(id)),partiallyAddressedObjections:[...result.partiallyAddressedObjections,...moved.filter(id=>requirements.find(x=>x.voteId===id)?.satisfiedRequirements.length)],unresolvedObjections:[...result.unresolvedObjections,...moved.filter(id=>!requirements.find(x=>x.voteId===id)?.satisfiedRequirements.length)],feasibilityWarnings:[...result.feasibilityWarnings,'VERIFICAÇÃO DE PENDÊNCIAS: objeções com requisitos ainda abertos foram retiradas da categoria atendida. A classificação continua consultiva.']};
  const original=[...result.addressedObjections,...result.partiallyAddressedObjections,...result.unresolvedObjections];
  const classified=new Set(original.filter(id=>allowed.has(id)));
  const addressed=formalIds.filter(id=>result.addressedObjections.includes(id)&&!result.partiallyAddressedObjections.includes(id)&&!result.unresolvedObjections.includes(id));
