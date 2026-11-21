@@ -1,0 +1,45 @@
+{
+  "kind": "SYNTHETIC_TECHNICAL_TEST_NOT_SCIENTIFIC_DATA",
+  "expectedCommit": "516fe216935dbbb930041011444c994323b0d532",
+  "startedAt": "2026-11-21T16:22:42.517Z",
+  "checks": [
+    {
+      "name": "exact-commit-and-global-policy",
+      "status": "PASS"
+    },
+    {
+      "name": "ten-distinct-enrollments-and-current-term",
+      "status": "PASS"
+    },
+    {
+      "name": "binary-request-contract-and-moderator-only-factual",
+      "status": "PASS"
+    },
+    {
+      "name": "ten-individual-real-gemini-reviews-through-shared-queue",
+      "status": "PASS"
+    },
+    {
+      "name": "same-review-reused-and-individual-cooldown-enforced",
+      "status": "PASS"
+    },
+    {
+      "name": "real-mediation-covers-ten-sources-and-keeps-draft-private",
+      "status": "PASS"
+    },
+    {
+      "name": "human-publication-opens-second-round-with-no-transferred-votes",
+      "status": "PASS"
+    },
+    {
+      "name": "unanimity-complete-export-and-no-operational-cache",
+      "status": "PASS"
+    }
+  ],
+  "roomCode": "0F4959164E",
+  "sha256": "299bb33ff510df2022fb7626016430e7927ff7d6aba42e77e9d7b0e9a2eea3e5",
+  "votes": 20,
+  "rounds": 2,
+  "result": "PASS",
+  "finishedAt": "2026-11-21T16:23:57.043Z"
+}

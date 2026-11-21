@@ -15,8 +15,8 @@ Implementação: branch feat/v2-fluxo-simples-20261121. Esta branch é candidata
 - [x] Registrar falha de mediação por etapa/código seguro, sem texto do provedor, credenciais ou argumentos nos logs. Preservar análise válida privada para reaproveitar em falha exclusiva da síntese.
 - [x] Eliminar representações duplicadas da mesma manifestação no pedido de análise quando há fontes canônicas; exigir cobertura dessas fontes na gramática de geração. A validação de proveniência continua estrita.
 - [x] Atualizar termo incorporado para 1.2-2026-11-21 e instruções afetadas. Questionário incorporado foi inspecionado: não menciona as duas categorias removidas; suas perguntas e identificação DSR-1.1 permanecem.
-- [ ] Completar build, testes de regressão, concorrência, janela móvel, intervalo individual e fluxo sintético com dez identidades.
-- [ ] Verificar serviço publicado e ensaio ponta a ponta com Gemini real.
+- [x] Completar build, testes de regressão, concorrência, janela móvel, intervalo individual e fluxo sintético com dez identidades.
+- [x] Verificar serviço publicado e ensaio ponta a ponta com Gemini real.
 - [ ] Conferir e alinhar documentos externos de termo/roteiro/questionário. Este arquivo não afirma que Google Docs/Forms já foram alterados.
 - [ ] Repetir ensaio com amigos até revisão humana, publicação e novos votos.
 - [ ] Somente depois aprovar referência final de congelamento e proteção da implantação.
