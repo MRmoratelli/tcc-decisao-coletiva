@@ -1,12 +1,12 @@
-export const RESEARCH_VERSION='1.3-2026-11-21' as const;
-export const RESEARCH_SOURCE='https://docs.google.com/document/d/13A-q5WTqWHdNUCfRjpWaRXfpCQXLtGDQ7-CwBdUT1Oo';
+export const RESEARCH_VERSION='1.4-2026-11-21' as const;
+export const RESEARCH_SOURCE='https://docs.google.com/document/d/1kGTqie0FNaX68z4Nii8JQwpDqopu8wxZf4eeUsMYF7E';
 export const RESEARCH_SECTIONS=[
   {
     "text": "INFORMAÇÃO E CONCORDÂNCIA — AVALIAÇÃO CIENTÍFICA REAL V2",
     "heading": true
   },
   {
-    "text": "Versão 1.3 — 21/11/2026 — registro eletrônico de concordância",
+    "text": "Versão 1.4 — 21/11/2026 — concordância eletrônica e questionário integrado",
     "heading": true
   },
   {
@@ -18,7 +18,7 @@ export const RESEARCH_SECTIONS=[
     "heading": false
   },
   {
-    "text": "Você poderá deliberar com o grupo, registrar posições e justificativas, consultar informações públicas e, após o encerramento, responder uma única vez ao questionário DSR-1.1 no Google Forms. A participação, cada manifestação e cada resposta são voluntárias. Recusar, não responder ou desistir não gera penalidade, prejuízo acadêmico ou consequência nas relações com os pesquisadores.",
+    "text": "Você poderá deliberar com o grupo, registrar posições e justificativas e consultar informações públicas. Após o encerramento, poderá responder uma única vez ao questionário DSR-1.1 integrado à aplicação, único canal oficial desta coleta. A participação, cada manifestação e cada resposta são voluntárias. Recusar, não responder ou desistir não gera penalidade, prejuízo acadêmico ou consequência nas relações com os pesquisadores.",
     "heading": false
   },
   {
@@ -26,7 +26,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "A V2 conserva propostas e versões, posições ACEITO e REJEITO, justificativas, contribuições, pareceres, sínteses, intervenções humanas, contestações, consultas e horários. O Forms registra horário de envio, código técnico opcional e respostas; não solicita nome, e-mail, CPF ou telefone. O código não é a credencial da aplicação. Não informe dados pessoais ou sensíveis nas manifestações ou respostas abertas.",
+    "text": "A V2 conserva propostas e versões, posições ACEITO e REJEITO, justificativas, contribuições, pareceres, sínteses, intervenções humanas, contestações, consultas e horários. O questionário integrado registra respostas, versão do instrumento e contexto da sessão, vinculados ao identificador pseudônimo do participante e à sala. Não solicita nome, e-mail, CPF ou telefone. Não informe dados pessoais ou sensíveis nos textos. As respostas individuais do questionário não são exibidas aos demais participantes.",
     "heading": false
   },
   {
@@ -66,7 +66,7 @@ export const RESEARCH_SECTIONS=[
     "heading": false
   },
   {
-    "text": "Guarda e cópias: os registros da aplicação são persistidos no PostgreSQL hospedado no Neon, com acesso mediado pelo serviço da V2 no Render. O JSON original exportado, sua cópia de segurança, o diário, os registros de concordância e a base Google Forms/Sheets serão conservados na área privada Google Drive denominada TCC_V2_DADOS_CIENTIFICOS_RESTRITOS_2026, administrada por Matheus. As cópias de trabalho permanecerão sob a mesma restrição de acesso. Não serão depositados dados individuais nas pastas compartilhadas de materiais nem no repositório público do código.",
+    "text": "Guarda e cópias: os registros da aplicação são persistidos no PostgreSQL hospedado no Neon, com acesso mediado pelo serviço da V2 no Render. O JSON original exportado, sua cópia de segurança, o diário, os registros de concordância e as respostas do questionário integrado e suas exportações serão conservados na área privada Google Drive denominada TCC_V2_DADOS_CIENTIFICOS_RESTRITOS_2026, administrada por Matheus. As cópias de trabalho permanecerão sob a mesma restrição de acesso. Não serão depositados dados individuais nas pastas compartilhadas de materiais nem no repositório público do código.",
     "heading": false
   },
   {
@@ -82,7 +82,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "Você pode parar de participar ou deixar questões em branco. Pedidos de retirada do uso científico podem ser apresentados pelo contato acima durante a guarda, enquanto os dados ainda puderem ser localizados. Informe, se tiver, seu código técnico opcional; não envie sua credencial de acesso à V2.",
+    "text": "Você pode parar de participar ou deixar questões em branco. Pedidos de retirada do uso científico podem ser apresentados pelo contato acima durante a guarda, enquanto os dados ainda puderem ser localizados. Informe, se tiver, o código da sala e seu pseudônimo (por exemplo, P01); não envie sua credencial de acesso à V2.",
     "heading": false
   },
   {
@@ -106,12 +106,16 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "Preparado a partir do protocolo DSR v0.4 e dos materiais da avaliação real. Responsável, canal, acesso da equipe e orientador e prazo de guarda definidos por Matheus na preparação de 20/11/2026. Os nomes e funções da equipe foram conferidos na monografia V2. Este documento não registra concordâncias já obtidas nem atribui parecer formal de Comitê inexistente.",
+    "text": "Preparado a partir do protocolo DSR v0.5 e dos materiais da avaliação real. Responsável, contato, acesso da equipe e orientador e prazo de guarda definidos por Matheus na preparação de 20/11/2026. Em 21/11/2026, Matheus informou revisão da variante DSR-1.1 pela equipe e conferência da compreensão das perguntas, N/A e omissões. Trata-se de relato de preparação, sem atribuir validação psicométrica ou aprovação formal do orientador. Este documento não registra concordâncias já obtidas nem atribui parecer de Comitê inexistente.",
     "heading": false
   },
   {
     "heading": false,
     "text": "Atualização 1.3: ACEITO significa aceitar a proposta como está, sem justificativa. Se houver condição ou ajuste, registre REJEITO e justifique. A classificação humana de cobertura/fidelidade não é solicitada ao moderador neste fluxo; registros antigos são preservados. Atualização 1.2: nas novas manifestações, apenas ACEITO e REJEITO. O silêncio não é aceitação. Pedidos de parecer possuem intervalo individual mínimo de 60 segundos e podem aguardar capacidade. A pesquisa externa é conduzida pelo moderador. Os registros históricos mantêm suas categorias originais. Atualização anterior 1.1: adaptação do registro de concordância ao fluxo eletrônico no software. As condições de participação, guarda, acesso e retirada da versão 1.0 foram preservadas."
+  },
+  {
+    "heading": false,
+    "text": "Atualização 1.4: questionário DSR-1.1 integrado como único canal oficial após encerramento legítimo, com ou sem consenso, a partir de uma rodada. Os 22 itens fechados, A1–A3, escala, N/A e omissões são preservados; A4 permanece adaptada para usos futuros. O Forms anterior é material histórico e não deve ser distribuído para esta coleta."
   }
 ] as const;
 export const RESEARCH_TEXT=RESEARCH_SECTIONS.map(s=>s.text).join('\n\n');

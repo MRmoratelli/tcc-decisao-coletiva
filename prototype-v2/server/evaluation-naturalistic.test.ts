@@ -30,3 +30,11 @@ test('DSR: 22 items and A1–A3 unchanged; A4 adaptation explicit; omission neve
  assert.equal(items.length,22);assert.equal(openItems.length,4);assert.deepEqual(naturalisticOpenItems.slice(0,3),openItems.slice(0,3));assert.match(openItems[3],/antes do uso real/);assert.match(naturalisticOpenItems[3],/usos futuros/);assert.notEqual(openItems[3],naturalisticOpenItems[3]);
  assert.equal(input().answers[2],null);assert.equal(input().answers[1],'N/A');
 });
+
+test('integrated channel metadata preserves import of previous preparation status',()=>{
+ const s=fresh();acceptAll(s);evaluate(s,s.participants[0].id,input());
+ assert.equal(s.evaluations[0].applicationContext?.status,'APLICACAO_INTEGRADA_POS_SESSAO');
+ assert.equal(s.evaluations[0].applicationContext?.collectionChannel,'APPLICATION');
+ const legacy=structuredClone(s);legacy.evaluations[0].applicationContext!.status='PROPOSTA_SUJEITA_A_REVISAO_E_PRE_TESTE';delete legacy.evaluations[0].applicationContext!.collectionChannel;
+ assert.deepEqual(validateState(legacy),legacy);
+});

@@ -73,7 +73,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  // Pair the contribution and vote written in the same operation. Keep history in storage.
  const linkedVote=(c:(typeof roundContributions)[number])=>roundVotes.find(v=>v.participantId===c.participantId&&v.justification===c.text&&Math.abs(Date.parse(v.createdAt)-Date.parse(c.createdAt))<2000);
  const independentContributions=roundContributions.filter(c=>!linkedVote(c));
- return <div className="workspace"><small>RC4 · parecer v2.9</small>
+ return <div className="workspace"><small>V2 coleta 21/11/2026 · parecer v2.9</small>
  {!isOpen&&text&&<details><summary>Seu rascunho não enviado, preservado após o encerramento</summary><p className="preserve">{text}</p></details>}
  {roundNotice&&<p className="alert" role="status">{roundNotice}</p>}
  {staleDraft&&<section className="alert"><p>Rascunhos preservados da versão anterior. Revise o conteúdo; nenhum voto foi transferido.</p><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);if(view.role!=='moderator')setDraft(p.content);setReason('');setChoice(text.trim()?'REJEITO':'ACEITO');setBypass(false);}}>Confirmar reutilização do meu texto na rodada atual</button><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);setText('');setOriginal('');setContest('');setDraft(p.content);setReason('');setChoice('ACEITO');setBypass(false);}}>Descartar rascunho anterior e iniciar novamente</button></section>}
