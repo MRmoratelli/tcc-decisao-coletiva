@@ -1,0 +1,88 @@
+{
+  "kind": "SYNTHETIC_TECHNICAL_TEST_NOT_SCIENTIFIC_DATA",
+  "startedAt": "2026-11-21T14:02:22.480Z",
+  "expectedCommit": "a7b169edd5561bdf454e9bf302da3ca740dc19c5",
+  "checks": [
+    {
+      "name": "health-and-exact-deployed-commit",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:22.677Z"
+    },
+    {
+      "name": "real-gemini-initial-review-before-room",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:24.723Z"
+    },
+    {
+      "name": "simplified-room-and-single-link",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:24.775Z"
+    },
+    {
+      "name": "consent-enrollment-concurrency-and-idempotent-return",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:25.056Z"
+    },
+    {
+      "name": "original-ai-suggestion-and-human-publication-preserved",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:25.057Z"
+    },
+    {
+      "name": "real-argument-review-and-three-distinct-positions",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:32.250Z"
+    },
+    {
+      "name": "real-gemini-automatic-analysis-synthesis-and-private-draft",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:44.654Z"
+    },
+    {
+      "name": "human-publication-and-new-round-without-transferred-votes",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:44.741Z"
+    },
+    {
+      "name": "unanimous-consensus-and-validated-complete-json-export",
+      "status": "PASS",
+      "at": "2026-11-21T14:02:45.275Z"
+    }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "health": {
+    "status": "ok",
+    "version": 2,
+    "commit": "a7b169edd5561bdf454e9bf302da3ca740dc19c5",
+    "aiConfigured": true,
+    "factual": {
+      "enabled": true,
+      "retrievalProvider": "TAVILY",
+      "model": "gemini-3.5-flash-lite",
+      "version": "factual-tavily-gemini-v2.1",
+      "availability": {
+        "searchConfigured": true,
+        "freePlanConfirmed": true
+      },
+      "limits": {
+        "maxDailySearches": 100,
+        "maxMinuteSearches": 15,
+        "maxMonthlySearches": 1000,
+        "maxDailyGeminiCalls": 250,
+        "maxMinuteGeminiCalls": 12,
+        "maxConcurrent": 10,
+        "persistent": true
+      }
+    }
+  },
+  "roomCode": "180B446272",
+  "exportSha256": "262b84f876bb780a543e8ce3cf40793523134e450116f0cd3879d5d7c6a73384",
+  "rounds": 2,
+  "votes": 6,
+  "consentVersion": "1.1-2026-11-21",
+  "promptVersions": [
+    "consensus-consultive-v2.6-initial-proposal"
+  ],
+  "result": "PASS",
+  "finishedAt": "2026-11-21T14:02:45.275Z"
+}
