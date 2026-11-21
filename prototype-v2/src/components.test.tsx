@@ -35,7 +35,7 @@ test('React: sala permite abstenção, parecer opcional e impede funções de mo
  const state=createState(randomUUID(),proposal,people,{result:null,status:'IGNORADA',promptVersion:'test',model:'none',reason:'Teste'});
  const view:RoomView={revision:1,room:{id:state.decision.id,code:'A123456789',topic:proposal.title,proposal:proposal.text,proposal_review:null},role:'participant',alias:'P01',participantId:people[0].id,canViewGroup:false,state,positions:[{...people[0],choice:'PENDENTE'}],metrics:null,contributions:[]};
  let rendered!:ReactTestRenderer;await act(async()=>{rendered=create(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
- assert.ok(JSON.stringify(rendered.toJSON()).includes('ABSTENHO'));assert.ok(JSON.stringify(rendered.toJSON()).includes('Continuar com meu texto sem parecer'));assert.ok(!JSON.stringify(rendered.toJSON()).includes('Confirmar revisão e publicar'));
+ assert.ok(!JSON.stringify(rendered.toJSON()).includes('ABSTENHO'));assert.ok(JSON.stringify(rendered.toJSON()).includes('Continuar com meu texto sem parecer'));assert.ok(!JSON.stringify(rendered.toJSON()).includes('Confirmar revisão e publicar'));
  await act(async()=>rendered.update(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={true} act={async f=>{await f();}} onRefresh={async()=>{}}/>));assert.ok(rendered.root.findAllByType('button').filter(b=>b.props.disabled===true).length>=3);await act(async()=>rendered.unmount());
 });
 test('React: entrada preservada com fluxo de criação e login por credenciais',async()=>{

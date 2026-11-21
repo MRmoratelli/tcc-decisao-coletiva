@@ -45,7 +45,7 @@ test('Entrada por link: aceite explícito, limite, inscrição concorrente e ret
 test('Mediação automática privada, publicação humana, nova rodada, consenso e JSON',async()=>{
  const c=await createRoom();for(const i of [11,12,13])assert.equal((await join(c,i)).status,200);
  assert.equal((await cast(c,11,'ACEITO')).status,201);
- assert.equal((await cast(c,12,'ACEITO_COM_RESSALVAS','Precisamos confirmar a disponibilidade.')).status,201);
+ assert.equal((await cast(c,12,'REJEITO','Precisamos confirmar a disponibilidade.')).status,201);
  assert.equal((await view(c)).state.syntheses.length,0);
  assert.equal((await cast(c,13,'REJEITO','O prazo é curto para todos.')).status,201);
  const ready=await waitReady(c);assert.equal(ready.state.proposals.length,1);assert.equal(ready.state.analyses.length,1);assert.equal(ready.state.syntheses.length,1);
@@ -66,7 +66,7 @@ test('Mediação automática privada, publicação humana, nova rodada, consenso
 
 test('Falha automática mantém proposta, registra falha e permite recuperação explícita',async()=>{
  const c=await createRoom(2);for(const i of [21,22])await join(c,i);
- ai.fail=true;await cast(c,21,'REJEITO','Falta tempo para executar.');await cast(c,22,'ABSTENHO');
+ ai.fail=true;await cast(c,21,'REJEITO','Falta tempo para executar.');await cast(c,22,'ACEITO');
  const failed=await waitReady(c,'FAILED');assert.equal(failed.state.proposals.length,1);assert.equal(failed.state.syntheses.length,0);
  ai.fail=false;await post('/rooms/'+c.code+'/prepare-mediation',{credential:c.moderatorCredential});
  assert.equal((await waitReady(c)).state.syntheses.length,1);
@@ -77,12 +77,12 @@ test('Escolhas da revisão: reformulação e descarte preservados, sem registrar
  const v=await view(c,token(31)),r=v.state.rounds[0],original='O prazo precisa ser combinado.';
  const result=await post('/rooms/'+c.code+'/contribution-review',{credential:token(31),text:original,roundId:r.id,proposalId:r.proposalId,consent:true});
  assert.equal(result.status,200);assert.equal((await view(c)).state.votes.length,0);
- const saved=await post('/rooms/'+c.code+'/votes',{credential:token(31),revision:v.revision,roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:review.suggestedRewrite,originalText:original,appliedRewrite:true,reviewChoice:'USED_REWRITE',receipt:result.data.rewriteReceipt});
+ const saved=await post('/rooms/'+c.code+'/votes',{credential:token(31),revision:(await view(c,token(31))).revision,roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:review.suggestedRewrite,originalText:original,appliedRewrite:true,reviewChoice:'USED_REWRITE',receipt:result.data.rewriteReceipt});
  assert.equal(saved.status,201,JSON.stringify(saved.data));
  const m=await view(c);assert.equal(m.state.votes.length,1);assert.equal(m.state.contributions.length,1);assert.equal(m.state.contributions[0].review.choice,'USED_REWRITE');assert.equal(m.state.contributions[0].originalText,original);
  const p2=await view(c,token(32));
  const res2=await post('/rooms/'+c.code+'/contribution-review',{credential:token(32),text:original,roundId:r.id,proposalId:r.proposalId,consent:true});
- const disc=await post('/rooms/'+c.code+'/votes',{credential:token(32),revision:p2.revision,roundId:r.id,proposalId:r.proposalId,choice:'ACEITO_COM_RESSALVAS',justification:original,originalText:original,reviewChoice:'DISCARDED',receipt:res2.data.receipt});
+ const disc=await post('/rooms/'+c.code+'/votes',{credential:token(32),revision:(await view(c,token(32))).revision,roundId:r.id,proposalId:r.proposalId,choice:'ACEITO',justification:original,originalText:original,reviewChoice:'DISCARDED',receipt:res2.data.receipt});
  assert.equal(disc.status,201,JSON.stringify(disc.data));
  const after=await view(c);assert.equal(after.state.contributions[1].review.choice,'DISCARDED');assert.equal(after.state.contributions[1].review.result.suggestedRewrite,review.suggestedRewrite);
 });

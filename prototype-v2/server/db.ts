@@ -18,10 +18,11 @@ export class Repository {
   const roomId=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),moderatorCredential=this.token();
   const people=Array.from({length:count},(_,i)=>({id:randomUUID(),alias:'P'+String(i+1).padStart(2,'0'),credential:this.token()}));
   let state=createState(roomId,proposal,people.map(({id,alias})=>({id,alias})),review,initialDraft);
+  if(!imported)state.votingMode='BINARY';
   if(imported){
    const mapping=new Map<string,string>([[imported.decision.id,roomId],...imported.participants.map((p,i)=>[p.id,people[i].id] as [string,string])]);
    function remap(value:any):any{if(typeof value==='string')return mapping.get(value)??value;if(Array.isArray(value))return value.map(remap);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,k==='originId'?v:remap(v)]));return value;}
-   state=validateState(remap(imported));delete state.enrollment;delete state.mediation;for(const f of state.factualChecks)f.provenance='IMPORTED_UNAUTHENTICATED';event(state,'moderator','IMPORTED','Cópia restaurada em sala nova; credenciais reemitidas. Proveniência do arquivo não autenticada.');
+   state=validateState(remap(imported));delete state.reviewRequests;delete state.enrollment;delete state.mediation;for(const f of state.factualChecks)f.provenance='IMPORTED_UNAUTHENTICATED';event(state,'moderator','IMPORTED','Cópia restaurada em sala nova; credenciais reemitidas. Proveniência do arquivo não autenticada.');
   }
   if(selfEnrollment){state.research={version:RESEARCH_VERSION,text:RESEARCH_TEXT,source:RESEARCH_SOURCE};state.enrollment={mode:'SELF',claims:[],automaticMediation:true};}
   const c=await this.pool.connect();try{

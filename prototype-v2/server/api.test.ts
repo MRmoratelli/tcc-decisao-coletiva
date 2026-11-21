@@ -55,8 +55,9 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   const participating=await view(room,room.participants[0].credential);assert.equal(participating.canViewGroup,true);assert.equal(participating.state.proposals[0].review.result,null);assert.equal(participating.room.proposal_review,null);
   const hidden=await view(room,room.participants[1].credential);assert.equal(hidden.state.contributions.length,0);assert.equal(hidden.state.votes.length,0);
  });
- await t.test('09 abstenção e ausência mantêm processo aberto',async()=>{
-  assert.equal((await cast(room,1,'ABSTENHO')).status,201);
+ await t.test('09 opções removidas são recusadas; aceite e ausência mantêm processo aberto',async()=>{
+  assert.equal((await cast(room,1,'ABSTENHO')).status,400);
+  assert.equal((await cast(room,1,'ACEITO')).status,201);
   const v=await view(room);assert.equal(v.state.decision.status,'OPEN');assert.ok(v.positions.some((p:any)=>p.choice==='PENDENTE'));
  });
  await t.test('12 análise de objeções e contestação posterior preservadas',async()=>{
@@ -132,9 +133,9 @@ test('Aceitação de reformulação IA preserva parecer, autoria do envio e text
  const input='O prazo é curto e precisamos discutir.';
  const reviewed=await action(room,'/contribution-review',{roundId:r.id,proposalId:r.proposalId,text:input,consent:true},credential);
  assert.equal(reviewed.status,200);assert.ok(reviewed.data.rewriteReceipt);
- const invalid=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'ACEITO_COM_RESSALVAS',justification:reviewed.data.review.suggestedRewrite,originalText:input,receipt:reviewed.data.receipt,appliedRewrite:true},credential);
+ const invalid=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:reviewed.data.review.suggestedRewrite,originalText:input,receipt:reviewed.data.receipt,appliedRewrite:true},credential);
  assert.equal(invalid.status,400);
- const send=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'ACEITO_COM_RESSALVAS',justification:reviewed.data.review.suggestedRewrite,originalText:input,receipt:reviewed.data.rewriteReceipt,appliedRewrite:true},credential);
+ const send=await action(room,'/votes',{roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification:reviewed.data.review.suggestedRewrite,originalText:input,receipt:reviewed.data.rewriteReceipt,appliedRewrite:true},credential);
  assert.equal(send.status,201,JSON.stringify(send.data));
  const saved=await view(room);
  assert.equal(saved.state.votes.length,1);
@@ -147,7 +148,7 @@ test('Aceitação de reformulação IA preserva parecer, autoria do envio e text
 test('Síntese do API com vínculos errados preserva ressalvas e registra ajuste sem fabricar rejeições',async()=>{
  const room=(await post('/rooms',{proposal,participantCount:3,bypassReason:'Sala sintética de vínculos.'})).data;
  assert.equal((await cast(room,0,'REJEITO','Local inacessível')).status,201);
- assert.equal((await cast(room,1,'ACEITO_COM_RESSALVAS','Alterar as bebidas')).status,201);
+ assert.equal((await cast(room,1,'ACEITO','Manter as bebidas separadas')).status,201);
  assert.equal((await cast(room,2,'ACEITO')).status,201);
  assert.equal((await action(room,'/analyze-objections',{consent:true})).status,200);
  const before=await view(room),analysis=before.state.analyses.at(-1);

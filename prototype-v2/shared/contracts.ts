@@ -36,7 +36,9 @@ export const SynthesisSchema=z.object({
  unresolvedObjections:z.array(z.string()).max(30),remainingImpasses:list,feasibilityWarnings:list,
 });
 export type SynthesisResult=z.infer<typeof SynthesisSchema>;
+// Historical values remain readable; new requests use ActiveChoiceSchema.
 export const ChoiceSchema=z.enum(['ACEITO','ACEITO_COM_RESSALVAS','REJEITO','ABSTENHO']);
+export const ActiveChoiceSchema=z.enum(['ACEITO','REJEITO']);
 export type Choice=z.infer<typeof ChoiceSchema>;
 const LegacyEvaluationSchema=z.object({
  instrumentVersion:z.literal('DSR-1.0-2026-11-16'),

@@ -1,4 +1,5 @@
 import {MemoryProviderBudget,type ProviderBudget,type BudgetKind} from './budget.js';
+import type {GeminiQueue} from './gemini-queue.js';
 import {GoogleGenAI} from '@google/genai';
 import {createHash} from 'node:crypto';
 import {z} from 'zod';
@@ -46,16 +47,20 @@ export class FactualService implements FactualAdapter {
  readonly enabled:boolean;private search:SearchAdapter;
  private cache=new Map<string,{until:number,value:Promise<TavilyReport>,completed:boolean,retryable:boolean}>();
  private budget:ProviderBudget;
- constructor(private options:{enabled?:boolean;freeTierConfirmed?:boolean;geminiTransport?:GeminiFactualTransport;search?:SearchAdapter;now?:()=>number;maxDailyGeminiCalls?:number;maxMinuteGeminiCalls?:number;maxDailySearches?:number;maxMinuteSearches?:number;maxMonthlySearches?:number;maxConcurrent?:number;budget?:ProviderBudget}={}){this.enabled=options.enabled??false;this.budget=options.budget??new MemoryProviderBudget(()=>this.time());this.search=options.search??new TavilySearchAdapter({freePlanConfirmed:process.env.TAVILY_RESEARCHER_CONFIRMED==='true'});}
+ constructor(private options:{enabled?:boolean;freeTierConfirmed?:boolean;geminiTransport?:GeminiFactualTransport;search?:SearchAdapter;now?:()=>number;maxDailyGeminiCalls?:number;maxMinuteGeminiCalls?:number;maxDailySearches?:number;maxMinuteSearches?:number;maxMonthlySearches?:number;maxConcurrent?:number;budget?:ProviderBudget;queue?:GeminiQueue}={}){this.enabled=options.enabled??false;this.budget=options.budget??new MemoryProviderBudget(()=>this.time());this.search=options.search??new TavilySearchAdapter({freePlanConfirmed:process.env.TAVILY_RESEARCHER_CONFIRMED==='true'});}
  get availability(){return {searchConfigured:this.search.configured,freePlanConfirmed:process.env.TAVILY_RESEARCHER_CONFIRMED==='true'};}
  private time(){return this.options.now?.()??Date.now();}
- get limits(){return {maxDailySearches:this.options.maxDailySearches??100,maxMinuteSearches:this.options.maxMinuteSearches??15,maxMonthlySearches:this.options.maxMonthlySearches??1000,maxDailyGeminiCalls:this.options.maxDailyGeminiCalls??250,maxMinuteGeminiCalls:this.options.maxMinuteGeminiCalls??12,maxConcurrent:this.options.maxConcurrent??10,persistent:this.budget.persistent};}
+ get limits(){return {maxDailySearches:this.options.maxDailySearches??100,maxMinuteSearches:this.options.maxMinuteSearches??15,maxMonthlySearches:this.options.maxMonthlySearches??1000,maxDailyGeminiCalls:this.options.maxDailyGeminiCalls??250,maxMinuteGeminiCalls:this.options.queue?14:this.options.maxMinuteGeminiCalls??12,maxConcurrent:this.options.maxConcurrent??10,persistent:this.budget.persistent};}
  private async reserve(kind:BudgetKind){
   if(!this.enabled||!this.options.freeTierConfirmed)throw Error('FREE_TIER_NOT_CONFIRMED');
   const l=this.limits;return this.budget.reserve(kind,{daily:kind==='search'?l.maxDailySearches:l.maxDailyGeminiCalls,minute:kind==='search'?l.maxMinuteSearches:l.maxMinuteGeminiCalls,monthly:kind==='search'?l.maxMonthlySearches:undefined,concurrent:l.maxConcurrent});
  }
  private async gemini(mode:'classify'|'interpret',input:string){
-  const release=await this.reserve('gemini');try{
+  if(this.options.queue)return this.options.queue.run(20,()=>this.geminiDirect(mode,input));
+  return this.geminiDirect(mode,input);
+ }
+ private async geminiDirect(mode:'classify'|'interpret',input:string){
+  const release=this.options.queue?async()=>{}:await this.reserve('gemini');try{
    if(this.options.geminiTransport)return await this.options.geminiTransport(mode,input);
    const key=process.env.GEMINI_API_KEY;if(!key)throw Error('GEMINI_NOT_CONFIGURED');
    const client=new GoogleGenAI({apiKey:key,httpOptions:{timeout:30000}}),schema=mode==='classify'?ClaimPlanSchema:InterpretationSchema;

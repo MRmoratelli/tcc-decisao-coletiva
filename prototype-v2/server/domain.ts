@@ -19,11 +19,12 @@ const EvaluationContext=z.object({applicationVariant:z.literal(APPLICATION_VARIA
 const Evaluation=z.object({id,participantId:id,at:date,input:EvaluationSchema,applicationContext:EvaluationContext.optional()});
 const Contest=z.object({id,participantId:id,targetId:id,text:z.string().min(1).max(2000),at:date});
 export const StateSchema=z.object({
- schemaVersion:z.literal(2),initialDraft:ProposalSchema,decision:z.object({id,originId:id,title:z.string(),status:z.enum(['OPEN','CONSENSUS','CLOSED_WITHOUT_CONSENSUS']),createdAt:date,closedAt:date.nullable(),closureReason:z.string()}),
+ schemaVersion:z.literal(2),votingMode:z.enum(['BINARY','LEGACY']).optional(),initialDraft:ProposalSchema,decision:z.object({id,originId:id,title:z.string(),status:z.enum(['OPEN','CONSENSUS','CLOSED_WITHOUT_CONSENSUS']),createdAt:date,closedAt:date.nullable(),closureReason:z.string()}),
  research:z.object({version:z.string(),text:z.string().max(20000),source:z.string()}).optional(),
  enrollment:z.object({mode:z.literal('SELF'),claims:z.array(id),automaticMediation:z.boolean()}).optional(),
  researchConsents:z.array(z.object({participantId:id,response:z.literal('SIM'),at:date,version:z.string(),actor:z.literal('participant')})).default([]),
- mediation:z.object({roundId:id,fingerprint:z.string(),status:z.enum(['RUNNING','READY','FAILED']),startedAt:date,detail:z.string()}).optional(),
+ mediation:z.object({roundId:id,fingerprint:z.string(),status:z.enum(['RUNNING','READY','FAILED']),startedAt:date,detail:z.string(),stage:z.string().optional(),failureCode:z.string().optional()}).optional(),
+ reviewRequests:z.array(z.object({participantId:id,requestId:id,at:date,textHash:z.string(),proposalId:id,roundId:id,status:z.enum(['RUNNING','DONE','FAILED']),review:ReviewSchema.optional()})).max(30).optional(),
  participants:z.array(z.object({id,alias:z.string().regex(/^P\d{2}$/)})).min(2).max(30),
  proposals:z.array(Proposal).min(1),rounds:z.array(Round).min(1),
  factualChecks:z.array(FactualCheckSchema).max(200).default([]),votes:z.array(Vote),contributions:z.array(Contribution),analyses:z.array(Analysis),syntheses:z.array(Synthesis),contests:z.array(Contest),events:z.array(Event),evaluations:z.array(Evaluation),
@@ -60,6 +61,7 @@ export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:
  open(s);participant(s,pid);const r=currentRound(s);
  if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Versão ou rodada desatualizada. Atualize a sala.',409);
  if(s.votes.some(v=>v.participantId===pid&&v.roundId===roundId))throw new DomainError('Seu voto nesta rodada já foi registrado. Aguarde o moderador publicar uma nova rodada.',409);
+ if(s.votingMode==='BINARY'&&!['ACEITO','REJEITO'].includes(choice))throw new DomainError('Escolha Aceito ou Rejeito.');
  if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!justification.trim())throw new DomainError('Rejeição e aceite com ressalvas exigem justificativa.');
  s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:now()});
  event(s,pid,'VOTE_RECORDED',choice);
@@ -226,7 +228,7 @@ export function validateState(input:unknown):State{
  if((s.decision.status==='OPEN')!==(s.decision.closedAt===null)||s.decision.status!=='OPEN'&&!s.decision.closureReason.trim())throw new DomainError('Encerramento inválido.');
  return s;
 }
-export function exportState(s:State){return {format:'dc2-consensus',version:2,exportedAt:now(),state:s,metrics:metrics(s),evaluation:statistics(s),provenance:'Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa.'};}
+export function exportState(s:State){const exported=structuredClone(s);delete exported.reviewRequests;return {format:'dc2-consensus',version:2,exportedAt:now(),state:exported,metrics:metrics(s),evaluation:statistics(s),provenance:'Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa.'};}
 export const ImportSchema=z.object({format:z.literal('dc2-consensus'),version:z.literal(2),state:StateSchema});
 
 export function addFactualCheck(s:State,report:FactualReport,participantId:string|null){

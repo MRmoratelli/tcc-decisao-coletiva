@@ -49,6 +49,8 @@ export function InitialProposalForm({busy,onCreate}:{busy:boolean;onCreate:(inpu
  {review.review.suggestedRewrite?<><blockquote className="preserve">{review.review.suggestedRewrite}</blockquote>
  <button type="button" className="secondary" disabled={locked} onClick={()=>{setProposal({...proposal,text:review.review.suggestedRewrite});setUsedSuggestion(true);}}>Usar sugestão da IA</button></>:<p>A IA não apresentou uma reformulação. Você pode revisar seu texto e manter a proposta.</p>}
  <button type="button" className="text-button" disabled={locked} onClick={()=>{setProposal({...proposal,text:reviewed.text});setUsedSuggestion(false);}}>Manter minha proposta</button>
+ {usedSuggestion&&<p className="alert" role="status">Sugestão aplicada ao campo Proposta inicial. Revise o texto acima: ele será publicado ao criar a sala.</p>}
+ {/\[(?:Data|Prazo|Valor|Local|Orçamento)[^\]]*\]/i.test(proposal.text)&&<p className="alert" role="alert">Há marcadores pendentes no texto. Remova-os ou substitua-os por informações definidas pelo grupo antes de publicar.</p>}
  {review.review.recommendations.length>0&&<><h4>Pontos de atenção</h4><ul>{review.review.recommendations.map((x,i)=><li key={i}>{x}</li>)}</ul></>}
  <p className="muted">O parecer se refere ao rascunho analisado, que será preservado. Você pode editar os campos acima antes de confirmar. Nenhuma sala foi criada nesta revisão.</p>
  <details><summary>Detalhes do parecer consultivo</summary><ReviewCard review={review.review} label="Parecer da proposta inicial"/></details>

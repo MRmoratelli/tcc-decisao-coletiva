@@ -10,7 +10,8 @@ export function reserveBudget(state:BudgetState,kind:BudgetKind,limits:BudgetLim
  const day=new Date(now).toISOString().slice(0,10),month=day.slice(0,7),c=state[kind];
  if(c.day!==day){c.day=day;c.calls=0;}if(c.month!==month){c.month=month;c.monthly=0;}
  c.minute=c.minute.filter(t=>t>now-60000);state.leases=state.leases.filter(l=>l.until>now);
- if(c.calls>=limits.daily||c.minute.length>=limits.minute)throw Error(kind==='search'?'LOCAL_SEARCH_LIMIT':'LOCAL_GEMINI_LIMIT');
+ if(c.calls>=limits.daily)throw Error(kind==='search'?'LOCAL_SEARCH_LIMIT':'LOCAL_GEMINI_DAILY_LIMIT');
+ if(c.minute.length>=limits.minute)throw Error(kind==='search'?'LOCAL_SEARCH_LIMIT':'LOCAL_GEMINI_LIMIT');
  if(limits.monthly!==undefined&&c.monthly>=limits.monthly)throw Error('LOCAL_SEARCH_MONTHLY_LIMIT');
  if(state.leases.length>=limits.concurrent)throw Error('LOCAL_EXTERNAL_CONCURRENCY_LIMIT');
  // Reserve before transmission. Failures/ambiguous charges are never refunded or retried automatically.

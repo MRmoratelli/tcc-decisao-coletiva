@@ -1,8 +1,9 @@
+import {reserveReview,finishReview,ReviewWait,REVIEW_INTERVAL_MS} from './review-requests.js';
 import { automaticMediation } from './automatic.js';
 import express from 'express';
 import { z, ZodError } from 'zod';
 import { makeReceipt, verifyReceipt } from './receipts.js';
-import { ProposalSchema, ReviewSchema, ChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
+import { ProposalSchema, ReviewSchema, ChoiceSchema, ActiveChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
 import { Repository, type Identity } from './db.js';
 import { FactualService,privateData,retryableFactual,type FactualAdapter } from './factual.js';
 import { FACTUAL_MODEL,FACTUAL_VERSION,isTavilyCheck,ResearchModeSchema } from '../shared/factual.js';
@@ -22,7 +23,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   if(v.n>max){res.status(429).json({error:'Muitas requisições. Aguarde um minuto.'});return;}next();
  };}
  app.use('/api',rateLimit(300));
- const aiLimit=rateLimit(20),creationLimit=rateLimit(10);
+ const aiLimit=rateLimit(60),creationLimit=rateLimit(10);
  const factualLimit=rateLimit(60),enrollmentLimit=rateLimit(90);
  const credential=z.string().min(20).max(128),revision=z.number().int().positive();
  const text=z.string().trim().min(1).max(5000);
@@ -59,6 +60,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    researchConsents:identity.role==='moderator'?s.researchConsents:s.researchConsents.filter(c=>c.participantId===pid),
    enrollment:s.enrollment?{...s.enrollment,claims:identity.role==='moderator'?s.enrollment.claims:s.enrollment.claims.filter(id=>id===pid)}:undefined,
    mediation:identity.role==='moderator'?s.mediation:undefined,
+   reviewRequests:(s.reviewRequests??[]).filter(x=>identity.role==='participant'&&x.participantId===pid).map(({review,...x})=>x),
    analyses:identity.role==='moderator'?s.analyses:s.analyses.filter(a=>s.syntheses.some(x=>x.analysisId===a.id&&x.publishedProposalId)),
    syntheses:identity.role==='moderator'?s.syntheses:s.syntheses.filter(x=>x.publishedProposalId),contests:s.contests.filter(c=>visible||c.participantId===pid),
    events:identity.role==='moderator'?s.events:s.events.filter(e=>e.actor===pid||['PROPOSAL_PUBLISHED','CONSENSUS_RECORDED','CLOSED_WITHOUT_CONSENSUS'].includes(e.type)),
@@ -69,7 +71,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
    metrics:identity.role==='moderator'?metrics(s):null};
  }
- app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,factual:{enabled:factual.enabled,retrievalProvider:'TAVILY',model:FACTUAL_MODEL,version:FACTUAL_VERSION,...(factual.availability?{availability:factual.availability,limits:factual.limits}:{})}});});
+ app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,geminiPolicy:{maxCalls:14,windowSeconds:60,participantIntervalSeconds:60},factual:{enabled:factual.enabled,retrievalProvider:'TAVILY',model:FACTUAL_MODEL,version:FACTUAL_VERSION,...(factual.availability?{availability:factual.availability,limits:factual.limits}:{})}});});
  app.post('/api/ai/proposal-review',aiLimit,async(req,res)=>{
   z.literal(true).parse(req.body.consent);const proposal=ProposalSchema.parse(req.body.proposal);
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});
@@ -113,7 +115,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const x=await repo.read(i);res.json(view(x.state,i,x.revision));
  });
  app.post('/api/rooms/:code/fact-check',factualLimit,async(req,res)=>{
-  const i=await auth(req),b=z.object({mode:ResearchModeSchema.default('VERIFY'),text:z.string().trim().min(4).max(1200),proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body);
+  const i=await auth(req,'moderator'),b=z.object({mode:ResearchModeSchema.default('VERIFY'),text:z.string().trim().min(4).max(1200),proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body);
   if(privateData(b.text))throw new DomainError('Remova dados pessoais, informações privadas e URLs. Envie somente a alegação pública mínima.');
   const x=await repo.read(i);if(x.state.decision.status!=='OPEN'||currentProposal(x.state).id!==b.proposalId||currentRound(x.state).id!==b.roundId)throw new DomainError('Proposta ou rodada desatualizada.',409);
   const existing=[...x.state.factualChecks].reverse().find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&(isTavilyCheck(f)?(f.modality??'VERIFY')===b.mode:true)&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
@@ -134,11 +136,15 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.post('/api/rooms/:code/contribution-review',aiLimit,async(req,res)=>{
   const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
   if(b.proposalId!==currentProposal(state).id||b.roundId!==currentRound(state).id)throw new DomainError('Versão desatualizada.',409);
-  try{const review=await ai.analyzeContribution(currentProposal(state).content,b.text);
+  const reserved=await reserveReview(repo,i,b.text);
+  try{const review=reserved.cached??await ai.analyzeContribution(currentProposal(state).content,b.text);
+   if(!reserved.cached)await finishReview(repo,i,reserved.requestId,review);
+   const latest=(await repo.read(i)).state;if(latest.decision.status!=='OPEN'||currentProposal(latest).id!==b.proposalId)throw new DomainError('A proposta mudou durante a consulta. Nenhum voto foi registrado.',409);
    const binding={roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text};
-   res.json({review,receipt:makeReceipt(signingKey,'contribution',binding,review),
+   res.json({review,availableAt:new Date(Date.parse(reserved.at)+REVIEW_INTERVAL_MS).toISOString(),cached:Boolean(reserved.cached),receipt:makeReceipt(signingKey,'contribution',binding,review),
     rewriteReceipt:review.suggestedRewrite?makeReceipt(signingKey,'contribution',{...binding,text:review.suggestedRewrite},review):null});}
-  catch(e){await repo.mutate(i,(await repo.read(i)).revision,s=>event(s,i.participantId!,'AI_FAILURE','analyzeContribution: '+(e instanceof AIUnavailable?e.code:'UNKNOWN')+'; '+PROMPT_VERSION+'; '+ai.model));throw e;}
+  catch(e){if(!reserved.cached)try{await finishReview(repo,i,reserved.requestId);}catch{}
+   await repo.mutate(i,(await repo.read(i)).revision,s=>event(s,i.participantId!,'AI_FAILURE','analyzeContribution: '+(e instanceof AIUnavailable?e.code:'UNKNOWN')+'; '+PROMPT_VERSION+'; '+ai.model));throw e;}
  });
  const contributionBody=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),text,originalText:text,contest:z.string().trim().max(2000).default('')});
  function contributionReview(i:Identity,b:z.infer<typeof contributionBody>){return reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text});}
@@ -148,7 +154,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   res.status(201).json({saved:true});
  });
  app.post('/api/rooms/:code/votes',async(req,res)=>{
-  const i=await auth(req,'participant'),b=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),choice:ChoiceSchema,justification:z.string().trim().max(5000).default(''),originalText:z.string().max(5000).optional(),contest:z.string().max(2000).default('')}).parse(req.body);
+  const i=await auth(req,'participant'),b=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),choice:ActiveChoiceSchema,justification:z.string().trim().max(5000).default(''),originalText:z.string().max(5000).optional(),contest:z.string().max(2000).default('')}).parse(req.body);
   const review=b.justification?reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.justification}):null;
   await repo.mutate(i,b.revision,s=>{
    if(review)contribute(s,i.participantId!,b.roundId,b.proposalId,b.justification,b.originalText??b.justification,review,b.contest);
@@ -193,6 +199,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.post('/api/rooms/:code/evaluation-results',async(req,res)=>{const i=await auth(req,'moderator'),{state}=await repo.read(i);res.json(statistics(state));});
  app.use((err:unknown,_req:express.Request,res:express.Response,_next:express.NextFunction)=>{
   if(err instanceof ZodError){res.status(400).json({error:'Dados inválidos. Revise os campos e vínculos.'});return;}
+  if(err instanceof ReviewWait){res.set('Retry-After',String(err.retryAfterSeconds));res.status(429).json({error:err.message,code:err.code,retryAfterSeconds:err.retryAfterSeconds});return;}
   if(err instanceof DomainError){res.status(err.status).json({error:err.message});return;}
   if(err instanceof AIUnavailable){console.warn('AI failure',JSON.stringify({code:err.code,status:err.httpStatus??null,attempts:err.attempts,model:ai.model,promptVersion:PROMPT_VERSION}));const unavailable=err.httpStatus===503;
    res.status(unavailable?503:502).json({error:unavailable?'O serviço Gemini está temporariamente indisponível após as tentativas automáticas. Seu texto foi mantido. Aguarde um pouco e tente novamente ou continue sem revisão.':'IA indisponível. Você pode continuar sem parecer; registre essa escolha.',code:err.code,attempts:err.attempts,retryable:unavailable});return;}
