@@ -1,0 +1,28 @@
+name: V2 frozen integrated questionnaire live gate
+on:
+  push:
+    branches: [validation/v2-questionnaire-20261121]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: prototype-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: node --import tsx server/questionnaire-live.ts
+        env:
+          FROZEN_COMMIT: 63189e5f21dd2794f5677894dc6cae04597095f5
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v2-questionnaire-synthetic-evidence
+          path: prototype-v2/questionnaire-evidence
+          retention-days: 30
