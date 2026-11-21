@@ -20,4 +20,6 @@ A recuperação automática depende do mesmo navegador e de seu armazenamento. O
 Compilação TypeScript e Vite. Suíte existente e novos testes de servidor/interface cobrem autenticação, inscrição concorrente, limite, consentimento, retorno idempotente, síntese privada, publicação, consenso, exportação/importação histórica, indisponibilidade da IA e voto único.
 O ambiente local bloqueia conexões TCP de loopback: testes de integração foram executados com um transporte HTTP em memória temporário, preservando os handlers Express e o PostgreSQL PGlite reais. Esse transporte não integra o produto e não é publicado. CI executa os mesmos testes com HTTP normal.
 
-Resultado local final: 96 testes aprovados, 0 falhas; TypeScript e Vite aprovados.
+Resultado local final: 97 testes aprovados, 0 falhas; TypeScript e Vite aprovados.
+
+A inscrição usa INSERT em dc2_participants, apenas ao ocupar a vaga reservada no estado. Não altera hashes existentes, não amplia permissões e não requer migração de esquema.

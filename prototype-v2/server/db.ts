@@ -21,13 +21,13 @@ export class Repository {
   if(imported){
    const mapping=new Map<string,string>([[imported.decision.id,roomId],...imported.participants.map((p,i)=>[p.id,people[i].id] as [string,string])]);
    function remap(value:any):any{if(typeof value==='string')return mapping.get(value)??value;if(Array.isArray(value))return value.map(remap);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,k==='originId'?v:remap(v)]));return value;}
-   state=validateState(remap(imported));for(const f of state.factualChecks)f.provenance='IMPORTED_UNAUTHENTICATED';event(state,'moderator','IMPORTED','Cópia restaurada em sala nova; credenciais reemitidas. Proveniência do arquivo não autenticada.');
+   state=validateState(remap(imported));delete state.enrollment;delete state.mediation;for(const f of state.factualChecks)f.provenance='IMPORTED_UNAUTHENTICATED';event(state,'moderator','IMPORTED','Cópia restaurada em sala nova; credenciais reemitidas. Proveniência do arquivo não autenticada.');
   }
   if(selfEnrollment){state.research={version:RESEARCH_VERSION,text:RESEARCH_TEXT,source:RESEARCH_SOURCE};state.enrollment={mode:'SELF',claims:[],automaticMediation:true};}
   const c=await this.pool.connect();try{
    await c.query('BEGIN');
    await c.query('INSERT INTO dc2_rooms(id,code,topic,proposal,proposal_review,moderator_hash) VALUES($1,$2,$3,$4,$5,$6)',[roomId,code,proposal.title,proposal.text,JSON.stringify(review.result??{}),this.hash(moderatorCredential)]);
-   for(const p of people)await c.query('INSERT INTO dc2_participants(id,room_id,alias,secret_hash) VALUES($1,$2,$3,$4)',[p.id,roomId,p.alias,this.hash(p.credential)]);
+   for(const p of selfEnrollment?[]:people)await c.query('INSERT INTO dc2_participants(id,room_id,alias,secret_hash) VALUES($1,$2,$3,$4)',[p.id,roomId,p.alias,this.hash(p.credential)]);
    await c.query('INSERT INTO dc2_snapshots(room_id,revision,state) VALUES($1,1,$2)',[roomId,JSON.stringify(state)]);
    await c.query('COMMIT');return {code,moderatorCredential,participants:selfEnrollment?[]:people.map(({alias,credential})=>({alias,credential}))};
   }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
@@ -48,7 +48,7 @@ export class Repository {
    if(s.decision.status!=='OPEN')throw new DomainError('Esta discussão já foi encerrada.',409);
    const p=s.participants.find(p=>!s.enrollment!.claims.includes(p.id));
    if(!p)throw new DomainError('Todas as vagas previstas para esta sala já foram ocupadas.',409);
-   await c.query('UPDATE dc2_participants SET secret_hash=$1 WHERE id=$2 AND room_id=$3',[hash,p.id,room.id]);
+   await c.query('INSERT INTO dc2_participants(id,room_id,alias,secret_hash) VALUES($1,$2,$3,$4)',[p.id,room.id,p.alias,hash]);
    s.enrollment.claims.push(p.id);
    s.researchConsents.push({participantId:p.id,response:'SIM',at:new Date().toISOString(),version,actor:'participant'});
    event(s,p.id,'RESEARCH_CONSENT_RECORDED','SIM; '+version);

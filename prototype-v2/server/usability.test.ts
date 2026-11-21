@@ -86,3 +86,14 @@ test('Escolhas da revisão: reformulação e descarte preservados, sem registrar
  assert.equal(disc.status,201,JSON.stringify(disc.data));
  const after=await view(c);assert.equal(after.state.contributions[1].review.choice,'DISCARDED');assert.equal(after.state.contributions[1].review.result.suggestedRewrite,review.suggestedRewrite);
 });
+
+test('Importar sala de inscrição automática emite acessos novos e conserva concordâncias como histórico',async()=>{
+ const c=await createRoom();await join(c,41);
+ const archive=await post('/rooms/'+c.code+'/export',{credential:c.moderatorCredential});
+ const restored=await post('/import',archive.data);
+ assert.equal(restored.status,201);assert.equal(restored.data.participants.length,3);
+ const copied=await view(restored.data,restored.data.participants[0].credential);
+ assert.equal(copied.state.enrollment,undefined);assert.equal(copied.state.researchConsents.length,1);
+ assert.equal((await post('/rooms/'+restored.data.code+'/invitation',{})).status,409);
+ assert.equal((await view(c)).state.enrollment.claims.length,1);
+});
