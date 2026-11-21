@@ -1,3 +1,4 @@
+import { automaticMediation } from './automatic.js';
 import express from 'express';
 import { z, ZodError } from 'zod';
 import { makeReceipt, verifyReceipt } from './receipts.js';
@@ -9,6 +10,7 @@ import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
 import { DomainError,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema,addFactualCheck,factualContext, type State, type ReviewRecordType } from './domain.js';
 export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean;factual?:FactualAdapter}={}){
  if(signingKey.length<32)throw new Error('REVIEW_SIGNING_KEY forte obrigatório.');
+ const prepare=automaticMediation(repo,ai);
  const factual=options.factual??new FactualService();
  const app=express();app.disable('x-powered-by');
  app.use((_req,res,next)=>{res.set({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});next();});
@@ -21,14 +23,14 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  };}
  app.use('/api',rateLimit(300));
  const aiLimit=rateLimit(20),creationLimit=rateLimit(10);
- const factualLimit=rateLimit(60);
+ const factualLimit=rateLimit(60),enrollmentLimit=rateLimit(90);
  const credential=z.string().min(20).max(128),revision=z.number().int().positive();
  const text=z.string().trim().min(1).max(5000);
- const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional(),appliedRewrite:z.boolean().optional()});
+ const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional(),appliedRewrite:z.boolean().optional(),reviewChoice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
  const reviewRecord=(body:z.infer<typeof reviewInput>,kind:'proposal'|'contribution',binding:unknown):ReviewRecordType=>{
   if(body.receipt){const result=ReviewSchema.parse(verifyReceipt(signingKey,body.receipt,kind,binding));
    if(kind==='contribution'&&body.appliedRewrite&&result.suggestedRewrite!==(binding as {text?:string}).text)throw new DomainError('Reformulação não corresponde ao parecer assinado. Analise novamente.');
-   return {result,status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:'',...(kind==='contribution'&&body.appliedRewrite?{appliedRewrite:true}:{})} as ReviewRecordType;
+   return {result,choice:body.reviewChoice??(body.appliedRewrite?'USED_REWRITE':'KEPT_ORIGINAL'),status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:'',...(kind==='contribution'&&body.appliedRewrite?{appliedRewrite:true}:{})} as ReviewRecordType;
   }
   if(body.appliedRewrite)throw new DomainError('Reformulação exige parecer de IA válido.');
   if(!body.bypassReason)throw new DomainError('Solicite parecer ou registre por que decidiu continuar sem ele.');
@@ -40,6 +42,10 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const identity=await repo.authorize(code,token);
   if(!identity)throw new DomainError('Código ou credencial inválidos.',401);
   if(role&&identity.role!==role)throw new DomainError('Permissão insuficiente.',403);
+  if(identity.role==='participant'){
+   const {state}=await repo.read(identity);
+   if(state.enrollment&&!state.researchConsents.some(c=>c.participantId===identity.participantId))throw new DomainError('Registre sua concordância antes de participar.',403);
+  }
   return identity;
  }
  function view(s:State,identity:Identity,revision:number){
@@ -50,7 +56,11 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    proposals:s.proposals.map((p,index)=>identity.role!=='moderator'&&index===0?{...p,review:{...p.review,result:null,reason:''}}:p),
    factualChecks:s.factualChecks.filter(f=>visible||f.participantId===pid),
    votes:s.votes.filter(v=>visible||v.participantId===pid),contributions:s.contributions.filter(c=>visible||c.participantId===pid),
-   analyses:visible?s.analyses:[],syntheses:visible?s.syntheses:[],contests:s.contests.filter(c=>visible||c.participantId===pid),
+   researchConsents:identity.role==='moderator'?s.researchConsents:s.researchConsents.filter(c=>c.participantId===pid),
+   enrollment:s.enrollment?{...s.enrollment,claims:identity.role==='moderator'?s.enrollment.claims:s.enrollment.claims.filter(id=>id===pid)}:undefined,
+   mediation:identity.role==='moderator'?s.mediation:undefined,
+   analyses:identity.role==='moderator'?s.analyses:s.analyses.filter(a=>s.syntheses.some(x=>x.analysisId===a.id&&x.publishedProposalId)),
+   syntheses:identity.role==='moderator'?s.syntheses:s.syntheses.filter(x=>x.publishedProposalId),contests:s.contests.filter(c=>visible||c.participantId===pid),
    events:identity.role==='moderator'?s.events:s.events.filter(e=>e.actor===pid||['PROPOSAL_PUBLISHED','CONSENSUS_RECORDED','CLOSED_WITHOUT_CONSENSUS'].includes(e.type)),
    evaluations:identity.role==='moderator'?[]:s.evaluations.filter(e=>e.participantId===pid)};
   return {revision,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:identity.role==='moderator'?s.proposals[0].review.result:null},
@@ -65,17 +75,34 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});
  });
  app.post('/api/rooms',creationLimit,async(req,res)=>{
-  const b=reviewInput.extend({proposal:ProposalSchema,reviewedProposal:ProposalSchema.optional(),appliedRewrite:z.boolean().optional(),participantCount:z.number().int().min(2).max(30)}).parse(req.body);
-  const review=reviewRecord(b,'proposal',b.reviewedProposal??b.proposal);if(b.appliedRewrite){if(!review.result?.suggestedRewrite)throw new DomainError('Sugestão original da IA indisponível.');review.appliedRewrite=true;}review.reason=b.reviewedProposal?'Moderador confirmou a versão publicada após parecer sobre o rascunho preservado.':review.reason;
-  res.status(201).json(await repo.create(b.proposal,b.participantCount,review,undefined,b.reviewedProposal));
+  const b=reviewInput.extend({proposal:ProposalSchema,reviewedProposal:ProposalSchema.optional(),appliedRewrite:z.boolean().optional(),participantCount:z.number().int().min(2).max(15),simple:z.boolean().default(false),aiConsent:z.boolean().optional()}).parse(req.body);
+  let review:ReviewRecordType;
+  if(b.simple){
+   if(b.aiConsent!==true)throw new DomainError('Autorize o apoio consultivo da IA na criação da sala.');
+   try{review={result:await ai.analyzeProposal(b.proposal),status:'OK',model:ai.model,promptVersion:PROMPT_VERSION,reason:'Parecer inicial automático, destinado ao moderador.'};}
+   catch{review={result:null,status:'INDISPONIVEL',model:ai.model,promptVersion:PROMPT_VERSION,reason:'Parecer inicial indisponível. Proposta confirmada pelo moderador.'};}
+  }else review=reviewRecord(b,'proposal',b.reviewedProposal??b.proposal);if(b.appliedRewrite){if(!review.result?.suggestedRewrite)throw new DomainError('Sugestão original da IA indisponível.');review.appliedRewrite=true;}review.reason=b.reviewedProposal?'Moderador confirmou a versão publicada após parecer sobre o rascunho preservado.':review.reason;
+  res.status(201).json(await repo.create(b.proposal,b.participantCount,review,undefined,b.reviewedProposal,b.simple));
  });
  app.post('/api/import',creationLimit,async(req,res)=>{
   const data=ImportSchema.parse(req.body);const state=validateState(data.state);
   // Import is a new process with new access credentials; it never targets an existing room.
   res.status(201).json(await repo.create(currentProposal(state).content,state.participants.length,state.proposals[0].review,state));
  });
+ app.post('/api/rooms/:code/invitation',enrollmentLimit,async(req,res)=>{
+  const code=z.string().regex(/^[A-F0-9]{10}$/).parse(String(req.params.code).toUpperCase());
+  res.json(await repo.invitation(code));
+ });
+ app.post('/api/rooms/:code/join',enrollmentLimit,async(req,res)=>{
+  const code=z.string().regex(/^[A-F0-9]{10}$/).parse(String(req.params.code).toUpperCase());
+  const b=z.object({browserCredential:z.string().regex(/^[a-f0-9]{64}$/),consent:z.literal(true),version:z.string()}).parse(req.body);
+  res.json(await repo.join(code,b.browserCredential,b.version));
+ });
+ app.post('/api/rooms/:code/prepare-mediation',aiLimit,async(req,res)=>{
+  const i=await auth(req,'moderator');void prepare(i,true);res.json({preparing:true});
+ });
  app.post('/api/rooms/:code/view',async(req,res)=>{
-  const i=await auth(req),known=z.number().int().positive().optional().parse(req.body.knownRevision);
+  const i=await auth(req);if(i.role==='moderator')void prepare(i);const known=z.number().int().positive().optional().parse(req.body.knownRevision);
   if(known!==undefined){const current=await repo.latestRevision(i);if(current===known){res.json({revision:current,unchanged:true});return;}}
   const x=await repo.read(i);res.json(view(x.state,i,x.revision));
  });
@@ -120,7 +147,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   await repo.mutate(i,b.revision,s=>{
    if(review)contribute(s,i.participantId!,b.roundId,b.proposalId,b.justification,b.originalText??b.justification,review,b.contest);
    vote(s,i.participantId!,b.roundId,b.proposalId,b.choice,b.justification);
-  });res.status(201).json({saved:true});
+  });void prepare(i);res.status(201).json({saved:true});
  });
  async function aiAction(req:express.Request,mode:'analysis'|'synthesis'){
   const i=await auth(req,'moderator'),b=z.object({revision,consent:z.literal(true),analysisId:z.string().uuid().optional()}).parse(req.body);
@@ -151,7 +178,10 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   await repo.mutate(i,b.revision,s=>publish(s,b.proposal,b.sourceId,b.reason,b.synthesisId,b.coverage));res.json({saved:true});
  });
  app.post('/api/rooms/:code/close',async(req,res)=>{const i=await auth(req,'moderator'),b=z.object({revision,reason:text}).parse(req.body);await repo.mutate(i,b.revision,s=>closeWithoutConsensus(s,b.reason));res.json({saved:true});});
- app.post('/api/rooms/:code/contest',async(req,res)=>{const i=await auth(req,'participant'),b=z.object({revision,targetId:z.string().uuid(),text:z.string().trim().min(1).max(2000)}).parse(req.body);await repo.mutate(i,b.revision,s=>contest(s,i.participantId!,b.targetId,b.text));res.status(201).json({saved:true});});
+ app.post('/api/rooms/:code/contest',async(req,res)=>{const i=await auth(req,'participant'),b=z.object({revision,targetId:z.string().uuid(),text:z.string().trim().min(1).max(2000)}).parse(req.body);await repo.mutate(i,b.revision,s=>{
+  if(s.enrollment&&(s.syntheses.some(x=>x.id===b.targetId&&!x.publishedProposalId)||s.analyses.some(a=>a.id===b.targetId&&!s.syntheses.some(x=>x.analysisId===a.id&&x.publishedProposalId))))throw new DomainError('Rascunho reservado ao moderador.',403);
+  contest(s,i.participantId!,b.targetId,b.text);
+ });res.status(201).json({saved:true});});
  app.post('/api/rooms/:code/evaluation',async(req,res)=>{const i=await auth(req,'participant'),b=z.object({revision,input:EvaluationSchema}).parse(req.body);await repo.mutate(i,b.revision,s=>evaluate(s,i.participantId!,b.input));res.status(201).json({saved:true});});
  app.post('/api/rooms/:code/export',async(req,res)=>{const i=await auth(req,'moderator'),x=await repo.read(i);res.json(exportState(x.state));});
  app.post('/api/rooms/:code/evaluation-results',async(req,res)=>{const i=await auth(req,'moderator'),{state}=await repo.read(i);res.json(statistics(state));});

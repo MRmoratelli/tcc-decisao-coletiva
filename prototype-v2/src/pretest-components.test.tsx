@@ -9,7 +9,8 @@ import {RoomWorkspace} from './components/RoomWorkspace';
 import {createState,publish,currentProposal,currentRound,vote,closeWithoutConsensus} from '../server/domain';
 import {proposal} from '../server/fixtures';
 import type {RoomView} from './api';
-Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
+const storage=new Map<string,string>();
+Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true,localStorage:{getItem:(k:string)=>storage.get(k)??null,setItem:(k:string,v:string)=>storage.set(k,v)}});
 const state=()=>createState(randomUUID(),proposal,[{id:randomUUID(),alias:'P01'},{id:randomUUID(),alias:'P02'}],{result:null,status:'IGNORADA',model:'none',promptVersion:'test',reason:'Teste sintético'});
 const view=(s:ReturnType<typeof state>,revision:number):RoomView=>({revision,state:structuredClone(s),room:{id:s.decision.id,code:'A123456789',topic:proposal.title,proposal:s.proposals.at(-1)!.content.text,proposal_review:null},role:'participant',alias:'P01',participantId:s.participants[0].id,canViewGroup:false,positions:[],contributions:[],metrics:null});
 
@@ -19,10 +20,10 @@ test('Pré-teste 5 React: polling recebe V2 sem Atualizar, mantém rascunho, exi
  t.mock.timers.enable({apis:['setTimeout']});
  try{
   await act(async()=>{rendered=create(<App/>);});
-  await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Entrar com código'))!.props.onClick());
+  await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Participar de uma sala'))!.props.onClick());
   const inputs=rendered.root.findAllByType('input');
-  await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[1].props.onChange({target:{value:'synthetic-participant-access-not-a-real-secret'}});});
-  await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
+  await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[inputs.length-1].props.onChange({target:{value:'synthetic-participant-access-not-a-real-secret'}});});
+  await act(async()=>rendered.root.findAllByType('form').at(-1)!.props.onSubmit({preventDefault(){}}));
   const manifest=()=>rendered.root.findAllByType('textarea').find(x=>x.props.rows===5)!;
   await act(async()=>manifest().props.onChange({target:{value:'Rascunho humano ainda não enviado.'}}));
   await act(async()=>{t.mock.timers.tick(4000);});assert.equal(manifest().props.value,'Rascunho humano ainda não enviado.');
@@ -58,10 +59,10 @@ test('Parecer inicial: somente moderador; aprovação simples discreta; edição
   let rendered!:ReactTestRenderer;
   try{
    await act(async()=>{rendered=create(<App/>);});
-   await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Entrar com código'))!.props.onClick());
+   await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Participar de uma sala'))!.props.onClick());
    const inputs=rendered.root.findAllByType('input');
-   await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[1].props.onChange({target:{value:'synthetic-access-not-a-real-secret'}});});
-   await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
+   await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[inputs.length-1].props.onChange({target:{value:'synthetic-access-not-a-real-secret'}});});
+   await act(async()=>rendered.root.findAllByType('form').at(-1)!.props.onSubmit({preventDefault(){}}));
    assert.equal(JSON.stringify(rendered.toJSON()).includes('PARECER_PRELIMINAR_RESERVADO'),role==='moderator');
   }finally{if(rendered)await act(async()=>rendered.unmount());mock.mock.restore();}
  }
@@ -97,10 +98,10 @@ test('React polling: quem já votou aguarda; nova rodada chega automaticamente e
  t.mock.timers.enable({apis:['setTimeout']});
  try{
   await act(async()=>{rendered=create(<App/>);});
-  await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Entrar com código'))!.props.onClick());
+  await act(async()=>rendered.root.findAllByType('button').find(b=>b.children.includes('Participar de uma sala'))!.props.onClick());
   const inputs=rendered.root.findAllByType('input');
-  await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[1].props.onChange({target:{value:credential}});});
-  await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
+  await act(async()=>{inputs[0].props.onChange({target:{value:remote.room.code}});inputs[inputs.length-1].props.onChange({target:{value:credential}});});
+  await act(async()=>rendered.root.findAllByType('form').at(-1)!.props.onSubmit({preventDefault(){}}));
   const register=()=>rendered.root.findAllByType('button').find(b=>b.children.join('').startsWith('Registrar '));
   assert.equal(register(),undefined);assert.ok(JSON.stringify(rendered.toJSON()).includes('Voto registrado nesta rodada'));
   await act(async()=>{t.mock.timers.tick(4000);});assert.equal(register(),undefined);

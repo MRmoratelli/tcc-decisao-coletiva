@@ -6,7 +6,7 @@ import { dimensions,NATURALISTIC_VERSION,APPLICATION_VARIANT,displayedOpenItems 
 
 export class DomainError extends Error { constructor(message:string, public status=400){super(message);} }
 const id=z.string().uuid(), date=z.string().datetime();
-const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional()});
+const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional(),choice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
 const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.nullable(),content:ProposalSchema,createdAt:date,approvedBy:z.string(),review:ReviewRecord,intervention:z.object({kind:z.enum(['APROVACAO_HUMANA','EDICAO_HUMANA']),source:z.enum(['PROPOSTA_ANTERIOR','SINTESE_IA','RASCUNHO_INICIAL','PARECER_INICIAL_IA']),sourceId:id,original:ProposalSchema,published:ProposalSchema,changes:z.array(z.object({field:z.string(),before:z.string(),after:z.string()})),reason:z.string(),at:date,actor:z.literal('moderator')}).optional()});
 const Round=z.object({id,number:z.number().int().positive(),proposalId:id,status:z.enum(['OPEN','CLOSED']),openedAt:date,closedAt:date.nullable()});
 const Vote=z.object({id,participantId:id,roundId:id,proposalId:id,choice:ChoiceSchema,justification:z.string().max(5000),createdAt:date});
@@ -20,6 +20,10 @@ const Evaluation=z.object({id,participantId:id,at:date,input:EvaluationSchema,ap
 const Contest=z.object({id,participantId:id,targetId:id,text:z.string().min(1).max(2000),at:date});
 export const StateSchema=z.object({
  schemaVersion:z.literal(2),initialDraft:ProposalSchema,decision:z.object({id,originId:id,title:z.string(),status:z.enum(['OPEN','CONSENSUS','CLOSED_WITHOUT_CONSENSUS']),createdAt:date,closedAt:date.nullable(),closureReason:z.string()}),
+ research:z.object({version:z.string(),text:z.string().max(20000),source:z.string()}).optional(),
+ enrollment:z.object({mode:z.literal('SELF'),claims:z.array(id),automaticMediation:z.boolean()}).optional(),
+ researchConsents:z.array(z.object({participantId:id,response:z.literal('SIM'),at:date,version:z.string(),actor:z.literal('participant')})).default([]),
+ mediation:z.object({roundId:id,fingerprint:z.string(),status:z.enum(['RUNNING','READY','FAILED']),startedAt:date,detail:z.string()}).optional(),
  participants:z.array(z.object({id,alias:z.string().regex(/^P\d{2}$/)})).min(2).max(30),
  proposals:z.array(Proposal).min(1),rounds:z.array(Round).min(1),
  factualChecks:z.array(FactualCheckSchema).max(200).default([]),votes:z.array(Vote),contributions:z.array(Contribution),analyses:z.array(Analysis),syntheses:z.array(Synthesis),contests:z.array(Contest),events:z.array(Event),evaluations:z.array(Evaluation),
@@ -42,7 +46,7 @@ export function createState(roomId:string,proposal:ProposalContent,participants:
  schemaVersion:2,initialDraft,decision:{id:roomId,originId:roomId,title:proposal.title,status:'OPEN',createdAt:at,closedAt:null,closureReason:''},participants,
  proposals:[{id:pid,version:1,parentId:null,content:proposal,createdAt:at,approvedBy:'moderator',review}],
  rounds:[{id:randomUUID(),number:1,proposalId:pid,status:'OPEN',openedAt:at,closedAt:null}],
- factualChecks:[],votes:[],contributions:[],analyses:[],syntheses:[],contests:[],events:[],evaluations:[]};
+ researchConsents:[],factualChecks:[],votes:[],contributions:[],analyses:[],syntheses:[],contests:[],events:[],evaluations:[]};
  if(review.appliedRewrite||JSON.stringify(initialDraft)!==JSON.stringify(proposal)){
   const original=review.appliedRewrite&&review.result?.suggestedRewrite?{...initialDraft,text:review.result.suggestedRewrite}:initialDraft;
   const changes=Object.keys(proposal).filter(k=>proposal[k as keyof ProposalContent]!==original[k as keyof ProposalContent]).map(k=>({field:k,before:original[k as keyof ProposalContent],after:proposal[k as keyof ProposalContent]}));
@@ -194,6 +198,9 @@ export function validateState(input:unknown):State{
  const allIds=[...s.proposals,...s.rounds,...s.votes,...s.contributions,...s.analyses,...s.syntheses,...s.factualChecks,...s.contests,...s.events,...s.evaluations].map(x=>x.id);
  if(!unique(allIds)||!unique(s.participants.map(p=>p.id))||!unique(s.participants.map(p=>p.alias))||!unique(s.evaluations.map(e=>e.participantId)))throw new DomainError('Identificadores duplicados no arquivo.');
  const pids=new Set(s.participants.map(p=>p.id));
+ if(s.enrollment&&(s.participants.length>15||!unique(s.enrollment.claims)||s.enrollment.claims.some(id=>!pids.has(id))))throw new DomainError('Inscrições incompatíveis com a sala.');
+ if(!unique(s.researchConsents.map(c=>c.participantId))||s.researchConsents.some(c=>!pids.has(c.participantId)||s.research&&c.version!==s.research.version))throw new DomainError('Concordância de pesquisa incompatível.');
+ if(s.enrollment&&s.votes.some(v=>!s.researchConsents.some(c=>c.participantId===v.participantId)))throw new DomainError('Voto sem concordância prévia.');
  for(let i=0;i<s.proposals.length;i++){const p=s.proposals[i];if(p.version!==i+1||p.parentId!==(i?s.proposals[i-1].id:null))throw new DomainError('Cadeia de propostas inválida.');}
  if(s.rounds.length!==s.proposals.length)throw new DomainError('Rodadas incompatíveis.');
  for(let i=0;i<s.rounds.length;i++){const r=s.rounds[i];if(r.number!==i+1||r.proposalId!==s.proposals[i].id||r.status!==(i===s.rounds.length-1&&s.decision.status==='OPEN'?'OPEN':'CLOSED'))throw new DomainError('Sequência de rodadas inválida.');}

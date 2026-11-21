@@ -11,7 +11,8 @@ import { createState,contribute,vote,currentRound } from '../server/domain';
 import { randomUUID } from 'node:crypto';
 import { proposal,review } from '../server/fixtures';
 import type { RoomView } from './api';
-Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
+const storage=new Map<string,string>();
+Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true,localStorage:{getItem:(k:string)=>storage.get(k)??null,setItem:(k:string,v:string)=>storage.set(k,v)}});
 test('React: proposta estruturada mantém campos opcionais e texto ao editar',async()=>{
  let value=emptyProposal,rendered!:ReactTestRenderer;
  await act(async()=>{rendered=create(<ProposalEditor value={value} onChange={v=>{value=v;}}/>);});
@@ -23,7 +24,7 @@ test('React: questionário conserva 22 itens, quatro abertas e separa N/A de aus
  assert.equal(rendered.root.findAllByType('select').length,22);assert.equal(rendered.root.findAllByType('textarea').length,4);
  const selects=rendered.root.findAllByType('select');
  await act(async()=>selects[0].props.onChange({target:{value:'5'}}));await act(async()=>selects[1].props.onChange({target:{value:'N/A'}}));
- await act(async()=>rendered.root.findByType('input').props.onChange({target:{checked:true}}));await act(async()=>rendered.root.findByType('form').props.onSubmit({preventDefault(){}}));
+ await act(async()=>rendered.root.findByType('input').props.onChange({target:{checked:true}}));await act(async()=>rendered.root.findAllByType('form').at(-1)!.props.onSubmit({preventDefault(){}}));
  assert.equal(output.answers[0],5);assert.equal(output.answers[1],'N/A');assert.equal(output.answers[2],null);assert.equal(output.open.length,4);await act(async()=>rendered.unmount());
 });
 test('React: parecer mostra incertezas e limitação factual, sem editar o texto',async()=>{
@@ -38,7 +39,7 @@ test('React: sala permite abstenção, parecer opcional e impede funções de mo
  await act(async()=>rendered.update(<RoomWorkspace session={{code:view.room.code,credential:'synthetic-token',view}} busy={true} act={async f=>{await f();}} onRefresh={async()=>{}}/>));assert.ok(rendered.root.findAllByType('button').filter(b=>b.props.disabled===true).length>=3);await act(async()=>rendered.unmount());
 });
 test('React: entrada preservada com fluxo de criação e login por credenciais',async()=>{
- let rendered!:ReactTestRenderer;await act(async()=>{rendered=create(<App/>);});const text=JSON.stringify(rendered.toJSON());assert.ok(text.includes('Criar nova sala'));assert.ok(text.includes('Entrar com código'));assert.ok(text.includes('Restaurar processo'));assert.ok(!text.includes('Svelte'));await act(async()=>rendered.unmount());
+ let rendered!:ReactTestRenderer;await act(async()=>{rendered=create(<App/>);});const text=JSON.stringify(rendered.toJSON());assert.ok(text.includes('Criar nova sala'));assert.ok(text.includes('Participar de uma sala'));assert.ok(text.includes('Restaurar processo'));assert.ok(!text.includes('Svelte'));await act(async()=>rendered.unmount());
 });
 
 test('React: não exibe voto justificado e sua contribuição técnica como duas manifestações',async()=>{

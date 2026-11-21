@@ -3,7 +3,7 @@ import { NATURALISTIC_VERSION,APPLICATION_VARIANT } from './instrument.js';
 
 const field = z.string().trim().max(5000);
 export const ProposalSchema = z.object({
- title:z.string().trim().min(3).max(180), problem:field.min(4), decision:field.min(4),
+ title:z.string().trim().min(3).max(180), problem:field.default(''), decision:field.default(''),
  goals:field.default(''), alternatives:field.default(''), constraints:field.default(''),
  successCriteria:field.default(''), context:field.default(''), text:field.min(4),
 });

@@ -42,3 +42,7 @@ dt{font-weight:700}dd{margin:6px 0 15px;white-space:pre-wrap}pre{white-space:pre
 .source-url{overflow-wrap:anywhere;font-size:.85rem;margin:.2rem 0}
 .search-suggestions{display:block;width:100%;box-sizing:border-box;border:0;height:230px;background:transparent;margin:.8rem 0}
 @media(max-width:600px){.search-suggestions{height:300px}.factual-claim{padding-left:.6rem}.factual-panel{padding:.8rem}}
+
+.research-information { padding: 1rem; border: 1px solid var(--border, #cbd5e1); border-radius: 12px; background: #f8fafc; color: #172331; overflow-wrap: anywhere; }
+.research-information p { white-space: pre-wrap; line-height: 1.65; }
+.credentials a, .room a { overflow-wrap: anywhere; }
