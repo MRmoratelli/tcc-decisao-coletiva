@@ -17,5 +17,6 @@ API -> R : mutate(addSynthesis)
 API --> M : rascunho privado
 M -> API : publish / confirm
 API -> R : mutate / publish
-R --> M : nova proposta e rodada
+R --> API : snapshot salvo
+API --> M : nova proposta e rodada
 @enduml
