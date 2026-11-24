@@ -10,7 +10,8 @@ participant Dominio as D
 P -> C : concorda / ingressa
 C -> API : POST join
 API -> R : join
-R --> C : alias / acesso
+R --> API : alias
+API --> C : alias
 P -> C : escolhe voto
 C -> API : POST votes (revisao)
 API -> R : authorize

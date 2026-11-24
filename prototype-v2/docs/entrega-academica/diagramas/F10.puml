@@ -9,11 +9,11 @@ participant Repository as R
 M -> API : solicitar analise
 API -> G : analyzeObjections
 G --> API : Assessment
-API -> R : addAnalysis
+API -> R : mutate(addAnalysis)
 M -> API : solicitar sintese
 API -> G : synthesizeProposal
 G --> API : SynthesisResult
-API -> R : addSynthesis
+API -> R : mutate(addSynthesis)
 API --> M : rascunho privado
 M -> API : publish / confirm
 API -> R : mutate / publish

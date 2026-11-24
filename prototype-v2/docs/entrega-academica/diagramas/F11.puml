@@ -1,25 +1,23 @@
 @startuml
 skinparam defaultFontSize 14
 skinparam shadowing false
-skinparam backgroundColor white
 start
 :Criar proposta e sala;
 :Participantes ingressam;
-repeat
-:Consultar proposta;
-:Registrar votos e razoes;
+while (Processo OPEN?) is (sim)
+:Consultar proposta e registrar votos;
 if (Todos ACEITO?) then (sim)
 :Registrar CONSENSUS;
-stop
-endif
+else (nao)
 :Examinar manifestacoes;
 if (Encerrar sem consenso?) then (sim)
 :Informar razao;
 :Registrar CLOSED_WITHOUT_CONSENSUS;
-stop
-endif
+else (nao)
 :Preparar analise/sintese ou revisao manual;
-:Moderador examina e confirma publicacao;
-repeat while (Nova rodada) is (sim)
+:Moderador examina e publica nova rodada;
+endif
+endif
+endwhile (nao)
 stop
 @enduml

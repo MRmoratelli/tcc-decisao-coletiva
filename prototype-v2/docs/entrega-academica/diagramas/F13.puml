@@ -1,0 +1,26 @@
+@startuml
+skinparam defaultFontSize 14
+interface SQLClient {
+query(text, values)
+release()
+}
+interface SQLPool {
+query(text, values)
+connect()
+}
+class Repository <<classe real>> {
+authorize(code, token)
+read(identity)
+latestRevision(identity)
+mutate(identity, expectedRevision, fn)
+create(proposal, count, review)
+join(code, token, version)
+}
+class DomainError <<classe real>> {
+status : number
+code : string?
+}
+SQLPool --> SQLClient : connect
+Repository --> SQLPool : pool
+Repository ..> DomainError : falhas de dominio
+@enduml
