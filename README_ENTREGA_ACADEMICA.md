@@ -14,7 +14,7 @@ O sistema apoia a organização de manifestações e a revisão de propostas em 
 - Código do servidor: [prototype-v2/server](prototype-v2/server)
 - Contratos compartilhados: [prototype-v2/shared](prototype-v2/shared)
 
-A consulta pública de24/11/2026 retornou HTTP503. A disponibilidade precisa ser restabelecida e conferida antes da demonstração. A URL identifica o serviço existente.
+Em24/11/2026, a página inicial carregou e `/api/health` retornou `status: ok`, versão2 e o commit científico. A primeira consulta retornou503 e a repetição respondeu normalmente. A conferência foi de leitura, sem sala, voto ou chamada de IA.
 
 ## Versão da pesquisa
 
