@@ -1,0 +1,52 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+class State <<tipo inferido>> {
+decision
+participants[]
+proposals[]
+rounds[]
+votes[]
+analyses[]
+syntheses[]
+}
+class Proposal <<schema>> {
+id : UUID
+parentId : UUID?
+version : number
+content : ProposalContent
+}
+class Round <<schema>> {
+id : UUID
+proposalId : UUID
+status : OPEN | CLOSED
+}
+class Vote <<schema>> {
+participantId : UUID
+roundId : UUID
+proposalId : UUID
+choice : Choice
+}
+class Analysis <<schema>> {
+sourceFingerprint : string
+result : Assessment
+}
+class Synthesis <<schema>> {
+analysisId : UUID
+result : SynthesisResult
+publishedProposalId : UUID?
+}
+class DomainError <<classe real>> {
+status : number
+code : string?
+}
+State "1" *-- "1..*" Proposal
+State "1" *-- "1..*" Round
+State "1" *-- "0..*" Vote
+State "1" *-- "0..*" Analysis
+State "1" *-- "0..*" Synthesis
+Round --> Proposal : proposalId
+Vote --> Round : roundId
+Synthesis --> Analysis : analysisId
+@enduml

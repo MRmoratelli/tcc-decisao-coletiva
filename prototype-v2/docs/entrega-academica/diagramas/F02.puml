@@ -1,0 +1,29 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+actor Moderador as M
+actor Participante as P
+actor "Gemini" as G
+actor "Tavily" as T
+rectangle "Decisao Coletiva" {
+usecase "UC06 Analisar" as A
+usecase "UC07 Sintetizar" as B
+usecase "UC10 Contestar" as C
+usecase "UC11 Consultar fontes" as D
+usecase "UC12 Exportar" as E
+usecase "UC13 Importar" as F
+usecase "UC14 Avaliar" as H
+}
+M -- A
+M -- B
+M -- D
+M -- E
+M -- F
+P -- C
+P -- H
+G -- A
+G -- B
+G -- D
+T -- D
+@enduml

@@ -1,0 +1,58 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+entity dc2_rooms {
+*id : UUID <<PK>>
+--
+code : varchar(10) <<UQ>>
+topic : text
+proposal : text
+proposal_review : jsonb
+moderator_hash : char(64)
+created_at : timestamptz
+}
+entity dc2_participants {
+*id : UUID <<PK>>
+--
+room_id : UUID <<FK>>
+alias : varchar(8)
+secret_hash : char(64)
+created_at : timestamptz
+}
+entity dc2_snapshots {
+*room_id : UUID <<PK,FK>>
+*revision : integer <<PK>>
+--
+state : jsonb
+created_at : timestamptz
+}
+entity dc2_contributions {
+*id : UUID <<PK>>
+--
+room_id : UUID <<FK>>
+participant_id : UUID <<FK>>
+text : text
+review : jsonb
+user_choice : varchar(24)
+receipt_hash : char(64) <<UQ>>
+created_at : timestamptz
+}
+entity dc2_migrations {
+*version : varchar(80) <<PK>>
+--
+checksum : char(64)
+applied_at : timestamptz
+}
+entity dc2_provider_budget {
+*id : smallint <<PK>>
+--
+state : jsonb
+updated_at : timestamptz
+}
+dc2_rooms ||--o{ dc2_participants
+dc2_rooms ||--o{ dc2_snapshots
+dc2_rooms ||--o{ dc2_contributions
+dc2_participants ||--o{ dc2_contributions
+note bottom of dc2_contributions : Tabela legada; fluxo atual usa snapshots
+@enduml

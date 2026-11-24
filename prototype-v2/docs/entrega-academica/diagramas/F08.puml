@@ -1,0 +1,24 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+entity Decision
+entity Participant
+entity Proposal
+entity Round
+entity Vote
+entity Contribution
+entity Analysis
+entity Synthesis
+entity Event
+Decision ||--|{ Participant : habilita
+Decision ||--|{ Proposal : conserva
+Proposal ||--|| Round : corresponde
+Round ||--o{ Vote : recebe
+Participant ||--o{ Vote : registra
+Round ||--o{ Contribution : recebe
+Round ||--o{ Analysis : fundamenta
+Analysis ||--o{ Synthesis : orienta
+Decision ||--o{ Event : registra
+note bottom : Modelo logico; entidades nao sao tabelas independentes
+@enduml

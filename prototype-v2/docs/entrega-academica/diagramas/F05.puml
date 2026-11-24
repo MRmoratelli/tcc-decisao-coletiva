@@ -1,0 +1,18 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+node "Navegador" as B
+node "Render: um servico Node.js" {
+artifact "dist (Vite)" as WEB
+artifact "API Express" as API
+}
+database "Neon PostgreSQL" as DB
+cloud "Gemini" as G
+cloud "Tavily" as T
+B --> WEB : HTTPS
+B --> API : HTTPS /api
+API --> DB : pg / transacoes
+API --> G : chamadas externas
+API --> T : busca externa
+@enduml

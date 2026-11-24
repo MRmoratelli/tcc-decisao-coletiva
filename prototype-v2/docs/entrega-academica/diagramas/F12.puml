@@ -1,0 +1,12 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+[*] --> OPEN : criar
+OPEN --> OPEN : publicar / nova rodada
+OPEN --> CONSENSUS : todos ACEITO
+OPEN --> CLOSED_WITHOUT_CONSENSUS : moderador / razao
+CONSENSUS --> [*]
+CLOSED_WITHOUT_CONSENSUS --> [*]
+note bottom : RUNNING / READY / FAILED pertencem a mediacao, nao a decisao
+@enduml

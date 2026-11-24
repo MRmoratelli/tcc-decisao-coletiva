@@ -1,0 +1,16 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+actor Moderador as M
+actor Participante as P
+rectangle "Sistema de decisao coletiva" as S
+cloud Gemini as G
+cloud Tavily as T
+database "PostgreSQL / Neon" as DB
+M --> S : propostas e revisoes
+P --> S : manifestacoes e votos
+S --> G : analise consultiva
+S --> T : busca externa opcional
+S --> DB : persistencia
+@enduml

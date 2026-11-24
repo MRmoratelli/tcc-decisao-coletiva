@@ -1,0 +1,21 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+actor Moderador as M
+participant API
+participant GeminiAdapter as G
+participant Repository as R
+M -> API : solicitar analise
+API -> G : analyzeObjections
+G --> API : Assessment
+API -> R : addAnalysis
+M -> API : solicitar sintese
+API -> G : synthesizeProposal
+G --> API : SynthesisResult
+API -> R : addSynthesis
+API --> M : rascunho privado
+M -> API : publish / confirm
+API -> R : mutate / publish
+R --> M : nova proposta e rodada
+@enduml

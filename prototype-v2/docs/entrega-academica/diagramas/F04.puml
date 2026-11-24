@@ -1,0 +1,19 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+component "React / src" as UI
+component "API / app.ts" as API
+component "Contratos Zod / shared" as C
+component "Dominio / domain.ts" as D
+component "Repository / db.ts" as R
+component "GeminiAdapter / ai.ts" as G
+component "FactualService / factual.ts" as F
+UI --> API : HTTP JSON
+API --> C : valida
+API --> D : regras
+API --> R : estado e revisao
+API --> G : parecer / sintese
+API --> F : consulta
+R --> D : valida estado
+@enduml

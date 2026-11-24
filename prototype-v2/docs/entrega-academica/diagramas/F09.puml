@@ -1,0 +1,22 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+actor Participante as P
+participant Cliente as C
+participant API
+participant Repository as R
+participant Dominio as D
+P -> C : concorda / ingressa
+C -> API : POST join
+API -> R : join
+R --> C : alias / acesso
+P -> C : escolhe voto
+C -> API : POST votes (revisao)
+API -> R : authorize
+API -> R : mutate
+R -> D : vote
+D --> R : estado validado
+R --> API : novo snapshot
+API --> C : saved
+@enduml

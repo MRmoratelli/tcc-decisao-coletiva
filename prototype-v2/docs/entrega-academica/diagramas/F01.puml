@@ -1,0 +1,24 @@
+@startuml
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam backgroundColor white
+actor Moderador as M
+actor Participante as P
+rectangle "Decisao Coletiva" {
+usecase "UC01 Criar sala" as A
+usecase "UC02 Ingressar" as B
+usecase "UC03 Consultar proposta" as C
+usecase "UC04 Manifestar" as D
+usecase "UC05 Votar" as E
+usecase "UC08 Publicar revisao" as F
+usecase "UC09 Encerrar" as G
+}
+M -- A
+M -- C
+M -- F
+M -- G
+P -- B
+P -- C
+P -- D
+P -- E
+@enduml
