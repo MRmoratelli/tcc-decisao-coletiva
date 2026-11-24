@@ -28,4 +28,7 @@ Documentos consolidados/retrospectivos elaborados em24/11/2026. Não representam
 - [F11 Atividade da deliberação](diagramas/F11.puml)
 - [F12 Estados efetivos da decisão](diagramas/F12.puml)
 
-A verificação visual está em andamento e seu resultado será registrado no catálogo de figuras. Não executar o roteiro de demonstração sem autorização.
+Consulte o catálogo de figuras para o registro da conferência de renderização e legibilidade. Não executar o roteiro de demonstração sem autorização.
+
+- [F13 — Interfaces e classe de persistência](diagramas/F13.puml)
+- [Galeria incorporada no Drive](https://docs.google.com/document/d/1fuScYv0Gz6_mNZLeQWnnIdhiC6YzHiNCHjgFbJlMiQY/edit)

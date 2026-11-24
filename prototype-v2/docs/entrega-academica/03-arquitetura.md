@@ -1,8 +1,10 @@
 # ENG-D03 — Arquitetura do Sistema
 
 Processo de decisao · UVA · Engenharia da Computação
-Versão1.0 ·24/11/2026 · Origem CONSOLIDADO
+Versão 1.0 ·24/11/2026 · Origem CONSOLIDADO
 Commit científico `63189e5f21dd2794f5677894dc6cae04597095f5`.
+
+TCC: Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Universidade Veiga de Almeida — Engenharia da Computação. Orientador: Prof. Carlos Alvaro de Macedo Soares Quintella.
 
 ## Finalidade e organização
 
@@ -55,4 +57,4 @@ Legenda sugerida — Implantação utilizada. Fonte — elaboração retrospecti
 
 ## Origem e limites
 
-A especificação original de17/11 já apresentava arquitetura e estados. Esta consolidação mantém componentes comprovados e incorpora pesquisa externa e as regras binárias da coleta. Não há microsserviços separados de cliente/servidor. A fila Gemini é componente em processo, com orçamento persistido. Não implica infraestrutura distribuída ou garantia de vazão. Ver ENG-D06 para execução e ENG-D05 para armazenamento.
+A especificação original de 17/11 já apresentava arquitetura e estados. Esta consolidação mantém componentes comprovados e incorpora pesquisa externa e as regras binárias da coleta. Não há microsserviços separados de cliente/servidor. A fila Gemini é componente em processo, com orçamento persistido. Não implica infraestrutura distribuída ou garantia de vazão. Ver ENG-D06 para execução e ENG-D05 para armazenamento.

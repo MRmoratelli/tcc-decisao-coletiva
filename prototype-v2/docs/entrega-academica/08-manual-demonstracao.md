@@ -1,8 +1,10 @@
 # ENG-D08 — Manual de Utilização e Roteiro de Demonstração
 
 Processo de decisao · UVA · Engenharia da Computação
-Versão1.0 ·24/11/2026 · Origem CONSOLIDADO
+Versão 1.0 ·24/11/2026 · Origem CONSOLIDADO
 Commit científico `63189e5f21dd2794f5677894dc6cae04597095f5`.
+
+TCC: Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Universidade Veiga de Almeida — Engenharia da Computação. Orientador: Prof. Carlos Alvaro de Macedo Soares Quintella.
 
 ## Acesso e cautelas
 
@@ -51,3 +53,7 @@ Consulta factual é auxiliar e não é necessária ao roteiro. Não acionar a sa
 ## Capturas e disponibilidade
 
 As capturas existentes em docs/evidence são ensaios anteriores. Sem confirmação visual da versão e de anonimização, não são apresentadas como telas finais da coleta. Nenhuma captura foi fabricada. O catálogo registra o estado de verificação e a seleção futura quando necessária. A disponibilidade da página e saúde pode ser conferida por GET, sem voto ou análise. Essa consulta não comprova o fluxo ponta a ponta.
+
+## Consulta de disponibilidade nesta elaboração
+
+Em 24/11/2026 a navegação pública recuperou a página inicial e GET /api/health retornou status ok, version 2 e commit 63189e5f21dd2794f5677894dc6cae04597095f5. O modelo factual informado foi gemini-3.5-flash-lite. A verificação não criou salas, votos ou pedidos de IA. O navegador apresentou a página, mas não disponibilizou arquivo exportável da captura; por isso nenhuma tela foi incorporada como evidência final. A demonstração completa continua pendente.

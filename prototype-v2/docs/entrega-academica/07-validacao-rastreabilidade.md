@@ -1,12 +1,14 @@
 # ENG-D07 — Validação Técnica e Matriz de Rastreabilidade
 
 Processo de decisao · UVA · Engenharia da Computação
-Versão1.0 ·24/11/2026 · Origem CONSOLIDADO
+Versão 1.0 ·24/11/2026 · Origem CONSOLIDADO
 Commit científico `63189e5f21dd2794f5677894dc6cae04597095f5`.
+
+TCC: Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Universidade Veiga de Almeida — Engenharia da Computação. Orientador: Prof. Carlos Alvaro de Macedo Soares Quintella.
 
 ## Evidência histórica
 
-CI44940268869, job136955708525, executada no SHA científico. Resultado previamente conferido:130 testes aprovados, zero falhas. Não houve repetição da suíte nesta etapa. A validação de17/11 registrava39 testes e é histórica. A suíte usa arquivos server/*.test.ts e src/*.test.tsx; sua contagem inclui subtestes. O teste de uma regra não é validação de segurança, disponibilidade ou qualidade da decisão.
+CI 44940268869, job136955708525, executada no SHA científico. Resultado previamente conferido:130 testes aprovados, zero falhas. Não houve repetição da suíte nesta etapa. A validação de 17/11 registrava39 testes e é histórica. A suíte usa arquivos server/*.test.ts e src/*.test.tsx; sua contagem inclui subtestes. O teste de uma regra não é validação de segurança, disponibilidade ou qualidade da decisão.
 
 [Execução da CI](https://github.com/MRmoratelli/tcc-decisao-coletiva/actions/runs/44940268869)
 

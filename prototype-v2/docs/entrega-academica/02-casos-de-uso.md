@@ -1,8 +1,10 @@
 # ENG-D02 — Modelagem e Especificação dos Casos de Uso
 
 Processo de decisao · UVA · Engenharia da Computação
-Versão1.0 ·24/11/2026 · Origem RETROSPECTIVO
+Versão 1.0 ·24/11/2026 · Origem RETROSPECTIVO
 Commit científico `63189e5f21dd2794f5677894dc6cae04597095f5`.
+
+TCC: Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Universidade Veiga de Almeida — Engenharia da Computação. Orientador: Prof. Carlos Alvaro de Macedo Soares Quintella.
 
 ## Atores
 

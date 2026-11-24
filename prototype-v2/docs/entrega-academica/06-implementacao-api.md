@@ -1,8 +1,10 @@
 # ENG-D06 — Documentação Técnica da Implementação
 
 Processo de decisao · UVA · Engenharia da Computação
-Versão1.0 ·24/11/2026 · Origem RETROSPECTIVO
+Versão 1.0 ·24/11/2026 · Origem RETROSPECTIVO
 Commit científico `63189e5f21dd2794f5677894dc6cae04597095f5`.
+
+TCC: Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Universidade Veiga de Almeida — Engenharia da Computação. Orientador: Prof. Carlos Alvaro de Macedo Soares Quintella.
 
 ## Cliente
 
@@ -22,7 +24,7 @@ Corpos JSON, limite8MB. Rotas de sala recebem code no caminho e credential no co
 |POST|/api/ai/proposal-review|Público com consentimento|consent=true,proposal:ProposalContent|review,receipt|200;400;429;502/503|
 |POST|/api/rooms|Moderador na criação|proposal,participantCount; parecer/dispensa; campos do contrato de criação|code,moderatorCredential,participants[]|201;400;429|
 |POST|/api/import|Criação de processo|ImportSchema com state validado|novos code/acessos|201;400;413;429|
-|POST|/api/rooms/:code/invitation|Público|Código de10 hexadecimais|research,participantCount,open|200;400;404;409|
+|POST|/api/rooms/:code/invitation|Público|Código de 10 hexadecimais|research,participantCount,open|200;400;404;409|
 |POST|/api/rooms/:code/join|Participante|browserCredential:hex64,consent=true,version|alias|200;400;404;409|
 |POST|/api/rooms/:code/view|Ambos|credential; knownRevision opcional|RoomView filtrada ou revision/unchanged|200;400;401;403;409|
 |POST|/api/rooms/:code/prepare-mediation|Moderador|credential|preparing:true|200;400;401;403;429|
@@ -56,6 +58,6 @@ FactualService recupera resultados Tavily e usa Gemini para interpretação. Man
 
 ## Instalação e configuração documentadas
 
-Node>=22.12.0; PostgreSQL isolado; lockfile do SHA. A sequência existente é `cd prototype-v2`, `npm ci`, `npm run migrate`, `npm run dev` para desenvolvimento ou `npm run build` e `npm start` para produção. As migrações só devem ser usadas em ambiente V2 isolado previamente autorizado. Esta documentação não executou instalação, migração, testes ou deploy. Em produção, frontend e API usam a mesma origem.
+Node >= 22.12.0; PostgreSQL isolado; lockfile do SHA. A sequência existente é `cd prototype-v2`, `npm ci`, `npm run migrate`, `npm run dev` para desenvolvimento ou `npm run build` e `npm start` para produção. As migrações só devem ser usadas em ambiente V2 isolado previamente autorizado. Esta documentação não executou instalação, migração, testes ou deploy. Em produção, frontend e API usam a mesma origem.
 
 Nomes de variáveis: DATABASE_URL_V2,V2_DATABASE_ISOLATED,AUTH_PEPPER,REVIEW_SIGNING_KEY,PORT/API_PORT,API_HOST,PUBLIC_ORIGIN,RENDER_EXTERNAL_URL,NODE_ENV,APP_COMMIT/RENDER_GIT_COMMIT,GEMINI_API_KEY,GEMINI_MODEL,FACTUAL_SEARCH_ENABLED,FACTUAL_FREE_TIER_CONFIRMED,TAVILY_API_KEY,TAVILY_RESEARCHER_CONFIRMED. Não colocar valores privados no repositório. runtime.ts exige pepper e signingKey distintos com no mínimo32 caracteres e origem HTTPS em produção. Configuração e disponibilidade de terceiros não garantem precisão ou permanência do serviço.

@@ -1,8 +1,10 @@
 # ENG-D01 — Visão, Escopo e Especificação de Requisitos
 
 Projeto Processo de decisao · UVA · Engenharia da Computação
-Versão documental1.0 · Elaborado em24/11/2026 · Origem CONSOLIDADO
+Versão documental 1.0 · Elaborado em 24/11/2026 · Origem CONSOLIDADO
 Referência científica `63189e5f21dd2794f5677894dc6cae04597095f5`.
+
+TCC: Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva. Universidade Veiga de Almeida — Engenharia da Computação. Orientador: Prof. Carlos Alvaro de Macedo Soares Quintella.
 
 ## Visão e escopo
 
@@ -10,7 +12,7 @@ Apoiar um grupo a organizar manifestações e acompanhar objeções, revisões e
 
 ## Desenvolvimento
 
-Node>=22.12.0; TypeScript, React e Vite no cliente; Express e pg no servidor; PostgreSQL/JSONB no Neon. Cliente e API são servidos pelo mesmo serviço Render em produção. Gemini e Tavily dependem de configuração privada. Sem cadastro sociodemográfico adicional obrigatório. O código usa src, server e shared. Faixas declaradas constam em package.json; versões resolvidas abaixo vêm do package-lock.json do SHA.
+Node >= 22.12.0; TypeScript, React e Vite no cliente; Express e pg no servidor; PostgreSQL/JSONB no Neon. Cliente e API são servidos pelo mesmo serviço Render em produção. Gemini e Tavily dependem de configuração privada. Sem cadastro sociodemográfico adicional obrigatório. O código usa src, server e shared. Faixas declaradas constam em package.json; versões resolvidas abaixo vêm do package-lock.json do SHA.
 
 ```
 react 19.3.1
@@ -26,7 +28,7 @@ tsx 4.23.15
 
 ## Requisitos funcionais e rastreabilidade histórica
 
-Os identificadores RF01–RF24 preservam o nexo com RFv1.1 de06/11. A coluna de origem descreve a mudança, sem retroagir a especificação. RF25–27 foram reconstruídos da implementação. ‘Implementado’ descreve a regra no código, não comprova seu efeito científico.
+Os identificadores RF01–RF24 preservam o nexo com RFv1.1 de 06/11. A coluna de origem descreve a mudança, sem retroagir a especificação. RF25–27 foram reconstruídos da implementação. ‘Implementado’ descreve a regra no código, não comprova seu efeito científico.
 
 |ID|Finalidade / ator|Condição e comportamento|Fonte e teste relacionado|Origem e cobertura|
 |---|---|---|---|---|
@@ -83,7 +85,7 @@ Os identificadores RF01–RF24 preservam o nexo com RFv1.1 de06/11. A coluna de 
 ## Regras de negócio
 
 - RB01 O moderador publica, encerra, exporta e solicita análises de conjunto. A autenticação é aplicada no servidor.
-- RB02 O conjunto habilitado tem2–30 participantes definidos na criação. No autoingresso, ocupam-se as vagas já previstas.
+- RB02 O contrato do servidor aceita de 2 a 30 participantes na criação; a interface pública observada limita o formulário a 2–15. O número habilitado é definido na criação. No autoingresso, ocupam-se as vagas já previstas.
 - RB03 Os pedidos novos aceitam somente ACEITO ou REJEITO. ACEITO não recebe justificativa. REJEITO exige razão e fluxo de parecer ou dispensa.
 - RB04 Cada participante vota uma única vez na rodada. Referências antigas à proposta/rodada e revisões concorrentes são recusadas.
 - RB05 Consenso exige ACEITO de todos na mesma proposta. O último aceite encerra automaticamente decisão e rodada.
@@ -97,4 +99,4 @@ Os identificadores RF01–RF24 preservam o nexo com RFv1.1 de06/11. A coluna de 
 
 ## Evidências e limites
 
-Fontes históricas RF/RNFv1.1 no Drive, ESPECIFICACAO_V2.md de17/11 e os arquivos app.ts, domain.ts, db.ts, contracts.ts e package-lock.json do snapshot. Os RNF antigos de Streamlit, equivalência A/B e cancelamento técnico não são requisitos satisfeitos da V2. Não há evidência de SLA, auditoria de segurança independente ou generalização de usabilidade. Propriedades de serviço dependem da configuração externa. Ver ENG-D06 e ENG-D07 para API, persistência e evidências.
+Fontes históricas RF/RNFv1.1 no Drive, ESPECIFICACAO_V2.md de 17/11 e os arquivos app.ts, domain.ts, db.ts, contracts.ts e package-lock.json do snapshot. Os RNF antigos de Streamlit, equivalência A/B e cancelamento técnico não são requisitos satisfeitos da V2. Não há evidência de SLA, auditoria de segurança independente ou generalização de usabilidade. Propriedades de serviço dependem da configuração externa. Ver ENG-D06 e ENG-D07 para API, persistência e evidências.
