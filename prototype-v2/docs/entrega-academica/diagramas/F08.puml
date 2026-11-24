@@ -20,5 +20,5 @@ Round ||--o{ Contribution : recebe
 Round ||--o{ Analysis : fundamenta
 Analysis ||--o{ Synthesis : orienta
 Decision ||--o{ Event : registra
-note bottom : Modelo logico; entidades nao sao tabelas independentes
+note bottom of Decision : Modelo logico; entidades nao sao tabelas independentes
 @enduml

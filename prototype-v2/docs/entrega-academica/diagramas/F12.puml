@@ -8,5 +8,5 @@ OPEN --> CONSENSUS : todos ACEITO
 OPEN --> CLOSED_WITHOUT_CONSENSUS : moderador / razao
 CONSENSUS --> [*]
 CLOSED_WITHOUT_CONSENSUS --> [*]
-note bottom : RUNNING / READY / FAILED pertencem a mediacao, nao a decisao
+note bottom of OPEN : RUNNING / READY / FAILED pertencem a mediacao, nao a decisao
 @enduml
