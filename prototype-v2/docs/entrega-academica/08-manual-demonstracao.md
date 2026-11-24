@@ -57,3 +57,10 @@ As capturas existentes em docs/evidence são ensaios anteriores. Sem confirmaç�
 ## Consulta de disponibilidade nesta elaboração
 
 Em 24/11/2026 a navegação pública recuperou a página inicial e GET /api/health retornou status ok, version 2 e commit 63189e5f21dd2794f5677894dc6cae04597095f5. O modelo factual informado foi gemini-3.5-flash-lite. A verificação não criou salas, votos ou pedidos de IA. O navegador apresentou a página, mas não disponibilizou arquivo exportável da captura; por isso nenhuma tela foi incorporada como evidência final. A demonstração completa continua pendente.
+
+## Referências técnicas verificáveis
+
+- [src/App.tsx](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/App.tsx)
+- [src/components/RoomWorkspace.tsx](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/components/RoomWorkspace.tsx)
+- [src/components/EvaluationForm.tsx](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/components/EvaluationForm.tsx)
+- [src/api.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/api.ts)

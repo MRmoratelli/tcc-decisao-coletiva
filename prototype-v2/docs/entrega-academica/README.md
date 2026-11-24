@@ -32,3 +32,7 @@ Consulte o catálogo de figuras para o registro da conferência de renderizaçã
 
 - [F13 — Interfaces e classe de persistência](diagramas/F13.puml)
 - [Galeria incorporada no Drive](https://docs.google.com/document/d/1fuScYv0Gz6_mNZLeQWnnIdhiC6YzHiNCHjgFbJlMiQY/edit)
+
+## Cobertura e limites
+
+27 RF,19 RNF classificados,12 regras,14 casos de uso,20 endpoints e13 diagramas. [Catálogo visual e quadros para a monografia](figuras/CATALOGO.md). Capturas reais exportáveis e demonstração ponta a ponta permanecem pendentes. Instalação e suíte de testes não foram reexecutadas nesta etapa. Os diagramas novos são retrospectivos; as referências históricas mantêm sua data e contexto.

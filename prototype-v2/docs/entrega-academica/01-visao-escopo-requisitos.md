@@ -100,3 +100,14 @@ Os identificadores RF01–RF24 preservam o nexo com RFv1.1 de 06/11. A coluna de
 ## Evidências e limites
 
 Fontes históricas RF/RNFv1.1 no Drive, ESPECIFICACAO_V2.md de 17/11 e os arquivos app.ts, domain.ts, db.ts, contracts.ts e package-lock.json do snapshot. Os RNF antigos de Streamlit, equivalência A/B e cancelamento técnico não são requisitos satisfeitos da V2. Não há evidência de SLA, auditoria de segurança independente ou generalização de usabilidade. Propriedades de serviço dependem da configuração externa. Ver ENG-D06 e ENG-D07 para API, persistência e evidências.
+
+## Referências técnicas verificáveis
+
+- [server/app.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/app.ts)
+- [server/domain.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/domain.ts)
+- [server/db.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/db.ts)
+- [shared/contracts.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/shared/contracts.ts)
+- [package.json](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/package.json)
+- [package-lock.json](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/package-lock.json)
+
+Antecedentes originais: [RFv1.1](https://docs.google.com/document/d/1AY0DDz7svSxR0FN0UCS3bzhDTKPwtkWCW4gWufjhOeE/edit) e [RNFv1.1](https://docs.google.com/document/d/1D5g_W5K16hkBsyqngFmlkC8KGAgbdYbAYrSfaK0hTY0/edit). Tratados como planejamento do protótipo anterior, sem presumir equivalência com a V2.

@@ -64,3 +64,12 @@ Os arquivos indicados são conjuntos relacionados às regras, não prova de cobe
 ## Técnica e ciência
 
 Uma verificação técnica comprova a propriedade testada naquela execução. O caso naturalístico examina uso, observações e percepções. Dez participantes são observações internas de um processo coletivo. Discord, moderação e relações prévias impedem atribuir o resultado exclusivamente à IA. A documentação técnica não transforma percepção em eficácia causal.
+
+## Referências técnicas verificáveis
+
+- [server/domain.test.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/domain.test.ts)
+- [server/api.test.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/api.test.ts)
+- [server/decision-progress.test.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/decision-progress.test.ts)
+- [server/linked-quotes.test.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/linked-quotes.test.ts)
+- [docs/VALIDACAO_V2.md](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/docs/VALIDACAO_V2.md)
+- [docs/PROTOCOLO_AVALIACAO_DSR_V2.md](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/docs/PROTOCOLO_AVALIACAO_DSR_V2.md)

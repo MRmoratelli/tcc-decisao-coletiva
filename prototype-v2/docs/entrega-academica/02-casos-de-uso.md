@@ -208,3 +208,9 @@ Fonte — POST evaluation em server/app.ts; server/domain.ts e server/db.ts.
 ## Limites
 
 Documentação reconstruída do código congelado. A preparação automática pode produzir análise/síntese após voto ou consulta do moderador. A publicação continua humana. As figuras estão no catálogo, com fonte editável e ligação para renderização. Sequências e estados em ENG-D04.
+
+## Referências técnicas verificáveis
+
+- [server/app.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/app.ts)
+- [server/domain.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/domain.ts)
+- [src/components/RoomWorkspace.tsx](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/components/RoomWorkspace.tsx)

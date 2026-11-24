@@ -61,3 +61,14 @@ FactualService recupera resultados Tavily e usa Gemini para interpretação. Man
 Node >= 22.12.0; PostgreSQL isolado; lockfile do SHA. A sequência existente é `cd prototype-v2`, `npm ci`, `npm run migrate`, `npm run dev` para desenvolvimento ou `npm run build` e `npm start` para produção. As migrações só devem ser usadas em ambiente V2 isolado previamente autorizado. Esta documentação não executou instalação, migração, testes ou deploy. Em produção, frontend e API usam a mesma origem.
 
 Nomes de variáveis: DATABASE_URL_V2,V2_DATABASE_ISOLATED,AUTH_PEPPER,REVIEW_SIGNING_KEY,PORT/API_PORT,API_HOST,PUBLIC_ORIGIN,RENDER_EXTERNAL_URL,NODE_ENV,APP_COMMIT/RENDER_GIT_COMMIT,GEMINI_API_KEY,GEMINI_MODEL,FACTUAL_SEARCH_ENABLED,FACTUAL_FREE_TIER_CONFIRMED,TAVILY_API_KEY,TAVILY_RESEARCHER_CONFIRMED. Não colocar valores privados no repositório. runtime.ts exige pepper e signingKey distintos com no mínimo32 caracteres e origem HTTPS em produção. Configuração e disponibilidade de terceiros não garantem precisão ou permanência do serviço.
+
+## Referências técnicas verificáveis
+
+- [src/App.tsx](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/App.tsx)
+- [src/api.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/src/api.ts)
+- [server/app.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/app.ts)
+- [server/ai.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/ai.ts)
+- [server/factual.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/factual.ts)
+- [server/runtime.ts](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/server/runtime.ts)
+- [package.json](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/package.json)
+- [README.md](https://github.com/MRmoratelli/tcc-decisao-coletiva/blob/63189e5f21dd2794f5677894dc6cae04597095f5/prototype-v2/README.md)

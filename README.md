@@ -37,3 +37,7 @@ Consulte ENG-D08 para moderador/participante e roteiro fictício, preparado para
 ## Documentação histórica preservada
 
 [README técnico V2](prototype-v2/README.md), [especificação17/11](prototype-v2/docs/ESPECIFICACAO_V2.md) e [documentação V1](docs) permanecem disponíveis em sua forma original. Suas regras e contagens devem ser lidas pela data e pelo protótipo a que se referem. Para a entrega atual, utilizar o índice consolidado acima.
+
+## Figuras e leitura
+
+O catálogo contém13 diagramas PlantUML renderizados e conferidos, com fontes versionadas. Inclui casos de uso, contexto, componentes, implantação, tipos/interfaces/classes, DER físico, modelo JSONB, sequências, atividades e estados. As imagens Markdown são servidas por um renderizador público; a galeria indicada no catálogo conserva cópias incorporadas no Drive, com acesso controlado pelo proprietário. Capturas exportáveis da interface e a execução do roteiro demonstrativo permanecem pendentes.
