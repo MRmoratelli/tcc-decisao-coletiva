@@ -1,4 +1,10 @@
-export const RESEARCH_VERSION='1.4-2026-11-21' as const;
+export const RESEARCH_VERSION='1.5-2026-11-26' as const;
+export const RESEARCH_CONTACT='moratellimc3@gmail.com';
+export const RESEARCH_SHORT_TEXT=`Esta atividade faz parte de um TCC de Engenharia da Computação da UVA sobre decisões em grupo. Participar e responder ao questionário é voluntário. Você pode parar a qualquer momento, sem penalidade.
+
+Seus votos, justificativas e respostas serão registrados sob pseudônimo e guardados com acesso restrito por cinco anos após o fim da pesquisa. O grupo pode ver suas manifestações na discussão. Se você solicitar um parecer, o texto e o contexto necessário serão enviados ao Gemini. A IA pode interpretar seu texto de forma incorreta. Evite informar dados pessoais.
+
+Para tirar dúvidas ou solicitar a retirada de dados ainda identificáveis do uso na pesquisa, fale com Matheus Moratelli pelo contato da equipe.`;
 export const RESEARCH_SOURCE='https://docs.google.com/document/d/1kGTqie0FNaX68z4Nii8JQwpDqopu8wxZf4eeUsMYF7E';
 export const RESEARCH_SECTIONS=[
   {
@@ -6,7 +12,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "Versão 1.4 — 21/11/2026 — concordância eletrônica e questionário integrado",
+    "text": "Versão 1.5 — 26/11/2026 — concordância eletrônica e questionário integrado",
     "heading": true
   },
   {
@@ -14,11 +20,11 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "Esta atividade integra o TCC “Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva”, de Engenharia da Computação da Universidade Veiga de Almeida. O grupo tem sua própria necessidade de organizar um churrasco. Os pesquisadores disponibilizam a V2 e observam seu uso; não criam o problema, não impõem alternativas, votos ou consenso.",
+    "text": "Esta atividade integra o TCC “Sistema de Inteligência Artificial Aplicado à Tomada de Decisão Coletiva”, de Engenharia da Computação da Universidade Veiga de Almeida. O grupo discute uma decisão de seu interesse. Os pesquisadores disponibilizam a V2 e observam seu uso; não criam o problema, não impõem alternativas, votos ou consenso.",
     "heading": false
   },
   {
-    "text": "Você poderá deliberar com o grupo, registrar posições e justificativas e consultar informações públicas. Após o encerramento, poderá responder uma única vez ao questionário DSR-1.1 integrado à aplicação, único canal oficial desta coleta. A participação, cada manifestação e cada resposta são voluntárias. Recusar, não responder ou desistir não gera penalidade, prejuízo acadêmico ou consequência nas relações com os pesquisadores.",
+    "text": "Você poderá deliberar com o grupo, registrar posições e justificativas. Após o encerramento, poderá responder uma única vez ao questionário DSR-1.1 integrado à aplicação, único canal oficial desta coleta. A participação, cada manifestação e cada resposta são voluntárias. Recusar, não responder ou desistir não gera penalidade, prejuízo acadêmico ou consequência nas relações com os pesquisadores.",
     "heading": false
   },
   {
@@ -26,7 +32,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "A V2 conserva propostas e versões, posições ACEITO e REJEITO, justificativas, contribuições, pareceres, sínteses, intervenções humanas, contestações, consultas e horários. O questionário integrado registra respostas, versão do instrumento e contexto da sessão, vinculados ao identificador pseudônimo do participante e à sala. Não solicita nome, e-mail, CPF ou telefone. Não informe dados pessoais ou sensíveis nos textos. As respostas individuais do questionário não são exibidas aos demais participantes.",
+    "text": "A V2 conserva propostas e versões, posições ACEITO e REJEITO, justificativas, contribuições, pareceres, sínteses, intervenções humanas, contestações, saídas, abstenções e horários. O questionário integrado registra respostas, versão do instrumento e contexto da sessão, vinculados ao identificador pseudônimo do participante e à sala. Não solicita nome, e-mail, CPF ou telefone. Não informe dados pessoais ou sensíveis nos textos. As respostas individuais do questionário não são exibidas aos demais participantes.",
     "heading": false
   },
   {
@@ -34,7 +40,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "O Gemini recebe os textos e o contexto necessários aos pareceres consultivos. Quando você autorizar pesquisa externa, a alegação ou pergunta pública mínima pode ser enviada à Tavily Search. Não envie informações privadas para pesquisa. As respostas da IA podem conter falhas e incertezas; a IA não vota nem decide consenso. O parecer preliminar da criação da sala é destinado ao moderador; intervenções relevantes permanecem identificáveis.",
+    "text": "O Gemini recebe os textos e o contexto necessários aos pareceres consultivos. A pesquisa externa e a verificação factual foram retiradas das próximas sessões. As respostas da IA podem conter falhas e incertezas; a IA não vota nem decide consenso. O parecer preliminar da criação da sala é destinado ao moderador; intervenções relevantes permanecem identificáveis.",
     "heading": false
   },
   {
@@ -58,7 +64,7 @@ export const RESEARCH_SECTIONS=[
     "heading": false
   },
   {
-    "text": "Responsável operacional pela guarda e pelo atendimento a dúvidas e pedidos de retirada: Matheus Rodrigues Moratelli, pesquisador discente de Engenharia da Computação da UVA. Contato: moratellimc3@gmail.com.",
+    "text": `Responsável operacional pela guarda e pelo atendimento a dúvidas e pedidos de retirada: Matheus Rodrigues Moratelli, pesquisador discente de Engenharia da Computação da UVA. Contato: ${RESEARCH_CONTACT}.`,
     "heading": false
   },
   {
@@ -98,7 +104,7 @@ export const RESEARCH_SECTIONS=[
     "heading": true
   },
   {
-    "text": "Antes de entrar na discussão, leia estas informações e registre sua concordância voluntária na caixa inicialmente desmarcada. Ao selecionar “Concordar e continuar”, o software registra sua resposta SIM, data e hora com fuso, versão deste termo e identificador pseudônimo, separadamente dos votos, no histórico e no JSON da pesquisa. A concordância não é preenchida antecipadamente e o silêncio não significa aceite. Se não concordar, não prossiga; você pode solicitar esclarecimentos ou comunicar NÃO ou DESISTÊNCIA ao responsável pelo contato acima. Você poderá solicitar uma cópia destas informações.",
+    "text": "Antes de entrar na discussão, leia estas informações e registre sua concordância voluntária na caixa inicialmente desmarcada. Ao selecionar “Continuar”, o software registra sua resposta SIM, data e hora com fuso, versão deste termo e identificador pseudônimo, separadamente dos votos, no histórico e no JSON da pesquisa. A concordância não é preenchida antecipadamente e o silêncio não significa aceite. Se não concordar, não prossiga; você pode solicitar esclarecimentos ou comunicar NÃO ou DESISTÊNCIA ao responsável pelo contato acima. Você poderá solicitar uma cópia destas informações.",
     "heading": false
   },
   {
@@ -111,11 +117,11 @@ export const RESEARCH_SECTIONS=[
   },
   {
     "heading": false,
-    "text": "Atualização 1.3: ACEITO significa aceitar a proposta como está, sem justificativa. Se houver condição ou ajuste, registre REJEITO e justifique. A classificação humana de cobertura/fidelidade não é solicitada ao moderador neste fluxo; registros antigos são preservados. Atualização 1.2: nas novas manifestações, apenas ACEITO e REJEITO. O silêncio não é aceitação. Pedidos de parecer possuem intervalo individual mínimo de 60 segundos e podem aguardar capacidade. A pesquisa externa é conduzida pelo moderador. Os registros históricos mantêm suas categorias originais. Atualização anterior 1.1: adaptação do registro de concordância ao fluxo eletrônico no software. As condições de participação, guarda, acesso e retirada da versão 1.0 foram preservadas."
+    "text": "Atualização 1.3: ACEITO significa aceitar a proposta como está, sem justificativa. Se houver condição ou ajuste, registre REJEITO e justifique. A classificação humana de cobertura/fidelidade não é solicitada ao moderador neste fluxo; registros antigos são preservados. Atualização 1.2: nas novas manifestações, apenas ACEITO e REJEITO. O silêncio não é aceitação. Pedidos de parecer possuem intervalo individual mínimo de 60 segundos e podem aguardar capacidade. Os registros históricos mantêm suas categorias originais. Atualização anterior 1.1: adaptação do registro de concordância ao fluxo eletrônico no software. As condições de participação, guarda, acesso e retirada da versão 1.0 foram preservadas."
   },
   {
     "heading": false,
-    "text": "Atualização 1.4: questionário DSR-1.1 integrado como único canal oficial após encerramento legítimo, com ou sem consenso, a partir de uma rodada. Os 22 itens fechados, A1–A3, escala, N/A e omissões são preservados; A4 permanece adaptada para usos futuros. O Forms anterior é material histórico e não deve ser distribuído para esta coleta."
+    "text": "Atualização 1.4: questionário DSR-1.1 integrado como único canal oficial após encerramento legítimo, com ou sem consenso, a partir de uma rodada. Os 22 itens fechados, A1–A3, escala, N/A e omissões são preservados; A4 permanece adaptada para usos futuros. O Forms anterior é material histórico. A versão 1.5 se aplica a novas salas e preserva as versões e concordâncias anteriores registradas em cada sessão."
   }
 ] as const;
 export const RESEARCH_TEXT=RESEARCH_SECTIONS.map(s=>s.text).join('\n\n');

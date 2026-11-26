@@ -2,7 +2,7 @@ import type {Repository,Identity} from './db.js';
 import type {AIAdapter} from './ai.js';
 import {AIUnavailable,PROMPT_VERSION} from './ai.js';
 import {withAIQueueStatus} from './gemini-queue.js';
-import {DomainError,currentRound,currentProposal,latestVotes,manifestations,factualContext,sourceFingerprint,addAnalysis,addSynthesis,reconcileSynthesisLinks,event,type State} from './domain.js';
+import {DomainError,currentRound,currentProposal,latestVotes,manifestations,sourceFingerprint,addAnalysis,addSynthesis,reconcileSynthesisLinks,event,type State} from './domain.js';
 
 export function automaticMediation(repo:Repository,ai:AIAdapter){
  const running=new Set<string>();
@@ -33,13 +33,13 @@ export function automaticMediation(repo:Repository,ai:AIAdapter){
    if(!analysis){
     await setStage('ANALYSIS_REQUEST','Analisando as manifestações do grupo.');
     const result=await withAIQueueStatus(queued,()=>ai.analyzeObjections(currentProposal(s).content,votes.map(({id,choice,justification})=>({id,choice,justification})),
-     [...s.contributions.filter(c=>c.roundId===roundId).map(c=>({id:c.id,text:c.text})),...factualContext(s).map(f=>({type:'EXTERNAL_EVIDENCE_CONSULTIVE',...f}))],manifestations(s)));
+     s.contributions.filter(c=>c.roundId===roundId).map(c=>({id:c.id,text:c.text})),manifestations(s)));
     stage='ANALYSIS_VALIDATION';
     const saved=await change(state=>addAnalysis(state,result,ai.model,PROMPT_VERSION));analysis=saved.state.analyses.at(-1)!;
    }
    await setStage('SYNTHESIS_REQUEST','Preparando a sugestão de nova proposta.');
    current=await repo.read(moderator);const draft=current.state;
-   const result=await withAIQueueStatus(queued,()=>ai.synthesizeProposal(currentProposal(draft).content,{...analysis!.result,uncertainties:[...analysis!.result.uncertainties,...factualContext(draft).map(f=>'EVIDÊNCIA EXTERNA CONSULTIVA: '+JSON.stringify(f))]},manifestations(draft)));
+   const result=await withAIQueueStatus(queued,()=>ai.synthesizeProposal(currentProposal(draft).content,analysis!.result,manifestations(draft)));
    stage='SYNTHESIS_VALIDATION';const verified=reconcileSynthesisLinks(draft,result);
    // Validate before persistence, then append privately. Publication remains human.
    const validation=structuredClone(draft);addSynthesis(validation,analysis.id,verified,ai.model,PROMPT_VERSION);

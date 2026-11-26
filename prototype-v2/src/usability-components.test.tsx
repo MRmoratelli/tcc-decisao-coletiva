@@ -7,7 +7,7 @@ import App from './App';
 import {RoomWorkspace} from './components/RoomWorkspace';
 import {createState} from '../server/domain';
 import {proposal,review} from '../server/fixtures';
-import {RESEARCH_TEXT,RESEARCH_VERSION} from '../shared/research';
+import {RESEARCH_TEXT,RESEARCH_VERSION,RESEARCH_SHORT_TEXT,RESEARCH_CONTACT} from '../shared/research';
 import type {RoomView} from './api';
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
 const storage=new Map<string,string>();
@@ -19,7 +19,7 @@ test('Acesso: termo integral e caixa desmarcada; concordância vem antes da entr
  storage.clear();const requests:any[]=[];const v=view();
  t.mock.method(globalThis,'fetch',async(url:RequestInfo|URL,init?:RequestInit)=>{
   const path=String(url),body=JSON.parse(String(init?.body));requests.push({path,body});
-  return {ok:true,json:async()=>path.endsWith('/invitation')?{research:{version:RESEARCH_VERSION,text:RESEARCH_TEXT,source:'https://example.test/term'},participantCount:2,open:true}:path.endsWith('/join')?{alias:'P01'}:v} as Response;
+  return {ok:true,json:async()=>path.endsWith('/invitation')?{research:{version:RESEARCH_VERSION,text:RESEARCH_TEXT,shortText:RESEARCH_SHORT_TEXT,source:'https://example.test/term'},participantCount:2,open:true}:path.endsWith('/join')?{alias:'P01'}:v} as Response;
  });
  let ui!:ReactTestRenderer;
  try{
@@ -28,11 +28,16 @@ test('Acesso: termo integral e caixa desmarcada; concordância vem antes da entr
   await act(async()=>ui.root.findAllByType('button').find(b=>b.children.includes('Participar de uma sala'))!.props.onClick());
   await act(async()=>ui.root.findAllByType('input')[0].props.onChange({target:{value:v.room.code}}));
   await act(async()=>ui.root.findAllByType('form')[0].props.onSubmit({preventDefault(){}}));
+  const short=ui.root.findByProps({className:'research-information'});
+  assert.equal(short.findAllByType('p').map(p=>p.children.join('')).join('\n\n'),RESEARCH_SHORT_TEXT);
+  assert.equal(short.props.tabIndex,0);
+  assert.equal(ui.root.findAllByProps({href:'mailto:'+RESEARCH_CONTACT}).length,1);
+  assert.ok(JSON.stringify(ui.toJSON()).includes('Ler termo completo'));
   assert.ok(JSON.stringify(ui.toJSON()).includes('Prazo de guarda'));
   assert.ok(!JSON.stringify(ui.toJSON()).includes('Sua manifestação'));
   const checkbox=ui.root.findAllByType('input').find(i=>i.props.type==='checkbox')!;
   assert.equal(checkbox.props.checked,false);
-  const agree=()=>ui.root.findAllByType('button').find(b=>b.children.includes('Concordar e continuar'))!;
+  const agree=()=>ui.root.findAllByType('button').find(b=>b.children.includes('Continuar'))!;
   assert.equal(agree().props.disabled,true);
   assert.ok(!requests.some(r=>r.path.endsWith('/join')));
   await act(async()=>checkbox.props.onChange({target:{checked:true}}));

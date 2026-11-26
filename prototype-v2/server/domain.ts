@@ -20,7 +20,7 @@ const Evaluation=z.object({id,participantId:id,at:date,input:EvaluationSchema,ap
 const Contest=z.object({id,participantId:id,targetId:id,text:z.string().min(1).max(2000),at:date});
 export const StateSchema=z.object({
  schemaVersion:z.literal(2),votingMode:z.enum(['BINARY','LEGACY']).optional(),initialDraft:ProposalSchema,decision:z.object({id,originId:id,title:z.string(),status:z.enum(['OPEN','CONSENSUS','CLOSED_WITHOUT_CONSENSUS']),createdAt:date,closedAt:date.nullable(),closureReason:z.string()}),
- research:z.object({version:z.string(),text:z.string().max(20000),source:z.string()}).optional(),
+ research:z.object({version:z.string(),text:z.string().max(20000),source:z.string(),shortText:z.string().max(2000).optional()}).optional(),
  enrollment:z.object({mode:z.literal('SELF'),claims:z.array(id),automaticMediation:z.boolean()}).optional(),
  researchConsents:z.array(z.object({participantId:id,response:z.literal('SIM'),at:date,version:z.string(),actor:z.literal('participant')})).default([]),
  mediation:z.object({roundId:id,fingerprint:z.string(),status:z.enum(['RUNNING','READY','FAILED']),startedAt:date,detail:z.string(),stage:z.string().optional(),failureCode:z.string().optional()}).optional(),
@@ -117,7 +117,7 @@ export function addAnalysis(s:State,result:Assessment,model:string,promptVersion
  open(s);assertAssessment(s,result);result=structuredClone(result);
  for(const row of result.manifestationAssessments??[])row.quoteOrigin=quoteOrigin(s,row.sourceId,currentRound(s).id,row.quotedExcerpt);
  for(const row of result.individualAssessments)row.quoteOrigin=quoteOrigin(s,row.voteId,currentRound(s).id,row.quotedExcerpt);
- const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),factualCheckIds:factualContext(s).map(f=>f.id),result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
+ const a={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,sourceFingerprint:sourceFingerprint(s),factualCheckIds:[],result,model,promptVersion,createdAt:now()};s.analyses.push(a);event(s,'moderator','OBJECTIONS_ANALYZED');return a;
 }
 export function assertSynthesis(s:State,result:SynthesisResult){
  const sourceIds=manifestations(s).map(x=>x.id),considered=result.consideredSourceIds??[];

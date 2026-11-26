@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import type pg from 'pg';
 import { DomainError, createState, validateState, event, type State, type ReviewRecordType } from './domain.js';
-import { RESEARCH_VERSION, RESEARCH_TEXT, RESEARCH_SOURCE } from '../shared/research.js';
+import { RESEARCH_VERSION, RESEARCH_TEXT, RESEARCH_SOURCE, RESEARCH_SHORT_TEXT } from '../shared/research.js';
 import type { ProposalContent } from '../shared/contracts.js';
 
 type QueryResult={rows:any[]};
@@ -24,7 +24,7 @@ export class Repository {
    function remap(value:any):any{if(typeof value==='string')return mapping.get(value)??value;if(Array.isArray(value))return value.map(remap);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,k==='originId'?v:remap(v)]));return value;}
    state=validateState(remap(imported));delete state.reviewRequests;delete state.enrollment;delete state.mediation;for(const f of state.factualChecks)f.provenance='IMPORTED_UNAUTHENTICATED';event(state,'moderator','IMPORTED','Cópia restaurada em sala nova; credenciais reemitidas. Proveniência do arquivo não autenticada.');
   }
-  if(selfEnrollment){state.research={version:RESEARCH_VERSION,text:RESEARCH_TEXT,source:RESEARCH_SOURCE};state.enrollment={mode:'SELF',claims:[],automaticMediation:true};}
+  if(selfEnrollment){state.research={version:RESEARCH_VERSION,text:RESEARCH_TEXT,source:RESEARCH_SOURCE,shortText:RESEARCH_SHORT_TEXT};state.enrollment={mode:'SELF',claims:[],automaticMediation:true};}
   const c=await this.pool.connect();try{
    await c.query('BEGIN');
    await c.query('INSERT INTO dc2_rooms(id,code,topic,proposal,proposal_review,moderator_hash) VALUES($1,$2,$3,$4,$5,$6)',[roomId,code,proposal.title,proposal.text,JSON.stringify(review.result??{}),this.hash(moderatorCredential)]);

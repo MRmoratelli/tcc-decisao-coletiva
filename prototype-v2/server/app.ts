@@ -5,14 +5,11 @@ import { z, ZodError } from 'zod';
 import { makeReceipt, verifyReceipt } from './receipts.js';
 import { ProposalSchema, ReviewSchema, ChoiceSchema, ActiveChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
 import { Repository, type Identity } from './db.js';
-import { FactualService,privateData,retryableFactual,type FactualAdapter } from './factual.js';
-import { FACTUAL_MODEL,FACTUAL_VERSION,isTavilyCheck,ResearchModeSchema } from '../shared/factual.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
-import { DomainError,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema,addFactualCheck,factualContext, type State, type ReviewRecordType } from './domain.js';
-export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean;factual?:FactualAdapter}={}){
+import { DomainError,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
+export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean}={}){
  if(signingKey.length<32)throw new Error('REVIEW_SIGNING_KEY forte obrigatório.');
  const prepare=automaticMediation(repo,ai);
- const factual=options.factual??new FactualService();
  const app=express();app.disable('x-powered-by');
  app.use((_req,res,next)=>{res.set({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});next();});
  app.use((req,res,next)=>{const origin=req.get('origin');if(origin&&origin!==(options.origin??req.protocol+'://'+req.get('host'))){res.status(403).json({error:'Origem não autorizada.'});return;}next();});
@@ -24,7 +21,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  };}
  app.use('/api',rateLimit(300));
  const aiLimit=rateLimit(60),creationLimit=rateLimit(10);
- const factualLimit=rateLimit(60),enrollmentLimit=rateLimit(90);
+ const enrollmentLimit=rateLimit(90);
  const credential=z.string().min(20).max(128),revision=z.number().int().positive();
  const text=z.string().trim().min(1).max(5000);
  const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional(),appliedRewrite:z.boolean().optional(),reviewChoice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
@@ -71,7 +68,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
    metrics:identity.role==='moderator'?metrics(s):null};
  }
- app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,geminiPolicy:{maxCalls:14,windowSeconds:60,participantIntervalSeconds:60},factual:{enabled:factual.enabled,retrievalProvider:'TAVILY',model:FACTUAL_MODEL,version:FACTUAL_VERSION,...(factual.availability?{availability:factual.availability,limits:factual.limits}:{})}});});
+ app.get('/api/health',async(_req,res)=>{await repo.healthy();res.json({status:'ok',version:2,commit:options.commit??null,aiConfigured:options.aiConfigured??false,geminiPolicy:{maxCalls:14,windowSeconds:60,participantIntervalSeconds:60}});});
  app.post('/api/ai/proposal-review',aiLimit,async(req,res)=>{
   z.literal(true).parse(req.body.consent);const proposal=ProposalSchema.parse(req.body.proposal);
   const review=await ai.analyzeProposal(proposal);res.json({review,receipt:makeReceipt(signingKey,'proposal',proposal,review)});
@@ -114,25 +111,6 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   if(known!==undefined){const current=await repo.latestRevision(i);if(current===known){res.json({revision:current,unchanged:true});return;}}
   const x=await repo.read(i);res.json(view(x.state,i,x.revision));
  });
- app.post('/api/rooms/:code/fact-check',factualLimit,async(req,res)=>{
-  const i=await auth(req,'moderator'),b=z.object({mode:ResearchModeSchema.default('VERIFY'),text:z.string().trim().min(4).max(1200),proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body);
-  if(privateData(b.text))throw new DomainError('Remova dados pessoais, informações privadas e URLs. Envie somente a alegação pública mínima.');
-  const x=await repo.read(i);if(x.state.decision.status!=='OPEN'||currentProposal(x.state).id!==b.proposalId||currentRound(x.state).id!==b.roundId)throw new DomainError('Proposta ou rodada desatualizada.',409);
-  const existing=[...x.state.factualChecks].reverse().find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&(isTavilyCheck(f)?(f.modality??'VERIFY')===b.mode:true)&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
-  if(existing&&!retryableFactual(existing,factual.availability?.searchConfigured)){res.json({check:existing,cached:true});return;}
-  if(x.state.factualChecks.length>=200)throw new DomainError('Limite de verificações desta sala atingido.',429);
-  const previous=[...x.state.factualChecks].reverse().filter(isTavilyCheck).find(f=>f.version===FACTUAL_VERSION&&f.provenance==='LIVE_PROVIDER'&&f.proposalId===b.proposalId&&f.originalText===b.text&&(isTavilyCheck(f)?(f.modality??'VERIFY')===b.mode:true)&&(i.role==='moderator'||f.participantId===(i.participantId??null))&&f.classificationModel?.startsWith(FACTUAL_MODEL));
-  const report=await factual.check(b.text,i.roomId,previous,b.mode);
-  // Merge only an append-only factual record, retrying revision races without repeating provider calls.
-  for(let attempt=0;attempt<12;attempt++){
-   const current=await repo.read(i);
-   if(current.state.decision.status!=='OPEN'||currentProposal(current.state).id!==b.proposalId)throw new DomainError('A proposta mudou durante a consulta. O resultado não foi aplicado.',409);
-   const duplicate=[...current.state.factualChecks].reverse().find(f=>f.version===FACTUAL_VERSION&&f.provenance!=='IMPORTED_UNAUTHENTICATED'&&f.proposalId===b.proposalId&&f.participantId===(i.participantId??null)&&f.originalText===b.text&&(isTavilyCheck(f)?(f.modality??'VERIFY')===b.mode:true)&&Date.now()-Date.parse(f.createdAt)>=0&&Date.now()-Date.parse(f.createdAt)<600000);
-   if(duplicate&&!retryableFactual(duplicate,factual.availability?.searchConfigured)){res.json({check:duplicate,cached:true});return;}
-   try{const saved=await repo.mutate(i,current.revision,s=>addFactualCheck(s,report,i.participantId??null));res.status(201).json({check:saved.state.factualChecks.at(-1),cached:false});return;}
-   catch(e){if(e instanceof DomainError&&e.status===409&&attempt<11)continue;throw e;}
-  }
- });
  app.post('/api/rooms/:code/contribution-review',aiLimit,async(req,res)=>{
   const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
   if(b.proposalId!==currentProposal(state).id||b.roundId!==currentRound(state).id)throw new DomainError('Versão desatualizada.',409);
@@ -168,11 +146,11 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   if(state.decision.status!=='OPEN')throw new DomainError('Processo encerrado.',409);
   try{
    if(mode==='analysis'){
-    const result=await ai.analyzeObjections(currentProposal(state).content,latestVotes(state).map(({id,choice,justification})=>({id,choice,justification})),[...state.contributions.filter(c=>c.roundId===currentRound(state).id).map(c=>({id:c.id,text:c.text})),...factualContext(state).map(f=>({type:'EXTERNAL_EVIDENCE_CONSULTIVE',...f}))],manifestations(state));
+    const result=await ai.analyzeObjections(currentProposal(state).content,latestVotes(state).map(({id,choice,justification})=>({id,choice,justification})),state.contributions.filter(c=>c.roundId===currentRound(state).id).map(c=>({id:c.id,text:c.text})),manifestations(state));
     return await repo.mutate(i,b.revision,s=>addAnalysis(s,result,ai.model,PROMPT_VERSION));
    }
    const a=state.analyses.find(a=>a.id===b.analysisId&&a.proposalId===currentProposal(state).id);if(!a)throw new DomainError('Análise atual não encontrada.');
-   const result=await ai.synthesizeProposal(currentProposal(state).content,{...a.result,uncertainties:[...a.result.uncertainties,...factualContext(state).map(f=>'EVIDÊNCIA EXTERNA CONSULTIVA, NÃO DECISÓRIA: '+JSON.stringify(f))]},manifestations(state));
+   const result=await ai.synthesizeProposal(currentProposal(state).content,a.result,manifestations(state));
    const verified=reconcileSynthesisLinks(state,result);
    return await repo.mutate(i,b.revision,s=>{
     if(verified!==result)event(s,'moderator','SYNTHESIS_LINKS_RECONCILED','IDs verificados; classificação ausente conservadoramente não atendida. Ver aviso no rascunho.');

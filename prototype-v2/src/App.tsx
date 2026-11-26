@@ -1,11 +1,11 @@
 import { useState,useEffect,useRef,type FormEvent } from 'react';
 import { request,type CreatedRoom,type RoomView,type RoomSyncResponse } from './api';
 import {InitialProposalForm,type InitialProposalInput} from './components/InitialProposalForm';
-import { ReviewCard } from './components/ReviewCard';
+import { RESEARCH_CONTACT } from '../shared/research';
 import { RoomWorkspace } from './components/RoomWorkspace';
 
 type Session={code:string;credential:string;view:RoomView};
-type Invitation={research:{version:string;text:string;source:string};participantCount:number;open:boolean};
+type Invitation={research:{version:string;text:string;source:string;shortText?:string};participantCount:number;open:boolean};
 const sessionKey=(code:string)=>'dc2-access-'+code;
 function savedCredential(code:string){try{return localStorage.getItem(sessionKey(code))??'';}catch{return '';}}
 function persist(code:string,credential:string){
@@ -108,11 +108,11 @@ export default function App(){
  <h2>{invitation?'Informação e concordância para a pesquisa':'Entrar em uma discussão'}</h2>
  {!invitation&&<><p>Abra o link enviado pelo moderador ou informe o código. Seu acesso será criado e salvo automaticamente neste navegador.</p><form onSubmit={join}><label>Código da sala<input required maxLength={10} value={code} onChange={e=>setCode(e.target.value.toUpperCase())}/></label><button className="primary" disabled={busy}>{busy?'Consultando sala…':'Continuar'}</button></form></>}
  {invitation&&<>
- <p>Leia o termo completo antes de entrar. Concordância com a pesquisa e posição sobre a proposta são registros separados.</p>
- <article className="research-information" aria-label="Termo completo de informação e concordância">{invitation.research.text.split('\n\n').map((paragraph,index)=><p key={index}>{paragraph}</p>)}</article>
- <p><a href={invitation.research.source} target="_blank" rel="noreferrer">Consultar documento de origem</a> · Versão exibida: {invitation.research.version}</p>
- <label className="check"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)}/> Li e compreendi as informações e concordo voluntariamente em participar da avaliação acadêmica descrita.</label>
- <button className="primary" disabled={busy||!accepted||!invitation.open} onClick={()=>void enroll()}>{busy?'Registrando concordância…':'Concordar e continuar'}</button>
+ <div className="research-information" tabIndex={0} role="region" aria-label="Informações para participar">{(invitation.research.shortText??invitation.research.text).split('\n\n').map((paragraph,index)=><p key={index}>{paragraph}</p>)}</div>
+ <details><summary>Ler termo completo</summary><div aria-label="Termo completo de informação e concordância">{invitation.research.text.split('\n\n').map((paragraph,index)=><p key={index}>{paragraph}</p>)}</div></details>
+ <p>Contato da equipe <a href={'mailto:'+RESEARCH_CONTACT}>{RESEARCH_CONTACT}</a></p>
+ <label className="check"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)}/> Li as informações e concordo em participar</label>
+ <button className="primary" disabled={busy||!accepted||!invitation.open} onClick={()=>void enroll()}>{busy?'Registrando concordância…':'Continuar'}</button>
  {!invitation.open&&<p className="alert">Esta discussão foi encerrada. Participantes já inscritos podem retornar pelo mesmo navegador.</p>}
  <p className="muted">Se não concordar, não prossiga. Para dúvidas ou retirada, utilize o contato informado no termo. Volte pelo mesmo navegador para recuperar seu acesso.</p>
  </>}
