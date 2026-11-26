@@ -8,7 +8,7 @@ import {FakeAI,proposal,review} from './fixtures.js';
 import {migrate} from './migrate.js';
 import {RESEARCH_VERSION} from '../shared/research.js';
 
-type View={state:State;revision:number;pendingVoteCount:number;positions:{id:string;choice:string}[]};
+type View={state:State;revision:number;votingDeadlineAt?:string;pendingVoteCount:number;positions:{id:string;choice:string}[]};
 type Room={code:string;moderatorCredential:string;participants:{credential:string}[]};
 const token=(i:number)=>i.toString(16).padStart(64,'0');
 
@@ -91,29 +91,53 @@ test('HTTP: prazo, saídas, encerramento, concorrência e histórico de rodadas'
    }finally{release();await pending;ai.analyzeContribution=previous;}
   });
 
-  await t.test('varredura fecha sem tráfego e inscrição tardia não vira abstenção retroativa',async()=>{
-   const room=await create(3,true),v=await view(room);
+  await t.test('primeira rodada dá o prazo inteiro a cada entrada e a varredura aguarda as vagas restantes',async()=>{
+   const room=await create(3,true),v=await view(room),opened=clock;
    const join=(n:number)=>roomPost(room,'/join',{browserCredential:token(n),consent:true,version:RESEARCH_VERSION});
+   assert.deepEqual(v.positions.map(p=>p.choice),['AINDA_NAO_ENTROU','AINDA_NAO_ENTROU','AINDA_NAO_ENTROU']);
+   clock=opened+60_000;
    assert.equal((await join(1)).status,200);
+   clock=opened+120_000;
+   assert.equal((await join(2)).status,200);
+   assert.equal((await join(1)).status,200);
+   const first=await roomPost<View>(room,'/view',{},token(1)),second=await roomPost<View>(room,'/view',{},token(2));
+   assert.equal(Date.parse(first.body.votingDeadlineAt!),opened+60_000+ROUND_DURATION_MS);
+   assert.equal(Date.parse(second.body.votingDeadlineAt!),opened+120_000+ROUND_DURATION_MS);
+   assert.equal(first.body.state.rounds[0].voting!.participantStarts!.length,1);
+   clock=opened+60_000+ROUND_DURATION_MS;
+   await repo.sweepExpiredRounds();
    const before=await view(room);
-   assert.equal(before.pendingVoteCount,1);
-   assert.deepEqual(round(before).voting!.eligibleIds,round(v).voting!.eligibleIds);
-   clock=Date.parse(round(v).voting!.deadlineAt);
+   assert.equal(round(before).status,'OPEN');
+   assert.equal((await vote(room,before,0,token(1))).status,409);
+   assert.equal((await vote(room,before,1,token(2))).status,201);
+   assert.equal((await join(3)).status,200);
+   clock+=ROUND_DURATION_MS;
    await repo.sweepExpiredRounds();
    const moderator=await repo.authorize(room.code,room.moderatorCredential);
    assert.ok(moderator);
    const rows=(await pool.query('SELECT state FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[moderator.roomId])).rows;
    const persisted=validateState(rows[0].state);
-   assert.deepEqual(persisted.rounds[0].voting!.closure,{cause:'PRAZO_EXPIRADO',abstentions:[v.state.participants[0].id]});
-   assert.equal((await join(2)).status,200);
+   assert.deepEqual(persisted.rounds[0].voting!.closure,{cause:'PRAZO_EXPIRADO',abstentions:[v.state.participants[0].id,v.state.participants[2].id]});
+  });
+
+  await t.test('moderador encerra com ausentes e a segunda rodada começa com prazo comum',async()=>{
+   const room=await create(3,true);
+   const join=(n:number)=>roomPost(room,'/join',{browserCredential:token(n),consent:true,version:RESEARCH_VERSION});
+   assert.equal((await join(4)).status,200);
+   clock+=ROUND_DURATION_MS+1;
+   const before=await view(room);
+   assert.equal(before.pendingVoteCount,1);
+   assert.equal((await close(room,before)).status,200);
+   assert.equal((await join(5)).status,200);
    const closed=await view(room);
-   assert.deepEqual(round(closed).voting!.closure,persisted.rounds[0].voting!.closure);
+   assert.deepEqual(closed.positions.map(p=>p.choice),['ABSTENCAO','SEM_VOTO','SEM_VOTO']);
    assert.equal((await roomPost(room,'/publish',{revision:closed.revision,sourceId:round(closed).proposalId,proposal,reason:'Revisão do grupo.',confirm:true})).status,200);
    const next=await view(room);
-   assert.deepEqual(round(next).voting!.eligibleIds,v.state.participants.slice(0,2).map(p=>p.id));
-   assert.equal((await join(3)).status,200);
-   assert.equal((await vote(room,next,2,token(3))).status,403);
-   assert.deepEqual(round(await view(room)).voting!.eligibleIds,round(next).voting!.eligibleIds);
+   assert.equal(round(next).voting!.participantStarts,undefined);
+   assert.equal(Date.parse(round(next).voting!.deadlineAt),clock+ROUND_DURATION_MS);
+   assert.deepEqual(round(next).voting!.eligibleIds,closed.state.participants.slice(0,2).map(p=>p.id));
+   assert.equal((await join(6)).status,200);
+   assert.equal((await vote(room,next,2,token(6))).status,403);
   });
 
   await t.test('saída antes de votar impede consenso, confirmação registra só os pendentes ativos',async()=>{

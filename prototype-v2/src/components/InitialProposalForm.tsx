@@ -4,6 +4,8 @@ import {ProposalSchema,type ProposalContent} from '../../shared/contracts';
 import {emptyProposal} from './ProposalEditor';
 import {ReviewCard} from './ReviewCard';
 
+const normalizeSpacing=(text:string)=>text.trim().replace(/\s+/g,' ');
+
 export type InitialProposalInput={
  proposal:ProposalContent;participantCount:number;simple:true;aiConsent:true;
  initialReviewMode:'REVIEWED'|'BYPASSED';reviewedProposal?:ProposalContent;
@@ -14,6 +16,8 @@ export function InitialProposalForm({busy,onCreate}:{busy:boolean;onCreate:(inpu
  const [review,setReview]=useState<ReviewResult|null>(null),[reviewed,setReviewed]=useState<ProposalContent|null>(null);
  const [reviewing,setReviewing]=useState(false),[failure,setFailure]=useState('');
  const [usedSuggestion,setUsedSuggestion]=useState(false);
+ const suggestedRewrite=review?.review.suggestedRewrite??'';
+ const hasRewrite=Boolean(reviewed&&normalizeSpacing(suggestedRewrite)&&normalizeSpacing(suggestedRewrite)!==normalizeSpacing(reviewed.text));
  const locked=busy||reviewing;
  const valid=proposal.title.trim().length>=3&&proposal.text.trim().length>=4&&Number.isInteger(count)&&count>=2&&count<=15;
  async function analyze(e:FormEvent){
@@ -46,14 +50,14 @@ export function InitialProposalForm({busy,onCreate}:{busy:boolean;onCreate:(inpu
  {failure&&<div className="alert" role="alert"><p>{failure}</p><button type="button" disabled={locked||!valid} onClick={()=>void create(true)}>Criar sala sem revisão da IA</button></div>}
  {review&&reviewed&&<section className="review-follow" aria-label="Revisão inicial da IA">
  <h3>Sugestão da IA para sua proposta</h3><p>{review.review.summary}</p>
- {review.review.suggestedRewrite?<><blockquote className="preserve">{review.review.suggestedRewrite}</blockquote>
- <button type="button" className="secondary" disabled={locked} onClick={()=>{setProposal({...proposal,text:review.review.suggestedRewrite});setUsedSuggestion(true);}}>Usar sugestão da IA</button></>:<p>A IA não apresentou uma reformulação. Você pode revisar seu texto e manter a proposta.</p>}
+ {hasRewrite?<><blockquote className="preserve">{suggestedRewrite}</blockquote>
+ <button type="button" className="secondary" disabled={locked} onClick={()=>{setProposal({...proposal,text:suggestedRewrite});setUsedSuggestion(true);}}>Usar sugestão da IA</button></>:<p>A IA não sugeriu alterações no texto da proposta</p>}
  <button type="button" className="text-button" disabled={locked} onClick={()=>{setProposal({...proposal,text:reviewed.text});setUsedSuggestion(false);}}>Manter minha proposta</button>
  {usedSuggestion&&<p className="alert" role="status">Sugestão aplicada ao campo Proposta inicial. Revise o texto acima: ele será publicado ao criar a sala.</p>}
  {/\[(?:Data|Prazo|Valor|Local|Orçamento)[^\]]*\]/i.test(proposal.text)&&<p className="alert" role="alert">Há marcadores pendentes no texto. Remova-os ou substitua-os por informações definidas pelo grupo antes de publicar.</p>}
  {review.review.recommendations.length>0&&<><h4>Pontos de atenção</h4><ul>{review.review.recommendations.map((x,i)=><li key={i}>{x}</li>)}</ul></>}
  <p className="muted">O parecer se refere ao rascunho analisado, que será preservado. Você pode editar os campos acima antes de confirmar. Nenhuma sala foi criada nesta revisão.</p>
- <details><summary>Detalhes do parecer consultivo</summary><ReviewCard review={review.review} label="Parecer da proposta inicial"/></details>
+ <details><summary>Detalhes do parecer consultivo</summary><ReviewCard review={{...review.review,suggestedRewrite:hasRewrite?suggestedRewrite:''}} label="Parecer da proposta inicial"/></details>
  <button type="button" className="primary" disabled={locked||!valid} onClick={()=>void create()}>{busy?'Criando sala…':'Criar sala com esta proposta'}</button>
  </section>}
  </form>;

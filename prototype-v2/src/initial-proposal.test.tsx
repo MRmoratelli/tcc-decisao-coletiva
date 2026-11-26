@@ -72,3 +72,22 @@ test('Revisão inicial: informa indisponibilidade do Gemini após as tentativas 
   assert.ok(button(rendered,'Criar sala sem revisão da IA'));
  }finally{await act(async()=>rendered.unmount());}
 });
+
+test('Criação: reformulação que só muda o espaçamento não é oferecida',async t=>{
+ let created:InitialProposalInput|undefined;
+ const unchanged={...review,suggestedRewrite:'  Proposta  original\npara revisão.  ',recommendations:['Confirme o horário.']};
+ t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({review:unchanged,receipt:'signed'})}) as Response);
+ let ui!:ReactTestRenderer;
+ try{
+  await act(async()=>{ui=create(<InitialProposalForm busy={false} onCreate={async input=>{created=input;}}/>);});
+  await fill(ui);await act(async()=>ui.root.findByType('form').props.onSubmit({preventDefault(){}}));
+  const rendered=JSON.stringify(ui.toJSON());
+  assert.ok(rendered.includes('A IA não sugeriu alterações no texto da proposta'));
+  assert.ok(rendered.includes('Confirme o horário.'));
+  assert.ok(!rendered.includes('Reformulação sugerida'));
+  assert.ok(!button(ui,'Usar sugestão da IA'));
+  await act(async()=>button(ui,'Criar sala com esta proposta').props.onClick());
+  assert.equal(created?.reviewChoice,'KEPT_ORIGINAL');
+  assert.equal(created?.receipt,'signed');
+ }finally{await act(async()=>ui.unmount());}
+});

@@ -6,7 +6,7 @@ import { makeReceipt, verifyReceipt } from './receipts.js';
 import { ProposalSchema, ReviewSchema, ReviewChoiceSchema, ActiveChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
 import { Repository, type Identity } from './db.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
-import { DomainError,assertVoter,DepartureKind,pendingVoters,closeRound,removeParticipant,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
+import { DomainError,assertVoter,participantVotingDeadline,DepartureKind,pendingVoters,closeRound,removeParticipant,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
 export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean}={}){
  if(signingKey.length<32)throw new Error('REVIEW_SIGNING_KEY forte obrigatório.');
  const prepare=automaticMediation(repo,ai);
@@ -52,6 +52,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   const filtered:State={...s,
    // Role projection only: persisted initial review and moderator exports stay complete.
    proposals:s.proposals.map((p,index)=>identity.role!=='moderator'&&index===0?{...p,review:{...p.review,result:null,reason:''}}:p),
+   rounds:identity.role==='moderator'?s.rounds:s.rounds.map(round=>round.voting?.participantStarts?{...round,voting:{...round.voting,participantStarts:round.voting.participantStarts.filter(start=>start.participantId===pid)}}:round),
    factualChecks:s.factualChecks.filter(f=>visible||f.participantId===pid),
    votes:s.votes.filter(v=>visible||v.participantId===pid),contributions:s.contributions.filter(c=>visible||c.participantId===pid),
    researchConsents:identity.role==='moderator'?s.researchConsents:s.researchConsents.filter(c=>c.participantId===pid),
@@ -62,9 +63,10 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    syntheses:identity.role==='moderator'?s.syntheses:s.syntheses.filter(x=>x.publishedProposalId),contests:s.contests.filter(c=>visible||c.participantId===pid),
    events:identity.role==='moderator'?s.events:s.events.filter(e=>e.actor===pid||['PROPOSAL_PUBLISHED','CONSENSUS_RECORDED','CLOSED_WITHOUT_CONSENSUS'].includes(e.type)),
    evaluations:identity.role==='moderator'?[]:s.evaluations.filter(e=>e.participantId===pid)};
-  return {revision,serverNow:Date.now(),pendingVoteCount:identity.role==='moderator'?pendingVoters(s).length:undefined,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:identity.role==='moderator'?s.proposals[0].review.result:null},
+  return {revision,serverNow:Date.now(),votingDeadlineAt:pid?participantVotingDeadline(r,pid):undefined,pendingVoteCount:identity.role==='moderator'?pendingVoters(s).length:undefined,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:identity.role==='moderator'?s.proposals[0].review.result:null},
    role:identity.role,alias:identity.alias??null,participantId:pid??null,canViewGroup:visible,state:filtered,
-   positions:visible?positions(s):positions(s).filter(p=>p.id===pid),
+   positions:(visible?positions(s):positions(s).filter(p=>p.id===pid)).map(pos=>
+    identity.role==='moderator'&&r.status==='OPEN'&&r.voting?.participantStarts&&pos.choice==='PENDENTE'&&!r.voting.participantStarts.some(start=>start.participantId===pos.id)?{...pos,choice:'AINDA_NAO_ENTROU'}:pos),
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
    metrics:identity.role==='moderator'?metrics(s):null};
  }

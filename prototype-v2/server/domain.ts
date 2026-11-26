@@ -12,7 +12,7 @@ export const ROUND_DURATION_MS=5*60*1000;
 export const DepartureKind=z.enum(['DESISTENCIA','ABANDONO']);
 const RoundClosure=z.enum(['CONSENSO','VOTACAO_CONCLUIDA','MODERADOR','PRAZO_EXPIRADO','SESSAO_ENCERRADA']);
 const Round=z.object({id,number:z.number().int().positive(),proposalId:id,status:z.enum(['OPEN','CLOSED']),openedAt:date,closedAt:date.nullable(),
- voting:z.object({eligibleIds:z.array(id),deadlineAt:date,closure:z.object({cause:RoundClosure,abstentions:z.array(id)}).optional()}).optional()});
+ voting:z.object({eligibleIds:z.array(id),deadlineAt:date,participantStarts:z.array(z.object({participantId:id,at:date})).optional(),closure:z.object({cause:RoundClosure,abstentions:z.array(id)}).optional()}).optional()});
 const Vote=z.object({id,participantId:id,roundId:id,proposalId:id,choice:ChoiceSchema,justification:z.string().max(5000),createdAt:date});
 const Contribution=z.object({id,participantId:id,roundId:id,proposalId:id,originalText:z.string().min(1).max(5000),text:z.string().min(1).max(5000),review:ReviewRecord,contest:z.string().max(2000),createdAt:date});
 const Analysis=z.object({id,proposalId:id,roundId:id,sourceFingerprint:z.string(),factualCheckIds:z.array(id).default([]),result:AssessmentSchema,promptVersion:z.string(),model:z.string(),createdAt:date});
@@ -48,24 +48,44 @@ export function positions(s:State){
  const r=currentRound(s),votes=latestVotes(s),active=new Set(r.voting?.eligibleIds);
  return s.participants.map(p=>({...p,choice:votes.find(v=>v.participantId===p.id)?.choice
   ??(r.voting?.closure?.abstentions.includes(p.id)?'ABSTENCAO':p.departure?.kind)
-  ??(r.voting&&(!active.has(p.id)||r.status==='CLOSED'&&s.enrollment&&!s.enrollment.claims.includes(p.id))?'SEM_VOTO':'PENDENTE')}));
+  ??(r.voting&&(!active.has(p.id)||r.status==='CLOSED'&&(r.voting.participantStarts?!r.voting.participantStarts.some(start=>start.participantId===p.id):s.enrollment&&!s.enrollment.claims.includes(p.id)))?'SEM_VOTO':'PENDENTE')}));
 }
 export function unanimous(s:State){
  const r=currentRound(s),votes=latestVotes(s),eligible=r.voting?.eligibleIds??s.participants.map(p=>p.id);
  return eligible.length>=(r.voting?1:2)&&eligible.every(id=>votes.some(v=>v.participantId===id&&v.proposalId===r.proposalId&&v.choice==='ACEITO'));
 }
-export function enableRoundVoting(s:State){
+export function enableRoundVoting(s:State,fromFirstEntry=false){
  const r=currentRound(s);
  // The first round reserves the seats set by the moderator at room creation.
  // Later rounds include only the active participants already enrolled.
  const eligibleIds=s.participants.filter(p=>!p.departure&&(r.number===1||!s.enrollment||s.enrollment.claims.includes(p.id))).map(p=>p.id);
- r.voting={eligibleIds,deadlineAt:new Date(Date.parse(r.openedAt)+ROUND_DURATION_MS).toISOString()};
+ r.voting={eligibleIds,deadlineAt:new Date(Date.parse(r.openedAt)+ROUND_DURATION_MS).toISOString(),...(fromFirstEntry?{participantStarts:[]}: {})};
+}
+export function startParticipantVoting(s:State,participantId:string,at:number){
+ const round=currentRound(s),voting=round.voting;
+ if(round.status!=='OPEN'||!voting?.participantStarts||!voting.eligibleIds.includes(participantId)||voting.participantStarts.some(start=>start.participantId===participantId))return false;
+ voting.participantStarts.push({participantId,at:new Date(at).toISOString()});
+ return true;
+}
+export function participantVotingDeadline(round:State['rounds'][number],participantId:string){
+ const voting=round.voting;
+ if(!voting)return;
+ if(!voting.participantStarts)return voting.deadlineAt;
+ const start=voting.participantStarts.find(entry=>entry.participantId===participantId);
+ if(start)return new Date(Date.parse(start.at)+ROUND_DURATION_MS).toISOString();
+}
+export function roundExpiration(round:State['rounds'][number]){
+ const voting=round.voting;
+ if(!voting)return;
+ if(!voting.participantStarts)return voting.deadlineAt;
+ if(voting.participantStarts.length!==voting.eligibleIds.length||!voting.participantStarts.length)return;
+ return new Date(Math.max(...voting.participantStarts.map(start=>Date.parse(start.at)))+ROUND_DURATION_MS).toISOString();
 }
 export function pendingVoters(s:State){
  const r=currentRound(s);
  if(!r.voting||r.status!=='OPEN')return [];
  const voted=new Set(latestVotes(s).map(v=>v.participantId));
- return r.voting.eligibleIds.filter(id=>!voted.has(id)&&s.participants.some(p=>p.id===id&&!p.departure)&&(!s.enrollment||s.enrollment.claims.includes(id)));
+ return r.voting.eligibleIds.filter(id=>!voted.has(id)&&s.participants.some(p=>p.id===id&&!p.departure)&&(r.voting!.participantStarts?r.voting!.participantStarts.some(start=>start.participantId===id):!s.enrollment||s.enrollment.claims.includes(id)));
 }
 function finishRound(s:State,cause:z.infer<typeof RoundClosure>,at:string){
  const r=currentRound(s);
@@ -78,7 +98,7 @@ function finishRound(s:State,cause:z.infer<typeof RoundClosure>,at:string){
  r.status='CLOSED';r.closedAt=at;
 }
 export function expireRound(s:State,at:number){
- const r=currentRound(s),deadline=r.voting?.deadlineAt;
+ const r=currentRound(s),deadline=roundExpiration(r);
  if(r.status!=='OPEN'||!deadline||at<Date.parse(deadline))return false;
  finishRound(s,'PRAZO_EXPIRADO',deadline);return true;
 }
@@ -129,8 +149,13 @@ function participant(s:State,pid:string){
 export function assertVoter(s:State,pid:string,roundId:string,proposalId:string,at=Date.now()){
  open(s);participant(s,pid);const r=currentRound(s);
  if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Versão ou rodada desatualizada. Atualize a sala.',409);
- if(r.status!=='OPEN'||r.voting&&at>=Date.parse(r.voting.deadlineAt))throw new DomainError('O prazo de votação desta rodada terminou.',409);
- if(r.voting&&(!r.voting.eligibleIds.includes(pid)||s.enrollment&&!s.enrollment.claims.includes(pid)))throw new DomainError('Participante não habilitado nesta rodada.',403);
+ if(r.status!=='OPEN')throw new DomainError('O prazo de votação desta rodada terminou.',409);
+ if(r.voting){
+  if(!r.voting.eligibleIds.includes(pid)||s.enrollment&&!s.enrollment.claims.includes(pid))throw new DomainError('Participante não habilitado nesta rodada.',403);
+  const deadline=participantVotingDeadline(r,pid);
+  if(!deadline)throw new DomainError('Entre na sala para iniciar seu prazo de votação.',409);
+  if(at>=Date.parse(deadline))throw new DomainError('O prazo de votação desta rodada terminou.',409);
+ }
  return r;
 }
 export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:Choice,justification:string,at=Date.now()){
@@ -327,14 +352,18 @@ export function validateState(input:unknown):State{
   const r=s.rounds[i];
   if(r.number!==i+1||r.proposalId!==s.proposals[i].id||r.status==='OPEN'&&(i!==s.rounds.length-1||s.decision.status!=='OPEN')||!r.voting&&r.status==='CLOSED'&&i===s.rounds.length-1&&s.decision.status==='OPEN')throw new DomainError('Sequência de rodadas inválida.');
   if(!r.voting)continue;
-  const {eligibleIds,deadlineAt,closure}=r.voting,openedAt=Date.parse(r.openedAt),closedAt=r.closedAt===null?null:Date.parse(r.closedAt);
+  const {eligibleIds,deadlineAt,closure,participantStarts}=r.voting,openedAt=Date.parse(r.openedAt),closedAt=r.closedAt===null?null:Date.parse(r.closedAt);
   const expected=s.participants.filter(p=>!p.departure||s.rounds.findIndex(x=>x.id===p.departure?.roundId)>=i).map(p=>p.id);
   if(!unique(eligibleIds)||i===0&&eligibleIds.length!==expected.length||eligibleIds.some(id=>!expected.includes(id))||Date.parse(deadlineAt)!==openedAt+ROUND_DURATION_MS)throw new DomainError('Elegibilidade ou prazo da rodada inválido.');
-  if((r.status==='CLOSED')!==Boolean(closure)||(r.status==='CLOSED')!==(closedAt!==null)||closedAt!==null&&(closedAt<openedAt||closedAt>Date.parse(deadlineAt))||closure?.cause==='PRAZO_EXPIRADO'&&r.closedAt!==deadlineAt)throw new DomainError('Encerramento de rodada incompatível.');
+  if(participantStarts&&(i!==0||!unique(participantStarts.map(start=>start.participantId))||participantStarts.some(start=>!eligibleIds.includes(start.participantId)||Date.parse(start.at)<openedAt||closedAt!==null&&Date.parse(start.at)>closedAt)))throw new DomainError('Início individual de votação incompatível.');
+  const expiration=roundExpiration(r);
+  if((r.status==='CLOSED')!==Boolean(closure)||(r.status==='CLOSED')!==(closedAt!==null)||closedAt!==null&&(closedAt<openedAt||expiration&&closedAt>Date.parse(expiration))||closure?.cause==='PRAZO_EXPIRADO'&&r.closedAt!==expiration)throw new DomainError('Encerramento de rodada incompatível.');
   const votes=s.votes.filter(v=>v.roundId===r.id);
   if(!unique(votes.map(v=>v.participantId))||votes.some(v=>{
    const timestamp=Date.parse(v.createdAt),departure=s.participants.find(p=>p.id===v.participantId)?.departure;
-   return !eligibleIds.includes(v.participantId)||timestamp<openedAt||timestamp>=Date.parse(deadlineAt)||closedAt!==null&&timestamp>closedAt||departure&&timestamp>Date.parse(departure.at);
+   const start=participantStarts?.find(entry=>entry.participantId===v.participantId);
+   const deadline=participantVotingDeadline(r,v.participantId);
+   return !eligibleIds.includes(v.participantId)||!deadline||timestamp<(start?Date.parse(start.at):openedAt)||timestamp>=Date.parse(deadline)||closedAt!==null&&timestamp>closedAt||departure&&timestamp>Date.parse(departure.at);
   }))throw new DomainError('Votos incompatíveis com a elegibilidade ou o prazo.');
   if(closure&&(!unique(closure.abstentions)||closure.abstentions.some(id=>{
    const departure=s.participants.find(p=>p.id===id)?.departure;

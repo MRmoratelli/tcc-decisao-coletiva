@@ -4,7 +4,7 @@ export type { Review };
 export type ReviewResult={review:Review;receipt:string;rewriteReceipt?:string|null;availableAt?:string;cached?:boolean};
 export type CreatedRoom={code:string;moderatorCredential:string;participants:Array<{alias:string;credential:string}>};
 export type RoomView={
- revision:number;serverNow?:number;pendingVoteCount?:number;room:{id:string;code:string;topic:string;proposal:string;proposal_review:Review|null};
+ revision:number;serverNow?:number;votingDeadlineAt?:string;pendingVoteCount?:number;room:{id:string;code:string;topic:string;proposal:string;proposal_review:Review|null};
  role:'moderator'|'participant';alias:string|null;participantId:string|null;canViewGroup:boolean;state:State;
  positions:Array<{id:string;alias:string;choice:string}>;
  metrics:unknown;contributions:Array<{id:string;alias:string;text:string;review:Review|null;user_choice:string;created_at:string}>;

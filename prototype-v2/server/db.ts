@@ -1,6 +1,6 @@
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import type pg from 'pg';
-import { DomainError, createState, validateState, event, currentRound, enableRoundVoting, expireRound, type State, type ReviewRecordType } from './domain.js';
+import { DomainError, createState, validateState, event, currentRound, enableRoundVoting, expireRound, roundExpiration, startParticipantVoting, ROUND_DURATION_MS, type State, type ReviewRecordType } from './domain.js';
 import { RESEARCH_VERSION, RESEARCH_TEXT, RESEARCH_SOURCE, RESEARCH_SHORT_TEXT } from '../shared/research.js';
 import type { ProposalContent } from '../shared/contracts.js';
 
@@ -18,7 +18,7 @@ export class Repository {
   const roomId=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),moderatorCredential=this.token();
   const people=Array.from({length:count},(_,i)=>({id:randomUUID(),alias:'P'+String(i+1).padStart(2,'0'),credential:this.token()}));
   let state=createState(roomId,proposal,people.map(({id,alias})=>({id,alias})),review,initialDraft,new Date(this.clock()).toISOString());
-  if(!imported){state.votingMode='BINARY';enableRoundVoting(state);}
+  if(!imported){state.votingMode='BINARY';enableRoundVoting(state,selfEnrollment);}
   if(imported){
    const mapping=new Map<string,string>([[imported.decision.id,roomId],...imported.participants.map((p,i)=>[p.id,people[i].id] as [string,string])]);
    function remap(value:any):any{if(typeof value==='string')return mapping.get(value)??value;if(Array.isArray(value))return value.map(remap);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,k==='originId'?v:remap(v)]));return value;}
@@ -56,6 +56,7 @@ export class Repository {
    expireRound(s,at);
    await c.query('INSERT INTO dc2_participants(id,room_id,alias,secret_hash) VALUES($1,$2,$3,$4)',[p.id,room.id,p.alias,hash]);
    s.enrollment.claims.push(p.id);
+   startParticipantVoting(s,p.id,at);
    s.researchConsents.push({participantId:p.id,response:'SIM',at:new Date(at).toISOString(),version,actor:'participant'});
    event(s,p.id,'RESEARCH_CONSENT_RECORDED','SIM; '+version,new Date(at).toISOString());
    event(s,p.id,'PARTICIPANT_ENROLLED',p.alias,new Date(at).toISOString());
@@ -83,10 +84,16 @@ export class Repository {
   const row=(await this.pool.query('SELECT revision,state FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];
   if(!row)throw new DomainError('Sala anterior à migração. Exporte-a pela versão original; não foi alterada.',409);
   const state=validateState(row.state),r=currentRound(state);
-  if(r.status==='OPEN'&&r.voting&&this.clock()>=Date.parse(r.voting.deadlineAt))return this.mutate(identity,null,()=>false);
+  const expiration=roundExpiration(r);
+  if(r.status==='OPEN'&&expiration&&this.clock()>=Date.parse(expiration))return this.mutate(identity,null,()=>false);
+  if(r.status==='OPEN'&&!state.enrollment&&identity.participantId&&r.voting?.participantStarts&&!r.voting.participantStarts.some(start=>start.participantId===identity.participantId)){
+   const participantId=identity.participantId;
+   return this.mutate(identity,null,(current,at)=>startParticipantVoting(current,participantId,at));
+  }
   return {revision:row.revision as number,state};
  }
  async sweepExpiredRounds(){
+  const at=this.clock();
   const {rows}=await this.pool.query(`
    SELECT r.id AS "roomId",r.code
    FROM dc2_rooms r
@@ -95,8 +102,11 @@ export class Repository {
     WHERE room_id=r.id ORDER BY revision DESC LIMIT 1
    ) latest
    WHERE latest.round->>'status'='OPEN'
-   AND (latest.round->'voting'->>'deadlineAt')::timestamptz <= $1::timestamptz
-  `,[new Date(this.clock()).toISOString()]);
+   AND CASE WHEN latest.round->'voting' ? 'participantStarts' THEN
+    jsonb_array_length(latest.round->'voting'->'participantStarts')=jsonb_array_length(latest.round->'voting'->'eligibleIds')
+    AND (SELECT max((entry->>'at')::timestamptz) FROM jsonb_array_elements(latest.round->'voting'->'participantStarts') entry) <= $2::timestamptz
+   ELSE (latest.round->'voting'->>'deadlineAt')::timestamptz <= $1::timestamptz END
+  `,[new Date(at).toISOString(),new Date(at-ROUND_DURATION_MS).toISOString()]);
   for(const row of rows)await this.mutate({...row,role:'moderator'},null,()=>false);
  }
  async mutate(identity:Identity,expectedRevision:number|null,fn:(s:State,at:number)=>unknown){

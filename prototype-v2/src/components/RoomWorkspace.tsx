@@ -67,11 +67,11 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
    setReviewChoice(value.trim()===review.review.suggestedRewrite?'USED_REWRITE':'EDITED_REWRITE');
   }else setReviewChoice('EDITED_ORIGINAL');
  }
- async function send(kind:'vote'|'contribution'){
+ async function sendVote(){
   await act(async()=>{
-   if(kind==='vote'&&ownVotes.length)throw new Error('Seu voto nesta rodada já foi registrado. Aguarde uma nova rodada.');
+   if(ownVotes.length)throw new Error('Seu voto nesta rodada já foi registrado. Aguarde uma nova rodada.');
    if(staleDraft||draftRound.current!==p.id)throw new Error('Confirme a reutilização do rascunho na nova rodada.');
-   if(kind==='vote'&&choice==='ACEITO')await post('/votes',{...binding,choice,justification:''});
+   if(choice==='ACEITO')await post('/votes',{...binding,choice,justification:''});
    else{
     if(!text.trim())throw new Error('Rejeição exige justificativa.');
     const appliedRewrite=reviewChoice==='USED_REWRITE'&&Boolean(review);
@@ -79,7 +79,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
      appliedRewrite:appliedRewrite||undefined,reviewChoice:review?reviewChoice:undefined,
      bypassReason:!review?'Autor enviou a justificativa sem parecer consultivo.':undefined,
      contest:contestText,originalText:review?original:text};
-    await post(kind==='vote'?'/votes':'/contributions',kind==='vote'?{...payload,choice,justification:text}:{...payload,text});
+    await post('/votes',{...payload,choice,justification:text});
    }
    reviewRun.current++;setAnalyzing(false);setReviewError('');setText('');setOriginal('');setReview(null);setHasAnalyzed(false);setContest('');
    await onRefresh();
@@ -88,10 +88,12 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  const analysis=s.analyses.filter(a=>a.proposalId===p.id).slice(-1)[0];
  const syntheses=s.syntheses.filter(x=>x.proposalId===p.id);
  const isOpen=s.decision.status==='OPEN';
- const secondsLeft=r.voting?Math.max(0,Math.ceil((Date.parse(r.voting.deadlineAt)-clock)/1000)):null;
- const votingOpen=isOpen&&r.status==='OPEN'&&secondsLeft!==0;
+ const individualTiming=r.voting?.participantStarts!==undefined;
+ const deadline=individualTiming?view.votingDeadlineAt:r.voting?.deadlineAt;
+ const secondsLeft=deadline?Math.max(0,Math.ceil((Date.parse(deadline)-clock)/1000)):null;
+ const votingOpen=isOpen&&r.status==='OPEN'&&(individualTiming||secondsLeft!==0);
  const ownDeparture=s.participants.find(p=>p.id===view.participantId)?.departure;
- const canVote=votingOpen&&!ownDeparture&&(!r.voting||r.voting.eligibleIds.includes(view.participantId??''));
+ const canVote=votingOpen&&(!individualTiming||secondsLeft!==null&&secondsLeft>0)&&!ownDeparture&&(!r.voting||r.voting.eligibleIds.includes(view.participantId??''));
  const pendingCount=r.voting?(view.pendingVoteCount??0):s.participants.length-latestCount();
  const selectable=s.participants.filter(p=>!p.departure&&(!s.enrollment||s.enrollment.claims.includes(p.id)));
  function latestCount(){return new Set(s.votes.filter(v=>v.roundId===r.id).map(v=>v.participantId)).size;}
@@ -132,7 +134,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  <details><summary>Problema e contexto da versão atual</summary><dl>{Object.entries(p.content).filter(([key,value])=>!['title','text'].includes(key)&&value).map(([key,value])=><div key={key}><dt>{{problem:'Problema',decision:'Decisão pretendida',goals:'Objetivos',alternatives:'Alternativas',constraints:'Restrições',successCriteria:'Critérios de sucesso',context:'Contexto'}[key]}</dt><dd>{value}</dd></div>)}</dl></details>
  <ul className="positions">{view.positions.map(pos=>{
   const departure=s.participants.find(p=>p.id===pos.id)?.departure;
-  return <li key={pos.id}><b>{pos.alias}</b> {departureLabels[pos.choice as keyof typeof departureLabels]??(pos.choice==='ABSTENCAO'?'Abstenção':pos.choice.replaceAll('_',' '))}{departure&&pos.choice!==departure.kind?' · '+departureLabels[departure.kind]:''}</li>;
+  return <li key={pos.id}><b>{pos.alias}</b> {departureLabels[pos.choice as keyof typeof departureLabels]??(pos.choice==='AINDA_NAO_ENTROU'?'Ainda não entrou':pos.choice==='ABSTENCAO'?'Abstenção':pos.choice.replaceAll('_',' '))}{departure&&pos.choice!==departure.kind?' · '+departureLabels[departure.kind]:''}</li>;
  })}</ul>
  {view.role==='moderator'&&isOpen&&r.voting&&selectable.length>0&&<details><summary>Registrar saída de participante</summary>
   <label>Participante<select value={removing} onChange={e=>setRemoving(e.target.value)}><option value="">Selecione</option>{selectable.map(p=><option key={p.id} value={p.id}>{p.alias}</option>)}</select></label>
@@ -142,12 +144,14 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  </details>}
  {view.role==='moderator'&&votingOpen&&r.voting&&<section>
   {!confirmClose?<button className="secondary" disabled={busy} onClick={()=>setConfirmClose(true)}>Encerrar rodada antecipadamente</button>:<>
-   <p role="status">{pendingCount} voto(s) pendente(s). Estes participantes serão registrados com Abstenção.</p>
+   <p role="status">{pendingCount} voto(s) pendente(s). {individualTiming?'Participantes que entraram e ainda não votaram serão registrados com Abstenção.':'Estes participantes serão registrados com Abstenção.'}</p>
+   {individualTiming&&view.positions.some(pos=>pos.choice==='AINDA_NAO_ENTROU')&&<p>Quem ainda não entrou ficará sem voto nesta rodada.</p>}
    <div className="actions"><button className="secondary" disabled={busy} onClick={()=>void act(async()=>{await mutate('/round-close',{roundId:r.id,pendingCount,confirm:true});setConfirmClose(false);})}>Confirmar encerramento da rodada</button><button disabled={busy} onClick={()=>setConfirmClose(false)}>Cancelar</button></div>
   </>}
  </section>}
  {view.role==='participant'&&ownDeparture&&<p role="status">Sua saída foi registrada como {departureLabels[ownDeparture.kind]}.</p>}
  {view.role==='participant'&&isOpen&&ownVotes.length>0&&<section className="entry" role="status"><h3>Voto registrado nesta rodada</h3><p>Sua posição foi registrada. Aguarde o moderador publicar uma nova rodada para votar novamente. A tela será atualizada automaticamente.</p></section>}
+ {view.role==='participant'&&votingOpen&&individualTiming&&secondsLeft===0&&!ownDeparture&&ownVotes.length===0&&<p role="status">Seu prazo para votar nesta rodada terminou.</p>}
  {view.role==='participant'&&canVote&&ownVotes.length===0&&<section className="entry"><h3>Sua manifestação sobre V{p.version}</h3>
  <p>Registre sua posição explicitamente. Cada participante pode votar uma única vez por rodada.</p>
  <label>Posição<select value={choice} onChange={e=>setChoice(e.target.value as Choice)}><option value="ACEITO">Aceito a proposta como está</option><option value="REJEITO">Rejeito e proponho ajustes</option></select></label>
@@ -171,7 +175,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  {reviewChoice==='DISCARDED'&&review&&<p role="status">Parecer descartado. Sua justificativa original foi restaurada.</p>}
  {review&&<details><summary>Contestar este parecer (opcional)</summary><label>Explique sua contestação<textarea maxLength={2000} rows={2} value={contestText} onChange={e=>setContest(e.target.value)}/></label></details>}
  </>}
- <div className="actions"><button className="primary" disabled={busy||staleDraft||(choice==='REJEITO'&&!text.trim())} onClick={()=>void send('vote')}>Registrar {choice.replaceAll("_"," ")}</button>{choice==='REJEITO'&&<button className="secondary" disabled={busy||!text.trim()} onClick={()=>void send('contribution')}>Enviar apenas contribuição</button>}</div>
+ <div className="actions"><button className="primary" disabled={busy||staleDraft||(choice==='REJEITO'&&!text.trim())} onClick={()=>void sendVote()}>Registrar {choice.replaceAll("_"," ")}</button></div>
  </section>}
  <section aria-label="Manifestações da rodada atual"><h3>Manifestações registradas · posições vigentes</h3>
   {!view.canViewGroup&&<p>As manifestações alheias ficam ocultas até seu primeiro registro nesta versão.</p>}
