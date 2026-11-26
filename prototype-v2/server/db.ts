@@ -57,8 +57,8 @@ export class Repository {
    await c.query('INSERT INTO dc2_participants(id,room_id,alias,secret_hash) VALUES($1,$2,$3,$4)',[p.id,room.id,p.alias,hash]);
    s.enrollment.claims.push(p.id);
    s.researchConsents.push({participantId:p.id,response:'SIM',at:new Date(at).toISOString(),version,actor:'participant'});
-   event(s,p.id,'RESEARCH_CONSENT_RECORDED','SIM; '+version);
-   event(s,p.id,'PARTICIPANT_ENROLLED',p.alias);
+   event(s,p.id,'RESEARCH_CONSENT_RECORDED','SIM; '+version,new Date(at).toISOString());
+   event(s,p.id,'PARTICIPANT_ENROLLED',p.alias,new Date(at).toISOString());
    validateState(s);
    await c.query('INSERT INTO dc2_snapshots(room_id,revision,state) VALUES($1,$2,$3)',[room.id,row.revision+1,JSON.stringify(s)]);
    await c.query('COMMIT');return {alias:p.alias};

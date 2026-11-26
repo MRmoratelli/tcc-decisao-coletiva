@@ -44,7 +44,7 @@ test('Moderator stages hide future publication until a synthesis is ready and al
  const v=fixture();let ui!:ReactTestRenderer;
  await act(async()=>{ui=create(<RoomWorkspace session={session(v)} busy={false} act={async f=>f()} onRefresh={async()=>{}}/>);});
  assert.equal(ui.root.findAllByType('textarea').filter(x=>x.props.value===proposal.text).length,0);
- assert.ok(JSON.stringify(ui.toJSON()).includes('Aguardando 2'));
+ assert.ok(ui.root.findAllByType('p').some(p=>p.children.join('').includes('2 voto(s) pendente(s)')));
  await act(async()=>ui.root.findAllByType('button').find(x=>x.children.includes('Abrir revisão manual'))!.props.onClick());
  assert.ok(JSON.stringify(ui.toJSON()).includes('Revisão e publicação de V'));
  await act(async()=>ui.unmount());

@@ -20,6 +20,8 @@ export const ReviewSchema=z.object({
  suggestedRewrite:field.default(''),
 });
 export type Review=z.infer<typeof ReviewSchema>;
+export const ReviewChoiceSchema=z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED','EDITED_REWRITE','EDITED_ORIGINAL']);
+export type ReviewChoice=z.infer<typeof ReviewChoiceSchema>;
 const list=z.array(z.string().max(2000)).max(50);
 export const ManifestationAssessmentSchema=z.object({sourceId:z.string(),kind:z.enum(['APOIO','RESSALVA','OBJECAO','ABSTENCAO','CONTRIBUICAO','CONTESTACAO']),quotedExcerpt:field,quoteOrigin:z.enum(['SUBMITTED','ORIGINAL']).optional(),interpretation:field,suggestedPath:field});
 export const AssessmentSchema=z.object({

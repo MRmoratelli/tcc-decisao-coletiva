@@ -5,6 +5,8 @@ import { Repository,type SQLPool } from './db.js';
 import { migrate } from './migrate.js';
 import { createApp } from './app.js';
 import { FakeAI,proposal,review } from './fixtures.js';
+import {GeminiAdapter,instructions,type AIAdapter} from './ai.js';
+import type {Assessment,ProposalContent,SynthesisResult} from '../shared/contracts.js';
 import { RESEARCH_VERSION } from '../shared/research.js';
 const db=new PGlite();
 const query=async(sql:string,values?:any[]):Promise<{rows:any[]}>=>{if(sql.includes('CREATE TABLE')){await db.exec(sql);return {rows:[]};}return db.query(sql,values);};
@@ -96,4 +98,101 @@ test('Importar sala de inscrição automática emite acessos novos e conserva co
  assert.equal(copied.state.enrollment,undefined);assert.equal(copied.state.researchConsents.length,1);
  assert.equal((await post('/rooms/'+restored.data.code+'/invitation',{})).status,409);
  assert.equal((await view(c)).state.enrollment.claims.length,1);
+});
+
+test('Churrasco sintético: síntese automática completa, com escolhas vinculadas e quantidades pendentes',async()=>{
+ const initial={title:'Churrasco do grupo',text:'Organizar o churrasco de confraternização no salão do prédio.'};
+ const created=await post('/rooms',{proposal:initial,participantCount:2,simple:true,aiConsent:true});
+ assert.equal(created.status,201);const c=created.data;
+ for(const n of [51,52])assert.equal((await join(c,n)).status,200);
+ const first=await view(c),r=first.state.rounds[0];
+ assert.equal((await post('/rooms/'+c.code+'/round-close',{credential:c.moderatorCredential,roundId:r.id,pendingCount:2,confirm:true})).status,200);
+ const closed=await view(c);
+ const latest={...closed.state.proposals[0].content,text:'Realizar o churrasco no sábado às 13h no salão do prédio. Cada pessoa levará seu prato e talheres. Ainda faltam cardápio e quantidades.'};
+ assert.equal((await post('/rooms/'+c.code+'/publish',{credential:c.moderatorCredential,revision:closed.revision,sourceId:r.proposalId,proposal:latest,reason:'O grupo definiu horário e utensílios.',confirm:true})).status,200);
+ const meat='Rejeito até incluir cortes sem carne suína. Proponho fraldinha e peito de frango.';
+ const drinks='Rejeito sem bebidas sem álcool. Proponho água e suco de laranja. Precisamos confirmar o número de pessoas antes de calcular as quantidades.';
+ const adapter:AIAdapter=ai,previous=adapter.synthesizeProposal;
+ let called=false;
+ const gemini=new GeminiAdapter('synthetic-barbecue',async(mode,input,grammar)=>{
+  called=true;assert.equal(mode,'synthesizeProposal');
+  const data=input as {initialProposal:ProposalContent;publishedProposal:ProposalContent;assessments:Assessment;manifestations:{id:string;text:string}[]};
+  assert.equal(data.initialProposal.text,initial.text);
+  assert.deepEqual(data.publishedProposal,latest);
+  assert.deepEqual(data.manifestations.map(m=>m.text),[meat,drinks]);
+  assert.match(instructions,/revisedProposal\.text a proposta completa/);
+  assert.match(instructions,/cortes de carne e bebidas concretos/);
+  assert.match(instructions,/mantenha apenas as quantidades pendentes/);
+  assert.match(instructions,/changeLog\.sourceIds/);
+  assert.ok((grammar.required as string[]).includes('resolutionChecks'));
+  const [meatId,drinksId]=data.manifestations.map(m=>m.id);
+  const response:SynthesisResult={
+   revisedProposal:{...data.publishedProposal,text:'Realizar o churrasco no sábado às 13h no salão do prédio. Cada pessoa levará seu prato e talheres. Servir fraldinha e peito de frango, sem carne suína, e oferecer água e suco de laranja. Confirmar o número de pessoas para calcular as quantidades de carnes e bebidas.'},
+   decisionProgress:{defined:['Sábado às 13h no salão do prédio','Cada pessoa leva prato e talheres'],suggested:['Fraldinha e peito de frango','Água e suco de laranja'],pending:['Número de pessoas e quantidades de carnes e bebidas'],questions:['Quantas pessoas participarão?']},
+   consideredSourceIds:[meatId,drinksId],
+   changeLog:[
+    {change:'Servir fraldinha e peito de frango',reason:'Atender à exigência de cortes sem carne suína.',sourceIds:[meatId],voteIds:[meatId]},
+    {change:'Oferecer água e suco de laranja',reason:'Atender ao pedido de bebidas sem álcool.',sourceIds:[drinksId],voteIds:[drinksId]}
+   ],
+   resolutionChecks:[
+    {voteId:meatId,satisfiedRequirements:['Cortes sem carne suína definidos.'],remainingRequirements:[]},
+    {voteId:drinksId,satisfiedRequirements:['Bebidas sem álcool definidas.'],remainingRequirements:['Quantidade para compra.']}
+   ],
+   addressedObjections:[meatId],partiallyAddressedObjections:[drinksId],unresolvedObjections:[],
+   remainingImpasses:['Quantidades dependem da confirmação do número de pessoas.'],feasibilityWarnings:[]
+  };
+  return JSON.stringify(response);
+ });
+ adapter.synthesizeProposal=gemini.synthesizeProposal.bind(gemini);
+ try{
+  assert.equal((await cast(c,51,'REJEITO',meat)).status,201);
+  assert.equal((await cast(c,52,'REJEITO',drinks)).status,201);
+  const ready=await waitReady(c);
+  assert.equal(called,true);
+  const draft=ready.state.syntheses[0];
+  assert.match(draft.result.revisedProposal.text,/fraldinha e peito de frango/);
+  assert.match(draft.result.revisedProposal.text,/água e suco de laranja/);
+  assert.match(draft.result.revisedProposal.text,/sábado às 13h no salão/);
+  assert.deepEqual(draft.result.decisionProgress.pending,['Número de pessoas e quantidades de carnes e bebidas']);
+  assert.deepEqual(draft.result.changeLog.map((x:{sourceIds:string[]})=>x.sourceIds),ready.state.votes.map((v:{id:string})=>[v.id]));
+  assert.equal(draft.publishedProposalId,null);
+  assert.equal(ready.state.proposals.length,2);
+  assert.equal((await view(c,token(51))).state.syntheses.length,0);
+  const publication=await post('/rooms/'+c.code+'/publish',{credential:c.moderatorCredential,revision:ready.revision,sourceId:ready.state.proposals.at(-1).id,synthesisId:draft.id,proposal:draft.result.revisedProposal,confirm:true});
+  assert.equal(publication.status,200);
+  const participant=await view(c,token(51));
+  assert.equal(participant.state.proposals.at(-1).content.text,draft.result.revisedProposal.text);
+  assert.equal(participant.state.proposals.at(-1).approvedBy,'moderator');
+ }finally{adapter.synthesizeProposal=previous;}
+});
+
+test('Parecer de REJEITO preserva restrição e pedido de mudança, com edição assinada pelo original',async()=>{
+ const c=await createRoom(2);assert.equal((await join(c,61)).status,200);
+ const v=await view(c,token(61)),r=v.state.rounds[0];
+ const original='Rejeito o cardápio atual porque não como carne suína. Peço incluir fraldinha e manter o custo em até R$ 50 por pessoa.';
+ const suggestion='Rejeito o cardápio atual. Não como carne suína e peço incluir fraldinha, com limite de R$ 50 por pessoa.';
+ const gemini=new GeminiAdapter('synthetic-individual',async(mode,input)=>{
+  assert.equal(mode,'analyzeContribution');
+  assert.deepEqual(input,{proposal:v.state.proposals[0].content,contribution:original,position:'REJEITO'});
+  assert.match(instructions,/mantenha explícita a rejeição/);
+  assert.match(instructions,/limites numéricos, condições obrigatórias/);
+  assert.match(instructions,/pedido concreto de mudança/);
+  return JSON.stringify({...review,suggestedRewrite:suggestion});
+ });
+ const adapter:AIAdapter=ai,previous=adapter.analyzeContribution;
+ adapter.analyzeContribution=gemini.analyzeContribution.bind(gemini);
+ try{
+  const result=await post('/rooms/'+c.code+'/contribution-review',{credential:token(61),text:original,roundId:r.id,proposalId:r.proposalId,position:'REJEITO',consent:true});
+  assert.equal(result.status,200);
+  assert.equal(result.data.review.suggestedRewrite,suggestion);
+  const justification=suggestion.replace('peço incluir','solicito incluir');
+  const payload={credential:token(61),revision:v.revision,roundId:r.id,proposalId:r.proposalId,choice:'REJEITO',justification,originalText:original,reviewChoice:'EDITED_REWRITE',receipt:result.data.receipt};
+  assert.equal((await post('/rooms/'+c.code+'/votes',{...payload,originalText:'Original alterado.'})).status,400);
+  assert.equal((await post('/rooms/'+c.code+'/votes',payload)).status,201);
+  const saved=(await view(c)).state.contributions[0];
+  assert.equal(saved.originalText,original);
+  assert.equal(saved.text,justification);
+  assert.equal(saved.review.choice,'EDITED_REWRITE');
+  assert.equal(saved.review.result.suggestedRewrite,suggestion);
+ }finally{adapter.analyzeContribution=previous;}
 });

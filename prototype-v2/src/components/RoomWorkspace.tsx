@@ -5,13 +5,15 @@ import {RoundAnalysis,RoundHistory,SynthesisDetails,RevisionHistory,sourceLabel,
 import { ProposalEditor } from './ProposalEditor';
 import { ReviewCard } from './ReviewCard';
 import { EvaluationForm } from './EvaluationForm';
-import type { ProposalContent,Choice,EvaluationInput } from '../../shared/contracts';
+import type { ProposalContent,Choice,EvaluationInput,ReviewChoice } from '../../shared/contracts';
 type Session={code:string;credential:string;view:RoomView};
 export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy:boolean;act:(work:()=>Promise<void>)=>Promise<void>;onRefresh:()=>Promise<void>}){
  const {view,code,credential}=session,s=view.state,r=s.rounds[s.rounds.length-1],p=s.proposals[s.proposals.length-1];
- const [text,setText]=useState(''),[original,setOriginal]=useState(''),[review,setReview]=useState<ReviewResult|null>(null),[choice,setChoice]=useState<Choice>('ACEITO'),[rewriteApplied,setRewriteApplied]=useState(false);
- const [analyzing,setAnalyzing]=useState(false),[hasAnalyzed,setHasAnalyzed]=useState(false),[reviewChoice,setReviewChoice]=useState<'USED_REWRITE'|'KEPT_ORIGINAL'|'DISCARDED'>('KEPT_ORIGINAL');
- const [contestText,setContest]=useState(''),[consent,setConsent]=useState(false),[bypass,setBypass]=useState(false);
+ const [text,setText]=useState(''),[original,setOriginal]=useState(''),[review,setReview]=useState<ReviewResult|null>(null),[choice,setChoice]=useState<Choice>('ACEITO');
+ const [analyzing,setAnalyzing]=useState(false),[hasAnalyzed,setHasAnalyzed]=useState(false),[reviewChoice,setReviewChoice]=useState<ReviewChoice>('KEPT_ORIGINAL');
+ const [reviewError,setReviewError]=useState('');
+ const reviewRun=useRef(0),draftText=useRef(text);draftText.current=text;
+ const [contestText,setContest]=useState(''),[consent,setConsent]=useState(false);
  const [moderatorEdited,setModeratorEdited]=useState(false),[manual,setManual]=useState(false),[reviewingSynthesis,setReviewingSynthesis]=useState(false);
  const [clock,setClock]=useState(Date.now()),[availableAt,setAvailableAt]=useState(0);
  useEffect(()=>{
@@ -36,24 +38,51 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
   setConfirmClose(false);setRemoving('');
   setRoundNotice('Nova rodada publicada. Confira a proposta antes de se manifestar.');
   setStaleDraft(needsDraftReview);if(!needsDraftReview){draftRound.current=p.id;setDraft(p.content);setModeratorEdited(false);setReason('');}
-  setReview(null);setHasAnalyzed(false);setRewriteApplied(false);setSynthesis(undefined);
-  setChoice(text.trim()?'REJEITO':'ACEITO');setConsent(false);setBypass(false);setManual(false);setReviewingSynthesis(false);
+  reviewRun.current++;setAnalyzing(false);setReviewError('');setReview(null);setHasAnalyzed(false);setSynthesis(undefined);
+  setChoice(text.trim()?'REJEITO':'ACEITO');setConsent(false);setManual(false);setReviewingSynthesis(false);
  }},[p.id]);
  const base={credential,revision:view.revision},binding={roundId:r.id,proposalId:p.id};
  const post=(suffix:string,data:object)=>request('/rooms/'+code+suffix,{...base,...data});
  const mutate=async(suffix:string,data:object)=>{await post(suffix,data);await onRefresh();};
- async function analyze(){setAnalyzing(true);try{await act(async()=>{if(!consent)throw new Error('Confirme o envio do texto ao Gemini.');setOriginal(text);const result=await post('/contribution-review',{...binding,text,consent:true}) as ReviewResult;setReview(result);setAvailableAt(result.availableAt?Date.parse(result.availableAt):Date.now()+60000);await onRefresh();setHasAnalyzed(true);setReviewChoice('KEPT_ORIGINAL');setRewriteApplied(false);setBypass(false);});}finally{setAnalyzing(false);}}
+ async function analyze(){
+  if(!consent||!text.trim())return;
+  const run=++reviewRun.current,source=text;
+  setAnalyzing(true);setReviewError('');
+  try{
+   const result=await request<ReviewResult>('/rooms/'+code+'/contribution-review',{...base,...binding,text:source,position:'REJEITO',consent:true});
+   if(run!==reviewRun.current)return;
+   setOriginal(source);setReview(result);setHasAnalyzed(true);
+   setReviewChoice(draftText.current.trim()===source.trim()?'KEPT_ORIGINAL':'EDITED_ORIGINAL');
+   setAvailableAt(result.availableAt?Date.parse(result.availableAt):Date.now()+60000);
+  }catch(error){
+   if(run===reviewRun.current)setReviewError(error instanceof Error?error.message:'Não foi possível obter o parecer.');
+  }finally{if(run===reviewRun.current)setAnalyzing(false);}
+ }
+ function updateText(value:string){
+  setText(value);
+  if(!review)return;
+  if(reviewChoice==='DISCARDED'){setReview(null);return;}
+  if(value.trim()===original.trim()){setReviewChoice('KEPT_ORIGINAL');return;}
+  if(reviewChoice==='USED_REWRITE'||reviewChoice==='EDITED_REWRITE'){
+   setReviewChoice(value.trim()===review.review.suggestedRewrite?'USED_REWRITE':'EDITED_REWRITE');
+  }else setReviewChoice('EDITED_ORIGINAL');
+ }
  async function send(kind:'vote'|'contribution'){
   await act(async()=>{
    if(kind==='vote'&&ownVotes.length)throw new Error('Seu voto nesta rodada já foi registrado. Aguarde uma nova rodada.');
    if(staleDraft||draftRound.current!==p.id)throw new Error('Confirme a reutilização do rascunho na nova rodada.');
-   if(kind==='vote'&&choice==='ACEITO'){await mutate('/votes',{...binding,choice,justification:''});setText('');setOriginal('');setReview(null);setContest('');return;}
-   if(text&&!review&&!bypass)throw new Error('Solicite parecer ou marque continuar sem parecer.');
-   if(rewriteApplied&&!review?.rewriteReceipt)throw new Error('Comprovante de reformulação indisponível. Analise novamente.');
-   if(choice==='REJEITO'&&!text.trim()&&kind==='vote')throw new Error('Rejeição exige justificativa.');
-   const payload={...binding,receipt:rewriteApplied?review?.rewriteReceipt:review?.receipt,appliedRewrite:rewriteApplied||undefined,reviewChoice:review?reviewChoice:undefined,bypassReason:!review?'Autor optou por continuar sem parecer consultivo.':undefined,contest:contestText,originalText:original||text};
-   await mutate(kind==='vote'?'/votes':'/contributions',kind==='vote'?{...payload,choice,justification:text}:{...payload,text});
-   setText('');setOriginal('');setReview(null);setHasAnalyzed(false);setRewriteApplied(false);setBypass(false);setContest('');
+   if(kind==='vote'&&choice==='ACEITO')await post('/votes',{...binding,choice,justification:''});
+   else{
+    if(!text.trim())throw new Error('Rejeição exige justificativa.');
+    const appliedRewrite=reviewChoice==='USED_REWRITE'&&Boolean(review);
+    const payload={...binding,receipt:appliedRewrite?review?.rewriteReceipt:review?.receipt,
+     appliedRewrite:appliedRewrite||undefined,reviewChoice:review?reviewChoice:undefined,
+     bypassReason:!review?'Autor enviou a justificativa sem parecer consultivo.':undefined,
+     contest:contestText,originalText:review?original:text};
+    await post(kind==='vote'?'/votes':'/contributions',kind==='vote'?{...payload,choice,justification:text}:{...payload,text});
+   }
+   reviewRun.current++;setAnalyzing(false);setReviewError('');setText('');setOriginal('');setReview(null);setHasAnalyzed(false);setContest('');
+   await onRefresh();
   });
  }
  const analysis=s.analyses.filter(a=>a.proposalId===p.id).slice(-1)[0];
@@ -91,7 +120,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  return <div className="workspace">
  {!isOpen&&text&&<details><summary>Seu rascunho não enviado, preservado após o encerramento</summary><p className="preserve">{text}</p></details>}
  {roundNotice&&<p className="alert" role="status">{roundNotice}</p>}
- {staleDraft&&<section className="alert"><p>Rascunhos preservados da versão anterior. Revise o conteúdo; nenhum voto foi transferido.</p><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);if(view.role!=='moderator')setDraft(p.content);setReason('');setChoice(text.trim()?'REJEITO':'ACEITO');setBypass(false);}}>Confirmar reutilização do meu texto na rodada atual</button><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);setText('');setOriginal('');setContest('');setDraft(p.content);setReason('');setChoice('ACEITO');setBypass(false);}}>Descartar rascunho anterior e iniciar novamente</button></section>}
+ {staleDraft&&<section className="alert"><p>Rascunhos preservados da versão anterior. Revise o conteúdo; nenhum voto foi transferido.</p><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);if(view.role!=='moderator')setDraft(p.content);setReason('');setChoice(text.trim()?'REJEITO':'ACEITO');}}>Confirmar reutilização do meu texto na rodada atual</button><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);setText('');setOriginal('');setContest('');setDraft(p.content);setReason('');setChoice('ACEITO');}}>Descartar rascunho anterior e iniciar novamente</button></section>}
  <section aria-label="Proposta vigente e votação"><div className="proposal"><h3>{votingOpen?'Proposta em votação':isOpen?'Proposta vigente':'Proposta final'} — V{p.version} · Rodada {r.number}</h3><p className="preserve">{p.content.text}</p></div>
  {p.intervention?.kind==='EDICAO_HUMANA'&&p.version>1&&<p className="alert"><b>Proposta alterada pelo moderador.</b> Justificativa: {p.intervention.reason}</p>}
  {p.intervention&&<RevisionHistory item={p}/>}
@@ -123,15 +152,24 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  <p>Registre sua posição explicitamente. Cada participante pode votar uma única vez por rodada.</p>
  <label>Posição<select value={choice} onChange={e=>setChoice(e.target.value as Choice)}><option value="ACEITO">Aceito a proposta como está</option><option value="REJEITO">Rejeito e proponho ajustes</option></select></label>
  {choice==='ACEITO'?<p>Ao registrar ACEITO, você aceita a proposta vigente como está, sem condições ou pedidos de mudança. Se algo impede sua aceitação, escolha REJEITO e explique.</p>:<>
- <label>Justificativa, objeção ou sugestão {choice==='REJEITO'?'(obrigatória)':'(opcional)'}<textarea rows={5} maxLength={5000} value={text} onChange={e=>{setText(e.target.value);setReview(null);setRewriteApplied(false);}}/></label>
+ <label>Justificativa, objeção ou sugestão {choice==='REJEITO'?'(obrigatória)':'(opcional)'}<textarea rows={5} maxLength={5000} value={text} onChange={e=>updateText(e.target.value)}/></label>
  <label className="check"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/> Autorizo enviar este texto e o contexto da proposta ao Gemini. Evite dados pessoais ou sensíveis.</label>
  <button className="secondary" disabled={busy||analyzing||reviewWait>0||(ownReview?.status==='RUNNING'&&clock-Date.parse(ownReview.at)<900000)||!consent||!text.trim()} onClick={()=>{void analyze();}}>{analyzing?'Analisando seu argumento…':hasAnalyzed?'Revisar novamente com IA':'Revisar meu argumento com IA'}</button>
  {reviewWait>0&&<p role="status">Novo pedido de parecer disponível em {reviewWait} segundos. O intervalo é individual; seu texto e o parecer recebido permanecem disponíveis.</p>}
- {analyzing&&<p role="status">Pedido em andamento. Se houver fila, aguarde; você não precisa enviar novamente.</p>}
+ {analyzing&&<p role="status">Parecer em andamento. Você pode registrar sua justificativa agora.</p>}
+ {reviewError&&<p className="alert" role="status">{reviewError}</p>}
  <p className="muted">A IA analisa sua justificativa e oferece observações para ajudar na discussão. Você decide se deseja ajustar o texto antes de registrar sua posição.</p>
- {review&&<><ReviewCard review={review.review} label="Parecer da manifestação"/>{review.review.suggestedRewrite&&!rewriteApplied&&<button className="secondary" disabled={busy||!review.rewriteReceipt} onClick={()=>{setText(review.review.suggestedRewrite);setRewriteApplied(true);setReviewChoice('USED_REWRITE');setBypass(false);}}>Usar reformulação da IA</button>}<button className="text-button" disabled={busy||reviewChoice==='DISCARDED'} onClick={()=>{setText(original);setRewriteApplied(false);setReviewChoice('DISCARDED');setBypass(false);}}>Descartar parecer da IA</button>{reviewChoice==='DISCARDED'&&<p role="status">Seu texto original foi mantido. Registre sua posição quando estiver pronto.</p>}{rewriteApplied&&<p className="alert" role="status">Reformulação da IA selecionada. Revise o texto e clique em Registrar para confirmar que ele representa sua posição. O parecer será preservado; não é necessário marcar “sem parecer”.</p>}</>}
+ {review&&reviewChoice!=='DISCARDED'&&<>
+  <ReviewCard review={review.review} label="Parecer da manifestação"/>
+  <div className="actions">
+   {review.review.suggestedRewrite&&reviewChoice!=='USED_REWRITE'&&<button className="secondary" disabled={busy||!review.rewriteReceipt} onClick={()=>{setText(review.review.suggestedRewrite);setReviewChoice('USED_REWRITE');}}>Usar reformulação da IA</button>}
+   {reviewChoice!=='KEPT_ORIGINAL'&&<button className="text-button" disabled={busy} onClick={()=>{setText(original);setReviewChoice('KEPT_ORIGINAL');}}>Restaurar justificativa original</button>}
+   <button className="text-button" disabled={busy} onClick={()=>{setText(original);setReviewChoice('DISCARDED');}}>Descartar parecer da IA</button>
+  </div>
+  {(reviewChoice==='USED_REWRITE'||reviewChoice==='EDITED_REWRITE')&&<p className="alert" role="status">Revise ou edite a reformulação no campo de justificativa antes de registrar sua posição.</p>}
+ </>}
+ {reviewChoice==='DISCARDED'&&review&&<p role="status">Parecer descartado. Sua justificativa original foi restaurada.</p>}
  {review&&<details><summary>Contestar este parecer (opcional)</summary><label>Explique sua contestação<textarea maxLength={2000} rows={2} value={contestText} onChange={e=>setContest(e.target.value)}/></label></details>}
- {!review&&<label className="check"><input type="checkbox" checked={bypass} onChange={e=>setBypass(e.target.checked)}/> Continuar com meu texto sem parecer da IA.</label>}
  </>}
  <div className="actions"><button className="primary" disabled={busy||staleDraft||(choice==='REJEITO'&&!text.trim())} onClick={()=>void send('vote')}>Registrar {choice.replaceAll("_"," ")}</button>{choice==='REJEITO'&&<button className="secondary" disabled={busy||!text.trim()} onClick={()=>void send('contribution')}>Enviar apenas contribuição</button>}</div>
  </section>}
@@ -141,6 +179,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
    <b>{s.participants.find(p=>p.id===v.participantId)?.alias}: {v.choice.replaceAll('_',' ')}</b>
    {v.justification&&<p>{v.justification}</p>}
    {c?.review.appliedRewrite&&<small>Reformulação sugerida pela IA aceita e enviada pelo participante.</small>}
+   {c?.review.choice==='EDITED_REWRITE'&&<small>Reformulação da IA editada e enviada pelo participante.</small>}
    {c&&c.originalText.trim()!==c.text.trim()&&<details><summary>Texto original antes da revisão</summary><p className="preserve">{c.originalText}</p></details>}
   </article>})}
   {view.canViewGroup&&independentContributions.map(c=><article className="entry-card" key={c.id}><b>{s.participants.find(p=>p.id===c.participantId)?.alias}: contribuição adicional</b><p>{c.text}</p><small>{c.review.status==='OK'?'Parecer consultivo registrado':'Enviada sem parecer'}</small></article>)}

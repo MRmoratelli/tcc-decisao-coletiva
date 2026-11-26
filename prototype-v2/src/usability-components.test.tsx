@@ -5,7 +5,7 @@ import {create,act,type ReactTestRenderer} from 'react-test-renderer';
 import {randomUUID} from 'node:crypto';
 import App from './App';
 import {RoomWorkspace} from './components/RoomWorkspace';
-import {createState} from '../server/domain';
+import {createState,enableRoundVoting} from '../server/domain';
 import {proposal,review} from '../server/fixtures';
 import {RESEARCH_TEXT,RESEARCH_VERSION,RESEARCH_SHORT_TEXT,RESEARCH_CONTACT} from '../shared/research';
 import type {RoomView} from './api';
@@ -73,18 +73,84 @@ test('Revisão: reformulação e descarte são escolhas anteriores ao único reg
  }finally{await act(async()=>ui.unmount());}
 });
 
-test('Revisão: editar argumento após o parecer exige nova análise e exibe rótulo correto',async t=>{
- const v=view();let ui!:ReactTestRenderer;
- t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({review,receipt:'test',rewriteReceipt:'rewrite'})}) as Response);
+test('Revisão: editar a reformulação preserva o parecer e permite enviar o texto',async t=>{
+ const v=view(),requests:any[]=[];let ui!:ReactTestRenderer;
+ t.mock.method(globalThis,'fetch',async(url:RequestInfo|URL,init?:RequestInit)=>{
+  const path=String(url);requests.push({path,body:JSON.parse(String(init?.body))});
+  return {ok:true,json:async()=>path.endsWith('/contribution-review')?{review,receipt:'original-receipt',rewriteReceipt:'rewrite-receipt'}:{saved:true}} as Response;
+ });
+ const click=(label:string)=>ui.root.findAllByType('button').find(b=>b.children.join('')===label)!.props.onClick();
  try{
   await act(async()=>{ui=create(<RoomWorkspace session={{code:v.room.code,credential:'synthetic',view:v}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
   await act(async()=>ui.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
   const text=()=>ui.root.findAllByType('textarea').find(t=>t.props.rows===5)!;
   await act(async()=>text().props.onChange({target:{value:'Primeiro argumento.'}}));
   await act(async()=>ui.root.findAllByType('input').find(i=>i.props.type==='checkbox')!.props.onChange({target:{checked:true}}));
-  await act(async()=>ui.root.findAllByType('button').find(b=>b.children.join('')==='Revisar meu argumento com IA')!.props.onClick());
-  await act(async()=>text().props.onChange({target:{value:'Argumento modificado.'}}));
-  assert.ok(JSON.stringify(ui.toJSON()).includes('Revisar novamente com IA'));
+  await act(async()=>click('Revisar meu argumento com IA'));
+  await act(async()=>click('Usar reformulação da IA'));
+  await act(async()=>text().props.onChange({target:{value:'Reformulação editada por mim.'}}));
+  assert.ok(JSON.stringify(ui.toJSON()).includes('Restaurar justificativa original'));
+  await act(async()=>click('Registrar REJEITO'));
+  assert.equal(requests.length,2);
+  assert.equal(requests[1].body.reviewChoice,'EDITED_REWRITE');
+  assert.equal(requests[1].body.receipt,'original-receipt');
+  assert.equal(requests[1].body.originalText,'Primeiro argumento.');
+  assert.equal(requests[1].body.justification,'Reformulação editada por mim.');
+ }finally{await act(async()=>ui.unmount());}
+});
+
+test('Revisão pendente não desabilita o envio da justificativa original',async t=>{
+ const v=view(),requests:any[]=[];let ui!:ReactTestRenderer;
+ let release!:()=>void;const wait=new Promise<void>(resolve=>{release=resolve;});
+ t.mock.method(globalThis,'fetch',async(url:RequestInfo|URL,init?:RequestInit)=>{
+  const path=String(url);requests.push({path,body:JSON.parse(String(init?.body))});
+  if(path.endsWith('/contribution-review'))await wait;
+  return {ok:true,json:async()=>path.endsWith('/contribution-review')?{review,receipt:'original-receipt',rewriteReceipt:'rewrite-receipt'}:{saved:true}} as Response;
+ });
+ const button=(label:string)=>ui.root.findAllByType('button').find(b=>b.children.join('')===label)!;
+ try{
+  await act(async()=>{ui=create(<RoomWorkspace session={{code:v.room.code,credential:'synthetic',view:v}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
+  await act(async()=>ui.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
+  await act(async()=>ui.root.findAllByType('textarea').find(t=>t.props.rows===5)!.props.onChange({target:{value:'Justificativa original.'}}));
+  await act(async()=>ui.root.findAllByType('input').find(i=>i.props.type==='checkbox')!.props.onChange({target:{checked:true}}));
+  await act(async()=>button('Revisar meu argumento com IA').props.onClick());
+  assert.equal(button('Registrar REJEITO').props.disabled,false);
+  await act(async()=>button('Registrar REJEITO').props.onClick());
+  assert.equal(requests[1].body.justification,'Justificativa original.');
+  assert.equal(requests[1].body.receipt,undefined);
+  await act(async()=>release());
   assert.ok(!JSON.stringify(ui.toJSON()).includes('Usar reformulação da IA'));
+ }finally{release();await act(async()=>ui.unmount());}
+});
+
+test('Moderação: cronômetro, confirmação de pendências e ações distintas',async t=>{
+ const v=view();
+ v.role='moderator';
+ v.canViewGroup=true;
+ v.serverNow=Date.now();
+ v.pendingVoteCount=2;
+ enableRoundVoting(v.state);
+ const requests:Array<{path:string;body:Record<string,unknown>}>=[];
+ t.mock.method(globalThis,'fetch',async(url:RequestInfo|URL,init?:RequestInit)=>{
+  requests.push({path:String(url),body:JSON.parse(String(init?.body))});
+  return {ok:true,json:async()=>({saved:true})} as Response;
+ });
+ let ui!:ReactTestRenderer;
+ const button=(label:string)=>ui.root.findAllByType('button').find(b=>b.children.join('')===label)!;
+ try{
+  await act(async()=>{ui=create(<RoomWorkspace session={{code:v.room.code,credential:'synthetic',view:v}} busy={false} act={async f=>{await f();}} onRefresh={async()=>{}}/>);});
+  assert.equal(ui.root.findAllByProps({role:'timer'}).length,1);
+  assert.ok(button('Exportar registros da sessão'));
+  assert.ok(button('Encerrar sem consenso'));
+  const rendered=JSON.stringify(ui.toJSON());
+  assert.ok(!rendered.includes('Pesquisa externa consultiva'));
+  assert.ok(!rendered.includes('Exportar respostas e estatísticas DSR'));
+  await act(async()=>button('Encerrar rodada antecipadamente').props.onClick());
+  assert.ok(JSON.stringify(ui.toJSON()).includes('voto(s) pendente(s). Estes participantes serão registrados com Abstenção'));
+  assert.equal(requests.length,0);
+  await act(async()=>button('Confirmar encerramento da rodada').props.onClick());
+  assert.equal(requests[0].path,'/api/rooms/'+v.room.code+'/round-close');
+  assert.equal(requests[0].body.pendingCount,2);
+  assert.equal(requests[0].body.confirm,true);
  }finally{await act(async()=>ui.unmount());}
 });

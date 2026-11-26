@@ -41,7 +41,7 @@ export function automaticMediation(repo:Repository,ai:AIAdapter){
    }
    await setStage('SYNTHESIS_REQUEST','Preparando a sugestão de nova proposta.');
    current=await repo.read(moderator);const draft=current.state;
-   const result=await withAIQueueStatus(queued,()=>ai.synthesizeProposal(currentProposal(draft).content,analysis!.result,manifestations(draft)));
+   const result=await withAIQueueStatus(queued,()=>ai.synthesizeProposal(currentProposal(draft).content,analysis!.result,manifestations(draft),draft.proposals[0].content));
    stage='SYNTHESIS_VALIDATION';const verified=reconcileSynthesisLinks(draft,result);
    // Validate before persistence, then append privately. Publication remains human.
    const validation=structuredClone(draft);addSynthesis(validation,analysis.id,verified,ai.model,PROMPT_VERSION);

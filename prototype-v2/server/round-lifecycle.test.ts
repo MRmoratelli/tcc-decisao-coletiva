@@ -4,7 +4,7 @@ import {PGlite} from '@electric-sql/pglite';
 import {createApp} from './app.js';
 import {Repository,type SQLPool} from './db.js';
 import {ROUND_DURATION_MS,validateState,exportState,type State} from './domain.js';
-import {FakeAI,proposal} from './fixtures.js';
+import {FakeAI,proposal,review} from './fixtures.js';
 import {migrate} from './migrate.js';
 import {RESEARCH_VERSION} from '../shared/research.js';
 
@@ -63,6 +63,32 @@ test('HTTP: prazo, saídas, encerramento, concorrência e histórico de rodadas'
    assert.equal(Date.parse(expired.state.votes[0].createdAt),clock-1);
    assert.equal((await vote(room,v,1)).status,409);
    assert.equal((await view(room)).revision,expired.revision);
+  });
+
+  await t.test('justificativa original é persistida no limite com parecer ainda em andamento',async()=>{
+   const room=await create(2),v=await view(room),r=round(v);
+   const credential=room.participants[0].credential;
+   const justification='Rejeito o prazo atual. Solicito mais dois dias.';
+   const body={proposalId:r.proposalId,roundId:r.id,revision:v.revision};
+   let started!:()=>void,release!:()=>void;
+   const entered=new Promise<void>(resolve=>{started=resolve;});
+   const wait=new Promise<void>(resolve=>{release=resolve;});
+   const previous=ai.analyzeContribution;
+   ai.analyzeContribution=async()=>{started();await wait;return review;};
+   const pending=roomPost(room,'/contribution-review',{...body,text:justification,position:'REJEITO',consent:true},credential);
+   try{
+    await Promise.race([entered,pending.then(result=>{throw new Error('Parecer retornou antes do teste: '+result.status);})]);
+    clock=Date.parse(r.voting!.deadlineAt)-1;
+    const cast=await roomPost(room,'/votes',{...body,choice:'REJEITO',justification},credential);
+    assert.equal(cast.status,201);
+    clock++;
+    release();
+    assert.equal((await pending).status,409);
+    const saved=await view(room);
+    assert.equal(saved.state.votes[0].justification,justification);
+    assert.equal(saved.state.contributions[0].review.status,'IGNORADA');
+    assert.deepEqual(round(saved).voting!.closure!.abstentions,[v.state.participants[1].id]);
+   }finally{release();await pending;ai.analyzeContribution=previous;}
   });
 
   await t.test('varredura fecha sem tráfego e inscrição tardia não vira abstenção retroativa',async()=>{
@@ -160,6 +186,14 @@ test('HTTP: prazo, saídas, encerramento, concorrência e histórico de rodadas'
     assert.equal(cast.status,409);assert.equal(closed.status,200);assert.equal(result.state.votes.length,0);
     assert.equal(round(result).voting!.closure!.abstentions.length,2);
    }
+   const removalRace=await create(3),before=await view(removalRace);
+   const [voted,removed]=await Promise.all([vote(removalRace,before,0),remove(removalRace,before,0,'ABANDONO')]);
+   assert.equal(removed.status,200);
+   assert.ok(voted.status===201||voted.status===403);
+   const after=await view(removalRace);
+   assert.equal(after.state.votes.length,voted.status===201?1:0);
+   assert.equal(after.state.participants[0].departure?.kind,'ABANDONO');
+   assert.ok(round(after).voting!.eligibleIds.includes(after.state.participants[0].id));
   });
  }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));await db.close();}
 });

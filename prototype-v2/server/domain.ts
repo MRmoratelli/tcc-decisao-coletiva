@@ -1,12 +1,12 @@
 import { randomUUID, createHash } from 'node:crypto';
 import { z } from 'zod';
-import { ProposalSchema, ReviewSchema, AssessmentSchema, SynthesisSchema, EvaluationSchema, ChoiceSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult, type EvaluationInput, type Choice } from '../shared/contracts.js';
-import { FactualCheckSchema,FactualReportSchema,soundEvidence,isTavilyCheck,type FactualReport } from '../shared/factual.js';
+import { ProposalSchema, ReviewSchema, ReviewChoiceSchema, AssessmentSchema, SynthesisSchema, EvaluationSchema, ChoiceSchema, type ProposalContent, type Review, type Assessment, type SynthesisResult, type EvaluationInput, type Choice } from '../shared/contracts.js';
+import { FactualCheckSchema,soundEvidence } from '../shared/factual.js';
 import { dimensions,NATURALISTIC_VERSION,APPLICATION_VARIANT,displayedOpenItems } from '../shared/instrument.js';
 
 export class DomainError extends Error { constructor(message:string, public status=400, public code?:string){super(message);} }
 const id=z.string().uuid(), date=z.string().datetime();
-const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional(),choice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
+const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional(),choice:ReviewChoiceSchema.optional()});
 const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.nullable(),content:ProposalSchema,createdAt:date,approvedBy:z.string(),review:ReviewRecord,intervention:z.object({kind:z.enum(['APROVACAO_HUMANA','EDICAO_HUMANA']),source:z.enum(['PROPOSTA_ANTERIOR','SINTESE_IA','RASCUNHO_INICIAL','PARECER_INICIAL_IA']),sourceId:id,original:ProposalSchema,published:ProposalSchema,changes:z.array(z.object({field:z.string(),before:z.string(),after:z.string()})),reason:z.string(),at:date,actor:z.literal('moderator')}).optional()});
 export const ROUND_DURATION_MS=5*60*1000;
 export const DepartureKind=z.enum(['DESISTENCIA','ABANDONO']);
@@ -36,7 +36,7 @@ export const StateSchema=z.object({
 export type State=z.infer<typeof StateSchema>;
 export type ReviewRecordType=z.infer<typeof ReviewRecord>;
 export const now=()=>new Date().toISOString();
-export function event(s:State,actor:string,type:string,detail=''){s.events.push({id:randomUUID(),at:now(),actor,type,detail});}
+export function event(s:State,actor:string,type:string,detail='',at=now()){s.events.push({id:randomUUID(),at,actor,type,detail});}
 export const currentRound=(s:State)=>s.rounds[s.rounds.length-1];
 export const currentProposal=(s:State)=>s.proposals[s.proposals.length-1];
 export function latestVotes(s:State,roundId=currentRound(s).id){
@@ -73,7 +73,7 @@ function finishRound(s:State,cause:z.infer<typeof RoundClosure>,at:string){
  if(r.voting){
   const abstentions=pendingVoters(s);
   r.voting.closure={cause,abstentions};
-  s.events.push({id:randomUUID(),at,actor:['MODERADOR','SESSAO_ENCERRADA'].includes(cause)?'moderator':'system',type:'ROUND_CLOSED',detail:cause+'; '+r.id+'; '+abstentions.length+' abstenção(ões)'});
+  event(s,['MODERADOR','SESSAO_ENCERRADA'].includes(cause)?'moderator':'system','ROUND_CLOSED',cause+'; '+r.id+'; '+abstentions.length+' abstenção(ões)',at);
  }
  r.status='CLOSED';r.closedAt=at;
 }
@@ -100,7 +100,7 @@ export function removeParticipant(s:State,pid:string,roundId:string,kind:z.infer
  open(s);
  const timestamp=new Date(at).toISOString();
  p.departure={kind,roundId,at:timestamp};
- s.events.push({id:randomUUID(),at:timestamp,actor:'moderator',type:'PARTICIPANT_REMOVED',detail:kind+'; '+pid+'; '+roundId});
+ event(s,'moderator','PARTICIPANT_REMOVED',kind+'; '+p.alias+'; rodada '+r.number,timestamp);
  completeVoting(s,timestamp);
 }
 function completeVoting(s:State,at:string){
@@ -118,7 +118,7 @@ export function createState(roomId:string,proposal:ProposalContent,participants:
   const changes=Object.keys(proposal).filter(k=>proposal[k as keyof ProposalContent]!==original[k as keyof ProposalContent]).map(k=>({field:k,before:original[k as keyof ProposalContent],after:proposal[k as keyof ProposalContent]}));
   s.proposals[0].intervention={kind:changes.length?'EDICAO_HUMANA':'APROVACAO_HUMANA',source:review.appliedRewrite?'PARECER_INICIAL_IA':'RASCUNHO_INICIAL',sourceId:pid,original,published:structuredClone(proposal),changes,reason:review.reason||'Confirmação humana da proposta inicial.',at,actor:'moderator'};
  }
- event(s,'moderator','ROOM_CREATED','Proposta inicial confirmada por pessoa responsável.');return s;
+ event(s,'moderator','ROOM_CREATED','Proposta inicial confirmada por pessoa responsável.',at);return s;
 }
 function open(s:State){if(s.decision.status!=='OPEN')throw new DomainError('Processo encerrado.',409);}
 function participant(s:State,pid:string){
@@ -140,10 +140,10 @@ export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:
  if(s.votingMode==='BINARY'&&!['ACEITO','REJEITO'].includes(choice))throw new DomainError('Escolha Aceito ou Rejeito.');
  if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!justification.trim())throw new DomainError('Rejeição e aceite com ressalvas exigem justificativa.');
  s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:timestamp});
- event(s,pid,'VOTE_RECORDED',choice);
+ event(s,pid,'VOTE_RECORDED',choice,timestamp);
  if(unanimous(s)){
   s.decision.status='CONSENSUS';s.decision.closedAt=timestamp;s.decision.closureReason='Aceitação explícita de todos na mesma versão.';
-  finishRound(s,'CONSENSO',timestamp);event(s,'system','CONSENSUS_RECORDED',s.decision.closureReason);
+  finishRound(s,'CONSENSO',timestamp);event(s,'system','CONSENSUS_RECORDED',s.decision.closureReason,timestamp);
  }else completeVoting(s,timestamp);
 }
 export function contribute(s:State,pid:string,roundId:string,proposalId:string,text:string,originalText:string,review:ReviewRecordType,contest:string,at=Date.now()){
@@ -156,7 +156,7 @@ export function manifestations(s:State){
  const kind=(choice:string)=>choice==='REJEITO'?'OBJECAO' as const:choice==='ACEITO_COM_RESSALVAS'?'RESSALVA' as const:choice==='ABSTENHO'?'ABSTENCAO' as const:'APOIO' as const;
  const contributions=s.contributions.filter(c=>c.roundId===roundId);
  const rows=[...votes.map(v=>({linkedOriginals:contributions.filter(c=>c.participantId===v.participantId&&c.text===v.justification).map(c=>({id:c.id,originalText:c.originalText,contest:c.contest})),id:v.id,kind:kind(v.choice),text:v.justification,participantId:v.participantId,choice:v.choice,linkedContributionIds:contributions.filter(c=>c.participantId===v.participantId&&c.text===v.justification).map(c=>c.id)})),...contributions.filter(c=>!votes.some(v=>v.participantId===c.participantId&&v.justification===c.text)).map(c=>({id:c.id,kind:'CONTRIBUICAO' as const,text:c.text,participantId:c.participantId,originalText:c.originalText,contest:c.contest}))];
- const relevant=new Set([...votes,...contributions,...s.analyses.filter(a=>a.roundId===roundId),...s.syntheses.filter(a=>a.roundId===roundId),...s.factualChecks.filter(a=>a.roundId===roundId)].map(a=>a.id));
+ const relevant=new Set([...votes,...contributions,...s.analyses.filter(a=>a.roundId===roundId),...s.syntheses.filter(a=>a.roundId===roundId)].map(a=>a.id));
  return [...rows,...s.contests.filter(c=>relevant.has(c.targetId)).map(c=>({id:c.id,kind:'CONTESTACAO' as const,text:c.text,participantId:c.participantId,targetId:c.targetId}))];
 }
 // Resolve quotes only against texts authoritatively linked to this source and round.
@@ -266,13 +266,13 @@ export function publish(s:State,content:ProposalContent,sourceId:string,reason:s
  s.proposals.push({...proposal,intervention});s.rounds.push({id:randomUUID(),number:s.rounds.length+1,proposalId:proposal.id,status:'OPEN',openedAt:timestamp,closedAt:null});
  if(r.voting)enableRoundVoting(s);
  if(synthesis){synthesis.publishedProposalId=proposal.id;synthesis.humanCoverage=coverage;}
- event(s,'moderator','PROPOSAL_PUBLISHED',reason);
+ event(s,'moderator','PROPOSAL_PUBLISHED',reason,timestamp);
 }
 export function closeWithoutConsensus(s:State,reason:string,at=Date.now()){
  open(s);if(!reason.trim())throw new DomainError('Informe a razão do encerramento.');
  s.decision.status='CLOSED_WITHOUT_CONSENSUS';s.decision.closedAt=new Date(at).toISOString();s.decision.closureReason=reason;
  finishRound(s,'SESSAO_ENCERRADA',s.decision.closedAt);
- event(s,'moderator','CLOSED_WITHOUT_CONSENSUS',reason);
+ event(s,'moderator','CLOSED_WITHOUT_CONSENSUS',reason,s.decision.closedAt);
 }
 export function contest(s:State,pid:string,targetId:string,text:string){
  participant(s,pid);
@@ -332,7 +332,10 @@ export function validateState(input:unknown):State{
   if(!unique(eligibleIds)||i===0&&eligibleIds.length!==expected.length||eligibleIds.some(id=>!expected.includes(id))||Date.parse(deadlineAt)!==openedAt+ROUND_DURATION_MS)throw new DomainError('Elegibilidade ou prazo da rodada inválido.');
   if((r.status==='CLOSED')!==Boolean(closure)||(r.status==='CLOSED')!==(closedAt!==null)||closedAt!==null&&(closedAt<openedAt||closedAt>Date.parse(deadlineAt))||closure?.cause==='PRAZO_EXPIRADO'&&r.closedAt!==deadlineAt)throw new DomainError('Encerramento de rodada incompatível.');
   const votes=s.votes.filter(v=>v.roundId===r.id);
-  if(!unique(votes.map(v=>v.participantId))||votes.some(v=>!eligibleIds.includes(v.participantId)||Date.parse(v.createdAt)<openedAt||Date.parse(v.createdAt)>=Date.parse(deadlineAt)||closedAt!==null&&Date.parse(v.createdAt)>closedAt))throw new DomainError('Votos incompatíveis com a elegibilidade ou o prazo.');
+  if(!unique(votes.map(v=>v.participantId))||votes.some(v=>{
+   const timestamp=Date.parse(v.createdAt),departure=s.participants.find(p=>p.id===v.participantId)?.departure;
+   return !eligibleIds.includes(v.participantId)||timestamp<openedAt||timestamp>=Date.parse(deadlineAt)||closedAt!==null&&timestamp>closedAt||departure&&timestamp>Date.parse(departure.at);
+  }))throw new DomainError('Votos incompatíveis com a elegibilidade ou o prazo.');
   if(closure&&(!unique(closure.abstentions)||closure.abstentions.some(id=>{
    const departure=s.participants.find(p=>p.id===id)?.departure;
    return !eligibleIds.includes(id)||votes.some(v=>v.participantId===id)||departure&&Date.parse(departure.at)<closedAt!;
@@ -363,15 +366,3 @@ export function validateState(input:unknown):State{
 }
 export function exportState(s:State){const exported=structuredClone(s);delete exported.reviewRequests;return {format:'dc2-consensus',version:2,exportedAt:now(),state:exported,metrics:metrics(s),evaluation:statistics(s),provenance:'Histórico exportado pelo moderador. Não é comprovação criptográfica de autoria externa.'};}
 export const ImportSchema=z.object({format:z.literal('dc2-consensus'),version:z.literal(2),state:StateSchema});
-
-export function addFactualCheck(s:State,report:FactualReport,participantId:string|null){
- open(s);if(participantId)participant(s,participantId);
- if(s.factualChecks.length>=200)throw new DomainError('Limite de verificações desta sala atingido.',429);
- FactualReportSchema.parse(report);if(!soundEvidence(report))throw new DomainError('Evidências sem suporte rastreável.',502);
- const entry={...report,id:randomUUID(),participantId,proposalId:currentProposal(s).id,roundId:currentRound(s).id};
- s.factualChecks.push(entry);event(s,participantId??'moderator','FACTUAL_CHECK_RECORDED',entry.id+'; '+report.version+'; '+report.model);return entry;
-}
-export function factualContext(s:State){
- return s.factualChecks.filter(isTavilyCheck).filter(f=>f.proposalId===currentProposal(s).id&&f.provenance!=='IMPORTED_UNAUTHENTICATED').slice(-12).map(f=>({id:f.id,provider:'TAVILY',version:f.version,queriedAt:f.createdAt,contested:s.contests.some(c=>c.targetId===f.id),contests:s.contests.filter(c=>c.targetId===f.id).map(c=>({text:c.text,at:c.at})),claims:f.claims.map(c=>({claim:c.claim.text,status:c.status,interpretation:c.explanation,sources:c.sources,evidenceLinks:c.evidenceLinks,retrieval:c.retrieval,limitations:c.limitations}))}));
-}
-

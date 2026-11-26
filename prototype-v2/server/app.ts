@@ -3,7 +3,7 @@ import { automaticMediation } from './automatic.js';
 import express from 'express';
 import { z, ZodError } from 'zod';
 import { makeReceipt, verifyReceipt } from './receipts.js';
-import { ProposalSchema, ReviewSchema, ChoiceSchema, ActiveChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
+import { ProposalSchema, ReviewSchema, ReviewChoiceSchema, ActiveChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
 import { Repository, type Identity } from './db.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
 import { DomainError,assertVoter,DepartureKind,pendingVoters,closeRound,removeParticipant,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
@@ -24,7 +24,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  const enrollmentLimit=rateLimit(90);
  const credential=z.string().min(20).max(128),revision=z.number().int().positive();
  const text=z.string().trim().min(1).max(5000);
- const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional(),appliedRewrite:z.boolean().optional(),reviewChoice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
+ const reviewInput=z.object({receipt:z.string().max(1000000).optional(),bypassReason:z.string().trim().min(4).max(1000).optional(),appliedRewrite:z.boolean().optional(),reviewChoice:ReviewChoiceSchema.optional()});
  const reviewRecord=(body:z.infer<typeof reviewInput>,kind:'proposal'|'contribution',binding:unknown):ReviewRecordType=>{
   if(body.receipt){const result=ReviewSchema.parse(verifyReceipt(signingKey,body.receipt,kind,binding));
    if(kind==='contribution'&&body.appliedRewrite&&result.suggestedRewrite!==(binding as {text?:string}).text)throw new DomainError('Reformulação não corresponde ao parecer assinado. Analise novamente.');
@@ -113,29 +113,41 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
   res.json(view(x.state,i,x.revision));
  });
  app.post('/api/rooms/:code/contribution-review',aiLimit,async(req,res)=>{
-  const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
+  const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),position:z.literal('REJEITO').default('REJEITO'),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
   if(b.proposalId!==currentProposal(state).id||b.roundId!==currentRound(state).id)throw new DomainError('Versão desatualizada.',409);
   const reserved=await reserveReview(repo,i,b.text,Date.now(),ai.model,b);
-  try{const review=reserved.cached??await ai.analyzeContribution(currentProposal(state).content,b.text);
+  try{const review=reserved.cached??await ai.analyzeContribution(currentProposal(state).content,b.text,b.position);
    if(!reserved.cached)await finishReview(repo,i,reserved.requestId,review);
    const latest=(await repo.read(i)).state;assertVoter(latest,i.participantId!,b.roundId,b.proposalId);
+   if(latest.votes.some(v=>v.roundId===b.roundId&&v.participantId===i.participantId))throw new DomainError('Seu voto já foi registrado.',409);
    const binding={roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text};
    res.json({review,availableAt:new Date(Date.parse(reserved.at)+REVIEW_INTERVAL_MS).toISOString(),cached:Boolean(reserved.cached),receipt:makeReceipt(signingKey,'contribution',binding,review),
     rewriteReceipt:review.suggestedRewrite?makeReceipt(signingKey,'contribution',{...binding,text:review.suggestedRewrite},review):null});}
-  catch(e){if(!reserved.cached)try{await finishReview(repo,i,reserved.requestId);}catch{}
-   await repo.mutate(i,(await repo.read(i)).revision,s=>event(s,i.participantId!,'AI_FAILURE','analyzeContribution: '+(e instanceof AIUnavailable?e.code:'UNKNOWN')+'; '+PROMPT_VERSION+'; '+ai.model));throw e;}
+  catch(e){
+   if(e instanceof AIUnavailable){
+    if(!reserved.cached)try{await finishReview(repo,i,reserved.requestId);}catch{}
+    await repo.mutate(i,null,s=>event(s,i.participantId!,'AI_FAILURE','analyzeContribution: '+e.code+'; '+PROMPT_VERSION+'; '+ai.model));
+   }
+   throw e;
+  }
  });
  const contributionBody=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),text,originalText:text,contest:z.string().trim().max(2000).default('')});
- function contributionReview(i:Identity,b:z.infer<typeof contributionBody>){return reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text});}
+ function contributionReview(i:Identity,b:z.infer<typeof reviewInput>&{roundId:string;proposalId:string;originalText?:string},submitted:string){
+  const edited=b.reviewChoice==='EDITED_REWRITE'||b.reviewChoice==='EDITED_ORIGINAL';
+  if(edited&&(!b.receipt||!b.originalText?.trim()||b.appliedRewrite))throw new DomainError('O texto editado exige o comprovante do parecer sobre a justificativa original.');
+  const review=reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:edited?b.originalText!.trim():submitted});
+  if(b.reviewChoice==='EDITED_REWRITE'&&!review.result?.suggestedRewrite)throw new DomainError('O parecer não tem reformulação para editar.');
+  return review;
+ }
  app.post('/api/rooms/:code/contributions',async(req,res)=>{
-  const i=await auth(req,'participant'),b=contributionBody.parse(req.body),review=contributionReview(i,b);
+  const i=await auth(req,'participant'),b=contributionBody.parse(req.body),review=contributionReview(i,b,b.text);
   await repo.mutate(i,b.revision,(s,at)=>{contribute(s,i.participantId!,b.roundId,b.proposalId,b.text,b.originalText,review,b.contest,at);});
   res.status(201).json({saved:true});
  });
  app.post('/api/rooms/:code/votes',async(req,res)=>{
   const i=await auth(req,'participant'),b=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),choice:ActiveChoiceSchema,justification:z.string().trim().max(5000).default(''),originalText:z.string().max(5000).optional(),contest:z.string().max(2000).default('')}).parse(req.body);
   if(b.choice==='ACEITO'&&b.justification)throw new DomainError('ACEITO significa aceitar a proposta como está, sem justificativa. Se precisa de alteração, escolha REJEITO e explique.');
-  const review=b.justification?reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.justification}):null;
+  const review=b.justification?contributionReview(i,{...b,bypassReason:b.bypassReason??'Autor enviou a justificativa sem parecer consultivo.'},b.justification):null;
   await repo.mutate(i,null,(s,at)=>{
    if(review)contribute(s,i.participantId!,b.roundId,b.proposalId,b.justification,b.originalText??b.justification,review,b.contest,at);
    vote(s,i.participantId!,b.roundId,b.proposalId,b.choice,b.justification,at);
@@ -151,7 +163,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
     return await repo.mutate(i,b.revision,s=>addAnalysis(s,result,ai.model,PROMPT_VERSION));
    }
    const a=state.analyses.find(a=>a.id===b.analysisId&&a.proposalId===currentProposal(state).id);if(!a)throw new DomainError('Análise atual não encontrada.');
-   const result=await ai.synthesizeProposal(currentProposal(state).content,a.result,manifestations(state));
+   const result=await ai.synthesizeProposal(currentProposal(state).content,a.result,manifestations(state),state.proposals[0].content);
    const verified=reconcileSynthesisLinks(state,result);
    return await repo.mutate(i,b.revision,s=>{
     if(verified!==result)event(s,'moderator','SYNTHESIS_LINKS_RECONCILED','IDs verificados; classificação ausente conservadoramente não atendida. Ver aviso no rascunho.');

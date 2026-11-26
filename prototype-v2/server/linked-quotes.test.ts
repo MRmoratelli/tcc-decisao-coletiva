@@ -48,7 +48,7 @@ test('Historical submitted quotes without origin metadata remain readable',async
  assert.equal(validateState(s).analyses.length,1);
 });
 test('Live grammar excludes server-derived quote metadata; individual mode keeps personal argument separate',async()=>{
- assert.ok(instructions.includes('analyzeContribution'));assert.ok(instructions.includes('EXCLUSIVAMENTE contribution'));
+ assert.ok(instructions.includes('analyzeContribution'));assert.match(instructions,/exclusivamente contribution/i);
  const {s,a}=await fixture();let saw=false;
  const ai=new GeminiAdapter('synthetic',async(mode,input,schema)=>{assert.equal(mode,'analyzeObjections');assert.ok(!JSON.stringify(schema).includes('quoteOrigin'));saw=true;return JSON.stringify(a);});
  await ai.analyzeObjections(currentProposal(s).content,s.votes,[],manifestations(s));assert.ok(saw);
