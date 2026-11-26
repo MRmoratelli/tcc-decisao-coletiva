@@ -61,6 +61,7 @@ test('Revisão: reformulação e descarte são escolhas anteriores ao único reg
   await act(async()=>ui.root.findAllByType('select')[0].props.onChange({target:{value:'REJEITO'}}));
   const text=()=>ui.root.findAllByType('textarea').find(t=>t.props.rows===5)!;
   await act(async()=>text().props.onChange({target:{value:'Precisamos rever o prazo.'}}));
+  assert.ok(!button('Enviar apenas contribuição'));
   await act(async()=>ui.root.findAllByType('input').find(i=>i.props.type==='checkbox')!.props.onChange({target:{checked:true}}));
   await act(async()=>button('Revisar meu argumento com IA').props.onClick());
   await act(async()=>button('Usar reformulação da IA').props.onClick());

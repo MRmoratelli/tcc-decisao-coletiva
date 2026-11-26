@@ -144,7 +144,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  </details>}
  {view.role==='moderator'&&votingOpen&&r.voting&&<section>
   {!confirmClose?<button className="secondary" disabled={busy} onClick={()=>setConfirmClose(true)}>Encerrar rodada antecipadamente</button>:<>
-   <p role="status">{pendingCount} voto(s) pendente(s). {individualTiming?'Participantes que entraram e ainda não votaram serão registrados com Abstenção.':'Estes participantes serão registrados com Abstenção.'}</p>
+   <p role="status">{pendingCount}{individualTiming?' voto(s) pendente(s). Participantes que entraram e ainda não votaram serão registrados com Abstenção.':' voto(s) pendente(s). Estes participantes serão registrados com Abstenção.'}</p>
    {individualTiming&&view.positions.some(pos=>pos.choice==='AINDA_NAO_ENTROU')&&<p>Quem ainda não entrou ficará sem voto nesta rodada.</p>}
    <div className="actions"><button className="secondary" disabled={busy} onClick={()=>void act(async()=>{await mutate('/round-close',{roundId:r.id,pendingCount,confirm:true});setConfirmClose(false);})}>Confirmar encerramento da rodada</button><button disabled={busy} onClick={()=>setConfirmClose(false)}>Cancelar</button></div>
   </>}
