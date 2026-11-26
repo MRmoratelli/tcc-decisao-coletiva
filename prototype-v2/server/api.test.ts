@@ -72,19 +72,20 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   const v=await view(room);synthesis=v.state.syntheses.at(-1);assert.equal(v.state.proposals.length,1);assert.equal(synthesis.publishedProposalId,null);assert.ok(synthesis.result.remainingImpasses.length);
  });
  await t.test('14 revisão humana obrigatória antes de publicar V2',async()=>{
+  assert.equal((await action(room,'/round-close',{roundId:originalRound.id,pendingCount:1,confirm:true})).status,200);
   const proposed={...synthesis.result.revisedProposal,text:synthesis.result.revisedProposal.text+' Revisado pelo moderador.'};
   assert.equal((await action(room,'/publish',{proposal:proposed,sourceId:originalRound.proposalId,synthesisId:synthesis.id,reason:'',confirm:true})).status,400);
   const publish=await action(room,'/publish',{proposal:proposed,sourceId:originalRound.proposalId,synthesisId:synthesis.id,reason:'Incorporada preocupação de prazo.',coverage:[{voteId:analysis.result.individualAssessments[0].voteId,status:'PARCIAL',faithful:true,note:'Julgamento humano sintético.'}],confirm:true});assert.equal(publish.status,200,JSON.stringify(publish.data));
  });
- await t.test('10-11 novas manifestações por versão; recibo antigo e revisão concorrente recusados',async()=>{
+ await t.test('10-11 nova regulamentação por rodada: vínculo desatualizado é recusado e votos simultâneos são aceitos',async()=>{
   const v=await view(room);assert.equal(v.state.rounds.length,2);assert.equal(v.state.votes.length,2);assert.ok(v.positions.every((p:any)=>p.choice==='PENDENTE'));
   assert.equal((await action(room,'/votes',{choice:'ACEITO',proposalId:originalRound.proposalId,roundId:originalRound.id},room.participants[0].credential)).status,409);
   const before=await view(room),r=before.state.rounds.at(-1);
   const first=await cast(room,0,'ACEITO');assert.equal(first.status,201);
-  const stale=await post('/rooms/'+room.code+'/votes',{credential:room.participants[1].credential,revision:before.revision,proposalId:r.proposalId,roundId:r.id,choice:'ACEITO'});assert.equal(stale.status,409);
+  const stale=await post('/rooms/'+room.code+'/votes',{credential:room.participants[1].credential,revision:before.revision,proposalId:r.proposalId,roundId:r.id,choice:'ACEITO'});assert.equal(stale.status,201);
  });
  await t.test('15 consenso somente com os três aceites explícitos na V2',async()=>{
-  assert.equal((await cast(room,1,'ACEITO')).status,201);assert.equal((await view(room)).state.decision.status,'OPEN');
+  assert.equal((await cast(room,1,'ACEITO')).status,409);assert.equal((await view(room)).state.decision.status,'OPEN');
   assert.equal((await cast(room,2,'ACEITO')).status,201);const v=await view(room);assert.equal(v.state.decision.status,'CONSENSUS');assert.ok(v.state.events.some((e:any)=>e.type==='CONSENSUS_RECORDED'));
  });
  await t.test('20 DSR individual pós-sessão; ausência e N/A distintos; exportação restrita',async()=>{
@@ -112,6 +113,7 @@ test('Integração HTTP + PostgreSQL embarcado: fluxo remoto sintético de três
   assert.equal((await cast(temp,0,'REJEITO','Objeção legítima ao prazo.')).status,201);
   assert.equal((await action(temp,'/analyze-objections',{consent:true})).status,502);ai.fail=false;
   const state=(await view(temp)).state;assert.equal(state.decision.status,'OPEN');assert.ok(state.events.filter((e:any)=>e.type==='AI_FAILURE').length>=2);
+  assert.equal((await action(temp,'/round-close',{roundId:r.id,pendingCount:1,confirm:true})).status,200);
   assert.equal((await action(temp,'/publish',{proposal,sourceId:r.proposalId,reason:'Revisão humana diante de falha Gemini.',confirm:true})).status,200);
  });
  await t.test('16 encerramento sem consenso independente da IA e sem alterar outra sala',async()=>{
@@ -181,6 +183,7 @@ test('HTTP: voto único, concorrência e repetição não criam votos ou contrib
  assert.equal((await cast(room,0,'REJEITO','Outra justificativa não pode substituir o voto.')).status,409);
  const unchanged=await view(room);
  assert.equal(unchanged.revision,saved.revision);assert.equal(JSON.stringify(unchanged.state),baseline);
+ assert.equal((await action(room,'/round-close',{roundId:r.id,pendingCount:2,confirm:true})).status,200);
  const published=await action(room,'/publish',{proposal:{...proposal,text:'Nova versão sintética com acesso revisto.'},sourceId:r.proposalId,reason:'Moderador publica nova rodada sintética.',confirm:true});
  assert.equal(published.status,200);
  const next=await view(room,credential);assert.ok(next.positions.every((x:any)=>x.choice==='PENDENTE'));

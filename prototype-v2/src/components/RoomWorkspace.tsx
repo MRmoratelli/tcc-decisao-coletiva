@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { RoomView,ReviewResult } from '../api';
 import { request,downloadJSON } from '../api';
-import {RoundAnalysis,RoundHistory,SynthesisDetails,RevisionHistory,sourceLabel} from './RoundViews';
+import {RoundAnalysis,RoundHistory,SynthesisDetails,RevisionHistory,sourceLabel,closureLabels,departureLabels} from './RoundViews';
 import { ProposalEditor } from './ProposalEditor';
 import { ReviewCard } from './ReviewCard';
 import { EvaluationForm } from './EvaluationForm';
@@ -14,15 +14,26 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  const [contestText,setContest]=useState(''),[consent,setConsent]=useState(false),[bypass,setBypass]=useState(false);
  const [moderatorEdited,setModeratorEdited]=useState(false),[manual,setManual]=useState(false),[reviewingSynthesis,setReviewingSynthesis]=useState(false);
  const [clock,setClock]=useState(Date.now()),[availableAt,setAvailableAt]=useState(0);
- useEffect(()=>{if(view.role!=='participant')return;const timer=setInterval(()=>setClock(Date.now()),1000);(timer as unknown as {unref?:()=>void}).unref?.();return()=>clearInterval(timer);},[view.role]);
+ useEffect(()=>{
+  if(!r.voting&&view.role!=='participant')return;
+  const offset=view.serverNow===undefined?0:view.serverNow-Date.now();
+  const updateClock=()=>setClock(Date.now()+offset);
+  updateClock();
+  const timer=setInterval(updateClock,1000);
+  (timer as unknown as {unref?:()=>void}).unref?.();
+  return()=>clearInterval(timer);
+ },[view.role,view.serverNow,r.id]);
  const ownReview=s.reviewRequests?.find(x=>x.participantId===view.participantId);
  const reviewWait=Math.max(0,Math.ceil((Math.max(availableAt,ownReview?Date.parse(ownReview.at)+60000:0)-clock)/1000));
  const [revisionDraft,setDraft]=useState<ProposalContent>(p.content),[reason,setReason]=useState(''),[sourceSynthesis,setSynthesis]=useState<string|undefined>(),[closeReason,setCloseReason]=useState('');
+ const [confirmClose,setConfirmClose]=useState(false);
+ const [removing,setRemoving]=useState(''),[departureKind,setDepartureKind]=useState<keyof typeof departureLabels>('DESISTENCIA');
  const [staleDraft,setStaleDraft]=useState(false),[roundNotice,setRoundNotice]=useState('');
  const draftRound=useRef(p.id);
  const [target,setTarget]=useState(''),[contestLater,setContestLater]=useState('');
  useEffect(()=>{if(draftRound.current!==p.id){
   const needsDraftReview=view.role==='moderator'?moderatorEdited&&JSON.stringify(revisionDraft)!==JSON.stringify(p.content):Boolean(text.trim()||original.trim()||contestText.trim());
+  setConfirmClose(false);setRemoving('');
   setRoundNotice('Nova rodada publicada. Confira a proposta antes de se manifestar.');
   setStaleDraft(needsDraftReview);if(!needsDraftReview){draftRound.current=p.id;setDraft(p.content);setModeratorEdited(false);setReason('');}
   setReview(null);setHasAnalyzed(false);setRewriteApplied(false);setSynthesis(undefined);
@@ -48,7 +59,12 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  const analysis=s.analyses.filter(a=>a.proposalId===p.id).slice(-1)[0];
  const syntheses=s.syntheses.filter(x=>x.proposalId===p.id);
  const isOpen=s.decision.status==='OPEN';
- const pendingCount=s.participants.length-latestCount();
+ const secondsLeft=r.voting?Math.max(0,Math.ceil((Date.parse(r.voting.deadlineAt)-clock)/1000)):null;
+ const votingOpen=isOpen&&r.status==='OPEN'&&secondsLeft!==0;
+ const ownDeparture=s.participants.find(p=>p.id===view.participantId)?.departure;
+ const canVote=votingOpen&&!ownDeparture&&(!r.voting||r.voting.eligibleIds.includes(view.participantId??''));
+ const pendingCount=r.voting?(view.pendingVoteCount??0):s.participants.length-latestCount();
+ const selectable=s.participants.filter(p=>!p.departure&&(!s.enrollment||s.enrollment.claims.includes(p.id)));
  function latestCount(){return new Set(s.votes.filter(v=>v.roundId===r.id).map(v=>v.participantId)).size;}
  const newestSynthesis=syntheses.filter(x=>!x.publishedProposalId).at(-1);
  const loadedSynthesis=useRef<string|undefined>(undefined);
@@ -72,20 +88,38 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  // Pair the contribution and vote written in the same operation. Keep history in storage.
  const linkedVote=(c:(typeof roundContributions)[number])=>roundVotes.find(v=>v.participantId===c.participantId&&v.justification===c.text&&Math.abs(Date.parse(v.createdAt)-Date.parse(c.createdAt))<2000);
  const independentContributions=roundContributions.filter(c=>!linkedVote(c));
- return <div className="workspace"><small>V2 coleta 21/11/2026 · parecer v2.9</small>
+ return <div className="workspace">
  {!isOpen&&text&&<details><summary>Seu rascunho não enviado, preservado após o encerramento</summary><p className="preserve">{text}</p></details>}
  {roundNotice&&<p className="alert" role="status">{roundNotice}</p>}
  {staleDraft&&<section className="alert"><p>Rascunhos preservados da versão anterior. Revise o conteúdo; nenhum voto foi transferido.</p><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);if(view.role!=='moderator')setDraft(p.content);setReason('');setChoice(text.trim()?'REJEITO':'ACEITO');setBypass(false);}}>Confirmar reutilização do meu texto na rodada atual</button><button onClick={()=>{draftRound.current=p.id;setStaleDraft(false);setText('');setOriginal('');setContest('');setDraft(p.content);setReason('');setChoice('ACEITO');setBypass(false);}}>Descartar rascunho anterior e iniciar novamente</button></section>}
- <section aria-label="Proposta vigente e votação"><div className="proposal"><h3>{isOpen?'Proposta em votação':'Proposta final'} — V{p.version} · Rodada {r.number}</h3><p className="preserve">{p.content.text}</p></div>
+ <section aria-label="Proposta vigente e votação"><div className="proposal"><h3>{votingOpen?'Proposta em votação':isOpen?'Proposta vigente':'Proposta final'} — V{p.version} · Rodada {r.number}</h3><p className="preserve">{p.content.text}</p></div>
  {p.intervention?.kind==='EDICAO_HUMANA'&&p.version>1&&<p className="alert"><b>Proposta alterada pelo moderador.</b> Justificativa: {p.intervention.reason}</p>}
  {p.intervention&&<RevisionHistory item={p}/>}
- <div className="status-strip" role="status"><b>Rodada {r.number} · Proposta V{p.version}</b><span>{s.decision.status==='CONSENSUS'?'Consenso unânime registrado':s.decision.status==='CLOSED_WITHOUT_CONSENSUS'?'Encerrado sem consenso':'Deliberação aberta'}</span></div>
- <p>Consenso exige Aceito de todos na mesma rodada. Quem não respondeu permanece pendente. Se precisar de ajustes para aceitar, escolha Rejeito e explique.</p>
+ <div className="status-strip" role="status"><b>Rodada {r.number} · Proposta V{p.version}</b><span>{s.decision.status==='CONSENSUS'?'Consenso unânime registrado':s.decision.status==='CLOSED_WITHOUT_CONSENSUS'?'Encerrado sem consenso':votingOpen?'Votação aberta':'Votação encerrada'}</span></div>
+ {secondsLeft!==null&&r.status==='OPEN'&&<p>Tempo restante <output role="timer" aria-label="Tempo restante para votar">{Math.floor(secondsLeft/60)}:{String(secondsLeft%60).padStart(2,'0')}</output></p>}
+ {r.voting?.closure&&<p>{closureLabels[r.voting.closure.cause]} · {r.voting.closure.abstentions.length} abstenção(ões)</p>}
+ <p>Consenso exige Aceito de todos os habilitados para a mesma proposta. Se precisar de ajustes para aceitar, escolha Rejeito e explique.</p>
  {s.decision.closureReason&&<p className="alert">{s.decision.closureReason}</p>}
  <details><summary>Problema e contexto da versão atual</summary><dl>{Object.entries(p.content).filter(([key,value])=>!['title','text'].includes(key)&&value).map(([key,value])=><div key={key}><dt>{{problem:'Problema',decision:'Decisão pretendida',goals:'Objetivos',alternatives:'Alternativas',constraints:'Restrições',successCriteria:'Critérios de sucesso',context:'Contexto'}[key]}</dt><dd>{value}</dd></div>)}</dl></details>
- <ul className="positions">{view.positions.map(pos=><li key={pos.id}><b>{pos.alias}</b> {pos.choice.replaceAll('_',' ')}</li>)}</ul>
+ <ul className="positions">{view.positions.map(pos=>{
+  const departure=s.participants.find(p=>p.id===pos.id)?.departure;
+  return <li key={pos.id}><b>{pos.alias}</b> {departureLabels[pos.choice as keyof typeof departureLabels]??(pos.choice==='ABSTENCAO'?'Abstenção':pos.choice.replaceAll('_',' '))}{departure&&pos.choice!==departure.kind?' · '+departureLabels[departure.kind]:''}</li>;
+ })}</ul>
+ {view.role==='moderator'&&isOpen&&r.voting&&selectable.length>0&&<details><summary>Registrar saída de participante</summary>
+  <label>Participante<select value={removing} onChange={e=>setRemoving(e.target.value)}><option value="">Selecione</option>{selectable.map(p=><option key={p.id} value={p.id}>{p.alias}</option>)}</select></label>
+  <label>Motivo da saída<select value={departureKind} onChange={e=>setDepartureKind(e.target.value as keyof typeof departureLabels)}><option value="DESISTENCIA">Desistência comunicada</option><option value="ABANDONO">Abandono registrado pelo moderador</option></select></label>
+  <p>O participante perde o direito de enviar novas manifestações. Os votos já registrados continuam válidos.</p>
+  <button disabled={busy||!removing||!selectable.some(p=>p.id===removing)} onClick={()=>void act(async()=>{await mutate('/participant-remove',{roundId:r.id,participantId:removing,kind:departureKind,confirm:true});setRemoving('');})}>Confirmar saída</button>
+ </details>}
+ {view.role==='moderator'&&votingOpen&&r.voting&&<section>
+  {!confirmClose?<button className="secondary" disabled={busy} onClick={()=>setConfirmClose(true)}>Encerrar rodada antecipadamente</button>:<>
+   <p role="status">{pendingCount} voto(s) pendente(s). Estes participantes serão registrados com Abstenção.</p>
+   <div className="actions"><button className="secondary" disabled={busy} onClick={()=>void act(async()=>{await mutate('/round-close',{roundId:r.id,pendingCount,confirm:true});setConfirmClose(false);})}>Confirmar encerramento da rodada</button><button disabled={busy} onClick={()=>setConfirmClose(false)}>Cancelar</button></div>
+  </>}
+ </section>}
+ {view.role==='participant'&&ownDeparture&&<p role="status">Sua saída foi registrada como {departureLabels[ownDeparture.kind]}.</p>}
  {view.role==='participant'&&isOpen&&ownVotes.length>0&&<section className="entry" role="status"><h3>Voto registrado nesta rodada</h3><p>Sua posição foi registrada. Aguarde o moderador publicar uma nova rodada para votar novamente. A tela será atualizada automaticamente.</p></section>}
- {view.role==='participant'&&isOpen&&ownVotes.length===0&&<section className="entry"><h3>Sua manifestação sobre V{p.version}</h3>
+ {view.role==='participant'&&canVote&&ownVotes.length===0&&<section className="entry"><h3>Sua manifestação sobre V{p.version}</h3>
  <p>Registre sua posição explicitamente. Cada participante pode votar uma única vez por rodada.</p>
  <label>Posição<select value={choice} onChange={e=>setChoice(e.target.value as Choice)}><option value="ACEITO">Aceito a proposta como está</option><option value="REJEITO">Rejeito e proponho ajustes</option></select></label>
  {choice==='ACEITO'?<p>Ao registrar ACEITO, você aceita a proposta vigente como está, sem condições ou pedidos de mudança. Se algo impede sua aceitação, escolha REJEITO e explique.</p>:<>
@@ -116,7 +150,7 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  </section>
  </section>
  {view.role==='moderator'&&isOpen&&<section className="entry"><h3>Preparação da próxima proposta — V{p.version+1}</h3>
- {s.enrollment?.automaticMediation?<><p>{pendingCount>0?'Aguardando '+pendingCount+' manifestação(ões). A análise e a síntese serão preparadas automaticamente se houver divergência.':s.mediation?.detail??'Preparando a análise e a síntese do grupo.'}</p>
+ {s.enrollment?.automaticMediation?<><p>{votingOpen?'Aguardando o encerramento da votação. '+pendingCount+' voto(s) pendente(s).':s.mediation?.detail??'A síntese automática é preparada quando há justificativas ou contribuições para revisar.'}</p>
  {s.mediation?.status==='RUNNING'&&<p role="status">A IA está preparando o rascunho. Você poderá revisá-lo antes de publicar.</p>}
  {s.mediation?.status==='FAILED'&&<button disabled={busy} onClick={()=>void act(()=>mutate('/prepare-mediation',{}))}>Tentar preparar síntese novamente</button>}
  </>:<><label className="check"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/> Autorizo enviar proposta e justificativas pseudonimizadas ao Gemini.</label>
@@ -129,14 +163,15 @@ export function RoomWorkspace({session,busy,act,onRefresh}:{session:Session;busy
  <label>Proposta revisada<textarea maxLength={5000} minLength={4} rows={6} value={revisionDraft.text} onChange={e=>{setDraft({...revisionDraft,text:e.target.value});setModeratorEdited(true);}}/></label>
  <details><summary>Editar título, contexto e demais campos (opcional)</summary><ProposalEditor hideText value={revisionDraft} onChange={value=>{setDraft(value);setModeratorEdited(true);}}/></details>
  {needsPublicationReason?<label>Justificativa das alterações do moderador<textarea name={'publicationReason'} required maxLength={5000} value={reason} onChange={e=>setReason(e.target.value)}/></label>:<p>Você está publicando a sugestão da IA sem alterações. Sua aprovação será registrada automaticamente.</p>}
- <button className="primary" disabled={busy||staleDraft||(needsPublicationReason&&!reason.trim())} onClick={()=>void act(()=>mutate('/publish',{proposal:revisionDraft,sourceId:p.id,synthesisId:sourceSynthesis,reason:needsPublicationReason?reason:'',confirm:true}))}>Confirmar revisão e publicar nova rodada</button>
+ {r.voting&&r.status==='OPEN'&&<p>Encerre a rodada atual para publicar a proposta revisada.</p>}
+ <button className="primary" disabled={busy||Boolean(r.voting&&r.status==='OPEN')||staleDraft||(needsPublicationReason&&!reason.trim())} onClick={()=>void act(()=>mutate('/publish',{proposal:revisionDraft,sourceId:p.id,synthesisId:sourceSynthesis,reason:needsPublicationReason?reason:'',confirm:true}))}>Confirmar revisão e publicar nova rodada</button>
  </section>}
  {view.role==='moderator'&&isOpen&&<details><summary>Encerrar sem consenso</summary><label>Razão para encerrar sem consenso<textarea value={closeReason} maxLength={5000} onChange={e=>setCloseReason(e.target.value)}/></label><button className="secondary" disabled={busy||!closeReason.trim()} onClick={()=>void act(()=>mutate('/close',{reason:closeReason}))}>Encerrar sem consenso</button>
  </details>}
- {view.role==='participant'&&view.canViewGroup&&<section><h3>Contestar análise da IA</h3><label>Parecer<select value={target} onChange={e=>setTarget(e.target.value)}><option value="">Selecione</option>{[...s.analyses,...s.syntheses,...s.contributions.filter(c=>c.participantId===view.participantId)].map(x=><option key={x.id} value={x.id}>{s.analyses.some(a=>a.id===x.id)?'Análise da rodada ':s.syntheses.some(a=>a.id===x.id)?'Sugestão da rodada ':'Parecer da rodada '}{s.rounds.find(r=>r.id===x.roundId)?.number}</option>)}</select></label><label>Explique sua contestação<textarea maxLength={2000} value={contestLater} onChange={e=>setContestLater(e.target.value)}/></label><button disabled={busy||!target||!contestLater.trim()} onClick={()=>void act(()=>mutate('/contest',{targetId:target,text:contestLater}))}>Registrar contestação</button></section>}
+ {view.role==='participant'&&!ownDeparture&&view.canViewGroup&&<section><h3>Contestar análise da IA</h3><label>Parecer<select value={target} onChange={e=>setTarget(e.target.value)}><option value="">Selecione</option>{[...s.analyses,...s.syntheses,...s.contributions.filter(c=>c.participantId===view.participantId)].map(x=><option key={x.id} value={x.id}>{s.analyses.some(a=>a.id===x.id)?'Análise da rodada ':s.syntheses.some(a=>a.id===x.id)?'Sugestão da rodada ':'Parecer da rodada '}{s.rounds.find(r=>r.id===x.roundId)?.number}</option>)}</select></label><label>Explique sua contestação<textarea maxLength={2000} value={contestLater} onChange={e=>setContestLater(e.target.value)}/></label><button disabled={busy||!target||!contestLater.trim()} onClick={()=>void act(()=>mutate('/contest',{targetId:target,text:contestLater}))}>Registrar contestação</button></section>}
  {s.contests.length>0&&<details><summary>Contestações preservadas</summary>{s.contests.map(c=><p key={c.id}>{s.participants.find(p=>p.id===c.participantId)?.alias}: {c.text}</p>)}</details>}
  <RoundHistory state={s} showInitialReview={view.role==='moderator'}/>
- {view.role==='participant'&&!isOpen&&(submitted?<p className="alert">Sua avaliação individual foi registrada.</p>:<EvaluationForm busy={busy} onSubmit={(input:EvaluationInput)=>act(()=>mutate('/evaluation',{input}))}/>)}
+ {view.role==='participant'&&!ownDeparture&&!isOpen&&(submitted?<p className="alert">Sua avaliação individual foi registrada.</p>:<EvaluationForm busy={busy} onSubmit={(input:EvaluationInput)=>act(()=>mutate('/evaluation',{input}))}/>)}
  {view.role==='moderator'&&<details open={!isOpen}><summary>Exportações e avaliação exploratória</summary><div className="actions"><button className="secondary" disabled={busy} onClick={()=>void act(async()=>downloadJSON(await post('/export',{}),'decisao-'+code+'.json'))}>Exportar registros da sessão</button><button className="secondary" disabled={busy} onClick={()=>void act(async()=>downloadJSON(await post('/evaluation-results',{}),'avaliacao-'+code+'.json'))}>Exportar respostas e estatísticas</button></div><details><summary>Indicadores desta sessão</summary><p>Indicadores operacionais. Avaliações humanas de cobertura/fidelidade, quando presentes, são históricas e não são coletadas neste fluxo.</p><pre>{JSON.stringify((view.metrics as {automatic?:unknown}|null)?.automatic,null,2)}</pre></details><p>Não há resultados científicos neste ambiente por padrão. Cobertura e fidelidade dependem de avaliação humana. Respostas abertas exigem codificação temática.</p></details>}
  </div>;
 }

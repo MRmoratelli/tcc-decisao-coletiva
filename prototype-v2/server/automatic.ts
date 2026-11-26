@@ -21,7 +21,9 @@ export function automaticMediation(repo:Repository,ai:AIAdapter){
   const queued=async(waiting:boolean)=>{try{await change(s=>{if(s.mediation)s.mediation.detail=waiting?'Aguardando capacidade do Gemini. Os votos estão preservados; a preparação continuará automaticamente.':'Preparando análise e síntese para revisão do moderador.';});}catch{/* A change of round cancels application of the result below. */}};
   try{
    const x=await repo.read(moderator),s=x.state,votes=latestVotes(s);
-   if(!s.enrollment?.automaticMediation||s.decision.status!=='OPEN'||votes.length!==s.participants.length||votes.every(v=>v.choice==='ACEITO'))return;
+   const round=currentRound(s);
+   const ready=round.voting?round.status==='CLOSED':votes.length===s.participants.length;
+   if(!s.enrollment?.automaticMediation||s.decision.status!=='OPEN'||!ready||!manifestations(s).some(m=>m.text.trim()))return;
    fingerprint=sourceFingerprint(s);roundId=currentRound(s).id;
    if(s.mediation?.fingerprint===fingerprint){
     if(s.mediation.status==='READY'||s.mediation.status==='FAILED'&&!retry)return;

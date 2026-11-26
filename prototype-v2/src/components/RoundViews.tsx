@@ -4,6 +4,11 @@ type State=RoomView['state'];
 type Analysis=State['analyses'][number];
 type Synthesis=State['syntheses'][number];
 export const proposalLabels:Record<string,string>={title:'Título',problem:'Problema',decision:'Decisão pretendida',goals:'Objetivos',alternatives:'Alternativas',constraints:'Restrições',successCriteria:'Critérios de sucesso',context:'Contexto',text:'Texto da proposta'};
+export const departureLabels={DESISTENCIA:'Desistência',ABANDONO:'Abandono'};
+export const closureLabels={
+ CONSENSO:'Consenso',VOTACAO_CONCLUIDA:'Votação concluída',MODERADOR:'Encerramento antecipado pelo moderador',
+ PRAZO_EXPIRADO:'Prazo expirado',SESSAO_ENCERRADA:'Sessão encerrada'
+};
 export function sourceLabel(s:State,id:string){
  const item=[...s.votes,...s.contributions,...s.contests].find(x=>x.id===id);
  if(!item)return 'Registro da rodada';
@@ -31,6 +36,10 @@ export function SynthesisDetails({state:s,synthesis:x,showText=false}:{state:Sta
 export function RoundHistory({state:s,showInitialReview=false}:{state:State;showInitialReview?:boolean}){
  return <details><summary>Histórico de rodadas</summary>{showInitialReview&&s.proposals[0].review.result&&<details><summary>Parecer inicial de apoio ao moderador</summary><ReviewCard review={s.proposals[0].review.result} label="Parecer inicial"/></details>}<details><summary>Rascunho inicial do moderador</summary><p>{s.initialDraft.text}</p></details>{s.rounds.map(r=>{
  const p=s.proposals.find(p=>p.id===r.proposalId)!;
- return <details key={r.id}><summary>Rodada {r.number} · Proposta V{p.version} · {r.status==='CLOSED'?'Encerrada':'Atual'}</summary><h4>Proposta publicada</h4><p>{p.content.text}</p><RevisionHistory item={p}/><details><summary>Votos e manifestações desta rodada</summary>{s.votes.filter(v=>v.roundId===r.id).map(v=><article key={v.id}><b>{sourceLabel(s,v.id)}</b><p>{v.choice.replaceAll('_',' ')}</p>{v.justification&&<p>{v.justification}</p>}</article>)}{s.contributions.filter(c=>c.roundId===r.id&&!s.votes.some(v=>v.roundId===r.id&&v.participantId===c.participantId&&v.justification===c.text)).map(c=><article key={c.id}><b>{sourceLabel(s,c.id)}</b><p>{c.text}</p></article>)}</details>{s.analyses.filter(a=>a.roundId===r.id&&r.status==='CLOSED').map(a=><details key={a.id}><summary>Análise da IA desta rodada</summary><RoundAnalysis state={s} analysis={a}/></details>)}{s.syntheses.filter(x=>x.roundId===r.id&&(x.publishedProposalId||r.status==='CLOSED')).map(x=><details key={x.id}><summary>Sugestão da IA para V{p.version+1} · {x.publishedProposalId?'Publicada após revisão humana':'Rascunho anterior'}</summary><SynthesisDetails state={s} synthesis={x} showText/></details>)}</details>;
+ return <details key={r.id}><summary>Rodada {r.number} · Proposta V{p.version} · {r.status==='CLOSED'?'Encerrada':'Atual'}</summary><h4>Proposta publicada</h4><p>{p.content.text}</p><RevisionHistory item={p}/>
+ {r.voting?.closure&&<p>Motivo do encerramento: {closureLabels[r.voting.closure.cause]}</p>}
+ {r.voting?.closure?.abstentions.map(id=><p key={id}>{s.participants.find(p=>p.id===id)?.alias}: Abstenção</p>)}
+ {s.participants.filter(p=>p.departure?.roundId===r.id).map(p=><p key={p.id}>{p.alias}: {departureLabels[p.departure!.kind]}</p>)}
+ <details><summary>Votos e manifestações desta rodada</summary>{s.votes.filter(v=>v.roundId===r.id).map(v=><article key={v.id}><b>{sourceLabel(s,v.id)}</b><p>{v.choice.replaceAll('_',' ')}</p>{v.justification&&<p>{v.justification}</p>}</article>)}{s.contributions.filter(c=>c.roundId===r.id&&!s.votes.some(v=>v.roundId===r.id&&v.participantId===c.participantId&&v.justification===c.text)).map(c=><article key={c.id}><b>{sourceLabel(s,c.id)}</b><p>{c.text}</p></article>)}</details>{s.analyses.filter(a=>a.roundId===r.id&&r.status==='CLOSED').map(a=><details key={a.id}><summary>Análise da IA desta rodada</summary><RoundAnalysis state={s} analysis={a}/></details>)}{s.syntheses.filter(x=>x.roundId===r.id&&(x.publishedProposalId||r.status==='CLOSED')).map(x=><details key={x.id}><summary>Sugestão da IA para V{p.version+1} · {x.publishedProposalId?'Publicada após revisão humana':'Rascunho anterior'}</summary><SynthesisDetails state={s} synthesis={x} showText/></details>)}</details>;
  })}<details><summary>Registro técnico de eventos</summary>{s.events.map(e=><p key={e.id}>{new Date(e.at).toLocaleString('pt-BR')} · {e.type} · {e.detail}</p>)}</details></details>;
 }

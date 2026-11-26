@@ -6,7 +6,7 @@ import { makeReceipt, verifyReceipt } from './receipts.js';
 import { ProposalSchema, ReviewSchema, ChoiceSchema, ActiveChoiceSchema, EvaluationSchema } from '../shared/contracts.js';
 import { Repository, type Identity } from './db.js';
 import { AIUnavailable, PROMPT_VERSION, type AIAdapter } from './ai.js';
-import { DomainError,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
+import { DomainError,assertVoter,DepartureKind,pendingVoters,closeRound,removeParticipant,manifestations,currentRound,currentProposal,latestVotes,positions,contribute,vote,addAnalysis,addSynthesis,reconcileSynthesisLinks,publish,closeWithoutConsensus,contest,evaluate,event,exportState,ImportSchema,validateState,statistics,metrics,CoverageSchema, type State, type ReviewRecordType } from './domain.js';
 export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options:{origin?:string;commit?:string|null;aiConfigured?:boolean}={}){
  if(signingKey.length<32)throw new Error('REVIEW_SIGNING_KEY forte obrigatório.');
  const prepare=automaticMediation(repo,ai);
@@ -62,7 +62,7 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
    syntheses:identity.role==='moderator'?s.syntheses:s.syntheses.filter(x=>x.publishedProposalId),contests:s.contests.filter(c=>visible||c.participantId===pid),
    events:identity.role==='moderator'?s.events:s.events.filter(e=>e.actor===pid||['PROPOSAL_PUBLISHED','CONSENSUS_RECORDED','CLOSED_WITHOUT_CONSENSUS'].includes(e.type)),
    evaluations:identity.role==='moderator'?[]:s.evaluations.filter(e=>e.participantId===pid)};
-  return {revision,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:identity.role==='moderator'?s.proposals[0].review.result:null},
+  return {revision,serverNow:Date.now(),pendingVoteCount:identity.role==='moderator'?pendingVoters(s).length:undefined,room:{id:s.decision.id,code:identity.code,topic:p.content.title,proposal:p.content.text,proposal_review:identity.role==='moderator'?s.proposals[0].review.result:null},
    role:identity.role,alias:identity.alias??null,participantId:pid??null,canViewGroup:visible,state:filtered,
    positions:visible?positions(s):positions(s).filter(p=>p.id===pid),
    contributions:filtered.contributions.map(c=>({...c,alias:s.participants.find(p=>p.id===c.participantId)!.alias,created_at:c.createdAt,review:c.review.result,user_choice:c.contest?'ENVIAR_COM_RESSALVA':'ENVIAR'})),
@@ -108,16 +108,17 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  });
  app.post('/api/rooms/:code/view',async(req,res)=>{
   const i=await auth(req);if(i.role==='moderator')void prepare(i);const known=z.number().int().positive().optional().parse(req.body.knownRevision);
-  if(known!==undefined){const current=await repo.latestRevision(i);if(current===known){res.json({revision:current,unchanged:true});return;}}
-  const x=await repo.read(i);res.json(view(x.state,i,x.revision));
+  const x=await repo.read(i);
+  if(known===x.revision){res.json({revision:x.revision,unchanged:true});return;}
+  res.json(view(x.state,i,x.revision));
  });
  app.post('/api/rooms/:code/contribution-review',aiLimit,async(req,res)=>{
   const i=await auth(req,'participant'),b=z.object({text,proposalId:z.string().uuid(),roundId:z.string().uuid(),consent:z.literal(true)}).parse(req.body),{state}=await repo.read(i);
   if(b.proposalId!==currentProposal(state).id||b.roundId!==currentRound(state).id)throw new DomainError('Versão desatualizada.',409);
-  const reserved=await reserveReview(repo,i,b.text,Date.now(),ai.model);
+  const reserved=await reserveReview(repo,i,b.text,Date.now(),ai.model,b);
   try{const review=reserved.cached??await ai.analyzeContribution(currentProposal(state).content,b.text);
    if(!reserved.cached)await finishReview(repo,i,reserved.requestId,review);
-   const latest=(await repo.read(i)).state;if(latest.decision.status!=='OPEN'||currentProposal(latest).id!==b.proposalId)throw new DomainError('A proposta mudou durante a consulta. Nenhum voto foi registrado.',409);
+   const latest=(await repo.read(i)).state;assertVoter(latest,i.participantId!,b.roundId,b.proposalId);
    const binding={roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text};
    res.json({review,availableAt:new Date(Date.parse(reserved.at)+REVIEW_INTERVAL_MS).toISOString(),cached:Boolean(reserved.cached),receipt:makeReceipt(signingKey,'contribution',binding,review),
     rewriteReceipt:review.suggestedRewrite?makeReceipt(signingKey,'contribution',{...binding,text:review.suggestedRewrite},review):null});}
@@ -128,16 +129,16 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  function contributionReview(i:Identity,b:z.infer<typeof contributionBody>){return reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.text});}
  app.post('/api/rooms/:code/contributions',async(req,res)=>{
   const i=await auth(req,'participant'),b=contributionBody.parse(req.body),review=contributionReview(i,b);
-  await repo.mutate(i,b.revision,s=>contribute(s,i.participantId!,b.roundId,b.proposalId,b.text,b.originalText,review,b.contest));
+  await repo.mutate(i,b.revision,(s,at)=>{contribute(s,i.participantId!,b.roundId,b.proposalId,b.text,b.originalText,review,b.contest,at);});
   res.status(201).json({saved:true});
  });
  app.post('/api/rooms/:code/votes',async(req,res)=>{
   const i=await auth(req,'participant'),b=reviewInput.extend({revision,proposalId:z.string().uuid(),roundId:z.string().uuid(),choice:ActiveChoiceSchema,justification:z.string().trim().max(5000).default(''),originalText:z.string().max(5000).optional(),contest:z.string().max(2000).default('')}).parse(req.body);
   if(b.choice==='ACEITO'&&b.justification)throw new DomainError('ACEITO significa aceitar a proposta como está, sem justificativa. Se precisa de alteração, escolha REJEITO e explique.');
   const review=b.justification?reviewRecord(b,'contribution',{roomId:i.roomId,participantId:i.participantId,roundId:b.roundId,proposalId:b.proposalId,text:b.justification}):null;
-  await repo.mutate(i,b.revision,s=>{
-   if(review)contribute(s,i.participantId!,b.roundId,b.proposalId,b.justification,b.originalText??b.justification,review,b.contest);
-   vote(s,i.participantId!,b.roundId,b.proposalId,b.choice,b.justification);
+  await repo.mutate(i,null,(s,at)=>{
+   if(review)contribute(s,i.participantId!,b.roundId,b.proposalId,b.justification,b.originalText??b.justification,review,b.contest,at);
+   vote(s,i.participantId!,b.roundId,b.proposalId,b.choice,b.justification,at);
   });void prepare(i);res.status(201).json({saved:true});
  });
  async function aiAction(req:express.Request,mode:'analysis'|'synthesis'){
@@ -166,9 +167,17 @@ export function createApp(repo:Repository,ai:AIAdapter,signingKey:string,options
  app.post('/api/rooms/:code/synthesize',aiLimit,async(req,res)=>{await aiAction(req,'synthesis');res.json({saved:true});});
  app.post('/api/rooms/:code/publish',async(req,res)=>{
   const i=await auth(req,'moderator'),b=z.object({revision,proposal:ProposalSchema,sourceId:z.string().uuid(),synthesisId:z.string().uuid().optional(),reason:z.string().trim().max(5000).default(''),coverage:CoverageSchema.default([]),confirm:z.literal(true)}).parse(req.body);
-  await repo.mutate(i,b.revision,s=>publish(s,b.proposal,b.sourceId,b.reason,b.synthesisId,b.coverage));res.json({saved:true});
+  await repo.mutate(i,b.revision,(s,at)=>publish(s,b.proposal,b.sourceId,b.reason,b.synthesisId,b.coverage,at));res.json({saved:true});
  });
- app.post('/api/rooms/:code/close',async(req,res)=>{const i=await auth(req,'moderator'),b=z.object({revision,reason:text}).parse(req.body);await repo.mutate(i,b.revision,s=>closeWithoutConsensus(s,b.reason));res.json({saved:true});});
+ app.post('/api/rooms/:code/round-close',async(req,res)=>{
+  const i=await auth(req,'moderator'),b=z.object({roundId:z.string().uuid(),pendingCount:z.number().int().nonnegative(),confirm:z.literal(true)}).parse(req.body);
+  await repo.mutate(i,null,(s,at)=>closeRound(s,b.roundId,b.pendingCount,at));void prepare(i);res.json({saved:true});
+ });
+ app.post('/api/rooms/:code/participant-remove',async(req,res)=>{
+  const i=await auth(req,'moderator'),b=z.object({roundId:z.string().uuid(),participantId:z.string().uuid(),kind:DepartureKind,confirm:z.literal(true)}).parse(req.body);
+  await repo.mutate(i,null,(s,at)=>removeParticipant(s,b.participantId,b.roundId,b.kind,at));void prepare(i);res.json({saved:true});
+ });
+ app.post('/api/rooms/:code/close',async(req,res)=>{const i=await auth(req,'moderator'),b=z.object({revision,reason:text}).parse(req.body);await repo.mutate(i,b.revision,(s,at)=>closeWithoutConsensus(s,b.reason,at));res.json({saved:true});});
  app.post('/api/rooms/:code/contest',async(req,res)=>{const i=await auth(req,'participant'),b=z.object({revision,targetId:z.string().uuid(),text:z.string().trim().min(1).max(2000)}).parse(req.body);await repo.mutate(i,b.revision,s=>{
   if(s.enrollment&&(s.syntheses.some(x=>x.id===b.targetId&&!x.publishedProposalId)||s.analyses.some(a=>a.id===b.targetId&&!s.syntheses.some(x=>x.analysisId===a.id&&x.publishedProposalId))))throw new DomainError('Rascunho reservado ao moderador.',403);
   contest(s,i.participantId!,b.targetId,b.text);

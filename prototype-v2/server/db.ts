@@ -1,6 +1,6 @@
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import type pg from 'pg';
-import { DomainError, createState, validateState, event, type State, type ReviewRecordType } from './domain.js';
+import { DomainError, createState, validateState, event, currentRound, enableRoundVoting, expireRound, type State, type ReviewRecordType } from './domain.js';
 import { RESEARCH_VERSION, RESEARCH_TEXT, RESEARCH_SOURCE, RESEARCH_SHORT_TEXT } from '../shared/research.js';
 import type { ProposalContent } from '../shared/contracts.js';
 
@@ -9,7 +9,7 @@ export interface SQLClient {query(text:string,values?:any[]):Promise<QueryResult
 export interface SQLPool {query(text:string,values?:any[]):Promise<QueryResult>;connect():Promise<SQLClient>;}
 export type Identity={roomId:string;code:string;role:'moderator'|'participant';participantId?:string;alias?:string};
 export class Repository {
- constructor(private pool:SQLPool,private pepper:string){if(pepper.length<32)throw new Error('AUTH_PEPPER forte obrigatório.');}
+ constructor(private pool:SQLPool,private pepper:string,private clock:()=>number=Date.now){if(pepper.length<32)throw new Error('AUTH_PEPPER forte obrigatório.');}
  private hash(token:string){return createHmac('sha256',this.pepper).update(token).digest('hex');}
  private token(){return randomBytes(32).toString('base64url');}
  private equal(a:string,b:string){const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&timingSafeEqual(x,y);}
@@ -17,8 +17,8 @@ export class Repository {
  async create(proposal:ProposalContent,count:number,review:ReviewRecordType,imported?:State,initialDraft?:ProposalContent,selfEnrollment=false){
   const roomId=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),moderatorCredential=this.token();
   const people=Array.from({length:count},(_,i)=>({id:randomUUID(),alias:'P'+String(i+1).padStart(2,'0'),credential:this.token()}));
-  let state=createState(roomId,proposal,people.map(({id,alias})=>({id,alias})),review,initialDraft);
-  if(!imported)state.votingMode='BINARY';
+  let state=createState(roomId,proposal,people.map(({id,alias})=>({id,alias})),review,initialDraft,new Date(this.clock()).toISOString());
+  if(!imported){state.votingMode='BINARY';enableRoundVoting(state);}
   if(imported){
    const mapping=new Map<string,string>([[imported.decision.id,roomId],...imported.participants.map((p,i)=>[p.id,people[i].id] as [string,string])]);
    function remap(value:any):any{if(typeof value==='string')return mapping.get(value)??value;if(Array.isArray(value))return value.map(remap);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,k==='originId'?v:remap(v)]));return value;}
@@ -45,13 +45,18 @@ export class Repository {
    if(version!==s.research.version)throw new DomainError('O termo mudou. Leia a versão atual antes de continuar.',409);
    const hash=this.hash(token);
    const existing=(await c.query('SELECT id,alias FROM dc2_participants WHERE room_id=$1 AND secret_hash=$2',[room.id,hash])).rows[0];
-   if(existing&&s.enrollment.claims.includes(existing.id)){await c.query('COMMIT');return {alias:existing.alias};}
+   if(existing&&s.enrollment.claims.includes(existing.id)){
+    if(s.participants.some(p=>p.id===existing.id&&p.departure))throw new DomainError('Sua saída desta sessão foi registrada.',403);
+    await c.query('COMMIT');return {alias:existing.alias};
+   }
    if(s.decision.status!=='OPEN')throw new DomainError('Esta discussão já foi encerrada.',409);
    const p=s.participants.find(p=>!s.enrollment!.claims.includes(p.id));
    if(!p)throw new DomainError('Todas as vagas previstas para esta sala já foram ocupadas.',409);
+   const at=this.clock();
+   expireRound(s,at);
    await c.query('INSERT INTO dc2_participants(id,room_id,alias,secret_hash) VALUES($1,$2,$3,$4)',[p.id,room.id,p.alias,hash]);
    s.enrollment.claims.push(p.id);
-   s.researchConsents.push({participantId:p.id,response:'SIM',at:new Date().toISOString(),version,actor:'participant'});
+   s.researchConsents.push({participantId:p.id,response:'SIM',at:new Date(at).toISOString(),version,actor:'participant'});
    event(s,p.id,'RESEARCH_CONSENT_RECORDED','SIM; '+version);
    event(s,p.id,'PARTICIPANT_ENROLLED',p.alias);
    validateState(s);
@@ -74,19 +79,56 @@ export class Repository {
   const p=(await this.pool.query('SELECT id,alias FROM dc2_participants WHERE room_id=$1 AND secret_hash=$2',[r.id,hash])).rows[0];
   return p?{roomId:r.id,code,role:'participant',participantId:p.id,alias:p.alias}:null;
  }
- async read(identity:Identity){const row=(await this.pool.query('SELECT revision,state FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];if(!row)throw new DomainError('Sala anterior à migração. Exporte-a pela versão original; não foi alterada.',409);return {revision:row.revision as number,state:validateState(row.state)};}
- async latestRevision(identity:Identity){const row=(await this.pool.query('SELECT revision FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];if(!row)throw new DomainError('Estado da sala indisponível.',409);return row.revision as number;}
- async mutate(identity:Identity,expectedRevision:number,fn:(s:State)=>void){
-  const c=await this.pool.connect();try{
+ async read(identity:Identity){
+  const row=(await this.pool.query('SELECT revision,state FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];
+  if(!row)throw new DomainError('Sala anterior à migração. Exporte-a pela versão original; não foi alterada.',409);
+  const state=validateState(row.state),r=currentRound(state);
+  if(r.status==='OPEN'&&r.voting&&this.clock()>=Date.parse(r.voting.deadlineAt))return this.mutate(identity,null,()=>false);
+  return {revision:row.revision as number,state};
+ }
+ async sweepExpiredRounds(){
+  const {rows}=await this.pool.query(`
+   SELECT r.id AS "roomId",r.code
+   FROM dc2_rooms r
+   CROSS JOIN LATERAL (
+    SELECT state->'rounds'->-1 AS round FROM dc2_snapshots
+    WHERE room_id=r.id ORDER BY revision DESC LIMIT 1
+   ) latest
+   WHERE latest.round->>'status'='OPEN'
+   AND (latest.round->'voting'->>'deadlineAt')::timestamptz <= $1::timestamptz
+  `,[new Date(this.clock()).toISOString()]);
+  for(const row of rows)await this.mutate({...row,role:'moderator'},null,()=>false);
+ }
+ async mutate(identity:Identity,expectedRevision:number|null,fn:(s:State,at:number)=>unknown){
+  const c=await this.pool.connect();
+  let committed=false;
+  try{
    await c.query('BEGIN');
    await c.query('SELECT id FROM dc2_rooms WHERE id=$1 FOR UPDATE',[identity.roomId]);
    const row=(await c.query('SELECT revision,state FROM dc2_snapshots WHERE room_id=$1 ORDER BY revision DESC LIMIT 1',[identity.roomId])).rows[0];
-   if(!row||row.revision!==expectedRevision)throw new DomainError('A sala mudou. Atualize antes de continuar.',409);
-   const s=validateState(row.state);fn(s);validateState(s);
-   await c.query('INSERT INTO dc2_snapshots(room_id,revision,state) VALUES($1,$2,$3)',[identity.roomId,row.revision+1,JSON.stringify(s)]);
-   await c.query('COMMIT');return {revision:row.revision+1,state:s};
-  }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+   if(!row)throw new DomainError('Estado da sala indisponível.',409);
+   const at=this.clock(),s=validateState(row.state),expired=expireRound(s,at);
+   const next=expired?structuredClone(s):s;
+   let changed=false,failed=false,failure:unknown;
+   try{
+    if(expectedRevision!==null&&(row.revision!==expectedRevision||expired))throw new DomainError('A sala mudou. Atualize antes de continuar.',409);
+    changed=fn(next,at)!==false;
+   }catch(e){
+    if(!expired)throw e;
+    // Expiration is authoritative even when the attempted action is too late.
+    failed=true;failure=e;
+   }
+   const state=failed?s:next,revision=row.revision+(changed||expired?1:0);
+   if(changed||expired){
+    validateState(state);
+    await c.query('INSERT INTO dc2_snapshots(room_id,revision,state) VALUES($1,$2,$3)',[identity.roomId,revision,JSON.stringify(state)]);
+   }
+   await c.query('COMMIT');committed=true;
+   if(failed)throw failure;
+   return {revision,state};
+  }catch(e){if(!committed)await c.query('ROLLBACK');throw e;}finally{c.release();}
  }
+
 }
 export function postgresRepository(pool:pg.Pool,pepper:string){return new Repository(pool as unknown as SQLPool,pepper);}
 

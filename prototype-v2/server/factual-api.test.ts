@@ -5,6 +5,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { Repository,type SQLPool } from './db.js';
 import { migrate } from './migrate.js';
 import { createApp } from './app.js';
+import type {exportState} from './domain.js';
 import { FakeAI } from './fixtures.js';
 import {readFile} from 'node:fs/promises';
 test('Pesquisa externa desativada e registros históricos preservados na exportação e restauração',async()=>{
@@ -20,10 +21,10 @@ test('Pesquisa externa desativada e registros históricos preservados na exporta
   for(const file of ['FACTUAL_SESSION_SYNTHETIC','TAVILY_SESSION_SYNTHETIC']){
    const archive=JSON.parse(await readFile(new URL('../docs/evidence/'+file+'.json',import.meta.url),'utf8'));
    const restored=await post('/import',archive);assert.equal(restored.status,201);
-   const {code,moderatorCredential}=await restored.json();
+   const {code,moderatorCredential}=await restored.json() as {code:string;moderatorCredential:string};
    const room='/rooms/'+code;
    assert.equal((await post(room+'/fact-check',{credential:moderatorCredential,text:'Alegação pública sintética.',consent:true})).status,404);
-   const exported=await (await post(room+'/export',{credential:moderatorCredential})).json();
+   const exported=await (await post(room+'/export',{credential:moderatorCredential})).json() as ReturnType<typeof exportState>;
    assert.equal(exported.format,'dc2-consensus');
    assert.equal(exported.version,2);
    assert.deepEqual(exported.state.factualChecks,archive.state.factualChecks.map((f:{participantId:string|null})=>({

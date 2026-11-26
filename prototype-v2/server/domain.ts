@@ -8,7 +8,11 @@ export class DomainError extends Error { constructor(message:string, public stat
 const id=z.string().uuid(), date=z.string().datetime();
 const ReviewRecord=z.object({result:ReviewSchema.nullable(),status:z.enum(['OK','IGNORADA','INDISPONIVEL']),promptVersion:z.string(),model:z.string(),reason:z.string(),appliedRewrite:z.boolean().optional(),choice:z.enum(['USED_REWRITE','KEPT_ORIGINAL','DISCARDED']).optional()});
 const Proposal=z.object({id,version:z.number().int().positive(),parentId:id.nullable(),content:ProposalSchema,createdAt:date,approvedBy:z.string(),review:ReviewRecord,intervention:z.object({kind:z.enum(['APROVACAO_HUMANA','EDICAO_HUMANA']),source:z.enum(['PROPOSTA_ANTERIOR','SINTESE_IA','RASCUNHO_INICIAL','PARECER_INICIAL_IA']),sourceId:id,original:ProposalSchema,published:ProposalSchema,changes:z.array(z.object({field:z.string(),before:z.string(),after:z.string()})),reason:z.string(),at:date,actor:z.literal('moderator')}).optional()});
-const Round=z.object({id,number:z.number().int().positive(),proposalId:id,status:z.enum(['OPEN','CLOSED']),openedAt:date,closedAt:date.nullable()});
+export const ROUND_DURATION_MS=5*60*1000;
+export const DepartureKind=z.enum(['DESISTENCIA','ABANDONO']);
+const RoundClosure=z.enum(['CONSENSO','VOTACAO_CONCLUIDA','MODERADOR','PRAZO_EXPIRADO','SESSAO_ENCERRADA']);
+const Round=z.object({id,number:z.number().int().positive(),proposalId:id,status:z.enum(['OPEN','CLOSED']),openedAt:date,closedAt:date.nullable(),
+ voting:z.object({eligibleIds:z.array(id),deadlineAt:date,closure:z.object({cause:RoundClosure,abstentions:z.array(id)}).optional()}).optional()});
 const Vote=z.object({id,participantId:id,roundId:id,proposalId:id,choice:ChoiceSchema,justification:z.string().max(5000),createdAt:date});
 const Contribution=z.object({id,participantId:id,roundId:id,proposalId:id,originalText:z.string().min(1).max(5000),text:z.string().min(1).max(5000),review:ReviewRecord,contest:z.string().max(2000),createdAt:date});
 const Analysis=z.object({id,proposalId:id,roundId:id,sourceFingerprint:z.string(),factualCheckIds:z.array(id).default([]),result:AssessmentSchema,promptVersion:z.string(),model:z.string(),createdAt:date});
@@ -25,7 +29,7 @@ export const StateSchema=z.object({
  researchConsents:z.array(z.object({participantId:id,response:z.literal('SIM'),at:date,version:z.string(),actor:z.literal('participant')})).default([]),
  mediation:z.object({roundId:id,fingerprint:z.string(),status:z.enum(['RUNNING','READY','FAILED']),startedAt:date,detail:z.string(),stage:z.string().optional(),failureCode:z.string().optional()}).optional(),
  reviewRequests:z.array(z.object({participantId:id,requestId:id,at:date,textHash:z.string(),proposalId:id,roundId:id,status:z.enum(['RUNNING','DONE','FAILED']),review:ReviewSchema.optional()})).max(30).optional(),
- participants:z.array(z.object({id,alias:z.string().regex(/^P\d{2}$/)})).min(2).max(30),
+ participants:z.array(z.object({id,alias:z.string().regex(/^P\d{2}$/),departure:z.object({kind:DepartureKind,roundId:id,at:date}).optional()})).min(2).max(30),
  proposals:z.array(Proposal).min(1),rounds:z.array(Round).min(1),
  factualChecks:z.array(FactualCheckSchema).max(200).default([]),votes:z.array(Vote),contributions:z.array(Contribution),analyses:z.array(Analysis),syntheses:z.array(Synthesis),contests:z.array(Contest),events:z.array(Event),evaluations:z.array(Evaluation),
 });
@@ -40,10 +44,71 @@ export function latestVotes(s:State,roundId=currentRound(s).id){
  for(const v of s.votes)if(v.roundId===roundId)map.set(v.participantId,v);
  return [...map.values()];
 }
-export function positions(s:State){const votes=latestVotes(s);return s.participants.map(p=>({...p,choice:votes.find(v=>v.participantId===p.id)?.choice??'PENDENTE'}));}
-export function unanimous(s:State){const r=currentRound(s);const votes=latestVotes(s);return s.participants.length>=2&&s.participants.every(p=>votes.some(v=>v.participantId===p.id&&v.proposalId===r.proposalId&&v.choice==='ACEITO'));}
-export function createState(roomId:string,proposal:ProposalContent,participants:State['participants'],review:ReviewRecordType,initialDraft:ProposalContent=proposal):State{
- const at=now(),pid=randomUUID();const s:State={
+export function positions(s:State){
+ const r=currentRound(s),votes=latestVotes(s),active=new Set(r.voting?.eligibleIds);
+ return s.participants.map(p=>({...p,choice:votes.find(v=>v.participantId===p.id)?.choice
+  ??(r.voting?.closure?.abstentions.includes(p.id)?'ABSTENCAO':p.departure?.kind)
+  ??(r.voting&&(!active.has(p.id)||r.status==='CLOSED'&&s.enrollment&&!s.enrollment.claims.includes(p.id))?'SEM_VOTO':'PENDENTE')}));
+}
+export function unanimous(s:State){
+ const r=currentRound(s),votes=latestVotes(s),eligible=r.voting?.eligibleIds??s.participants.map(p=>p.id);
+ return eligible.length>=(r.voting?1:2)&&eligible.every(id=>votes.some(v=>v.participantId===id&&v.proposalId===r.proposalId&&v.choice==='ACEITO'));
+}
+export function enableRoundVoting(s:State){
+ const r=currentRound(s);
+ // The first round reserves the seats set by the moderator at room creation.
+ // Later rounds include only the active participants already enrolled.
+ const eligibleIds=s.participants.filter(p=>!p.departure&&(r.number===1||!s.enrollment||s.enrollment.claims.includes(p.id))).map(p=>p.id);
+ r.voting={eligibleIds,deadlineAt:new Date(Date.parse(r.openedAt)+ROUND_DURATION_MS).toISOString()};
+}
+export function pendingVoters(s:State){
+ const r=currentRound(s);
+ if(!r.voting||r.status!=='OPEN')return [];
+ const voted=new Set(latestVotes(s).map(v=>v.participantId));
+ return r.voting.eligibleIds.filter(id=>!voted.has(id)&&s.participants.some(p=>p.id===id&&!p.departure)&&(!s.enrollment||s.enrollment.claims.includes(id)));
+}
+function finishRound(s:State,cause:z.infer<typeof RoundClosure>,at:string){
+ const r=currentRound(s);
+ if(r.status==='CLOSED')return;
+ if(r.voting){
+  const abstentions=pendingVoters(s);
+  r.voting.closure={cause,abstentions};
+  s.events.push({id:randomUUID(),at,actor:['MODERADOR','SESSAO_ENCERRADA'].includes(cause)?'moderator':'system',type:'ROUND_CLOSED',detail:cause+'; '+r.id+'; '+abstentions.length+' abstenção(ões)'});
+ }
+ r.status='CLOSED';r.closedAt=at;
+}
+export function expireRound(s:State,at:number){
+ const r=currentRound(s),deadline=r.voting?.deadlineAt;
+ if(r.status!=='OPEN'||!deadline||at<Date.parse(deadline))return false;
+ finishRound(s,'PRAZO_EXPIRADO',deadline);return true;
+}
+export function closeRound(s:State,roundId:string,confirmedPending:number,at:number){
+ const r=currentRound(s);
+ if(r.id!==roundId||!r.voting)throw new DomainError('Rodada desatualizada.',409);
+ if(r.voting.closure?.cause==='MODERADOR')return false;
+ open(s);
+ if(r.status!=='OPEN')throw new DomainError('Esta rodada já foi encerrada.',409);
+ if(pendingVoters(s).length!==confirmedPending)throw new DomainError('A quantidade de votos pendentes mudou. Confira e confirme novamente.',409);
+ finishRound(s,'MODERADOR',new Date(at).toISOString());
+}
+export function removeParticipant(s:State,pid:string,roundId:string,kind:z.infer<typeof DepartureKind>,at:number){
+ const r=currentRound(s),p=s.participants.find(p=>p.id===pid);
+ if(r.id!==roundId||!r.voting)throw new DomainError('Rodada desatualizada.',409);
+ if(!p||s.enrollment&&!s.enrollment.claims.includes(pid))throw new DomainError('Participante não está inscrito nesta sala.',404);
+ if(p.departure?.kind===kind&&p.departure.roundId===roundId)return false;
+ if(p.departure)throw new DomainError('A saída deste participante já foi registrada.',409);
+ open(s);
+ const timestamp=new Date(at).toISOString();
+ p.departure={kind,roundId,at:timestamp};
+ s.events.push({id:randomUUID(),at:timestamp,actor:'moderator',type:'PARTICIPANT_REMOVED',detail:kind+'; '+pid+'; '+roundId});
+ completeVoting(s,timestamp);
+}
+function completeVoting(s:State,at:string){
+ const r=currentRound(s),votes=latestVotes(s);
+ if(r.status==='OPEN'&&r.voting?.eligibleIds.every(id=>votes.some(v=>v.participantId===id)||s.participants.some(p=>p.id===id&&p.departure)))finishRound(s,'VOTACAO_CONCLUIDA',at);
+}
+export function createState(roomId:string,proposal:ProposalContent,participants:State['participants'],review:ReviewRecordType,initialDraft:ProposalContent=proposal,at=now()):State{
+ const pid=randomUUID();const s:State={
  schemaVersion:2,initialDraft,decision:{id:roomId,originId:roomId,title:proposal.title,status:'OPEN',createdAt:at,closedAt:null,closureReason:''},participants,
  proposals:[{id:pid,version:1,parentId:null,content:proposal,createdAt:at,approvedBy:'moderator',review}],
  rounds:[{id:randomUUID(),number:1,proposalId:pid,status:'OPEN',openedAt:at,closedAt:null}],
@@ -56,22 +121,34 @@ export function createState(roomId:string,proposal:ProposalContent,participants:
  event(s,'moderator','ROOM_CREATED','Proposta inicial confirmada por pessoa responsável.');return s;
 }
 function open(s:State){if(s.decision.status!=='OPEN')throw new DomainError('Processo encerrado.',409);}
-function participant(s:State,pid:string){if(!s.participants.some(p=>p.id===pid))throw new DomainError('Participante não pertence à sala.',403);}
-export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:Choice,justification:string){
+function participant(s:State,pid:string){
+ const p=s.participants.find(p=>p.id===pid);
+ if(!p)throw new DomainError('Participante não pertence à sala.',403);
+ if(p.departure)throw new DomainError('Sua saída desta sessão foi registrada.',403);
+}
+export function assertVoter(s:State,pid:string,roundId:string,proposalId:string,at=Date.now()){
  open(s);participant(s,pid);const r=currentRound(s);
  if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Versão ou rodada desatualizada. Atualize a sala.',409);
+ if(r.status!=='OPEN'||r.voting&&at>=Date.parse(r.voting.deadlineAt))throw new DomainError('O prazo de votação desta rodada terminou.',409);
+ if(r.voting&&(!r.voting.eligibleIds.includes(pid)||s.enrollment&&!s.enrollment.claims.includes(pid)))throw new DomainError('Participante não habilitado nesta rodada.',403);
+ return r;
+}
+export function vote(s:State,pid:string,roundId:string,proposalId:string,choice:Choice,justification:string,at=Date.now()){
+ const r=assertVoter(s,pid,roundId,proposalId,at),timestamp=new Date(at).toISOString();
  if(s.votes.some(v=>v.participantId===pid&&v.roundId===roundId))throw new DomainError('Seu voto nesta rodada já foi registrado. Aguarde o moderador publicar uma nova rodada.',409);
  if(s.votingMode==='BINARY'&&choice==='ACEITO'&&justification.trim())throw new DomainError('ACEITO não recebe justificativa. Se há condição ou ajuste, escolha REJEITO e explique.');
  if(s.votingMode==='BINARY'&&!['ACEITO','REJEITO'].includes(choice))throw new DomainError('Escolha Aceito ou Rejeito.');
  if(['REJEITO','ACEITO_COM_RESSALVAS'].includes(choice)&&!justification.trim())throw new DomainError('Rejeição e aceite com ressalvas exigem justificativa.');
- s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:now()});
+ s.votes.push({id:randomUUID(),participantId:pid,roundId,proposalId,choice,justification:justification.trim(),createdAt:timestamp});
  event(s,pid,'VOTE_RECORDED',choice);
- if(unanimous(s)){s.decision.status='CONSENSUS';s.decision.closedAt=now();s.decision.closureReason='Aceitação explícita de todos na mesma versão.';r.status='CLOSED';r.closedAt=s.decision.closedAt;event(s,'system','CONSENSUS_RECORDED',s.decision.closureReason);}
+ if(unanimous(s)){
+  s.decision.status='CONSENSUS';s.decision.closedAt=timestamp;s.decision.closureReason='Aceitação explícita de todos na mesma versão.';
+  finishRound(s,'CONSENSO',timestamp);event(s,'system','CONSENSUS_RECORDED',s.decision.closureReason);
+ }else completeVoting(s,timestamp);
 }
-export function contribute(s:State,pid:string,roundId:string,proposalId:string,text:string,originalText:string,review:ReviewRecordType,contest:string){
- open(s);participant(s,pid);const r=currentRound(s);
- if(r.id!==roundId||r.proposalId!==proposalId)throw new DomainError('Rodada desatualizada.',409);
- const entry={id:randomUUID(),participantId:pid,roundId,proposalId,text,originalText,review,contest,createdAt:now()};
+export function contribute(s:State,pid:string,roundId:string,proposalId:string,text:string,originalText:string,review:ReviewRecordType,contest:string,at=Date.now()){
+ assertVoter(s,pid,roundId,proposalId,at);
+ const entry={id:randomUUID(),participantId:pid,roundId,proposalId,text,originalText,review,contest,createdAt:new Date(at).toISOString()};
  s.contributions.push(entry);event(s,pid,'CONTRIBUTION_RECORDED',contest?'Parecer contestado.':'Texto preservado.');return entry;
 }
 export function manifestations(s:State){
@@ -170,7 +247,7 @@ export function addSynthesis(s:State,analysisId:string,result:SynthesisResult,mo
  const entry={id:randomUUID(),proposalId:currentProposal(s).id,roundId:currentRound(s).id,analysisId,factualCheckIds:a.factualCheckIds,result,model,promptVersion,createdAt:now(),publishedProposalId:null,humanCoverage:[]};
  s.syntheses.push(entry);event(s,'moderator','SYNTHESIS_DRAFTED');return entry;
 }
-export function publish(s:State,content:ProposalContent,sourceId:string,reason:string,synthesisId?:string,coverage:z.infer<typeof CoverageSchema>=[]){
+export function publish(s:State,content:ProposalContent,sourceId:string,reason:string,synthesisId?:string,coverage:z.infer<typeof CoverageSchema>=[],at=Date.now()){
  open(s);if(sourceId!==currentProposal(s).id)throw new DomainError('Proposta desatualizada.',409);
  const synthesis=synthesisId?s.syntheses.find(x=>x.id===synthesisId&&x.proposalId===sourceId&&!x.publishedProposalId):undefined;
  if(synthesisId&&!synthesis)throw new DomainError('Síntese inválida.');
@@ -181,14 +258,22 @@ export function publish(s:State,content:ProposalContent,sourceId:string,reason:s
  const changes=Object.keys(content).filter(k=>content[k as keyof ProposalContent]!==original[k as keyof ProposalContent]).map(k=>({field:k,before:original[k as keyof ProposalContent],after:content[k as keyof ProposalContent]}));
  if((changes.length||!synthesis)&&!reason.trim())throw new DomainError('Justifique as alterações feitas pelo moderador antes de publicar.');
  reason=reason.trim()||'Sugestão da IA aprovada pelo moderador sem alterações (registro automático).';
- const r=currentRound(s);r.status='CLOSED';r.closedAt=now();
- const proposal={id:randomUUID(),version:s.proposals.length+1,parentId:sourceId,content,createdAt:now(),approvedBy:'moderator',review:{result:null,status:'IGNORADA' as const,promptVersion:'human-review-v1',model:'human',reason}};
+ const r=currentRound(s),timestamp=new Date(at).toISOString();
+ if(r.voting&&r.status==='OPEN')throw new DomainError('Encerre a rodada atual antes de publicar uma nova proposta.',409);
+ finishRound(s,'SESSAO_ENCERRADA',timestamp);
+ const proposal={id:randomUUID(),version:s.proposals.length+1,parentId:sourceId,content,createdAt:timestamp,approvedBy:'moderator',review:{result:null,status:'IGNORADA' as const,promptVersion:'human-review-v1',model:'human',reason}};
  const intervention={kind:changes.length?'EDICAO_HUMANA' as const:'APROVACAO_HUMANA' as const,source:synthesis?'SINTESE_IA' as const:'PROPOSTA_ANTERIOR' as const,sourceId:synthesis?.id??sourceId,original:structuredClone(original),published:structuredClone(content),changes,reason,at:proposal.createdAt,actor:'moderator' as const};
- s.proposals.push({...proposal,intervention});s.rounds.push({id:randomUUID(),number:s.rounds.length+1,proposalId:proposal.id,status:'OPEN',openedAt:now(),closedAt:null});
+ s.proposals.push({...proposal,intervention});s.rounds.push({id:randomUUID(),number:s.rounds.length+1,proposalId:proposal.id,status:'OPEN',openedAt:timestamp,closedAt:null});
+ if(r.voting)enableRoundVoting(s);
  if(synthesis){synthesis.publishedProposalId=proposal.id;synthesis.humanCoverage=coverage;}
  event(s,'moderator','PROPOSAL_PUBLISHED',reason);
 }
-export function closeWithoutConsensus(s:State,reason:string){open(s);if(!reason.trim())throw new DomainError('Informe a razão do encerramento.');s.decision.status='CLOSED_WITHOUT_CONSENSUS';s.decision.closedAt=now();s.decision.closureReason=reason;currentRound(s).status='CLOSED';currentRound(s).closedAt=s.decision.closedAt;event(s,'moderator','CLOSED_WITHOUT_CONSENSUS',reason);}
+export function closeWithoutConsensus(s:State,reason:string,at=Date.now()){
+ open(s);if(!reason.trim())throw new DomainError('Informe a razão do encerramento.');
+ s.decision.status='CLOSED_WITHOUT_CONSENSUS';s.decision.closedAt=new Date(at).toISOString();s.decision.closureReason=reason;
+ finishRound(s,'SESSAO_ENCERRADA',s.decision.closedAt);
+ event(s,'moderator','CLOSED_WITHOUT_CONSENSUS',reason);
+}
 export function contest(s:State,pid:string,targetId:string,text:string){
  participant(s,pid);
  const own=s.contributions.some(c=>c.id===targetId&&c.participantId===pid);
@@ -209,7 +294,7 @@ export function metrics(s:State){
  const coverage=s.syntheses.flatMap(x=>x.humanCoverage);
  const counted=(status:string)=>coverage.filter(x=>x.status===status).length;
  return {automatic:{consensus:s.decision.status==='CONSENSUS',rounds:s.rounds.length,deliberationMs:s.decision.closedAt?Date.parse(s.decision.closedAt)-Date.parse(s.decision.createdAt):null,
- repeatedObjections:repeatedObjections(s),votes:s.votes.length,conditionalAcceptances:s.votes.filter(v=>v.choice==='ACEITO_COM_RESSALVAS').length,objections:s.votes.filter(v=>v.choice==='REJEITO').length,distinctObjectionsByRound:s.rounds.reduce((n,r)=>n+latestVotes(s,r.id).filter(v=>v.choice==='REJEITO').length,0)},
+ repeatedObjections:repeatedObjections(s),votes:s.votes.length,abstentions:s.rounds.reduce((n,r)=>n+(r.voting?.closure?.abstentions.length??0),0),departures:s.participants.filter(p=>p.departure).length,conditionalAcceptances:s.votes.filter(v=>v.choice==='ACEITO_COM_RESSALVAS').length,objections:s.votes.filter(v=>v.choice==='REJEITO').length,distinctObjectionsByRound:s.rounds.reduce((n,r)=>n+latestVotes(s,r.id).filter(v=>v.choice==='REJEITO').length,0)},
  human:{addressed:counted('ATENDIDA'),partial:counted('PARCIAL'),unresolved:counted('NAO_ATENDIDA'),assessed:coverage.length,faithful:coverage.filter(c=>c.faithful===true).length,fidelityAssessed:coverage.filter(c=>c.faithful!==null).length,argumentQuality:null},
  limitation:'Cobertura e fidelidade são avaliações humanas do moderador, não medidas automáticas de qualidade ou resultados científicos.'};
 }
@@ -237,7 +322,23 @@ export function validateState(input:unknown):State{
  if(s.enrollment&&s.votes.some(v=>!s.researchConsents.some(c=>c.participantId===v.participantId)))throw new DomainError('Voto sem concordância prévia.');
  for(let i=0;i<s.proposals.length;i++){const p=s.proposals[i];if(p.version!==i+1||p.parentId!==(i?s.proposals[i-1].id:null))throw new DomainError('Cadeia de propostas inválida.');}
  if(s.rounds.length!==s.proposals.length)throw new DomainError('Rodadas incompatíveis.');
- for(let i=0;i<s.rounds.length;i++){const r=s.rounds[i];if(r.number!==i+1||r.proposalId!==s.proposals[i].id||r.status!==(i===s.rounds.length-1&&s.decision.status==='OPEN'?'OPEN':'CLOSED'))throw new DomainError('Sequência de rodadas inválida.');}
+ for(const p of s.participants)if(p.departure&&!s.rounds.some(r=>r.id===p.departure?.roundId&&r.voting&&Date.parse(p.departure.at)>=Date.parse(r.openedAt)))throw new DomainError('Saída sem rodada válida.');
+ for(let i=0;i<s.rounds.length;i++){
+  const r=s.rounds[i];
+  if(r.number!==i+1||r.proposalId!==s.proposals[i].id||r.status==='OPEN'&&(i!==s.rounds.length-1||s.decision.status!=='OPEN')||!r.voting&&r.status==='CLOSED'&&i===s.rounds.length-1&&s.decision.status==='OPEN')throw new DomainError('Sequência de rodadas inválida.');
+  if(!r.voting)continue;
+  const {eligibleIds,deadlineAt,closure}=r.voting,openedAt=Date.parse(r.openedAt),closedAt=r.closedAt===null?null:Date.parse(r.closedAt);
+  const expected=s.participants.filter(p=>!p.departure||s.rounds.findIndex(x=>x.id===p.departure?.roundId)>=i).map(p=>p.id);
+  if(!unique(eligibleIds)||i===0&&eligibleIds.length!==expected.length||eligibleIds.some(id=>!expected.includes(id))||Date.parse(deadlineAt)!==openedAt+ROUND_DURATION_MS)throw new DomainError('Elegibilidade ou prazo da rodada inválido.');
+  if((r.status==='CLOSED')!==Boolean(closure)||(r.status==='CLOSED')!==(closedAt!==null)||closedAt!==null&&(closedAt<openedAt||closedAt>Date.parse(deadlineAt))||closure?.cause==='PRAZO_EXPIRADO'&&r.closedAt!==deadlineAt)throw new DomainError('Encerramento de rodada incompatível.');
+  const votes=s.votes.filter(v=>v.roundId===r.id);
+  if(!unique(votes.map(v=>v.participantId))||votes.some(v=>!eligibleIds.includes(v.participantId)||Date.parse(v.createdAt)<openedAt||Date.parse(v.createdAt)>=Date.parse(deadlineAt)||closedAt!==null&&Date.parse(v.createdAt)>closedAt))throw new DomainError('Votos incompatíveis com a elegibilidade ou o prazo.');
+  if(closure&&(!unique(closure.abstentions)||closure.abstentions.some(id=>{
+   const departure=s.participants.find(p=>p.id===id)?.departure;
+   return !eligibleIds.includes(id)||votes.some(v=>v.participantId===id)||departure&&Date.parse(departure.at)<closedAt!;
+  })))throw new DomainError('Abstenções incompatíveis com os registros da rodada.');
+ }
+
  for(const v of [...s.votes,...s.contributions]){if(!pids.has(v.participantId)||!s.rounds.some(r=>r.id===v.roundId&&r.proposalId===v.proposalId))throw new DomainError('Manifestação com vínculo inválido.');}
  if(s.votes.some(v=>['REJEITO','ACEITO_COM_RESSALVAS'].includes(v.choice)&&!v.justification.trim()))throw new DomainError('Rejeição sem justificativa.');
  for(const a of s.analyses){const r=s.rounds.find(r=>r.id===a.roundId&&r.proposalId===a.proposalId);if(!r||a.result.individualAssessments.some(x=>!s.votes.some(v=>v.id===x.voteId&&v.roundId===r.id&&v.choice==='REJEITO')))throw new DomainError('Análise com vínculo inválido.');}

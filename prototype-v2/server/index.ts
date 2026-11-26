@@ -12,7 +12,18 @@ const config=runtimeConfig(process.env);
 const pool=new pg.Pool({connectionString:config.database,max:5,connectionTimeoutMillis:5000,idleTimeoutMillis:30000});
 const providerBudget=new PostgresProviderBudget(pool);
 const queue=new GeminiQueue(providerBudget);
-const app=createApp(postgresRepository(pool,config.pepper),new GeminiAdapter(undefined,undefined,{queue}),config.signingKey,{origin:config.origin,commit:config.commit,aiConfigured:config.aiConfigured});
+const repo=postgresRepository(pool,config.pepper);
+const app=createApp(repo,new GeminiAdapter(undefined,undefined,{queue}),config.signingKey,{origin:config.origin,commit:config.commit,aiConfigured:config.aiConfigured});
 if(config.production||process.env.SERVE_FRONTEND==='true')serveFrontend(app,fileURLToPath(new URL('../dist',import.meta.url)));
 const server=app.listen(config.port,config.host,()=>console.log(JSON.stringify({event:'API_V2_READY',port:config.port,commit:config.commit,aiConfigured:config.aiConfigured})));
-for(const signal of ['SIGTERM','SIGINT'] as const)process.on(signal,()=>{server.close(()=>{void pool.end();});setTimeout(()=>{process.exit(1);},25000).unref();});
+let sweeping=false;
+async function sweep(){
+ if(sweeping)return;
+ sweeping=true;
+ try{await repo.sweepExpiredRounds();}
+ catch(error){console.warn('ROUND_EXPIRATION_SWEEP_FAILED',error instanceof Error?error.name:'unknown');}
+ finally{sweeping=false;}
+}
+void sweep();
+const expirationTimer=setInterval(()=>void sweep(),5000).unref();
+for(const signal of ['SIGTERM','SIGINT'] as const)process.on(signal,()=>{clearInterval(expirationTimer);server.close(()=>{void pool.end();});setTimeout(()=>{process.exit(1);},25000).unref();});
